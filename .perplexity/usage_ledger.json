@@ -540,8 +540,8 @@
     ]
   },
   "2025-W36": {
-    "total_cost": 2.0654419999999996,
-    "request_count": 31,
+    "total_cost": 2.3855939999999993,
+    "request_count": 36,
     "requests": [
       {
         "timestamp": "2025-09-01 01:45:00.168500",
@@ -880,6 +880,61 @@
         "output_tokens": 1323,
         "searches_performed": 5,
         "estimated_cost": 0.079454,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-09-01 20:20:42.197913",
+        "model": "sonar-pro",
+        "input_tokens": 338,
+        "output_tokens": 1508,
+        "searches_performed": 5,
+        "estimated_cost": 0.064028,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-09-01 20:21:01.585406",
+        "model": "sonar-pro",
+        "input_tokens": 338,
+        "output_tokens": 1216,
+        "searches_performed": 5,
+        "estimated_cost": 0.064028,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-09-01 20:21:31.856848",
+        "model": "sonar-pro",
+        "input_tokens": 338,
+        "output_tokens": 1553,
+        "searches_performed": 5,
+        "estimated_cost": 0.064028,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-09-01 20:21:52.136197",
+        "model": "sonar-pro",
+        "input_tokens": 339,
+        "output_tokens": 1353,
+        "searches_performed": 5,
+        "estimated_cost": 0.06403400000000001,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-09-01 20:22:36.529998",
+        "model": "sonar-pro",
+        "input_tokens": 339,
+        "output_tokens": 1727,
+        "searches_performed": 5,
+        "estimated_cost": 0.06403400000000001,
         "actual_cost": null,
         "cache_hit": false,
         "complexity_score": 10
