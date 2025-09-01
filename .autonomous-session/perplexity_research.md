@@ -1,88 +1,107 @@
 # 🔍 Perplexity Browser Research Results
 
-**Generated**: 2025-09-01T02:05:13.407749
+**Generated**: 2025-09-01T06:40:00.074422
 
-## 🚧 2025+ Research-Derived Roadmap Enhancements (EchoTune AI)
+## EchoTune AI — Updated Roadmap Section (2025-2026)
 
-### High-Priority Tasks & Emerging Trends
+### 🚩 High-Priority Tasks & Research-Derived Improvements
 
-**1. AI-Driven Personalization & Contextualization**  
-- **Task:** Implement *hyper-personalized playlisting* and *context-aware recommendations* using advanced user modeling (activity, mood, time, location)[3][2].  
-  *Complexity:* 7  
-- **Task:** Integrate *AI-powered remixing* and *auto-mashup* tools for user-generated content, leveraging generative models for stems and transitions[1][5].  
-  *Complexity:* 8  
-- **Task:** Add *real-time mood detection* from audio input or user feedback to dynamically adjust recommendations and playlist flow[3].  
-  *Complexity:* 6  
+#### 1. **AI-Driven Creative Collaboration & Personalization**
+- **Integrate AI-powered music creation tools** (e.g., AI mastering, voice cloning, genre transformation) for user-generated content and remixing[1][4].
+  - *Complexity*: 8
+- **Expand contextual recommendation algorithms** to leverage activity, mood, and real-time context, not just historical listening[2][3].
+  - *Complexity*: 7
+- **Implement explainable AI for recommendations**: surface why tracks are suggested, with user-facing transparency[1][2].
+  - *Complexity*: 6
+- **Support for Spotify ‘Music Pro’ features**: early access, AI remixing, high-fidelity audio, and superfan engagement tools[2].
+  - *Complexity*: 7
 
-**2. AI Collaboration & Creative Tools**  
-- **Task:** Enable *text-to-music* and *AI lyric generation* features, allowing users to create or extend tracks via natural language prompts[1][5].  
-  *Complexity:* 8  
-- **Task:** Integrate *AI mastering* and *smart distribution* (auto-tagging, metadata suggestion) for user uploads[5].  
-  *Complexity:* 7  
-- **Task:** Offer *AI voice cloning* and *virtual collaboration* tools for creators, supporting genre/style transfer and vocal transformations[5].  
-  *Complexity:* 8  
+#### 2. **Emerging Technologies & Frontend Modernization**
+- **Upgrade frontend to React 19** and adopt concurrent rendering for improved UI responsiveness and scalability[2].
+  - *Complexity*: 6
+- **Integrate MCP (Model Context Protocol) for unified AI provider orchestration**; enable seamless provider failover and multi-model blending[1].
+  - *Complexity*: 7
+- **Add client-side AI for real-time audio feature visualization** (e.g., radar/sparkline charts for mood, energy, valence)[2].
+  - *Complexity*: 5
 
-**3. Advanced Analytics & Engagement**  
-- **Task:** Expand analytics to include *superfan engagement metrics* (e.g., early access, exclusive content, AI-powered fan insights)[3].  
-  *Complexity:* 5  
-- **Task:** Implement *real-time audience feedback* and *adaptive playlisting* during live sessions or listening parties[2][3].  
-  *Complexity:* 6  
+#### 3. **Performance Optimization Opportunities**
+- **Persist rolling API latency/error metrics to Redis** for multi-instance aggregation and dashboarding (in progress).
+  - *Complexity*: 7
+- **Implement MongoDB compound and TTL indexes** for analytics and telemetry data rotation[2].
+  - *Complexity*: 6
+- **Enable response streaming for large analytics datasets** to reduce dashboard load times[2].
+  - *Complexity*: 6
+- **Prometheus metrics export** for real-time alerting and monitoring[2].
+  - *Complexity*: 5
+- **Memory profiling with clinic.js** and automated performance regression detection[2].
+  - *Complexity*: 5
 
-**4. Performance Optimization**  
-- **Task:** Adopt *edge caching/CDN* for audio assets and ML inference to reduce latency for global users[3].  
-  *Complexity:* 6  
-- **Task:** Integrate *incremental hydration* and *React 19 server components* for faster, more interactive UI loads[3].  
-  *Complexity:* 5  
-- **Task:** Optimize MongoDB with *sharding* and *advanced indexing* for high-volume analytics and recommendation queries.  
-  *Complexity:* 7  
+#### 4. **Security & Ethical Enhancements**
+- **Integrate OpenTelemetry distributed tracing** for end-to-end observability and incident response[2].
+  - *Complexity*: 7
+- **Expand Jest integration/security tests** for MCP endpoints and provider health (in progress).
+  - *Complexity*: 5
+- **Implement provider key vault and rotation policies**; automate detection of leaked/expired keys.
+  - *Complexity*: 6
+- **Adopt ethical AI guidelines**: ensure all AI-generated content is licensed, artist-approved, and credits are surfaced in UI[4][5].
+  - *Complexity*: 6
+- **Surface algorithmic bias and diversity metrics** in recommendation analytics; allow users to opt-in for genre/artist discovery[5].
+  - *Complexity*: 6
 
-**5. Security & Compliance Enhancements**  
-- **Task:** Implement *AI-driven anomaly detection* for fraud, abuse, and copyright violations in uploads and user activity.  
-  *Complexity:* 7  
-- **Task:** Enforce *OAuth 2.1* and *PKCE* for all third-party integrations (Spotify, Google, etc.).  
-  *Complexity:* 5  
-- **Task:** Add *granular audit logging* and *user consent management* for all AI-generated content and data usage.  
-  *Complexity:* 6  
-
----
-
-### Updated Priorities (2025+)
-
-| Priority | Area                        | Rationale                                                                                 |
-|----------|-----------------------------|-------------------------------------------------------------------------------------------|
-| 1        | Hyper-personalization       | Industry shift to context-aware, mood-based, and superfan experiences[3][2].              |
-| 2        | AI creative collaboration   | Demand for text-to-music, AI remixing, and virtual collabs is rapidly growing[1][5].      |
-| 3        | Performance at scale        | Global user base and real-time features require low-latency, scalable infrastructure[3].   |
-| 4        | Security & compliance       | AI content raises new risks; proactive detection and user controls are essential.       |
-| 5        | Analytics & engagement      | Superfan tiers and adaptive experiences drive retention and monetization[3].               |
+#### 5. **User Engagement & Superfan Features**
+- **Develop superfan engagement modules**: exclusive content, early access, and AI-powered remixing for premium users[2].
+  - *Complexity*: 7
+- **Integrate social discovery and collaborative playlist creation** with real-time AI suggestions[2].
+  - *Complexity*: 6
 
 ---
 
-### Implementation Suggestions
+### 📈 Updated Priorities (2025-2026)
 
-- **Leverage latest LLMs** (e.g., GPT-4o, Gemini 2.0) for *natural language music creation* and *explainable recommendations*.
-- **Adopt Spotify’s new APIs** (2024-2025) for *AI DJ*, *superfan features*, and *real-time playlist curation*[3].
-- **Utilize React 19 features** (server components, concurrent rendering) for *snappier, modular UIs*.
-- **Integrate OpenTelemetry** for *end-to-end tracing* and *performance monitoring* across distributed services.
-- **Deploy AI moderation** (e.g., Google’s Perspective API, custom ML) for *content safety* and *copyright compliance*.
-
----
-
-### Performance Optimization Opportunities
-
-- **Edge inference**: Deploy lightweight ML models at the CDN edge for instant recommendations and mood detection[3].
-- **Incremental analytics**: Use MongoDB change streams and TTL indexes for *real-time, low-latency dashboards*.
-- **Frontend bundle splitting**: Further reduce JS payloads with React 19’s async loading and granular code splitting.
+| Priority | Task/Feature | Rationale |
+|----------|--------------|-----------|
+| High     | Contextual AI recommendations, explainability, and personalization | Industry shift to context-based listening and hyper-personalization[2][3] |
+| High     | AI-powered creative tools (mastering, voice cloning, remixing) | AI as a creative collaborator and user engagement driver[1][4] |
+| High     | Security, tracing, and ethical AI compliance | Growing scrutiny on AI ethics, artist compensation, and data privacy[4][5] |
+| Medium   | Performance optimization (Redis, MongoDB, streaming, Prometheus) | Scalability and reliability for production deployment[2] |
+| Medium   | Frontend modernization (React 19, client-side AI visualizations) | Improved UX and maintainability[2] |
+| Medium   | Superfan and social features | Competitive differentiation and user retention[2] |
 
 ---
 
-### Security Enhancement Recommendations
+### 🛠️ Implementation Suggestions
 
-- **AI-powered abuse detection**: Monitor uploads and user interactions for suspicious patterns using anomaly detection.
-- **OAuth 2.1 everywhere**: Upgrade all integrations to latest OAuth standards with PKCE for enhanced security.
-- **Consent & transparency**: Provide clear user controls and audit trails for all AI-generated content and data sharing.
-- **Regular security audits**: Schedule automated and manual reviews of all AI/ML pipelines and third-party integrations.
+- **Leverage open-source AI music libraries** (e.g., Kits.AI, Endel) for rapid prototyping of creative features[4].
+- **Adopt Spotify’s latest API endpoints** for playlist creation, remixing, and high-fidelity streaming[2].
+- **Use React 19’s concurrent features** for smoother UI updates, especially in analytics and discovery panels[2].
+- **Integrate Prometheus and OpenTelemetry** for unified monitoring and distributed tracing[2].
+- **Automate ethical compliance checks** for AI-generated content; display licensing and credits in the UI[4][5].
+- **Implement Redis-backed rolling metrics** for real-time performance dashboards and multi-instance support[2].
 
 ---
 
-*These tasks and priorities reflect the latest research and industry trends for AI-powered music platforms in 2025. Each item includes a complexity estimate (1–10) to support sprint planning and resource allocation.*
+### 🔒 Security Enhancement Recommendations
+
+- **Provider key vault with automated rotation and leak detection**.
+- **Distributed tracing for all API calls and provider interactions**.
+- **Expanded security test coverage for all MCP endpoints**.
+- **User-facing privacy controls for AI recommendations and data usage**.
+- **Algorithmic bias monitoring and opt-in diversity features**.
+
+---
+
+### 📋 Actionable Tasks (with Complexity Estimates)
+
+- [ ] Integrate AI mastering and voice cloning tools (8)
+- [ ] Expand contextual recommendation engine and explainability UI (7)
+- [ ] Upgrade frontend to React 19 and add client-side feature visualizations (6)
+- [ ] Persist rolling metrics to Redis and enable Prometheus export (7)
+- [ ] Implement MongoDB compound/TTL indexes and response streaming (6)
+- [ ] Integrate OpenTelemetry tracing and memory profiling (7)
+- [ ] Expand security tests and provider key management (6)
+- [ ] Surface ethical AI compliance and diversity metrics in analytics (6)
+- [ ] Develop superfan engagement and social discovery modules (7)
+
+---
+
+*This section synthesizes current music AI/ML trends, Spotify API updates, frontend modernization, MCP integration, performance, and security best practices for EchoTune’s next development phase[1][2][3][4][5].*
