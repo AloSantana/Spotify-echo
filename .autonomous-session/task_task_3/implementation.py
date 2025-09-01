@@ -1,9 +1,9 @@
 
-# Task: Expand Jest Integration/Security Tests for MCP Endpoints
-# Description: Add new Jest tests to cover MCP endpoints and provider health checks, focusing on integration and basic security (e.g., input validation, error handling).
-# Files to modify: ['tests/integration/mcp.test.js', 'src/api/routes/mcp.js']
+# Task: Add Provider Quick-Switch to EnhancedChatInterface.jsx
+# Description: Enable users to quickly switch LLM providers in the chat interface using the useLLM() hook and display the current provider as a chip/badge.
+# Files to modify: ['frontend/components/EnhancedChatInterface.jsx']
 
-print("Implementing: Expand Jest Integration/Security Tests for MCP Endpoints")
+print("Implementing: Add Provider Quick-Switch to EnhancedChatInterface.jsx")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

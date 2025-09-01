@@ -3,88 +3,98 @@
     {
       "id": "task_1",
       "title": "Persist Rolling Window Metrics to Redis",
-      "description": "Implement logic to persist API latency and error metrics in a rolling window to Redis for durability and multi-instance aggregation. This will improve observability and reliability of performance metrics across deployments.",
+      "description": "Implement persistence of API latency and error metrics to Redis for durability and multi-instance aggregation. This will ensure metrics are not lost on server restart and can be aggregated across instances.",
       "priority": "high",
-      "estimated_time": "60-90 minutes",
+      "estimated_time": "45-60 minutes",
       "files_to_modify": [
         "scripts/bench/api-latency.js",
-        "src/utils/metrics.js",
+        "src/api/middleware/metrics.js",
         "src/config/redis.js"
       ],
       "implementation_steps": [
         "Add Redis client initialization in src/config/redis.js if not present.",
-        "Update scripts/bench/api-latency.js to write rolling window metrics to Redis after each measurement.",
-        "Modify src/utils/metrics.js to support reading/writing rolling window data from Redis.",
-        "Test with local Redis instance to ensure metrics persist and aggregate correctly."
-      ],
-      "complexity_score": 7
-    },
-    {
-      "id": "task_2",
-      "title": "TypeScript Migration Plan for High-Change Backend Modules",
-      "description": "Draft and begin implementing a migration plan to convert high-change backend modules (e.g., src/api/routes/*, src/chat/*) from JavaScript to TypeScript, starting with type annotations and tsconfig updates.",
-      "priority": "medium",
-      "estimated_time": "60 minutes",
-      "files_to_modify": [
-        "src/api/routes/*",
-        "src/chat/*",
-        "tsconfig.json",
-        "package.json"
-      ],
-      "implementation_steps": [
-        "Create or update tsconfig.json for backend.",
-        "Rename one or two high-change files (e.g., src/api/routes/someRoute.js) to .ts.",
-        "Add basic type annotations for function parameters and return types.",
-        "Update package.json scripts to include TypeScript compilation.",
-        "Verify build and run tests to ensure no regressions."
+        "Update scripts/bench/api-latency.js to write rolling window metrics to Redis after each run.",
+        "Modify metrics middleware to read/write rolling window data from/to Redis instead of in-memory only.",
+        "Test with local Redis instance to verify durability and multi-instance aggregation."
       ],
       "complexity_score": 6
     },
     {
-      "id": "task_3",
-      "title": "Expand Jest Integration/Security Tests for MCP Endpoints",
-      "description": "Add new Jest tests to cover MCP endpoints and provider health checks, focusing on integration and basic security (e.g., input validation, error handling).",
-      "priority": "high",
-      "estimated_time": "45-60 minutes",
+      "id": "task_2",
+      "title": "TypeScript Migration Plan for High-Change Backend Modules",
+      "description": "Draft and commit a migration plan for converting backend modules with high change-rate (e.g., src/api/routes/*, src/chat/*) to TypeScript. This should include a prioritized list, migration guidelines, and initial type definitions.",
+      "priority": "medium",
+      "estimated_time": "30-45 minutes",
       "files_to_modify": [
-        "tests/integration/mcp.test.js",
-        "src/api/routes/mcp.js"
+        "MIGRATION_PLAN.md",
+        "src/api/routes/",
+        "src/chat/"
       ],
       "implementation_steps": [
-        "Identify untested MCP endpoints and provider health routes.",
-        "Write new Jest test cases for endpoint responses, error handling, and edge cases.",
-        "Run tests and ensure coverage increases.",
-        "Document new tests in WORKFLOW_STATE.md."
+        "Create MIGRATION_PLAN.md outlining the migration order and rationale.",
+        "List modules by change frequency and technical risk.",
+        "Add example tsconfig.json and initial type definitions for one module.",
+        "Commit plan and sample conversion for review."
       ],
       "complexity_score": 5
     },
     {
-      "id": "task_4",
-      "title": "Containerize Node Backend and React Frontend with Dockerfiles",
-      "description": "Write simple Dockerfiles for the Node backend and React frontend, and add a docker-compose.yml for local development orchestration.",
-      "priority": "medium",
-      "estimated_time": "60-90 minutes",
+      "id": "task_3",
+      "title": "Add Provider Quick-Switch to EnhancedChatInterface.jsx",
+      "description": "Enable users to quickly switch LLM providers in the chat interface using the useLLM() hook and display the current provider as a chip/badge.",
+      "priority": "high",
+      "estimated_time": "30-45 minutes",
       "files_to_modify": [
-        "Dockerfile.backend",
-        "Dockerfile.frontend",
-        "docker-compose.yml",
-        "README.md"
+        "frontend/components/EnhancedChatInterface.jsx"
       ],
       "implementation_steps": [
-        "Create Dockerfile.backend for Node backend (install deps, copy code, set CMD).",
-        "Create Dockerfile.frontend for React frontend (build static files, serve with nginx or similar).",
-        "Write docker-compose.yml to orchestrate both services.",
-        "Update README.md with build/run instructions.",
-        "Test local build and startup."
+        "Import and use the useLLM() hook in EnhancedChatInterface.jsx.",
+        "Add a dropdown or button group for provider selection.",
+        "Display the current provider as a chip/badge in the chat UI.",
+        "Test provider switching and UI updates."
       ],
-      "complexity_score": 7
+      "complexity_score": 4
+    },
+    {
+      "id": "task_4",
+      "title": "Add Mood Settings Radar/Sparkline to EnhancedMusicDiscovery.jsx",
+      "description": "Implement a client-only radar or sparkline chart to visualize moodSettings values in the music discovery interface.",
+      "priority": "medium",
+      "estimated_time": "30-45 minutes",
+      "files_to_modify": [
+        "frontend/components/EnhancedMusicDiscovery.jsx"
+      ],
+      "implementation_steps": [
+        "Select a lightweight charting library (e.g., Chart.js, Recharts) if not already present.",
+        "Add a radar or sparkline chart component to display moodSettings.",
+        "Bind chart data to current moodSettings state.",
+        "Test with mock data for visual correctness."
+      ],
+      "complexity_score": 4
+    },
+    {
+      "id": "task_5",
+      "title": "Expand Jest Integration/Security Tests for MCP Endpoints",
+      "description": "Add new Jest tests to cover MCP endpoints and provider health checks, focusing on integration and basic security validation.",
+      "priority": "medium",
+      "estimated_time": "45-60 minutes",
+      "files_to_modify": [
+        "tests/integration/mcpEndpoints.test.js",
+        "src/api/routes/providers.js"
+      ],
+      "implementation_steps": [
+        "Identify untested MCP endpoints and provider health routes.",
+        "Write integration tests for endpoint responses, error handling, and security edge cases.",
+        "Run tests and ensure coverage is reported.",
+        "Document any uncovered areas for future work."
+      ],
+      "complexity_score": 5
     }
   ],
   "next_research_topics": [
     "Implementing circuit breaker pattern for provider failover in Node.js",
     "Best practices for OpenTelemetry distributed tracing integration",
-    "MongoDB compound and TTL indexes for analytics data rotation",
-    "Efficient response streaming for large datasets in Express.js"
+    "Efficient MongoDB compound and TTL index strategies for analytics data"
   ],
   "completion_percentage": 75
 }
