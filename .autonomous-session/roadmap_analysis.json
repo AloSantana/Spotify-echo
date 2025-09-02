@@ -3,98 +3,95 @@
     {
       "id": "task_1",
       "title": "Persist Rolling Window Metrics to Redis",
-      "description": "Implement logic to persist API latency and error metrics in a rolling window to Redis for durability and multi-instance aggregation. This will improve reliability and scalability of performance monitoring.",
+      "description": "Implement logic to persist API latency and error metrics in a rolling window to Redis for durability and multi-instance aggregation. This will improve observability and reliability of performance data across deployments.",
       "priority": "high",
       "estimated_time": "60-90 minutes",
       "files_to_modify": [
         "scripts/bench/api-latency.js",
-        "src/api/middleware/metrics.js",
-        "config/redis.js"
+        "src/utils/metrics.js",
+        "src/config/redis.js"
       ],
       "implementation_steps": [
-        "Add Redis connection setup in config/redis.js.",
-        "Modify metrics middleware to write rolling window data to Redis after each request.",
-        "Update scripts/bench/api-latency.js to read/write metrics from Redis if available.",
-        "Test multi-instance aggregation by simulating concurrent writes."
+        "Add Redis client initialization in src/config/redis.js if not present.",
+        "Update scripts/bench/api-latency.js to write rolling window metrics to Redis after each run.",
+        "Modify src/utils/metrics.js to support reading/writing rolling window data from/to Redis.",
+        "Test persistence and retrieval of metrics across restarts and multiple instances."
       ],
       "complexity_score": 7
     },
     {
       "id": "task_2",
       "title": "TypeScript Migration Plan for High-Change Backend Modules",
-      "description": "Draft and begin implementing a migration plan to convert backend modules with high change-rate (e.g., src/api/routes/*, src/chat/*) from JavaScript to TypeScript for improved type safety and maintainability.",
+      "description": "Draft and commit a migration plan for converting backend modules with high change-rate (e.g., src/api/routes/*, src/chat/*) to TypeScript, including a prioritized file list and migration guidelines.",
       "priority": "medium",
-      "estimated_time": "60 minutes",
+      "estimated_time": "30-45 minutes",
       "files_to_modify": [
+        "MIGRATION_PLAN.md",
         "src/api/routes/*",
-        "src/chat/*",
-        "tsconfig.json"
+        "src/chat/*"
       ],
       "implementation_steps": [
-        "Create tsconfig.json with appropriate settings.",
-        "Identify and list high-change files for migration.",
-        "Convert one representative file (e.g., src/api/routes/example.js) to TypeScript.",
-        "Document migration steps and common patterns for team reference."
-      ],
-      "complexity_score": 6
-    },
-    {
-      "id": "task_3",
-      "title": "Expand Jest Integration/Security Tests for MCP Endpoints",
-      "description": "Add and enhance Jest tests to cover MCP endpoints and provider health, focusing on security and reliability. This will increase test coverage and catch regressions early.",
-      "priority": "high",
-      "estimated_time": "45-60 minutes",
-      "files_to_modify": [
-        "tests/mcpEndpoints.test.js",
-        "src/api/routes/providers.js"
-      ],
-      "implementation_steps": [
-        "Review existing MCP endpoint logic for test gaps.",
-        "Write new Jest tests for edge cases and error handling.",
-        "Add security-focused tests (e.g., input validation, authentication).",
-        "Run test suite and verify coverage improvements."
+        "Create MIGRATION_PLAN.md outlining migration order and guidelines.",
+        "List high-change files in src/api/routes/* and src/chat/* for initial migration.",
+        "Add TypeScript configuration notes and any required tsconfig updates."
       ],
       "complexity_score": 5
     },
     {
-      "id": "task_4",
-      "title": "EnhancedChatInterface: Provider Quick-Switch and Badge",
-      "description": "Add provider quick-switch functionality and display the current provider badge in EnhancedChatInterface.jsx using useLLM(). Improves user experience and transparency.",
+      "id": "task_3",
+      "title": "Expand Jest Integration/Security Tests for MCP Endpoints",
+      "description": "Add new Jest tests to cover MCP endpoints and provider health checks, focusing on integration and basic security validation.",
       "priority": "medium",
-      "estimated_time": "30-45 minutes",
+      "estimated_time": "45-60 minutes",
       "files_to_modify": [
-        "src/components/EnhancedChatInterface.jsx"
+        "tests/integration/mcp.test.js",
+        "tests/integration/providers.test.js"
       ],
       "implementation_steps": [
-        "Implement provider quick-switch dropdown using useLLM().",
-        "Add UI element to show current provider badge.",
-        "Test switching behavior and badge updates."
+        "Identify untested MCP endpoints and provider health routes.",
+        "Write integration tests for endpoint responses, error handling, and security headers.",
+        "Run tests and ensure coverage is reported in CI."
       ],
-      "complexity_score": 4
+      "complexity_score": 6
+    },
+    {
+      "id": "task_4",
+      "title": "EnhancedChatInterface: Provider Quick-Switch and Badge",
+      "description": "Add a provider quick-switch UI and current provider badge to EnhancedChatInterface.jsx using useLLM().",
+      "priority": "high",
+      "estimated_time": "30-45 minutes",
+      "files_to_modify": [
+        "frontend/components/EnhancedChatInterface.jsx"
+      ],
+      "implementation_steps": [
+        "Import and use useLLM() hook to access provider switching logic.",
+        "Add a dropdown or button group for provider selection.",
+        "Display the current provider as a badge or chip in the chat UI.",
+        "Test switching providers and UI updates."
+      ],
+      "complexity_score": 5
     },
     {
       "id": "task_5",
       "title": "EnhancedMusicDiscovery: Mood Sliders and Feature Visualization",
-      "description": "Add client-only radar/sparkline visualization for moodSettings values in EnhancedMusicDiscovery.jsx. This will make music discovery more interactive and visually informative.",
+      "description": "Implement client-only mood sliders and a mini radar/sparkline visualization for moodSettings values in EnhancedMusicDiscovery.jsx.",
       "priority": "medium",
-      "estimated_time": "45 minutes",
+      "estimated_time": "45-60 minutes",
       "files_to_modify": [
-        "src/components/EnhancedMusicDiscovery.jsx"
+        "frontend/components/EnhancedMusicDiscovery.jsx"
       ],
       "implementation_steps": [
-        "Design and implement radar/sparkline chart for moodSettings.",
-        "Integrate chart into the music discovery UI.",
-        "Test with mock data for correct rendering."
+        "Add slider components for moodSettings (e.g., energy, valence).",
+        "Implement a radar or sparkline chart using a lightweight chart library or SVG.",
+        "Bind slider values to the visualization and ensure real-time updates."
       ],
-      "complexity_score": 4
+      "complexity_score": 6
     }
   ],
   "next_research_topics": [
-    "Implementing circuit breaker pattern for provider failover",
-    "Request correlation IDs for end-to-end tracing",
+    "Circuit breaker pattern implementation for provider failover in Node.js",
     "MongoDB compound and TTL indexes for analytics optimization",
-    "Prometheus metrics export for backend alerting",
-    "OpenTelemetry distributed tracing integration"
+    "OpenTelemetry distributed tracing integration for Node.js/React apps"
   ],
   "completion_percentage": 75
 }

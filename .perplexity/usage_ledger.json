@@ -540,8 +540,8 @@
     ]
   },
   "2025-W36": {
-    "total_cost": 2.860657999999999,
-    "request_count": 43,
+    "total_cost": 3.015569999999999,
+    "request_count": 45,
     "requests": [
       {
         "timestamp": "2025-09-01 01:45:00.168500",
@@ -1010,6 +1010,28 @@
         "model": "sonar-pro",
         "input_tokens": 2910,
         "output_tokens": 1757,
+        "searches_performed": 5,
+        "estimated_cost": 0.07946,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-09-02 06:37:30.671803",
+        "model": "sonar-pro",
+        "input_tokens": 2242,
+        "output_tokens": 1061,
+        "searches_performed": 5,
+        "estimated_cost": 0.075452,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-09-02 06:38:00.541265",
+        "model": "sonar-pro",
+        "input_tokens": 2910,
+        "output_tokens": 1390,
         "searches_performed": 5,
         "estimated_cost": 0.07946,
         "actual_cost": null,
