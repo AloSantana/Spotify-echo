@@ -1,7 +1,7 @@
 
 # Task: Persist Rolling Window Metrics to Redis
-# Description: Implement persistence of API latency and error metrics using Redis to enable durability and aggregation across multiple instances. This will improve observability and reliability of performance monitoring.
-# Files to modify: ['scripts/bench/api-latency.js', 'src/api/middleware/metrics.js', 'src/config/redis.js']
+# Description: Implement persistence of rolling window API performance metrics to Redis for durability and multi-instance aggregation. This will ensure that performance data is not lost on server restart and can be aggregated across multiple instances.
+# Files to modify: ['scripts/bench/api-latency.js', 'src/api/middleware/performance.js', 'src/utils/redis.js']
 
 print("Implementing: Persist Rolling Window Metrics to Redis")
 

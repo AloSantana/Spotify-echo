@@ -5,20 +5,20 @@
       "task_id": "task_1",
       "title": "Persist Rolling Window Metrics to Redis",
       "status": "attempted",
-      "complexity": 7
+      "complexity": 6
     },
     {
       "task_id": "task_2",
       "title": "TypeScript Migration Plan for High-Change Backend Modules",
       "status": "attempted",
-      "complexity": 6
+      "complexity": 4
     },
     {
       "task_id": "task_3",
-      "title": "Add MongoDB TTL Indexes for Telemetry Data Rotation",
+      "title": "Containerize Node Backend with Simple Dockerfile",
       "status": "attempted",
       "complexity": 5
     }
   ],
-  "timestamp": "Mon Sep  8 01:52:20 UTC 2025"
+  "timestamp": "Mon Sep  8 06:37:17 UTC 2025"
 }

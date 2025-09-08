@@ -3,99 +3,100 @@
     {
       "id": "task_1",
       "title": "Persist Rolling Window Metrics to Redis",
-      "description": "Implement persistence of API latency and error metrics using Redis to enable durability and aggregation across multiple instances. This will improve observability and reliability of performance monitoring.",
+      "description": "Implement persistence of rolling window API performance metrics to Redis for durability and multi-instance aggregation. This will ensure that performance data is not lost on server restart and can be aggregated across multiple instances.",
       "priority": "high",
       "estimated_time": "60-90 minutes",
       "files_to_modify": [
         "scripts/bench/api-latency.js",
-        "src/api/middleware/metrics.js",
-        "src/config/redis.js"
+        "src/api/middleware/performance.js",
+        "src/utils/redis.js"
       ],
       "implementation_steps": [
-        "Add Redis client initialization in src/config/redis.js if not present.",
-        "Update metrics middleware to write rolling window data to Redis on each request.",
-        "Modify scripts/bench/api-latency.js to read/write metrics from Redis for aggregation.",
-        "Test multi-instance aggregation by simulating concurrent writes and reads.",
-        "Document Redis usage and configuration in PROJECT_CONFIG.md."
-      ],
-      "complexity_score": 7
-    },
-    {
-      "id": "task_2",
-      "title": "TypeScript Migration Plan for High-Change Backend Modules",
-      "description": "Draft and begin implementing a migration plan to convert backend modules with high change rates (e.g., src/api/routes/*, src/chat/*) from JavaScript to TypeScript for improved type safety and maintainability.",
-      "priority": "medium",
-      "estimated_time": "60 minutes",
-      "files_to_modify": [
-        "src/api/routes/*",
-        "src/chat/*",
-        "tsconfig.json"
-      ],
-      "implementation_steps": [
-        "Create tsconfig.json with appropriate settings for incremental migration.",
-        "Rename one or two high-change files (e.g., src/api/routes/example.js to example.ts) and add type annotations.",
-        "Fix type errors and update imports as needed.",
-        "Document migration steps and guidelines in a new MIGRATION.md file."
+        "Add Redis client setup in src/utils/redis.js if not already present.",
+        "Modify scripts/bench/api-latency.js to write rolling window metrics to Redis after each run.",
+        "Update performance middleware to read/write rolling window data from/to Redis.",
+        "Test persistence by restarting the server and verifying metrics are retained."
       ],
       "complexity_score": 6
     },
     {
-      "id": "task_3",
-      "title": "Add MongoDB TTL Indexes for Telemetry Data Rotation",
-      "description": "Implement TTL (Time-To-Live) indexes on MongoDB telemetry collections to automatically expire old performance and health data, reducing storage usage and keeping analytics queries fast.",
+      "id": "task_2",
+      "title": "TypeScript Migration Plan for High-Change Backend Modules",
+      "description": "Draft and commit a migration plan for converting backend modules with high change-rate (e.g., src/api/routes/*, src/chat/*) to TypeScript. This plan should outline the order of migration, key type definitions, and any blockers.",
       "priority": "medium",
       "estimated_time": "30-45 minutes",
       "files_to_modify": [
-        "src/db/telemetry.js",
-        "scripts/db/init.js"
+        "MIGRATION_PLAN.md",
+        "src/api/routes/*",
+        "src/chat/*"
       ],
       "implementation_steps": [
-        "Identify telemetry collections storing time-series data.",
-        "Add code to create TTL indexes on timestamp fields (e.g., expire after 7 days).",
-        "Test index creation and data expiration locally.",
-        "Document TTL index configuration in PROJECT_CONFIG.md."
+        "Create MIGRATION_PLAN.md outlining migration order and rationale.",
+        "Identify and list all high-change files in src/api/routes/* and src/chat/*.",
+        "Draft initial type definitions for shared data structures.",
+        "Commit the plan and circulate for team review."
+      ],
+      "complexity_score": 4
+    },
+    {
+      "id": "task_3",
+      "title": "Containerize Node Backend with Simple Dockerfile",
+      "description": "Write a basic Dockerfile for the Node backend service to enable containerized development and deployment. Ensure the Dockerfile supports local development with hot-reload.",
+      "priority": "high",
+      "estimated_time": "30-45 minutes",
+      "files_to_modify": [
+        "Dockerfile.backend",
+        "README.md"
+      ],
+      "implementation_steps": [
+        "Create Dockerfile.backend in the project root.",
+        "Configure the Dockerfile to install dependencies, copy source, and set up the entrypoint.",
+        "Add instructions for local development (e.g., mounting source for hot-reload) to README.md.",
+        "Test by building and running the container locally."
       ],
       "complexity_score": 5
     },
     {
       "id": "task_4",
+      "title": "Expand Jest Integration/Security Tests for MCP Endpoints",
+      "description": "Add new Jest tests to cover MCP endpoints and provider health checks, focusing on integration and basic security (e.g., input validation, error handling).",
+      "priority": "medium",
+      "estimated_time": "60-90 minutes",
+      "files_to_modify": [
+        "tests/integration/mcp.test.js",
+        "src/api/routes/mcp.js"
+      ],
+      "implementation_steps": [
+        "Identify untested MCP endpoints and provider health routes.",
+        "Write integration tests for each endpoint, including edge cases.",
+        "Add basic security tests for input validation and error scenarios.",
+        "Run tests and ensure coverage increases."
+      ],
+      "complexity_score": 6
+    },
+    {
+      "id": "task_5",
       "title": "EnhancedChatInterface: Provider Quick-Switch and Badge",
-      "description": "Add a provider quick-switch dropdown and current provider badge to the chat interface using the useLLM() hook, improving user experience for AI provider selection.",
+      "description": "Add a provider quick-switch dropdown and current provider badge to EnhancedChatInterface.jsx using the useLLM() hook.",
       "priority": "medium",
       "estimated_time": "30-45 minutes",
       "files_to_modify": [
         "frontend/components/EnhancedChatInterface.jsx"
       ],
       "implementation_steps": [
-        "Import and use useLLM() to access provider switching logic.",
-        "Add a dropdown or button group for provider selection.",
-        "Display the current provider as a badge or chip in the UI.",
-        "Test switching and badge updates in the chat interface."
+        "Import and use the useLLM() hook in EnhancedChatInterface.jsx.",
+        "Add a dropdown for provider selection and display the current provider as a badge.",
+        "Wire up the dropdown to trigger provider switching logic.",
+        "Test UI updates and provider switching in the chat interface."
       ],
       "complexity_score": 4
-    },
-    {
-      "id": "task_5",
-      "title": "EnhancedMusicDiscovery: Mood Sliders and Feature Visualization",
-      "description": "Implement client-only mood sliders and a mini radar/sparkline visualization for moodSettings in the music discovery UI, enabling users to interactively explore music recommendations.",
-      "priority": "low",
-      "estimated_time": "30-45 minutes",
-      "files_to_modify": [
-        "frontend/components/EnhancedMusicDiscovery.jsx"
-      ],
-      "implementation_steps": [
-        "Add slider components for moodSettings (e.g., energy, valence).",
-        "Implement a radar or sparkline chart to visualize current slider values.",
-        "Wire up slider changes to update the visualization in real time.",
-        "Test UI responsiveness and usability."
-      ],
-      "complexity_score": 3
     }
   ],
   "next_research_topics": [
-    "Implementing circuit breaker patterns for provider failover in Node.js",
-    "OpenTelemetry distributed tracing integration for Node/React stacks",
-    "Efficient response streaming for large MongoDB datasets"
+    "Implementing circuit breaker pattern for provider failover in Node.js",
+    "Request correlation IDs for distributed tracing",
+    "MongoDB compound and TTL indexes for analytics optimization",
+    "Prometheus metrics export integration"
   ],
   "completion_percentage": 75
 }

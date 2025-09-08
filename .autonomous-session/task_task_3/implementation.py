@@ -1,9 +1,9 @@
 
-# Task: Add MongoDB TTL Indexes for Telemetry Data Rotation
-# Description: Implement TTL (Time-To-Live) indexes on MongoDB telemetry collections to automatically expire old performance and health data, reducing storage usage and keeping analytics queries fast.
-# Files to modify: ['src/db/telemetry.js', 'scripts/db/init.js']
+# Task: Containerize Node Backend with Simple Dockerfile
+# Description: Write a basic Dockerfile for the Node backend service to enable containerized development and deployment. Ensure the Dockerfile supports local development with hot-reload.
+# Files to modify: ['Dockerfile.backend', 'README.md']
 
-print("Implementing: Add MongoDB TTL Indexes for Telemetry Data Rotation")
+print("Implementing: Containerize Node Backend with Simple Dockerfile")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
