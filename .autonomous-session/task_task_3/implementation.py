@@ -1,9 +1,9 @@
 
-# Task: Containerize Node Backend with Simple Dockerfile
-# Description: Write a basic Dockerfile for the Node backend service to enable containerized development and deployment. Ensure the Dockerfile supports local development with hot-reload.
-# Files to modify: ['Dockerfile.backend', 'README.md']
+# Task: Expand Jest Integration/Security Tests for MCP Endpoints
+# Description: Add new Jest tests to cover MCP endpoints and provider health checks, focusing on integration and basic security (e.g., input validation, error handling).
+# Files to modify: ['tests/integration/mcp.test.js', 'src/api/routes/providers.js', 'src/api/routes/mcp.js']
 
-print("Implementing: Containerize Node Backend with Simple Dockerfile")
+print("Implementing: Expand Jest Integration/Security Tests for MCP Endpoints")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
