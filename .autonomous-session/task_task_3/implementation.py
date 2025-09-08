@@ -1,9 +1,9 @@
 
-# Task: Expand Jest Integration/Security Tests for MCP Endpoints
-# Description: Add new Jest tests to cover MCP endpoints and provider health checks, focusing on integration and basic security validation.
-# Files to modify: ['tests/integration/mcp.test.js', 'tests/integration/providers.test.js']
+# Task: Add MongoDB TTL Indexes for Telemetry Data Rotation
+# Description: Implement TTL (Time-To-Live) indexes on MongoDB telemetry collections to automatically expire old performance and health data, reducing storage usage and keeping analytics queries fast.
+# Files to modify: ['src/db/telemetry.js', 'scripts/db/init.js']
 
-print("Implementing: Expand Jest Integration/Security Tests for MCP Endpoints")
+print("Implementing: Add MongoDB TTL Indexes for Telemetry Data Rotation")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
