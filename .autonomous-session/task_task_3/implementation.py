@@ -1,7 +1,7 @@
 
 # Task: Expand Jest Integration/Security Tests for MCP Endpoints
-# Description: Add new Jest tests to cover MCP endpoints and provider health, focusing on integration and basic security (e.g., auth, error handling).
-# Files to modify: ['tests/mcpEndpoints.test.js', 'src/api/routes/mcp.js']
+# Description: Add new Jest tests to cover MCP endpoints and provider health checks, focusing on integration and basic security (e.g., input validation, error handling).
+# Files to modify: ['tests/integration/mcp.test.js', 'src/api/routes/providers.js', 'src/api/routes/mcp.js']
 
 print("Implementing: Expand Jest Integration/Security Tests for MCP Endpoints")
 
