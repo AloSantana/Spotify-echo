@@ -1041,8 +1041,8 @@
     ]
   },
   "2025-W37": {
-    "total_cost": 2.0654419999999996,
-    "request_count": 31,
+    "total_cost": 2.3855819999999994,
+    "request_count": 36,
     "requests": [
       {
         "timestamp": "2025-09-08 01:25:52.797572",
@@ -1379,6 +1379,61 @@
         "model": "sonar-pro",
         "input_tokens": 338,
         "output_tokens": 1435,
+        "searches_performed": 5,
+        "estimated_cost": 0.064028,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-09-09 04:23:57.827234",
+        "model": "sonar-pro",
+        "input_tokens": 338,
+        "output_tokens": 1662,
+        "searches_performed": 5,
+        "estimated_cost": 0.064028,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-09-09 04:24:15.178096",
+        "model": "sonar-pro",
+        "input_tokens": 338,
+        "output_tokens": 1258,
+        "searches_performed": 5,
+        "estimated_cost": 0.064028,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-09-09 04:24:30.952404",
+        "model": "sonar-pro",
+        "input_tokens": 338,
+        "output_tokens": 1307,
+        "searches_performed": 5,
+        "estimated_cost": 0.064028,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-09-09 04:24:51.761258",
+        "model": "sonar-pro",
+        "input_tokens": 338,
+        "output_tokens": 1590,
+        "searches_performed": 5,
+        "estimated_cost": 0.064028,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-09-09 04:25:11.135303",
+        "model": "sonar-pro",
+        "input_tokens": 338,
+        "output_tokens": 1469,
         "searches_performed": 5,
         "estimated_cost": 0.064028,
         "actual_cost": null,
