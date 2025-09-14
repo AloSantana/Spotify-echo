@@ -106,32 +106,58 @@ class EmbeddingSemanticStrategy {
   // Private methods
 
   async _loadEmbeddings() {
-    // In a real implementation, this would load pre-computed embeddings from a vector database
-    // For now, we'll generate mock embeddings
-    console.log('Loading track embeddings (mock implementation)');
+    const MongoDBManager = require('../../database/mongodb-manager');
     
-    const mockTracks = Array.from({length: 500}, (_, i) => `track_${i}`);
-    
-    for (const trackId of mockTracks) {
-      // Generate mock embedding vector
-      const embedding = Array.from({length: this.options.embeddingDimension}, () => 
-        (Math.random() - 0.5) * 2 // Random values between -1 and 1
-      );
+    try {
+      console.log('Loading track embeddings from MongoDB...');
       
-      // Normalize embedding
-      const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
-      const normalizedEmbedding = embedding.map(val => val / magnitude);
+      // Connect to MongoDB
+      const mongoManager = new MongoDBManager();
+      if (!mongoManager._isConnected) {
+        await mongoManager.connect();
+      }
       
-      this.trackEmbeddings.set(trackId, {
-        trackId,
-        embedding: normalizedEmbedding,
-        metadata: {
-          artist: `artist_${Math.floor(i / 10)}`,
-          genre: ['rock', 'pop', 'jazz', 'electronic', 'classical'][i % 5],
-          description: this._generateMockDescription(trackId)
-        }
-      });
+      const db = mongoManager.db;
+      if (!db) {
+        throw new Error('MongoDB connection not available');
+      }
+      
+      // Load real embeddings from database
+      const embeddings = await db.collection('track_embeddings')
+        .find({ 
+          model: 'gemini',
+          embedding: { $exists: true, $ne: [] }
+        })
+        .limit(10000) // Reasonable limit for memory
+        .toArray();
+
+      if (embeddings.length === 0) {
+        console.warn('⚠️ No track embeddings found in database');
+        console.warn('   Run "node scripts/embed-tracks.js" to generate embeddings');
+        return false;
+      }
+
+      // Process and store embeddings
+      for (const embedding of embeddings) {
+        this.trackEmbeddings.set(embedding.trackId, {
+          trackId: embedding.trackId,
+          embedding: embedding.embedding,
+          metadata: {
+            dimensions: embedding.dimensions,
+            model: embedding.model,
+            createdAt: embedding.createdAt,
+            text: embedding.text
+          }
+        });
+      }
+
+      console.log(`✅ Loaded ${this.trackEmbeddings.size} track embeddings`);
+      return true;
+    } catch (error) {
+      console.error('Failed to load embeddings:', error);
+      return false;
     }
+  }
 
     // Load text embeddings for common music queries
     const commonQueries = [
@@ -374,19 +400,18 @@ class EmbeddingSemanticStrategy {
     return embedding.map(val => magnitude > 0 ? val / magnitude : 0);
   }
 
-  _generateMockDescription(trackId) {
-    const adjectives = ['upbeat', 'melodic', 'energetic', 'smooth', 'atmospheric', 'rhythmic'];
-    const moods = ['happy', 'melancholy', 'exciting', 'peaceful', 'intense', 'dreamy'];
-    const instruments = ['guitar', 'piano', 'synthesizer', 'drums', 'violin', 'saxophone'];
-    
-    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-    const mood = moods[Math.floor(Math.random() * moods.length)];
-    const instrument = instruments[Math.floor(Math.random() * instruments.length)];
-    
-    return `${adj} ${mood} track featuring ${instrument}`;
-  }
-
   _handleNoEmbeddings(params) {
+    console.warn('⚠️ No embeddings available for semantic strategy');
+    return {
+      candidates: [],
+      diagnostics: {
+        strategy: this.name,
+        noEmbeddings: true,
+        message: 'No track embeddings found. Run embedding ingestion script.',
+        executionTime: 0
+      }
+    };
+  }
     return {
       candidates: [],
       diagnostics: {
