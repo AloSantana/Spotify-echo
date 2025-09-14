@@ -1,382 +1,336 @@
 /**
- * Recommendation Explanation Generator
- * Generates human-readable explanations for music recommendations using real data
+ * Generate explanations for music recommendations
+ * Provides transparent reasoning for recommendation choices based on audio features and user patterns
  */
 
-class ExplanationGenerator {
-  constructor() {
-    this.templates = {
-      collaborative: {
-        high: "Users with similar music taste often enjoy this track",
-        medium: "Other listeners with interests like yours have liked this",
-        low: "This track is popular among users with some overlapping preferences"
-      },
-      content: {
-        high: "This matches your audio preferences perfectly (energy: {energy}, valence: {valence})",
-        medium: "The audio features align well with your listening patterns",
-        low: "This has some musical characteristics similar to your preferences"
-      },
-      semantic: {
-        high: "This track's style and mood closely match your recent listening",
-        medium: "The genre and musical style are similar to tracks you enjoy",
-        low: "This shares some thematic elements with music you like"
-      },
-      hybrid: {
-        high: "Multiple recommendation systems strongly agree this fits your taste",
-        medium: "Several recommendation approaches suggest you'd enjoy this",
-        low: "This track scores well across different recommendation methods"
-      },
-      diversity: {
-        high: "This adds variety while staying within your preferences",
-        medium: "Expanding your musical horizons with this recommendation",
-        low: "A slight departure from your usual style you might enjoy"
-      },
-      novelty: {
-        high: "This is a recent release that matches your taste",
-        medium: "A newer track that aligns with your preferences",
-        low: "Fresh music similar to what you already enjoy"
-      },
-      popularity: {
-        high: "This is trending and matches your musical preferences",
-        medium: "A popular track that fits your listening style",
-        low: "Many listeners enjoy this track"
-      }
-    };
+const { VALID_AUDIO_FEATURES } = require('../provenance/model');
 
-    this.audioFeatureDescriptions = {
-      energy: {
-        high: "high-energy",
-        medium: "moderate energy",
-        low: "mellow"
-      },
-      valence: {
-        high: "upbeat and positive",
-        medium: "balanced mood",
-        low: "moody and introspective"
-      },
-      danceability: {
-        high: "very danceable",
-        medium: "somewhat danceable", 
-        low: "more contemplative"
-      },
-      acousticness: {
-        high: "acoustic",
-        medium: "semi-acoustic",
-        low: "electronic"
-      },
-      tempo: {
-        fast: "fast-paced",
-        medium: "moderate tempo",
-        slow: "slow-paced"
-      }
-    };
+/**
+ * Generate explanation for a single recommendation
+ * @param {Object} config - Configuration object with track and provenance
+ * @param {Object} options - Options for explanation generation
+ * @returns {Object} Explanation object
+ */
+function generateExplanation(config, options = {}) {
+  if (!config || typeof config !== 'object') {
+    throw new Error('MISSING_INPUT: config object is required');
   }
 
-  /**
-   * Generate explanation for a recommendation
-   * @param {Object} recommendation - Recommendation object with metadata
-   * @param {Object} userProfile - User's music profile and preferences
-   * @returns {Object} Explanation with primary and detailed text
-   */
-  generateExplanation(recommendation, userProfile = {}) {
-    try {
-      if (!recommendation || !recommendation.metadata) {
-        return this.getFallbackExplanation();
-      }
+  const { track, provenance } = config;
+  
+  if (!track) {
+    throw new Error('MISSING_INPUT: track is required');
+  }
+  
+  if (!provenance) {
+    throw new Error('MISSING_INPUT: provenance is required');
+  }
 
-      const { metadata, track } = recommendation;
-      const { strategies, scores, features } = metadata;
-
-      // Determine primary reason
-      const primaryStrategy = this.getPrimaryStrategy(strategies, scores);
-      const confidence = this.getConfidenceLevel(scores);
-
-      // Generate primary explanation
-      const primaryExplanation = this.generatePrimaryExplanation(
-        primaryStrategy,
-        confidence,
-        features,
-        track
-      );
-
-      // Generate detailed breakdown
-      const detailedExplanation = this.generateDetailedExplanation(
-        strategies,
-        scores,
-        features,
-        track,
-        userProfile
-      );
-
-      // Generate audio feature description
-      const audioDescription = this.generateAudioFeatureDescription(features);
-
-      return {
-        primary: primaryExplanation,
-        detailed: detailedExplanation,
-        audioFeatures: audioDescription,
-        confidence: confidence,
-        strategies: Object.keys(strategies || {}),
-        metadata: {
-          primaryStrategy,
-          confidenceScore: this.getMaxScore(scores),
-          featuresUsed: Object.keys(features || {})
-        }
-      };
-    } catch (error) {
-      console.error('Error generating explanation:', error);
-      return this.getFallbackExplanation();
+  const audioFeatures = track.audio_features || track.audioFeatures || {};
+  const featuresUsed = provenance.featuresUsed || [];
+  
+  // Validate that all referenced features exist in the track's feature object
+  for (const feature of featuresUsed) {
+    if (!(feature in audioFeatures)) {
+      throw new Error(`FEATURE_MISSING: Feature '${feature}' referenced in provenance but not found in track audio features. Available features: ${Object.keys(audioFeatures).join(', ')}`);
+    }
+    
+    // Validate that feature is a known audio feature
+    if (!VALID_AUDIO_FEATURES.includes(feature)) {
+      throw new Error(`INVALID_FEATURE: Feature '${feature}' is not a valid Spotify audio feature. Valid features: ${VALID_AUDIO_FEATURES.join(', ')}`);
     }
   }
 
-  /**
-   * Get primary strategy that contributed most to the recommendation
-   */
-  getPrimaryStrategy(strategies, scores) {
-    if (!strategies || !scores) return 'hybrid';
-
-    let maxScore = 0;
-    let primaryStrategy = 'hybrid';
-
-    Object.entries(scores).forEach(([strategy, score]) => {
-      if (score > maxScore) {
-        maxScore = score;
-        primaryStrategy = strategy;
-      }
-    });
-
-    return primaryStrategy;
+  // Get strategy information
+  const strategies = provenance.strategies || [];
+  const scoreComponents = provenance.scoreComponents || {};
+  
+  // Generate base explanation using only validated features
+  let explanation = generateBaseExplanation(track, audioFeatures, featuresUsed, strategies, scoreComponents);
+  
+  // Add novelty information if available
+  if (provenance.noveltyDaysSinceLastPlay !== undefined && provenance.noveltyDaysSinceLastPlay !== null) {
+    explanation += generateNoveltyExplanation(provenance.noveltyDaysSinceLastPlay);
+  }
+  
+  // Add diversity information if applicable
+  if (provenance.diversityPenaltyApplied && provenance.diversityPenaltyApplied > 0) {
+    explanation += generateDiversityExplanation(provenance.diversityPenaltyApplied);
   }
 
-  /**
-   * Determine confidence level based on scores
-   */
-  getConfidenceLevel(scores) {
-    if (!scores) return 'medium';
+  return {
+    text: explanation.trim(),
+    confidence: calculateExplanationConfidence(featuresUsed, strategies),
+    strategies: strategies,
+    featuresUsed: featuresUsed,
+    explanationRef: provenance.explanationRef || generateExplanationRef(track, strategies)
+  };
+}
 
-    const maxScore = this.getMaxScore(scores);
+/**
+ * Generate base explanation text based on audio features and strategies
+ */
+function generateBaseExplanation(track, audioFeatures, featuresUsed, strategies, scoreComponents) {
+  const trackName = track.name || 'This track';
+  const artistName = track.artists?.[0]?.name || track.artist || 'the artist';
+  
+  // Primary strategy explanation
+  const primaryStrategy = strategies[0] || 'content';
+  const primaryScore = scoreComponents[primaryStrategy] || 1.0;
+  
+  let explanation = '';
+  
+  if (primaryStrategy === 'collaborative') {
+    explanation = `${trackName} by ${artistName} is recommended because users with similar taste also enjoyed it. `;
+  } else if (primaryStrategy === 'content') {
+    explanation = `${trackName} by ${artistName} matches your preferences based on its musical characteristics. `;
+  } else if (primaryStrategy === 'semantic') {
+    explanation = `${trackName} by ${artistName} is recommended based on semantic similarity to your listening history. `;
+  } else {
+    explanation = `${trackName} by ${artistName} is recommended based on multiple analysis approaches. `;
+  }
+  
+  // Add feature-specific explanations (only for features that exist and are validated)
+  if (featuresUsed.length > 0) {
+    const featureExplanations = generateFeatureExplanations(audioFeatures, featuresUsed);
+    if (featureExplanations.length > 0) {
+      explanation += `It features ${featureExplanations.join(', ')}.`;
+    }
+  }
+  
+  // Add multi-strategy explanation if applicable
+  if (strategies.length > 1) {
+    const strategyContributions = strategies
+      .filter(s => s !== primaryStrategy)
+      .map(s => {
+        const score = scoreComponents[s] || 0;
+        const percentage = Math.round(score * 100);
+        return `${s} analysis (${percentage}%)`;
+      });
     
-    if (maxScore >= 0.8) return 'high';
-    if (maxScore >= 0.5) return 'medium';
-    return 'low';
+    if (strategyContributions.length > 0) {
+      explanation += ` This recommendation also incorporates ${strategyContributions.join(' and ')}.`;
+    }
   }
+  
+  return explanation;
+}
 
-  /**
-   * Get maximum score from scores object
-   */
-  getMaxScore(scores) {
-    if (!scores || typeof scores !== 'object') return 0;
-    return Math.max(...Object.values(scores));
-  }
-
-  /**
-   * Generate primary explanation text
-   */
-  generatePrimaryExplanation(strategy, confidence, features, track) {
-    const template = this.templates[strategy]?.[confidence] || 
-                    this.templates.hybrid[confidence];
+/**
+ * Generate explanations for specific audio features (deterministic based on real values)
+ */
+function generateFeatureExplanations(audioFeatures, featuresUsed) {
+  const explanations = [];
+  
+  featuresUsed.forEach(feature => {
+    const value = audioFeatures[feature];
+    if (value === undefined || value === null) return;
     
-    return this.interpolateTemplate(template, features, track);
-  }
-
-  /**
-   * Generate detailed explanation breakdown
-   */
-  generateDetailedExplanation(strategies, scores, features, track, userProfile) {
-    const explanations = [];
-
-    // Add strategy-specific explanations
-    Object.entries(scores || {}).forEach(([strategy, score]) => {
-      if (score > 0.3) { // Only include meaningful contributions
-        const confidence = score >= 0.7 ? 'high' : score >= 0.4 ? 'medium' : 'low';
-        const template = this.templates[strategy]?.[confidence];
+    let explanation = '';
+    
+    switch (feature) {
+      case 'energy':
+        const energy = parseFloat(value);
+        if (energy >= 0.7) explanation = `high energy (${energy.toFixed(2)})`;
+        else if (energy >= 0.4) explanation = `moderate energy (${energy.toFixed(2)})`;
+        else explanation = `calm energy (${energy.toFixed(2)})`;
+        break;
         
-        if (template) {
-          const explanation = this.interpolateTemplate(template, features, track);
-          explanations.push({
-            strategy,
-            score,
-            explanation
-          });
+      case 'valence':
+        const valence = parseFloat(value);
+        if (valence >= 0.7) explanation = `positive mood (${valence.toFixed(2)})`;
+        else if (valence >= 0.4) explanation = `neutral mood (${valence.toFixed(2)})`;
+        else explanation = `melancholic mood (${valence.toFixed(2)})`;
+        break;
+        
+      case 'danceability':
+        const danceability = parseFloat(value);
+        if (danceability >= 0.7) explanation = `high danceability (${danceability.toFixed(2)})`;
+        else if (danceability >= 0.4) explanation = `moderate danceability (${danceability.toFixed(2)})`;
+        else explanation = `low danceability (${danceability.toFixed(2)})`;
+        break;
+        
+      case 'tempo':
+        const tempo = parseFloat(value);
+        if (tempo >= 140) explanation = `fast tempo (${Math.round(tempo)} BPM)`;
+        else if (tempo >= 90) explanation = `moderate tempo (${Math.round(tempo)} BPM)`;
+        else explanation = `slow tempo (${Math.round(tempo)} BPM)`;
+        break;
+        
+      case 'acousticness':
+        const acousticness = parseFloat(value);
+        if (acousticness >= 0.7) explanation = `acoustic sound (${acousticness.toFixed(2)})`;
+        else if (acousticness >= 0.3) explanation = `mixed acoustic elements (${acousticness.toFixed(2)})`;
+        break;
+        
+      case 'instrumentalness':
+        const instrumentalness = parseFloat(value);
+        if (instrumentalness >= 0.7) explanation = `primarily instrumental (${instrumentalness.toFixed(2)})`;
+        else if (instrumentalness >= 0.3) explanation = `some instrumental passages (${instrumentalness.toFixed(2)})`;
+        break;
+        
+      case 'liveness':
+        const liveness = parseFloat(value);
+        if (liveness >= 0.7) explanation = `live recording feel (${liveness.toFixed(2)})`;
+        break;
+        
+      case 'speechiness':
+        const speechiness = parseFloat(value);
+        if (speechiness >= 0.7) explanation = `speech-like characteristics (${speechiness.toFixed(2)})`;
+        else if (speechiness >= 0.4) explanation = `some spoken elements (${speechiness.toFixed(2)})`;
+        break;
+        
+      case 'loudness':
+        const loudness = parseFloat(value);
+        explanation = `${loudness.toFixed(1)} dB loudness`;
+        break;
+        
+      case 'key':
+        const key = parseInt(value);
+        const keyNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        if (key >= 0 && key < 12) {
+          explanation = `${keyNames[key]} key`;
         }
-      }
-    });
-
-    // Add diversity/novelty explanations if applicable
-    if (features?.novelty > 0.6) {
-      explanations.push({
-        strategy: 'novelty',
-        score: features.novelty,
-        explanation: this.templates.novelty.high
-      });
+        break;
+        
+      case 'mode':
+        const mode = parseInt(value);
+        explanation = mode === 1 ? 'major mode' : 'minor mode';
+        break;
+        
+      case 'time_signature':
+        const timeSignature = parseInt(value);
+        explanation = `${timeSignature}/4 time signature`;
+        break;
     }
-
-    if (features?.diversity > 0.6) {
-      explanations.push({
-        strategy: 'diversity', 
-        score: features.diversity,
-        explanation: this.templates.diversity.medium
-      });
-    }
-
-    return explanations;
-  }
-
-  /**
-   * Generate audio feature description
-   */
-  generateAudioFeatureDescription(features) {
-    if (!features || typeof features !== 'object') {
-      return "Audio characteristics not available";
-    }
-
-    const descriptions = [];
-
-    // Energy
-    if (typeof features.energy === 'number') {
-      const level = features.energy >= 0.7 ? 'high' : features.energy >= 0.4 ? 'medium' : 'low';
-      descriptions.push(this.audioFeatureDescriptions.energy[level]);
-    }
-
-    // Valence (mood)
-    if (typeof features.valence === 'number') {
-      const level = features.valence >= 0.7 ? 'high' : features.valence >= 0.4 ? 'medium' : 'low';
-      descriptions.push(this.audioFeatureDescriptions.valence[level]);
-    }
-
-    // Tempo
-    if (typeof features.tempo === 'number') {
-      const level = features.tempo >= 140 ? 'fast' : features.tempo >= 90 ? 'medium' : 'slow';
-      descriptions.push(this.audioFeatureDescriptions.tempo[level]);
-    }
-
-    // Acousticness
-    if (typeof features.acousticness === 'number') {
-      const level = features.acousticness >= 0.7 ? 'high' : features.acousticness >= 0.3 ? 'medium' : 'low';
-      descriptions.push(this.audioFeatureDescriptions.acousticness[level]);
-    }
-
-    if (descriptions.length === 0) {
-      return "Audio characteristics not available";
-    }
-
-    return `This track is ${descriptions.join(', ')}`;
-  }
-
-  /**
-   * Interpolate template with real feature values
-   */
-  interpolateTemplate(template, features, track) {
-    if (!template) return "Recommended based on your listening preferences";
-
-    let result = template;
-
-    // Replace feature placeholders with actual values
-    if (features) {
-      Object.entries(features).forEach(([key, value]) => {
-        const placeholder = `{${key}}`;
-        if (result.includes(placeholder) && typeof value === 'number') {
-          result = result.replace(placeholder, (value * 100).toFixed(0) + '%');
-        }
-      });
-    }
-
-    // Replace track placeholders
-    if (track) {
-      if (track.name && result.includes('{trackName}')) {
-        result = result.replace('{trackName}', track.name);
-      }
-      if (track.artist && result.includes('{artist}')) {
-        result = result.replace('{artist}', track.artist);
-      }
-      if (track.genre && result.includes('{genre}')) {
-        result = result.replace('{genre}', track.genre);
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * Generate explanation for a list of recommendations
-   */
-  generateBatchExplanations(recommendations, userProfile = {}) {
-    return recommendations.map(rec => ({
-      ...rec,
-      explanation: this.generateExplanation(rec, userProfile)
-    }));
-  }
-
-  /**
-   * Generate summary explanation for a set of recommendations
-   */
-  generateSummaryExplanation(recommendations, userProfile = {}) {
-    if (!recommendations || recommendations.length === 0) {
-      return "No recommendations available";
-    }
-
-    const strategies = new Set();
-    const totalRecommendations = recommendations.length;
     
-    // Analyze primary strategies used
-    recommendations.forEach(rec => {
-      if (rec.metadata?.strategies) {
-        Object.keys(rec.metadata.strategies).forEach(strategy => {
-          strategies.add(strategy);
-        });
-      }
-    });
-
-    const strategyList = Array.from(strategies);
-    
-    if (strategyList.length === 0) {
-      return `Generated ${totalRecommendations} recommendations based on your listening preferences`;
+    if (explanation) {
+      explanations.push(explanation);
     }
+  });
+  
+  return explanations;
+}
 
-    if (strategyList.length === 1) {
-      const strategy = strategyList[0];
-      return `Generated ${totalRecommendations} recommendations using ${strategy} analysis of your music taste`;
-    }
-
-    return `Generated ${totalRecommendations} recommendations by analyzing your music preferences across multiple approaches: ${strategyList.join(', ')}`;
-  }
-
-  /**
-   * Get fallback explanation when data is insufficient
-   */
-  getFallbackExplanation() {
-    return {
-      primary: "Recommended based on your listening preferences",
-      detailed: [{
-        strategy: 'fallback',
-        score: 0.5,
-        explanation: "This recommendation is based on general music preferences and popularity"
-      }],
-      audioFeatures: "Audio characteristics not available",
-      confidence: 'medium',
-      strategies: ['fallback'],
-      metadata: {
-        primaryStrategy: 'fallback',
-        confidenceScore: 0.5,
-        featuresUsed: []
-      }
-    };
-  }
-
-  /**
-   * Validate explanation object
-   */
-  validateExplanation(explanation) {
-    return !!(
-      explanation &&
-      explanation.primary &&
-      explanation.detailed &&
-      Array.isArray(explanation.detailed) &&
-      explanation.confidence &&
-      explanation.strategies &&
-      Array.isArray(explanation.strategies)
-    );
+/**
+ * Generate novelty explanation
+ */
+function generateNoveltyExplanation(daysSinceLastPlay) {
+  if (daysSinceLastPlay === 0) {
+    return ' You recently played this track.';
+  } else if (daysSinceLastPlay < 7) {
+    return ` You last played this ${daysSinceLastPlay} day${daysSinceLastPlay > 1 ? 's' : ''} ago.`;
+  } else if (daysSinceLastPlay < 30) {
+    const weeks = Math.round(daysSinceLastPlay / 7);
+    return ` You last played this ${weeks} week${weeks > 1 ? 's' : ''} ago.`;
+  } else {
+    const months = Math.round(daysSinceLastPlay / 30);
+    return ` It's been ${months} month${months > 1 ? 's' : ''} since you last played this.`;
   }
 }
 
-module.exports = ExplanationGenerator;
+/**
+ * Generate diversity explanation
+ */
+function generateDiversityExplanation(diversityPenalty) {
+  const percentage = Math.round(diversityPenalty * 100);
+  return ` This adds ${percentage}% diversity to your recommendations.`;
+}
+
+/**
+ * Calculate confidence score for explanation
+ */
+function calculateExplanationConfidence(featuresUsed, strategies) {
+  let confidence = 0.5; // Base confidence
+  
+  // More features = higher confidence
+  confidence += (featuresUsed.length * 0.1);
+  
+  // Multiple strategies = higher confidence
+  confidence += (strategies.length * 0.15);
+  
+  // Cap at 1.0
+  return Math.min(confidence, 1.0);
+}
+
+/**
+ * Generate explanation reference ID
+ */
+function generateExplanationRef(track, strategies) {
+  const trackId = track.id || track.track_id || 'unknown';
+  const strategyStr = strategies.join('_');
+  const timestamp = Date.now();
+  return `exp_${strategyStr}_${trackId.slice(-8)}_${timestamp}`;
+}
+
+/**
+ * Generate batch explanations for multiple tracks
+ * @param {Array} recommendations - Array of {track, provenance} objects
+ * @param {Object} options - Generation options
+ * @returns {Array} Array of explanation objects
+ */
+function generateBatchExplanations(recommendations, options = {}) {
+  if (!Array.isArray(recommendations)) {
+    throw new Error('INVALID_INPUT: recommendations must be an array');
+  }
+  
+  return recommendations.map((rec, index) => {
+    try {
+      return generateExplanation({ track: rec.track, provenance: rec.provenance }, options);
+    } catch (error) {
+      console.error(`Error generating explanation for recommendation ${index}:`, error.message);
+      return {
+        text: 'This track is recommended based on your listening preferences.',
+        confidence: 0.3,
+        strategies: ['content'],
+        featuresUsed: [],
+        error: error.message
+      };
+    }
+  });
+}
+
+/**
+ * Validate explanation against provenance
+ * @param {Object} explanation - Generated explanation object
+ * @param {Object} provenance - Original provenance object
+ * @returns {boolean} Whether explanation is valid
+ */
+function validateExplanation(explanation, provenance) {
+  try {
+    // Check that explanation references only features in provenance
+    const provenanceFeaturesUsed = provenance.featuresUsed || [];
+    const explanationFeaturesUsed = explanation.featuresUsed || [];
+    
+    for (const feature of explanationFeaturesUsed) {
+      if (!provenanceFeaturesUsed.includes(feature)) {
+        console.warn(`Explanation references feature '${feature}' not in provenance`);
+        return false;
+      }
+    }
+    
+    // Check that strategies match
+    const provenanceStrategies = provenance.strategies || [];
+    const explanationStrategies = explanation.strategies || [];
+    
+    for (const strategy of explanationStrategies) {
+      if (!provenanceStrategies.includes(strategy)) {
+        console.warn(`Explanation references strategy '${strategy}' not in provenance`);
+        return false;
+      }
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error validating explanation:', error.message);
+    return false;
+  }
+}
+
+module.exports = {
+  generateExplanation,
+  generateBatchExplanations,
+  validateExplanation,
+  generateFeatureExplanations,
+  calculateExplanationConfidence
+};
