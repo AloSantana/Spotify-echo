@@ -68,6 +68,7 @@ const providersRoutes = require('./api/routes/providers');
 const databaseRoutes = require('./api/routes/database');
 const playlistRoutes = require('./api/routes/playlists');
 const settingsRoutes = require('./api/routes/settings');
+const userSettingsRoutes = require('./api/routes/user-settings');
 const systemRoutes = require('./api/routes/system');
 const analyticsRoutes = require('./api/routes/analytics');
 const insightsRoutes = require('./api/routes/insights'); // Enhanced Spotify insights with caching and pagination
@@ -636,6 +637,7 @@ app.use('/api/providers', providersRoutes);
 app.use('/api/database', databaseRoutes);
 app.use('/api/playlists', playlistRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/user-settings', userSettingsRoutes);
 app.use('/api/system', systemRoutes);
 app.use('/api/settings', llmProvidersRoutes); // Enhanced LLM provider management
 app.use('/api/settings', advancedSettingsRoutes); // Advanced Settings UI API

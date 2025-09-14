@@ -22,6 +22,16 @@ import {
   Tooltip,
   IconButton,
   Snackbar,
+  Chip,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
 } from '@mui/material';
 import {
   Settings,
@@ -34,22 +44,30 @@ import {
   PlaylistPlay,
   Assessment,
   RestorePageOutlined,
+  CheckCircle,
+  Error as ErrorIcon,
+  Warning,
+  Visibility,
+  VisibilityOff,
 } from '@mui/icons-material';
 import LLMProviderSelector from './LLMProviderSelector';
 
 /**
  * Settings Panel Component
- * Comprehensive user settings management with real-time synchronization
+ * Phase 3 User Settings with optimistic concurrency, weight normalization, and provider override
  */
 const SettingsPanel = ({ userId, onSettingsChange }) => {
   const [tabValue, setTabValue] = useState(0);
   const [settings, setSettings] = useState(null);
   const [originalSettings, setOriginalSettings] = useState(null);
+  const [providerStatus, setProviderStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [hasChanges, setHasChanges] = useState(false);
+  const [weightSum, setWeightSum] = useState(1.0);
+  const [normalizedWeights, setNormalizedWeights] = useState(null);
 
   // Load user settings
   const loadSettings = useCallback(async () => {
@@ -62,15 +80,32 @@ const SettingsPanel = ({ userId, onSettingsChange }) => {
     setError(null);
 
     try {
-      const response = await fetch(`/api/settings?userId=${userId}`);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      // Load user settings and provider status in parallel
+      const [settingsResponse, statusResponse] = await Promise.all([
+        fetch('/api/user-settings', {
+          headers: { 'x-user-id': userId }
+        }),
+        fetch('/api/user-settings/providers/status')
+      ]);
+
+      if (!settingsResponse.ok) {
+        throw new Error(`Settings API error: ${settingsResponse.status} ${settingsResponse.statusText}`);
       }
 
-      const data = await response.json();
-      setSettings(data.data);
-      setOriginalSettings(JSON.parse(JSON.stringify(data.data)));
+      if (!statusResponse.ok) {
+        throw new Error(`Provider status error: ${statusResponse.status} ${statusResponse.statusText}`);
+      }
+
+      const [settingsData, statusData] = await Promise.all([
+        settingsResponse.json(),
+        statusResponse.json()
+      ]);
+
+      setSettings(settingsData.data);
+      setOriginalSettings(JSON.parse(JSON.stringify(settingsData.data)));
+      setProviderStatus(statusData.data);
       setHasChanges(false);
+      updateWeightCalculations(settingsData.data.strategyWeights);
     } catch (err) {
       console.error('Failed to load settings:', err);
       setError('Failed to load settings. Please try again.');
@@ -78,6 +113,33 @@ const SettingsPanel = ({ userId, onSettingsChange }) => {
       setLoading(false);
     }
   }, [userId]);
+
+  // Helper to calculate weight normalization
+  const updateWeightCalculations = (weights) => {
+    if (!weights) return;
+    
+    const { collaborative = 0, content = 0, semantic = 0, diversity = 0 } = weights;
+    const baseSum = collaborative + content + semantic;
+    setWeightSum(baseSum + diversity);
+    
+    // Show normalized preview
+    if (baseSum > 0) {
+      const factor = 1.0 / baseSum;
+      setNormalizedWeights({
+        collaborative: Math.round(collaborative * factor * 1000000) / 1000000,
+        content: Math.round(content * factor * 1000000) / 1000000,
+        semantic: Math.round(semantic * factor * 1000000) / 1000000,
+        diversity: diversity
+      });
+    } else {
+      setNormalizedWeights({
+        collaborative: 0.333333,
+        content: 0.333333,
+        semantic: 0.333334,
+        diversity: diversity
+      });
+    }
+  };
 
   // Save settings
   const saveSettings = async () => {
@@ -87,20 +149,33 @@ const SettingsPanel = ({ userId, onSettingsChange }) => {
     setError(null);
 
     try {
-      const response = await fetch(`/api/settings?userId=${userId}`, {
+      const response = await fetch('/api/user-settings', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'x-user-id': userId,
           'If-Unmodified-Since': originalSettings?.updatedAt || '',
         },
         body: JSON.stringify(settings),
       });
 
       if (!response.ok) {
-        if (response.status === 409) {
-          const data = await response.json();
-          throw new Error('Settings were modified by another process. Please refresh and try again.');
+        const errorData = await response.json();
+        
+        if (response.status === 409 && errorData.error === 'VERSION_CONFLICT') {
+          setError(
+            `Settings were modified by another session. ` +
+            `Server version: ${errorData.serverVersion}. ` +
+            `Please refresh to see the latest changes.`
+          );
+          return;
         }
+        
+        if (response.status === 400) {
+          setError(`Validation error: ${errorData.message}`);
+          return;
+        }
+        
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
@@ -109,6 +184,7 @@ const SettingsPanel = ({ userId, onSettingsChange }) => {
       setOriginalSettings(JSON.parse(JSON.stringify(data.data)));
       setHasChanges(false);
       setSuccessMessage('Settings saved successfully');
+      updateWeightCalculations(data.data.strategyWeights);
 
       // Notify parent component
       if (onSettingsChange) {
@@ -125,7 +201,7 @@ const SettingsPanel = ({ userId, onSettingsChange }) => {
   // Reset to defaults
   const resetToDefaults = async () => {
     try {
-      const response = await fetch('/api/settings/defaults');
+      const response = await fetch('/api/user-settings/defaults');
       if (!response.ok) {
         throw new Error('Failed to load default settings');
       }
@@ -167,6 +243,12 @@ const SettingsPanel = ({ userId, onSettingsChange }) => {
       }
       
       current[keys[keys.length - 1]] = value;
+      
+      // Update weight calculations if strategy weights changed
+      if (path.startsWith('strategyWeights.')) {
+        updateWeightCalculations(newSettings.strategyWeights);
+      }
+      
       return newSettings;
     });
   };
@@ -258,6 +340,76 @@ const SettingsPanel = ({ userId, onSettingsChange }) => {
           {/* AI Provider Tab */}
           {tabValue === 0 && (
             <Box>
+              {/* Provider Status */}
+              {providerStatus && (
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    Provider Status
+                  </Typography>
+                  <Grid container spacing={2}>
+                    {Object.values(providerStatus.providers).map(provider => (
+                      <Grid item xs={12} md={4} key={provider.id}>
+                        <Paper sx={{ p: 2, border: 1, borderColor: provider.available ? 'success.main' : 'error.main' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                            {provider.available ? 
+                              <CheckCircle sx={{ color: 'success.main', mr: 1 }} /> :
+                              <ErrorIcon sx={{ color: 'error.main', mr: 1 }} />
+                            }
+                            <Typography variant="subtitle1">
+                              {provider.name}
+                            </Typography>
+                            {provider.default && (
+                              <Chip size="small" label="Default" sx={{ ml: 1 }} />
+                            )}
+                          </Box>
+                          {!provider.available && provider.reasonUnavailable && (
+                            <Typography variant="caption" color="error">
+                              {provider.reasonUnavailable}
+                            </Typography>
+                          )}
+                          {provider.available && (
+                            <Typography variant="caption" color="text.secondary">
+                              Models: {provider.models.slice(0, 2).join(', ')}
+                              {provider.models.length > 2 && ` +${provider.models.length - 2} more`}
+                            </Typography>
+                          )}
+                        </Paper>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Box>
+              )}
+
+              {/* Provider Override */}
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  Provider Override
+                </Typography>
+                <FormControl fullWidth>
+                  <InputLabel>Override Provider (Optional)</InputLabel>
+                  <Select
+                    value={settings.providerOverride || ''}
+                    onChange={(e) => updateSettings('providerOverride', e.target.value || null)}
+                    disabled={saving}
+                  >
+                    <MenuItem value="">
+                      <em>Use automatic selection</em>
+                    </MenuItem>
+                    {providerStatus?.providers && Object.values(providerStatus.providers)
+                      .filter(p => p.available)
+                      .map(provider => (
+                        <MenuItem key={provider.id} value={provider.id}>
+                          {provider.name}
+                        </MenuItem>
+                      ))
+                    }
+                  </Select>
+                </FormControl>
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                  Override the automatic provider selection with a specific choice
+                </Typography>
+              </Box>
+
               <LLMProviderSelector
                 selectedProvider={settings.llmProvider}
                 onProviderChange={(provider) => updateSettings('llmProvider', provider)}
@@ -294,8 +446,21 @@ const SettingsPanel = ({ userId, onSettingsChange }) => {
               
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                 Adjust how much influence each strategy has on your recommendations.
-                Weights must sum to 1.0.
+                The first three weights will be automatically normalized to sum to 1.0.
               </Typography>
+
+              {/* Weight normalization preview */}
+              {normalizedWeights && (
+                <Alert severity="info" sx={{ mb: 3 }}>
+                  <Typography variant="body2">
+                    <strong>Normalized weights preview:</strong><br />
+                    Collaborative: {normalizedWeights.collaborative.toFixed(6)}, 
+                    Content: {normalizedWeights.content.toFixed(6)}, 
+                    Semantic: {normalizedWeights.semantic.toFixed(6)}<br />
+                    Diversity: {normalizedWeights.diversity.toFixed(6)} (not normalized)
+                  </Typography>
+                </Alert>
+              )}
 
               <Grid container spacing={3}>
                 <Grid item xs={12} md={6}>
@@ -378,18 +543,20 @@ const SettingsPanel = ({ userId, onSettingsChange }) => {
                     />
                   </Box>
                   <Typography variant="caption" color="text.secondary">
-                    Adds variety and prevents echo chambers
+                    Adds variety and prevents echo chambers (not normalized)
                   </Typography>
                 </Grid>
               </Grid>
 
-              <Alert severity="info" sx={{ mt: 3 }}>
+              <Alert 
+                severity={Math.abs(weightSum - 1.0) > 0.01 ? "warning" : "success"} 
+                sx={{ mt: 3 }}
+              >
                 <Typography variant="body2">
-                  <strong>Current total:</strong> {
-                    Object.values(settings.strategyWeights || {}).reduce((sum, weight) => sum + weight, 0).toFixed(2)
-                  }
-                  {Math.abs(Object.values(settings.strategyWeights || {}).reduce((sum, weight) => sum + weight, 0) - 1.0) > 0.01 && 
-                    ' (Warning: Should equal 1.0)'
+                  <strong>Current total:</strong> {weightSum.toFixed(3)}
+                  {Math.abs(weightSum - 1.0) > 0.01 ? 
+                    ' (Weights will be automatically normalized on save)' :
+                    ' ✓ Weights are balanced'
                   }
                 </Typography>
               </Alert>
@@ -486,14 +653,18 @@ const SettingsPanel = ({ userId, onSettingsChange }) => {
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    label="Default Playlist Description"
+                    label="Default Playlist Description Template"
                     value={settings.playlistDefaults?.descriptionTemplate || ''}
                     onChange={(e) => updateSettings('playlistDefaults.descriptionTemplate', e.target.value)}
                     disabled={saving}
                     multiline
-                    rows={2}
-                    helperText="Template for automatically generated playlist descriptions"
+                    rows={3}
+                    helperText="Template for playlist descriptions. Use {{genre}}, {{date}}, {{mood}} tokens. Max 500 characters."
+                    inputProps={{ maxLength: 500 }}
                   />
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                    Available tokens: {{genre}}, {{date}}, {{mood}}, {{artist}}, {{decade}}, {{energy}}
+                  </Typography>
                 </Grid>
               </Grid>
             </Box>

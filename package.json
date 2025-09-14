@@ -142,6 +142,7 @@
     "lint:check": "eslint src/ --ext .js",
     "test:orchestrator": "jest tests/orchestration --coverage",
     "test:strategies": "jest tests/recommendation --coverage",
+    "test:settings": "jest tests/unit/services/UserSettingsService.test.js tests/unit/routes/settings.test.js --coverage",
     "inventory": "node scripts/generate-structure-inventory.js",
     "eval:recs": "node scripts/evaluate-recommendations.js",
     "eval:recs:collaborative": "node scripts/evaluate-recommendations.js --strategy collaborative",
