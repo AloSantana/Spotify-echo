@@ -269,7 +269,7 @@ class DistributedTransactionCoordinator extends EventEmitter {
     // Check for commit failures
     const failures = results.filter(result => result.status === 'failed');
     if (failures.length > 0) {
-      console.warn(`⚠️ Some participants failed to commit:`, failures);
+      console.warn('⚠️ Some participants failed to commit:', failures);
       // This requires manual intervention in production
     }
     

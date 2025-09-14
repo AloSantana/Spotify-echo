@@ -83,7 +83,7 @@ class RealTimeInferenceService extends EventEmitter {
         this.abTests = new Map();
         this.abResults = new Map();
         
-        console.log(`🚀 Real-Time Inference Service initialized with config:`, {
+        console.log('🚀 Real-Time Inference Service initialized with config:', {
             maxLatency: this.config.maxLatency,
             batchSize: this.config.batchSize,
             caching: this.config.enableCaching,

@@ -89,7 +89,7 @@ class Phase10Orchestrator extends EventEmitter {
             lastUpdated: new Date()
         };
         
-        console.log(`🎭 Phase 10 Orchestrator initialized with config:`, {
+        console.log('🎭 Phase 10 Orchestrator initialized with config:', {
             services: Object.keys(this.config).filter(key => key.startsWith('enable') && this.config[key]).length,
             coordinationInterval: this.config.coordinationInterval,
             enableCrossServiceOptimization: this.config.enableCrossServiceOptimization,

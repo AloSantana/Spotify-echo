@@ -83,7 +83,7 @@ class PersonalizationEngineService extends EventEmitter {
         this.learningQueue = [];
         this.adaptationQueue = [];
         
-        console.log(`🧠 Personalization Engine Service initialized with config:`, {
+        console.log('🧠 Personalization Engine Service initialized with config:', {
             learningRate: this.config.learningRate,
             adaptationSpeed: this.config.adaptationSpeed,
             contextual: this.config.enableContextualPersonalization,
