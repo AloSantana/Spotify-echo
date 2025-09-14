@@ -380,7 +380,15 @@
     "ai:eval:baseline": "node scripts/ai/run_eval.js run --model text-bison@latest --suite baseline_recommendations",
     "ai:health": "node -e \"const AgentRouter = require('./src/ai/agent/router'); const router = new AgentRouter(); router.healthCheck().then(console.log).catch(console.error)\"",
     "ai:analytics": "node -e \"const AgentRouter = require('./src/ai/agent/router'); const router = new AgentRouter(); console.log(JSON.stringify(router.getAnalytics(), null, 2))\"",
-    "ai:metrics": "curl -s http://localhost:3000/metrics | grep echotune_ai || echo 'Metrics endpoint not available'"
+    "ai:metrics": "curl -s http://localhost:3000/metrics | grep echotune_ai || echo 'Metrics endpoint not available'",
+    "inventory": "node scripts/generate-structure-inventory.js",
+    "eval:recs": "node scripts/evaluate-recommendations.js",
+    "validate:structure": "node scripts/validate-structure.js",
+    "validate:structure:fix": "node scripts/validate-structure.js --fix",
+    "validate:structure:health": "node scripts/validate-structure.js --health",
+    "apply:indexes": "node scripts/apply-indexes.js",
+    "apply:indexes:dry-run": "node scripts/apply-indexes.js --dry-run",
+    "apply:indexes:analyze": "node scripts/apply-indexes.js --analyze"
   },
   "keywords": [
     "music-discovery",
