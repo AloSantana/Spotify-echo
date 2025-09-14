@@ -145,13 +145,23 @@ class CollaborativeStrategy {
   // Private methods
 
   async _loadUserInteractions() {
-    const Database = require('../../database/Database');
+    const MongoDBManager = require('../../database/mongodb-manager');
     
     try {
-      console.log('Loading real user interactions from database...');
+      console.log('Loading real user interactions from MongoDB...');
+      
+      // Connect to MongoDB
+      const mongoManager = new MongoDBManager();
+      if (!mongoManager._isConnected) {
+        await mongoManager.connect();
+      }
+      
+      const db = mongoManager.db;
+      if (!db) {
+        throw new Error('MongoDB connection not available');
+      }
       
       // Load real user interaction data from MongoDB
-      const db = Database.getInstance();
       const userInteractions = await db.collection('user_interactions')
         .aggregate([
           {
@@ -170,12 +180,13 @@ class CollaborativeStrategy {
                   timestamp: '$timestamp',
                   sessionId: '$sessionId'
                 }
-              }
+              },
+              totalInteractions: { $sum: 1 }
             }
           },
           {
             $match: {
-              'interactions': { $size: { $gte: this.options.minInteractions } }
+              totalInteractions: { $gte: this.options.minInteractions }
             }
           }
         ])
@@ -187,13 +198,16 @@ class CollaborativeStrategy {
       }
 
       if (this.userInteractions.size === 0) {
-        throw new Error('No user interaction data found. Collaborative filtering requires historical user data.');
+        console.warn('⚠️ No sufficient user interaction data found for collaborative filtering');
+        // Don't throw error - gracefully handle by indicating insufficient data
+        return false;
       }
 
-      console.log(`Loaded interactions for ${this.userInteractions.size} users`);
+      console.log(`✅ Loaded interactions for ${this.userInteractions.size} users`);
+      return true;
     } catch (error) {
       console.error('Failed to load user interactions:', error);
-      throw new Error(`Collaborative strategy initialization failed: ${error.message}`);
+      return false;
     }
   }
 

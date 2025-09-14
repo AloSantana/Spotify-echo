@@ -265,7 +265,7 @@ class MLPipelineOrchestrator extends EventEmitter {
   async _trainContentBased(job, pipeline) {
     const { batchSize, epochs } = job.options;
     
-    job.logs.push(`Starting content-based training with audio features`);
+    job.logs.push('Starting content-based training with audio features');
     
     // Feature extraction phase
     await this._simulateEpoch(500); // Feature extraction takes longer
@@ -297,7 +297,7 @@ class MLPipelineOrchestrator extends EventEmitter {
   async _trainDeepLearning(job, pipeline) {
     const { batchSize, epochs, learningRate } = job.options;
     
-    job.logs.push(`Starting deep learning training (Neural Collaborative Filtering)`);
+    job.logs.push('Starting deep learning training (Neural Collaborative Filtering)');
     job.logs.push(`Configuration: LR=${learningRate}, Batch=${batchSize}, GPU=${this.options.enableGPU}`);
     
     // Deep learning training with more complex metrics

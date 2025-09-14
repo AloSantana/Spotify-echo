@@ -74,7 +74,7 @@ class AdvancedRecommendationEngineService extends EventEmitter {
             hybrid: new HybridAlgorithm()
         };
         
-        console.log(`🤖 Advanced Recommendation Engine Service initialized with config:`, {
+        console.log('🤖 Advanced Recommendation Engine Service initialized with config:', {
             algorithms: Object.keys(this.config.algorithms).filter(alg => this.config.algorithms[alg].enabled),
             realTimeLearning: this.config.enableRealTimeLearning,
             cacheSize: this.config.cacheSize
@@ -630,10 +630,10 @@ class AdvancedRecommendationEngineService extends EventEmitter {
         const metadata = this.getTrackMetadata(recommendation.trackId);
         const explanations = [
             `Based on your interest in ${metadata.genre}`,
-            `Similar to artists you like`,
-            `Matches your mood preferences`,
-            `Popular among similar users`,
-            `Discovered through your listening patterns`
+            'Similar to artists you like',
+            'Matches your mood preferences',
+            'Popular among similar users',
+            'Discovered through your listening patterns'
         ];
         
         return explanations[Math.floor(Math.random() * explanations.length)];

@@ -174,7 +174,7 @@ class MLPipelineManager extends EventEmitter {
       return pipeline;
       
     } catch (error) {
-      console.error(`❌ Failed to create ML pipeline:`, error);
+      console.error('❌ Failed to create ML pipeline:', error);
       throw error;
     }
   }

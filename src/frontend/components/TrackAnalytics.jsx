@@ -1,4 +1,4 @@
-import React, { useMemo, memo } from 'react';
+import React, { useState, useEffect, useMemo, memo } from 'react';
 import { 
   Box, 
   Typography, 
@@ -18,14 +18,47 @@ import {
 
 /**
  * Track Analytics Component
- * Displays detailed analytics for a music track
+ * Displays detailed analytics for a music track with real-time updates
  */
-const TrackAnalytics = memo(({ track }) => {
-  const analytics = useMemo(() => {
-    if (!track) return null;
+const TrackAnalytics = memo(({ track, trackId }) => {
+  const [loading, setLoading] = useState(false);
+  const [analyticsData, setAnalyticsData] = useState(null);
+  const [error, setError] = useState(null);
 
-    const features = track.audio_features || {};
-    const popularity = track.popularity || Math.floor(Math.random() * 100);
+  // Fetch additional analytics data when track ID is provided
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      if (!trackId) return;
+      
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const response = await fetch(`/api/insights/song/${trackId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setAnalyticsData(data);
+        } else {
+          setError(data.message || 'Failed to load analytics');
+        }
+      } catch (err) {
+        setError('Network error loading analytics');
+        console.error('Analytics error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, [trackId]);
+
+  const analytics = useMemo(() => {
+    if (!track && !analyticsData) return null;
+
+    const source = analyticsData || track;
+    const features = source.audio_features || source.audioFeatures || {};
+    const popularity = source.popularity || Math.floor(Math.random() * 100);
     
     return {
       audioFeatures: {
@@ -51,7 +84,39 @@ const TrackAnalytics = memo(({ track }) => {
         plays: Math.floor(Math.random() * 100000)
       }
     };
-  }, [track]);
+  }, [track, analyticsData]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <Card variant="outlined" sx={{ mt: 2 }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            <TrendingUp sx={{ mr: 1 }} />
+            Loading Analytics...
+          </Typography>
+          <LinearProgress />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <Card variant="outlined" sx={{ mt: 2 }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom color="error">
+            <TrendingUp sx={{ mr: 1 }} />
+            Analytics Error
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {error}
+          </Typography>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!analytics) {
     return (

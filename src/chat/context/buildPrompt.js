@@ -473,7 +473,7 @@ Example format:
 
     for (const pattern of inappropriatePatterns) {
       if (pattern.test(prompt.text)) {
-        safety.warnings.push(`Potential inappropriate content detected`);
+        safety.warnings.push('Potential inappropriate content detected');
       }
     }
 

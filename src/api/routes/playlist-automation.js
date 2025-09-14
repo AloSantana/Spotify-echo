@@ -1,295 +1,394 @@
 const express = require('express');
-const axios = require('axios');
 const router = express.Router();
+const PlaylistService = require('../../spotify/PlaylistService');
+const recommendationEngine = require('../../ml/recommendation-engine-enhanced');
+const { traceManager } = require('../../utils/agentops-trace-manager');
 
 /**
- * Enhanced Playlist Automation API
+ * Phase 6: Playlist Automation API - Production Ready
  *
- * Provides intelligent playlist creation with:
- * - AI-powered track selection
- * - Automatic playlist generation
- * - Mood and activity-based curation
- * - Real-time Spotify integration
+ * Provides comprehensive playlist management with:
+ * - Real Spotify API integration (NO_MOCK policy)
+ * - AI-powered track selection using recommendation engine
+ * - Chat orchestrator integration for voice commands
+ * - Automatic playlist generation and management
+ * - Comprehensive error handling and token management
  */
+
+// Initialize playlist service
+const playlistService = new PlaylistService();
 
 /**
- * POST /api/playlists/create-smart
- * Create a smart playlist using AI recommendations
+ * POST /api/playlist-automation/create
+ * Create a personalized playlist with real Spotify integration
  */
-router.post('/create-smart', async (req, res) => {
-  try {
-    const {
-      userId = 'demo_user',
-      playlistName,
-      description,
-      mood,
-      activity,
-      targetLength = 20, // number of tracks
-      audioFeatures = {},
-      seedTracks = [],
-      seedGenres = [],
-      isPublic = false,
-      accessToken,
-    } = req.body;
+router.post('/create', async (req, res) => {
+  return await traceManager.traceSpotifyOperation('createPlaylist', async () => {
+    try {
+      const {
+        userId,
+        name,
+        description,
+        tracks = [],
+        config = {},
+        spotifyAccessToken
+      } = req.body;
 
-    if (!playlistName) {
-      return res.status(400).json({
-        success: false,
-        error: 'Playlist name is required',
-      });
-    }
-
-    // Generate AI-curated track list
-    const curatedTracks = await generateSmartPlaylist({
-      mood,
-      activity,
-      targetLength,
-      audioFeatures,
-      seedTracks,
-      seedGenres,
-      userId,
-    });
-
-    if (accessToken && curatedTracks.length > 0) {
-      // Create actual Spotify playlist
-      const spotifyPlaylist = await createSpotifyPlaylist({
-        accessToken,
-        name: playlistName,
-        description: description || `AI-curated ${mood || activity || 'personalized'} playlist`,
-        isPublic,
-        trackUris: curatedTracks.map((track) => track.uri).filter((uri) => uri),
-      });
-
-      if (spotifyPlaylist.success) {
-        res.json({
-          success: true,
-          playlist: {
-            id: spotifyPlaylist.id,
-            name: playlistName,
-            description,
-            url: spotifyPlaylist.url,
-            trackCount: curatedTracks.length,
-            tracks: curatedTracks,
-          },
-          metadata: {
-            createdAt: new Date().toISOString(),
-            aiGenerated: true,
-            criteria: { mood, activity, targetLength },
-          },
+      // Validate required fields
+      if (!userId || !name || !spotifyAccessToken) {
+        return res.status(400).json({
+          success: false,
+          error: 'userId, name, and spotifyAccessToken are required'
         });
-      } else {
-        throw new Error('Failed to create Spotify playlist');
       }
-    } else {
-      // Return curated tracks without Spotify creation
+
+      if (!tracks || tracks.length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'At least one track is required'
+        });
+      }
+
+      // Validate Spotify token
+      const tokenValidation = await playlistService.validateToken(spotifyAccessToken);
+      if (!tokenValidation.valid) {
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid or expired Spotify access token',
+          details: tokenValidation.error
+        });
+      }
+
+      console.log(`Creating playlist "${name}" for user ${userId} with ${tracks.length} tracks`);
+
+      // Create playlist using PlaylistService
+      const result = await playlistService.createPersonalizedPlaylist(
+        userId,
+        name,
+        tracks,
+        {
+          description: description || `AI-curated playlist created by EchoTune AI`,
+          public: config.public || false,
+          collaborative: config.collaborative || false,
+          ...config
+        },
+        spotifyAccessToken
+      );
+
       res.json({
         success: true,
         playlist: {
-          name: playlistName,
-          description,
-          tracks: curatedTracks,
-          trackCount: curatedTracks.length,
+          id: result.playlist.id,
+          name: result.playlist.name,
+          description: result.playlist.description,
+          spotifyUrl: result.spotifyUrl,
+          trackCount: result.addedTracks,
+          tracks: result.playlist.tracks.slice(0, 10), // Return first 10 tracks for preview
+          createdAt: result.playlist.createdAt
         },
         metadata: {
-          createdAt: new Date().toISOString(),
-          aiGenerated: true,
-          criteria: { mood, activity, targetLength },
-          note: accessToken
-            ? 'No tracks found'
-            : 'No access token provided - returning track suggestions only',
-        },
+          totalTracksAdded: result.addedTracks,
+          totalTracksAttempted: result.totalAttempted,
+          warnings: result.warnings || [],
+          source: 'echotune_ai'
+        }
+      });
+
+    } catch (error) {
+      console.error('Create playlist error:', error);
+      
+      // Handle specific error types
+      if (error.message.includes('token expired')) {
+        return res.status(401).json({
+          success: false,
+          error: 'Spotify access token expired',
+          code: 'TOKEN_EXPIRED',
+          message: 'Please re-authenticate with Spotify'
+        });
+      } else if (error.message.includes('permissions')) {
+        return res.status(403).json({
+          success: false,
+          error: 'Insufficient Spotify permissions',
+          code: 'INSUFFICIENT_PERMISSIONS',
+          message: 'Please grant playlist modification permissions'
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        error: 'Failed to create playlist',
+        details: error.message
       });
     }
-  } catch (error) {
-    console.error('Smart playlist creation error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to create smart playlist',
-      message: error.message,
-    });
-  }
+  });
 });
 
 /**
- * POST /api/playlists/auto-generate
- * Auto-generate playlists based on AI chat suggestions
+ * POST /api/playlist-automation/generate-from-prompt
+ * Generate and create playlist from natural language prompt
  */
-router.post('/auto-generate', async (req, res) => {
-  try {
-    const {
-      userId: _userId = 'demo_user',
-      aiSuggestion, // AI chat response with music recommendations
-      contextData = {},
-      accessToken,
-      autoCreate = false,
-    } = req.body;
+router.post('/generate-from-prompt', async (req, res) => {
+  return await traceManager.traceSpotifyOperation('generateFromPrompt', async () => {
+    try {
+      const {
+        userId,
+        prompt,
+        trackCount = 20,
+        spotifyAccessToken,
+        autoCreate = false
+      } = req.body;
 
-    if (!aiSuggestion) {
-      return res.status(400).json({
-        success: false,
-        error: 'AI suggestion is required',
-      });
-    }
+      if (!userId || !prompt) {
+        return res.status(400).json({
+          success: false,
+          error: 'userId and prompt are required'
+        });
+      }
 
-    // Parse AI suggestion for playlist creation
-    const playlistData = await parseAISuggestion(aiSuggestion, contextData);
+      console.log(`Generating playlist from prompt: "${prompt}"`);
 
-    if (!playlistData.tracks || playlistData.tracks.length === 0) {
-      return res.json({
-        success: true,
-        message: 'No specific tracks found in AI suggestion',
-        suggestion: aiSuggestion,
-        playlistData,
-      });
-    }
+      // Parse prompt using chat orchestrator's intent classification
+      const IntentClassifier = require('../../chat/intents/classifyIntent');
+      const intentClassifier = new IntentClassifier();
+      const intent = intentClassifier.classifyIntent(prompt);
+      const entities = intentClassifier.extractEntities(prompt);
 
-    if (autoCreate && accessToken) {
-      // Automatically create the playlist
-      const spotifyPlaylist = await createSpotifyPlaylist({
-        accessToken,
-        name: playlistData.name,
-        description: playlistData.description,
-        isPublic: false,
-        trackUris: playlistData.tracks.map((track) => track.uri).filter((uri) => uri),
+      // Generate recommendations based on prompt context
+      const recommendations = await recommendationEngine.generateRecommendations(userId, {
+        limit: trackCount,
+        context: {
+          mood: entities.moods[0] || null,
+          activity: entities.activities[0] || null,
+          genre: entities.genres[0] || null,
+          artist: entities.artists[0] || null
+        }
       });
 
-      if (spotifyPlaylist.success) {
+      if (!recommendations.success || recommendations.recommendations.length === 0) {
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to generate recommendations from prompt',
+          prompt,
+          context
+        });
+      }
+
+      // Extract playlist name from prompt
+      const playlistName = extractPlaylistName(prompt) || 
+        generatePlaylistName(entities) || 
+        `AI Playlist: ${prompt.slice(0, 30)}...`;
+
+      const playlistData = {
+        name: playlistName,
+        description: `Generated from: "${prompt}"`,
+        tracks: recommendations.recommendations,
+        context: entities,
+        generatedAt: new Date().toISOString()
+      };
+
+      if (autoCreate && spotifyAccessToken) {
+        // Validate token
+        const tokenValidation = await playlistService.validateToken(spotifyAccessToken);
+        if (!tokenValidation.valid) {
+          return res.status(401).json({
+            success: false,
+            error: 'Invalid or expired Spotify access token'
+          });
+        }
+
+        // Auto-create the playlist
+        const result = await playlistService.createPersonalizedPlaylist(
+          userId,
+          playlistName,
+          recommendations.recommendations,
+          {
+            description: playlistData.description,
+            public: false
+          },
+          spotifyAccessToken
+        );
+
         res.json({
           success: true,
           autoCreated: true,
-          playlist: {
-            id: spotifyPlaylist.id,
-            name: playlistData.name,
-            url: spotifyPlaylist.url,
-            tracks: playlistData.tracks,
-          },
-          aiSuggestion,
+          playlist: result.playlist,
+          spotifyUrl: result.spotifyUrl,
+          prompt,
+          context: entities,
+          recommendations: {
+            total: recommendations.recommendations.length,
+            strategy: recommendations.strategy,
+            explanation: recommendations.explanation
+          }
         });
       } else {
-        throw new Error('Failed to auto-create playlist');
-      }
-    } else {
-      // Return playlist suggestions for manual creation
-      res.json({
-        success: true,
-        autoCreated: false,
-        playlistSuggestion: playlistData,
-        aiSuggestion,
-        message: 'Playlist suggestion ready for creation',
-      });
-    }
-  } catch (error) {
-    console.error('Auto-generate playlist error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to auto-generate playlist',
-      message: error.message,
-    });
-  }
-});
-
-/**
- * POST /api/playlists/enhance
- * Enhance existing playlist with AI suggestions
- */
-router.post('/enhance', async (req, res) => {
-  try {
-    const {
-      playlistId,
-      accessToken,
-      enhancementType = 'similar', // 'similar', 'diverse', 'mood_continuation'
-      targetAdditions = 5,
-      userId = 'demo_user',
-    } = req.body;
-
-    if (!playlistId || !accessToken) {
-      return res.status(400).json({
-        success: false,
-        error: 'Playlist ID and access token are required',
-      });
-    }
-
-    // Get current playlist tracks
-    const currentTracks = await getPlaylistTracks(accessToken, playlistId);
-
-    if (!currentTracks || currentTracks.length === 0) {
-      return res.status(404).json({
-        success: false,
-        error: 'Playlist not found or empty',
-      });
-    }
-
-    // Generate enhancement suggestions
-    const suggestions = await generatePlaylistEnhancements({
-      currentTracks,
-      enhancementType,
-      targetAdditions,
-      userId,
-    });
-
-    // Add suggestions to playlist
-    if (suggestions.length > 0) {
-      const addResult = await addTracksToPlaylist(
-        accessToken,
-        playlistId,
-        suggestions.map((track) => track.uri)
-      );
-
-      if (addResult.success) {
+        // Return suggestions without creating
         res.json({
           success: true,
-          enhanced: true,
-          addedTracks: suggestions,
-          totalTracksAdded: suggestions.length,
-          enhancementType,
+          autoCreated: false,
+          playlistSuggestion: playlistData,
+          prompt,
+          context: entities,
+          recommendations: {
+            tracks: recommendations.recommendations,
+            total: recommendations.recommendations.length,
+            strategy: recommendations.strategy,
+            explanation: recommendations.explanation
+          },
+          message: 'Playlist suggestion ready. Provide spotifyAccessToken and set autoCreate=true to create automatically.'
         });
-      } else {
-        throw new Error('Failed to add tracks to playlist');
       }
-    } else {
-      res.json({
-        success: true,
-        enhanced: false,
-        message: 'No suitable enhancement tracks found',
+
+    } catch (error) {
+      console.error('Generate from prompt error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to generate playlist from prompt',
+        details: error.message
       });
     }
-  } catch (error) {
-    console.error('Playlist enhancement error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to enhance playlist',
-      message: error.message,
-    });
-  }
+  });
 });
 
 /**
- * GET /api/playlists/suggestions
- * Get playlist suggestions based on current listening
+ * POST /api/playlist-automation/:playlistId/tracks
+ * Add tracks to existing playlist
  */
-router.get('/suggestions', async (req, res) => {
+router.post('/:playlistId/tracks', async (req, res) => {
+  return await traceManager.traceSpotifyOperation('addTracks', async () => {
+    try {
+      const { playlistId } = req.params;
+      const { userId, tracks, spotifyAccessToken } = req.body;
+
+      if (!tracks || !Array.isArray(tracks) || tracks.length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'tracks array is required'
+        });
+      }
+
+      if (!spotifyAccessToken) {
+        return res.status(400).json({
+          success: false,
+          error: 'spotifyAccessToken is required'
+        });
+      }
+
+      // Validate token
+      const tokenValidation = await playlistService.validateToken(spotifyAccessToken);
+      if (!tokenValidation.valid) {
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid or expired Spotify access token'
+        });
+      }
+
+      console.log(`Adding ${tracks.length} tracks to playlist ${playlistId}`);
+
+      const result = await playlistService.appendTracks(
+        userId,
+        playlistId,
+        tracks,
+        spotifyAccessToken
+      );
+
+      res.json({
+        success: true,
+        addedTracks: result.addedTracks,
+        totalAttempted: result.totalAttempted,
+        warnings: result.warnings || [],
+        snapshot_id: result.snapshot_id
+      });
+
+    } catch (error) {
+      console.error('Add tracks error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to add tracks to playlist',
+        details: error.message
+      });
+    }
+  });
+});
+
+/**
+ * POST /api/playlist-automation/ensure
+ * Ensure playlist exists for a specific purpose (e.g., workout, study)
+ */
+router.post('/ensure', async (req, res) => {
+  return await traceManager.traceSpotifyOperation('ensurePlaylist', async () => {
+    try {
+      const {
+        userId,
+        key, // Unique identifier for playlist type (e.g., 'workout', 'study', 'daily_mix')
+        config = {},
+        spotifyAccessToken
+      } = req.body;
+
+      if (!userId || !key || !spotifyAccessToken) {
+        return res.status(400).json({
+          success: false,
+          error: 'userId, key, and spotifyAccessToken are required'
+        });
+      }
+
+      // Validate token
+      const tokenValidation = await playlistService.validateToken(spotifyAccessToken);
+      if (!tokenValidation.valid) {
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid or expired Spotify access token'
+        });
+      }
+
+      const result = await playlistService.ensurePlaylistExists(
+        userId,
+        key,
+        {
+          name: config.name || `EchoTune ${key.charAt(0).toUpperCase() + key.slice(1)} Playlist`,
+          description: config.description || `Auto-managed ${key} playlist by EchoTune AI`,
+          public: config.public || false,
+          initialTracks: config.initialTracks || []
+        },
+        spotifyAccessToken
+      );
+
+      res.json({
+        success: true,
+        playlist: result.playlist,
+        created: result.created,
+        key,
+        message: result.created ? 'New playlist created' : 'Using existing playlist'
+      });
+
+    } catch (error) {
+      console.error('Ensure playlist error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to ensure playlist exists',
+        details: error.message
+      });
+    }
+  });
+});
+
+/**
+ * GET /api/playlist-automation/stats
+ * Get playlist service statistics
+ */
+router.get('/stats', (req, res) => {
   try {
-    const { userId = 'demo_user', context = 'general', limit = 5 } = req.query;
-
-    // Generate playlist suggestions
-    const suggestions = await generatePlaylistSuggestions({
-      userId,
-      context,
-      limit: parseInt(limit),
-    });
-
+    const stats = playlistService.getStats();
     res.json({
       success: true,
-      suggestions,
-      context,
-      generatedAt: new Date().toISOString(),
+      stats,
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Playlist suggestions error:', error);
+    console.error('Get stats error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to generate playlist suggestions',
-      message: error.message,
+      error: 'Failed to get statistics'
     });
   }
 });
@@ -299,330 +398,50 @@ router.get('/suggestions', async (req, res) => {
  */
 
 /**
- * Generate smart playlist with AI curation
+ * Extract playlist name from natural language prompt
  */
-async function generateSmartPlaylist(params) {
-  try {
-    // Mock smart playlist generation - in production, use ML models and Spotify API
-    const moodTracks = {
-      energetic: [
-        {
-          name: 'High Energy Track',
-          artist: 'Energy Artist',
-          uri: 'spotify:track:energy1',
-          audioFeatures: { energy: 0.9, valence: 0.8 },
-        },
-        {
-          name: 'Pump Up Song',
-          artist: 'Motivation Band',
-          uri: 'spotify:track:energy2',
-          audioFeatures: { energy: 0.85, valence: 0.9 },
-        },
-      ],
-      chill: [
-        {
-          name: 'Relaxing Vibes',
-          artist: 'Chill Artist',
-          uri: 'spotify:track:chill1',
-          audioFeatures: { energy: 0.3, valence: 0.6 },
-        },
-        {
-          name: 'Peaceful Melody',
-          artist: 'Calm Collective',
-          uri: 'spotify:track:chill2',
-          audioFeatures: { energy: 0.2, valence: 0.7 },
-        },
-      ],
-      happy: [
-        {
-          name: 'Feel Good Hit',
-          artist: 'Happy Crew',
-          uri: 'spotify:track:happy1',
-          audioFeatures: { energy: 0.7, valence: 0.9 },
-        },
-        {
-          name: 'Sunshine Song',
-          artist: 'Bright Band',
-          uri: 'spotify:track:happy2',
-          audioFeatures: { energy: 0.6, valence: 0.8 },
-        },
-      ],
-    };
+function extractPlaylistName(prompt) {
+  // Try various patterns to extract playlist name
+  const patterns = [
+    /(?:create|make|generate).*?playlist.*?(?:called|named|titled)\s+"([^"]+)"/i,
+    /(?:create|make|generate).*?playlist.*?(?:called|named|titled)\s+([^,.\n!?]+)/i,
+    /playlist.*?(?:called|named|titled)\s+"([^"]+)"/i,
+    /playlist.*?(?:called|named|titled)\s+([^,.\n!?]+)/i
+  ];
 
-    const activityTracks = {
-      workout: [
-        {
-          name: 'Gym Anthem',
-          artist: 'Fitness Fighter',
-          uri: 'spotify:track:workout1',
-          audioFeatures: { energy: 0.95, danceability: 0.8 },
-        },
-        {
-          name: 'Cardio Beat',
-          artist: 'Exercise Elite',
-          uri: 'spotify:track:workout2',
-          audioFeatures: { energy: 0.9, danceability: 0.85 },
-        },
-      ],
-      study: [
-        {
-          name: 'Focus Flow',
-          artist: 'Study Sounds',
-          uri: 'spotify:track:study1',
-          audioFeatures: { energy: 0.4, instrumentalness: 0.8 },
-        },
-        {
-          name: 'Concentration Central',
-          artist: 'Brain Beats',
-          uri: 'spotify:track:study2',
-          audioFeatures: { energy: 0.3, instrumentalness: 0.9 },
-        },
-      ],
-      commute: [
-        {
-          name: 'Drive Time',
-          artist: 'Road Runners',
-          uri: 'spotify:track:drive1',
-          audioFeatures: { energy: 0.6, valence: 0.7 },
-        },
-        {
-          name: 'Transit Tunes',
-          artist: 'Journey Jams',
-          uri: 'spotify:track:drive2',
-          audioFeatures: { energy: 0.5, valence: 0.6 },
-        },
-      ],
-    };
-
-    let selectedTracks = [];
-
-    // Combine mood and activity tracks
-    if (params.mood && moodTracks[params.mood]) {
-      selectedTracks = [...selectedTracks, ...moodTracks[params.mood]];
+  for (const pattern of patterns) {
+    const match = prompt.match(pattern);
+    if (match && match[1]) {
+      return match[1].trim();
     }
-
-    if (params.activity && activityTracks[params.activity]) {
-      selectedTracks = [...selectedTracks, ...activityTracks[params.activity]];
-    }
-
-    // Add seed tracks if provided
-    if (params.seedTracks && params.seedTracks.length > 0) {
-      selectedTracks = [...selectedTracks, ...params.seedTracks];
-    }
-
-    // If no specific criteria, use general recommendations
-    if (selectedTracks.length === 0) {
-      selectedTracks = [...moodTracks.happy, ...activityTracks.study];
-    }
-
-    // Limit to target length
-    return selectedTracks.slice(0, params.targetLength);
-  } catch (error) {
-    console.error('Generate smart playlist error:', error);
-    return [];
   }
+
+  return null;
 }
 
 /**
- * Create Spotify playlist
+ * Generate playlist name from context
  */
-async function createSpotifyPlaylist({ accessToken, name, description, isPublic, trackUris }) {
-  try {
-    // Get user profile
-    const userResponse = await axios.get('https://api.spotify.com/v1/me', {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-
-    const userId = userResponse.data.id;
-
-    // Create playlist
-    const playlistResponse = await axios.post(
-      `https://api.spotify.com/v1/users/${userId}/playlists`,
-      {
-        name,
-        description,
-        public: isPublic,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    const playlist = playlistResponse.data;
-
-    // Add tracks to playlist
-    if (trackUris && trackUris.length > 0) {
-      await axios.post(
-        `https://api.spotify.com/v1/playlists/${playlist.id}/tracks`,
-        {
-          uris: trackUris,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-    }
-
-    return {
-      success: true,
-      id: playlist.id,
-      url: playlist.external_urls.spotify,
-      name: playlist.name,
-    };
-  } catch (error) {
-    console.error('Create Spotify playlist error:', error);
-    return { success: false, error: error.message };
+function generatePlaylistName(entities) {
+  const parts = [];
+  
+  if (entities.moods && entities.moods.length > 0) {
+    parts.push(entities.moods[0].charAt(0).toUpperCase() + entities.moods[0].slice(1));
   }
-}
-
-/**
- * Parse AI suggestion for playlist data
- */
-async function parseAISuggestion(suggestion, contextData) {
-  try {
-    // Extract playlist information from AI text
-    const nameMatch =
-      suggestion.match(/playlist.*?["']([^"']+)["']/i) ||
-      suggestion.match(/create.*?["']([^"']+)["']/i) ||
-      suggestion.match(/called.*?["']([^"']+)["']/i);
-
-    const playlistName = nameMatch
-      ? nameMatch[1]
-      : contextData.mood
-        ? `${contextData.mood} Mix`
-        : contextData.activity
-          ? `${contextData.activity} Playlist`
-          : 'AI Curated Playlist';
-
-    // Extract artist/song mentions
-    const artistMatches =
-      suggestion.match(/artist.*?(?:like|such as|including)\s+([^.!?]+)/gi) || [];
-    const _songMatches = suggestion.match(/song.*?["']([^"']+)["']/gi) || [];
-    const _trackMatches = suggestion.match(/track.*?["']([^"']+)["']/gi) || [];
-
-    // Create mock tracks from mentions
-    const tracks = [];
-
-    artistMatches.forEach((match, index) => {
-      tracks.push({
-        name: `Track by ${match.split(' ').slice(-1)[0]}`,
-        artist: match.split(' ').slice(-1)[0],
-        uri: `spotify:track:suggested_${index}`,
-      });
-    });
-
-    return {
-      name: playlistName,
-      description: `AI-generated playlist based on: ${suggestion.slice(0, 100)}...`,
-      tracks: tracks.slice(0, 10), // Limit to 10 suggested tracks
-    };
-  } catch (error) {
-    console.error('Parse AI suggestion error:', error);
-    return {
-      name: 'AI Suggested Playlist',
-      description: 'Generated from AI recommendation',
-      tracks: [],
-    };
+  
+  if (entities.activities && entities.activities.length > 0) {
+    parts.push(entities.activities[0].charAt(0).toUpperCase() + entities.activities[0].slice(1));
   }
-}
-
-/**
- * Generate playlist suggestions
- */
-async function generatePlaylistSuggestions(params) {
-  try {
-    const suggestions = [
-      {
-        name: 'Morning Energy Boost',
-        description: 'Start your day with uplifting tracks',
-        mood: 'energetic',
-        estimatedTracks: 15,
-        suitableFor: ['morning', 'commute', 'workout'],
-      },
-      {
-        name: 'Focus Flow',
-        description: 'Instrumental and ambient tracks for concentration',
-        mood: 'focused',
-        estimatedTracks: 20,
-        suitableFor: ['work', 'study', 'reading'],
-      },
-      {
-        name: 'Evening Unwind',
-        description: 'Relaxing songs to end your day',
-        mood: 'chill',
-        estimatedTracks: 12,
-        suitableFor: ['evening', 'relaxation', 'meditation'],
-      },
-    ];
-
-    return suggestions.slice(0, params.limit);
-  } catch (error) {
-    console.error('Generate playlist suggestions error:', error);
-    return [];
+  
+  if (entities.genres && entities.genres.length > 0) {
+    parts.push(entities.genres[0].charAt(0).toUpperCase() + entities.genres[0].slice(1));
   }
-}
 
-/**
- * Get playlist tracks from Spotify
- */
-async function getPlaylistTracks(accessToken, playlistId) {
-  try {
-    const response = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-
-    return response.data.items.map((item) => item.track);
-  } catch (error) {
-    console.error('Get playlist tracks error:', error);
-    return [];
+  if (parts.length > 0) {
+    return `${parts.join(' ')} Mix`;
   }
-}
 
-/**
- * Generate playlist enhancements
- */
-async function generatePlaylistEnhancements(params) {
-  try {
-    // Mock enhancement suggestions
-    const enhancements = [
-      { name: 'Similar Vibe Track', artist: 'Related Artist', uri: 'spotify:track:enhancement1' },
-      { name: 'Complementary Song', artist: 'Harmony Band', uri: 'spotify:track:enhancement2' },
-    ];
-
-    return enhancements.slice(0, params.targetAdditions);
-  } catch (error) {
-    console.error('Generate enhancements error:', error);
-    return [];
-  }
-}
-
-/**
- * Add tracks to Spotify playlist
- */
-async function addTracksToPlaylist(accessToken, playlistId, trackUris) {
-  try {
-    await axios.post(
-      `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
-      { uris: trackUris },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    return { success: true };
-  } catch (error) {
-    console.error('Add tracks error:', error);
-    return { success: false, error: error.message };
-  }
+  return null;
 }
 
 module.exports = router;

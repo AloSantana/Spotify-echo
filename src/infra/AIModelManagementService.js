@@ -87,7 +87,7 @@ class AIModelManagementService extends EventEmitter {
             lastUpdated: new Date()
         };
         
-        console.log(`🤖 AI Model Management Service initialized with config:`, {
+        console.log('🤖 AI Model Management Service initialized with config:', {
             versioningStrategy: this.config.modelVersioningStrategy,
             deploymentStrategy: this.config.defaultDeploymentStrategy,
             abTesting: this.config.enableABTesting,

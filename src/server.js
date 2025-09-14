@@ -739,8 +739,8 @@ if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') server.listen(PORT, 
     if (infrastructure.phase9Orchestrator) {
       const phase9Overview = infrastructure.phase9Orchestrator.getOverview();
       console.log(`✅ Phase 9: Advanced Observability & Analytics ready (${phase9Overview.services.active}/${phase9Overview.services.total} services)`);
-      console.log(`🔍 APM: enabled, 📊 Business Intelligence: enabled`);
-      console.log(`📈 Real-Time Analytics: enabled, 🚨 Advanced Alerting: enabled`);
+      console.log('🔍 APM: enabled, 📊 Business Intelligence: enabled');
+      console.log('📈 Real-Time Analytics: enabled, 🚨 Advanced Alerting: enabled');
       console.log(`💡 Health Score: System ${phase9Overview.health.system.toFixed(1)}%, Business ${phase9Overview.health.business.toFixed(1)}%`);
     }
 
@@ -751,7 +751,7 @@ if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') server.listen(PORT, 
       console.log(`🤖 AI Services: ${phase10Overview.services.list.join(', ')}`);
       console.log(`🎯 ML Pipeline: ${phase10Overview.metrics.totalRequests} requests processed, ${phase10Overview.metrics.averageLatency}ms avg latency`);
       console.log(`⚡ Optimizations: ${phase10Overview.metrics.optimizationEvents} events, ${phase10Overview.integrationPatterns.length} integration patterns`);
-      console.log(`🔍 API Endpoints: 30+ endpoints available at /api/phase10/*`);
+      console.log('🔍 API Endpoints: 30+ endpoints available at /api/phase10/*');
     }
   } catch (error) {
     console.error('❌ Infrastructure initialization failed:', error);

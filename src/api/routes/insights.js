@@ -606,10 +606,28 @@ router.get('/listening-trends', requireAuth, insightsRateLimit, async (req, res)
     });
   } catch (error) {
     console.error('Error getting listening trends:', error);
-    res.status(500).json({
+    
+    // Enhanced error handling with different error types
+    let errorMessage = 'Failed to get listening trends';
+    let statusCode = 500;
+    
+    if (error.name === 'ValidationError') {
+      errorMessage = 'Invalid request parameters';
+      statusCode = 400;
+    } else if (error.message.includes('timeout')) {
+      errorMessage = 'Request timeout - please try again';
+      statusCode = 408;
+    } else if (error.message.includes('connection')) {
+      errorMessage = 'Database connection error';
+      statusCode = 503;
+    }
+    
+    res.status(statusCode).json({
       success: false,
-      error: 'Failed to get listening trends',
+      error: errorMessage,
       message: error.message,
+      timestamp: new Date().toISOString(),
+      requestId: req.headers['x-request-id'] || 'unknown'
     });
   }
 });

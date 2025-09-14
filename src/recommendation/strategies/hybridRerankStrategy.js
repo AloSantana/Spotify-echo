@@ -317,24 +317,30 @@ class HybridRerankStrategy {
     
     const seenTracks = new Set();
     
+    let selectionIndex = 0;
+    
     while (interleavedList.length < limit && strategyCursors.some(sc => sc.cursor < sc.candidates.length)) {
       // Select strategy based on weight and remaining candidates
       const availableStrategies = strategyCursors.filter(sc => sc.cursor < sc.candidates.length);
       
       if (availableStrategies.length === 0) break;
       
-      // Weighted selection of strategy
+      // Deterministic weighted selection of strategy
       const totalWeight = availableStrategies.reduce((sum, sc) => sum + sc.weight, 0);
-      let random = Math.random() * totalWeight;
       
+      // Use deterministic selection based on current position
+      let weightedPosition = (selectionIndex * 7919) % totalWeight; // Prime number for better distribution
       let selectedStrategy = availableStrategies[0];
+      
       for (const strategy of availableStrategies) {
-        random -= strategy.weight;
-        if (random <= 0) {
+        weightedPosition -= strategy.weight;
+        if (weightedPosition <= 0) {
           selectedStrategy = strategy;
           break;
         }
       }
+      
+      selectionIndex++;
       
       // Get next candidate from selected strategy
       const candidate = selectedStrategy.candidates[selectedStrategy.cursor];
