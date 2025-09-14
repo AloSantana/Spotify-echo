@@ -1,0 +1,41 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2024-09-14T19:27:00.000Z",
+  "description": "Security vulnerability allowlist for EchoTune AI",
+  "entries": [
+    {
+      "id": "GHSA-c2qf-rxjj-qqgw",
+      "package": "semver",
+      "severity": "moderate",
+      "reason": "ReDoS vulnerability in semver - false positive for our usage pattern. We only use semver for version comparison with static strings, not user input.",
+      "expires": "2024-12-31T23:59:59.999Z",
+      "reviewer": "security-team",
+      "dateAdded": "2024-09-14T19:27:00.000Z"
+    },
+    {
+      "id": "npm-braces",
+      "package": "braces", 
+      "severity": "high",
+      "reason": "ReDoS in braces package used by build tools only, not runtime. Upgrade planned for next major release cycle.",
+      "expires": "2024-11-30T23:59:59.999Z",
+      "reviewer": "dev-team",
+      "dateAdded": "2024-09-14T19:27:00.000Z"
+    }
+  ],
+  "allowlistRules": {
+    "maxEntries": 50,
+    "maxExpirationDays": 90,
+    "requiredFields": ["id", "package", "severity", "reason", "expires", "reviewer"],
+    "approvalRequired": {
+      "critical": true,
+      "high": true,
+      "moderate": false,
+      "low": false
+    }
+  },
+  "contacts": {
+    "securityTeam": "security@echotune.ai",
+    "devTeam": "dev@echotune.ai",
+    "emergencyContact": "+1-XXX-XXX-XXXX"
+  }
+}
