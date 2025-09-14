@@ -7,6 +7,7 @@ const IntentClassifier = require('./intents/classifyIntent');
 const recommendationEngine = require('../ml/recommendation-engine'); // Import the singleton instance
 const SpotifyAudioFeaturesService = require('../spotify/audio-features');
 const SpotifyAPIService = require('../spotify/api-service');
+const PlaylistService = require('../spotify/PlaylistService'); // Phase 6: Playlist Automation
 
 // AgentOps integration
 const { traceManager } = require('../utils/agentops-trace-manager');
@@ -25,6 +26,7 @@ class EchoTuneChatbot {
     this.recommendationEngine = recommendationEngine; // Use the singleton instance
     this.spotifyService = new SpotifyAudioFeaturesService();
     this.spotifyAPI = new SpotifyAPIService();
+    this.playlistService = new PlaylistService(); // Phase 6: Playlist Automation
 
     // Initialize providers based on config
     this.initializeProviders();
@@ -314,10 +316,12 @@ class EchoTuneChatbot {
         break;
 
       case 'playlist_create':
-        if (intent.confidence > 0.9 && intent.requiresSpotifyAuth) {
+        if (intent.confidence > 0.7) {
           const accessToken = session?.context?.spotifyAccessToken;
-          if (!accessToken) {
-            const authResponse = 'To create playlists, I need access to your Spotify account. Please connect your Spotify account first.';
+          const userId = session?.context?.spotifyUserId;
+          
+          if (!accessToken || !userId) {
+            const authResponse = 'To create playlists, I need access to your Spotify account. Please connect your Spotify account first and make sure I have playlist modification permissions.';
             
             await this.conversationManager.addMessage(
               session.sessionId,
@@ -334,6 +338,113 @@ class EchoTuneChatbot {
               sessionId: session.sessionId,
               authRequired: true,
               intent: intent,
+            };
+          }
+
+          // Extract playlist details from intent entities
+          const playlistName = entities.playlistName || 
+            this._generatePlaylistName(entities) || 
+            'AI Generated Playlist';
+          
+          // Get recommendations for the playlist
+          try {
+            const recommendations = await this.getRecommendations({
+              limit: entities.trackCount || 20,
+              target_features: {
+                genres: entities.genres,
+                moods: entities.moods,
+                activities: entities.activities,
+              },
+            }, session);
+
+            if (!recommendations.success || recommendations.recommendations.length === 0) {
+              const errorResponse = 'I couldn\'t generate suitable tracks for your playlist. Could you provide more specific preferences?';
+              
+              await this.conversationManager.addMessage(
+                session.sessionId,
+                { role: 'assistant', content: errorResponse }
+              );
+
+              return {
+                response: errorResponse,
+                sessionId: session.sessionId,
+                intent: intent,
+                error: 'No recommendations generated'
+              };
+            }
+
+            // Create the playlist using PlaylistService
+            const playlistResult = await this.playlistService.createPersonalizedPlaylist(
+              userId,
+              playlistName,
+              recommendations.recommendations,
+              {
+                description: `AI-generated playlist based on your request: "${message.slice(0, 100)}..."`,
+                public: false
+              },
+              accessToken
+            );
+
+            if (playlistResult.success) {
+              const successResponse = `🎵 Great! I've created your playlist "${playlistName}" with ${playlistResult.addedTracks} tracks. ` +
+                `You can find it in your Spotify library or listen here: ${playlistResult.spotifyUrl}`;
+              
+              await this.conversationManager.addMessage(
+                session.sessionId,
+                { role: 'assistant', content: successResponse },
+                {
+                  responseTime: Date.now() - startTime,
+                  intent: primary,
+                  confidence: intent.confidence,
+                  playlistCreated: true,
+                  playlistId: playlistResult.playlist.id,
+                  tracksAdded: playlistResult.addedTracks
+                }
+              );
+
+              return {
+                response: successResponse,
+                sessionId: session.sessionId,
+                provider: this.currentProvider,
+                intent: intent,
+                playlist: {
+                  id: playlistResult.playlist.id,
+                  name: playlistName,
+                  url: playlistResult.spotifyUrl,
+                  trackCount: playlistResult.addedTracks
+                },
+                metadata: {
+                  responseTime: Date.now() - startTime,
+                  directResponse: true,
+                },
+              };
+            } else {
+              throw new Error('Failed to create playlist on Spotify');
+            }
+
+          } catch (error) {
+            console.error('Playlist creation error:', error);
+            
+            let errorResponse = 'I encountered an issue creating your playlist. ';
+            
+            if (error.message.includes('token expired')) {
+              errorResponse += 'Your Spotify access token has expired. Please re-authenticate.';
+            } else if (error.message.includes('permissions')) {
+              errorResponse += 'Please make sure I have permission to create and modify playlists in your Spotify account.';
+            } else {
+              errorResponse += 'Please try again, or provide more specific preferences for your playlist.';
+            }
+            
+            await this.conversationManager.addMessage(
+              session.sessionId,
+              { role: 'assistant', content: errorResponse }
+            );
+
+            return {
+              response: errorResponse,
+              sessionId: session.sessionId,
+              intent: intent,
+              error: error.message
             };
           }
         }
@@ -1465,6 +1576,40 @@ Remember to be conversational, helpful, and always focus on music discovery and 
    * @param {string} message - User message
    * @param {string} sessionId - Session identifier
    * @returns {Promise<Object>} Chat response
+   */
+  /**
+   * Generate a playlist name from intent entities
+   */
+  _generatePlaylistName(entities) {
+    const parts = [];
+    
+    if (entities.moods && entities.moods.length > 0) {
+      parts.push(entities.moods[0].charAt(0).toUpperCase() + entities.moods[0].slice(1));
+    }
+    
+    if (entities.activities && entities.activities.length > 0) {
+      parts.push(entities.activities[0].charAt(0).toUpperCase() + entities.activities[0].slice(1));
+    }
+    
+    if (entities.genres && entities.genres.length > 0) {
+      parts.push(entities.genres[0].charAt(0).toUpperCase() + entities.genres[0].slice(1));
+    }
+
+    if (parts.length > 0) {
+      return `${parts.join(' ')} Mix`;
+    }
+
+    // Fallback names based on time of day
+    const hour = new Date().getHours();
+    if (hour < 10) return 'Morning Vibes';
+    if (hour < 14) return 'Midday Mix';
+    if (hour < 18) return 'Afternoon Playlist';
+    if (hour < 22) return 'Evening Tunes';
+    return 'Late Night Mix';
+  }
+
+  /**
+   * Legacy chat method for backward compatibility
    */
   async chat(message, sessionId) {
     const response = await this.sendMessage(sessionId, message);
