@@ -3,6 +3,7 @@ const GeminiProvider = require('./llm-providers/gemini-provider');
 const CustomAPIProvider = require('./llm-providers/custom-provider');
 const MockLLMProvider = require('./llm-providers/mock-provider');
 const ConversationManager = require('./conversation-manager');
+const IntentClassifier = require('./intents/classifyIntent');
 const recommendationEngine = require('../ml/recommendation-engine'); // Import the singleton instance
 const SpotifyAudioFeaturesService = require('../spotify/audio-features');
 const SpotifyAPIService = require('../spotify/api-service');
@@ -20,6 +21,7 @@ class EchoTuneChatbot {
     this.providers = new Map();
     this.currentProvider = null;
     this.conversationManager = new ConversationManager();
+    this.intentClassifier = new IntentClassifier();
     this.recommendationEngine = recommendationEngine; // Use the singleton instance
     this.spotifyService = new SpotifyAudioFeaturesService();
     this.spotifyAPI = new SpotifyAPIService();
@@ -177,7 +179,32 @@ class EchoTuneChatbot {
           const session = await this._validateSession(sessionId);
           const provider = await this._setupProvider(options);
 
+          // Classify intent
+          const intent = this.intentClassifier.classifyIntent(message, {
+            previousIntent: session.context?.lastIntent,
+            userPreferences: session.context?.userPreferences,
+          });
+
+          console.log(`🎯 Intent classified: ${intent.primary} (confidence: ${intent.confidence.toFixed(2)})`);
+
+          // Store intent in session context
+          session.context = session.context || {};
+          session.context.lastIntent = intent.primary;
+          session.context.currentIntent = intent;
+
           await this._addUserMessage(sessionId, message);
+
+          // Handle intent-specific logic
+          const intentResponse = await this._handleIntentBasedLogic(
+            intent,
+            message,
+            session,
+            options,
+            startTime
+          );
+          if (intentResponse) {
+            return intentResponse;
+          }
 
           const commandResponse = await this._handleSpecialCommands(
             message,
@@ -189,7 +216,7 @@ class EchoTuneChatbot {
             return commandResponse;
           }
 
-          const llmResponse = await this._generateLLMResponse(sessionId, session, provider, options);
+          const llmResponse = await this._generateLLMResponse(sessionId, session, provider, options, intent);
           const finalResponse = await this._processFunctionCalls(
             llmResponse,
             session,
@@ -197,7 +224,7 @@ class EchoTuneChatbot {
             options
           );
 
-          return await this._finalizeResponse(sessionId, finalResponse, llmResponse, startTime);
+          return await this._finalizeResponse(sessionId, finalResponse, llmResponse, startTime, intent);
         } catch (error) {
           return await this._handleSendMessageError(error, sessionId, startTime);
         }
@@ -242,8 +269,117 @@ class EchoTuneChatbot {
   }
 
   /**
-   * Handle special commands and return response if applicable
+   * Handle intent-specific logic before LLM processing
    */
+  async _handleIntentBasedLogic(intent, message, session, options, startTime) {
+    const { primary, entities, suggestedActions } = intent;
+
+    // Handle high-confidence intents that don't need LLM processing
+    switch (primary) {
+      case 'recommend':
+        if (intent.confidence > 0.8 && entities.genres.length > 0) {
+          const recommendations = await this.getRecommendations({
+            limit: 5,
+            target_features: {
+              genres: entities.genres,
+              moods: entities.moods,
+              activities: entities.activities,
+            },
+          }, session);
+
+          const response = this._formatRecommendationResponse(recommendations, entities);
+          
+          await this.conversationManager.addMessage(
+            session.sessionId,
+            { role: 'assistant', content: response },
+            {
+              responseTime: Date.now() - startTime,
+              intent: primary,
+              confidence: intent.confidence,
+              directResponse: true,
+            }
+          );
+
+          return {
+            response,
+            sessionId: session.sessionId,
+            provider: this.currentProvider,
+            intent: intent,
+            metadata: {
+              responseTime: Date.now() - startTime,
+              directResponse: true,
+            },
+          };
+        }
+        break;
+
+      case 'playlist_create':
+        if (intent.confidence > 0.9 && intent.requiresSpotifyAuth) {
+          const accessToken = session?.context?.spotifyAccessToken;
+          if (!accessToken) {
+            const authResponse = 'To create playlists, I need access to your Spotify account. Please connect your Spotify account first.';
+            
+            await this.conversationManager.addMessage(
+              session.sessionId,
+              { role: 'assistant', content: authResponse },
+              {
+                responseTime: Date.now() - startTime,
+                intent: primary,
+                authRequired: true,
+              }
+            );
+
+            return {
+              response: authResponse,
+              sessionId: session.sessionId,
+              authRequired: true,
+              intent: intent,
+            };
+          }
+        }
+        break;
+
+      case 'insight':
+        if (intent.confidence > 0.8) {
+          const analysis = await this.analyzeListeningHabits(
+            { timeframe: entities.timeframe },
+            session
+          );
+
+          const response = this._formatInsightResponse(analysis, entities);
+          
+          await this.conversationManager.addMessage(
+            session.sessionId,
+            { role: 'assistant', content: response },
+            {
+              responseTime: Date.now() - startTime,
+              intent: primary,
+              confidence: intent.confidence,
+              directResponse: true,
+            }
+          );
+
+          return {
+            response,
+            sessionId: session.sessionId,
+            provider: this.currentProvider,
+            intent: intent,
+            metadata: {
+              responseTime: Date.now() - startTime,
+              directResponse: true,
+            },
+          };
+        }
+        break;
+
+      case 'feedback':
+        // Process feedback and update user preferences
+        await this._processFeedback(entities, session);
+        break;
+    }
+
+    return null; // Continue with normal LLM processing
+  }
   async _handleSpecialCommands(message, session, options, startTime) {
     const commandResponse = await this.handleSpecialCommands(message, session, options);
     if (commandResponse) {
@@ -273,12 +409,16 @@ class EchoTuneChatbot {
   /**
    * Generate LLM response
    */
-  async _generateLLMResponse(sessionId, session, provider, options) {
+  async _generateLLMResponse(sessionId, session, provider, options, intent) {
     const messages = this.conversationManager.getMessagesForLLM(sessionId, {
       maxMessages: options.maxHistory || 10,
     });
 
-    const llmResponse = await provider.generateCompletion(messages, {
+    // Add intent context to the system message
+    const systemMessage = this._buildSystemMessageWithIntent(intent, session);
+    const messagesWithContext = [systemMessage, ...messages];
+
+    const llmResponse = await provider.generateCompletion(messagesWithContext, {
       model: options.model || session.metadata.model,
       temperature: options.temperature || 0.7,
       maxTokens: options.maxTokens || 1500,
@@ -352,13 +492,15 @@ class EchoTuneChatbot {
   /**
    * Finalize response and add to conversation
    */
-  async _finalizeResponse(sessionId, finalResponse, llmResponse, startTime) {
+  async _finalizeResponse(sessionId, finalResponse, llmResponse, startTime, intent) {
     const responseMetadata = {
       responseTime: Date.now() - startTime,
       provider: this.currentProvider,
       model: llmResponse.model,
       tokens: llmResponse.usage?.totalTokens || 0,
       functionCalls: llmResponse.functionCall || llmResponse.toolCalls ? 1 : 0,
+      intent: intent?.primary,
+      confidence: intent?.confidence,
     };
 
     await this.conversationManager.addMessage(
@@ -374,6 +516,7 @@ class EchoTuneChatbot {
       response: finalResponse,
       sessionId,
       provider: this.currentProvider,
+      intent: intent,
       functionResults: llmResponse.functionCall || llmResponse.toolCalls ? true : null,
       metadata: responseMetadata,
     };
@@ -1100,6 +1243,221 @@ Just ask me anything about music and I'll help you discover your next favorite s
     }
 
     return insights;
+  }
+
+  /**
+   * Build system message with intent context
+   */
+  _buildSystemMessageWithIntent(intent, session) {
+    const { primary, entities, confidence } = intent;
+    const userPreferences = session.context?.userPreferences || {};
+
+    let systemContent = `You are EchoTune AI, a personalized music recommendation assistant. 
+
+Current conversation context:
+- Detected intent: ${primary} (confidence: ${confidence.toFixed(2)})
+- Intent description: ${this.intentClassifier.getIntentDescription(primary)}
+- Extracted entities: ${JSON.stringify(entities)}
+- User preferences: ${JSON.stringify(userPreferences)}
+
+Instructions based on intent:`;
+
+    switch (primary) {
+      case 'recommend':
+        systemContent += `
+- Focus on providing specific music recommendations
+- Use the extracted genres, moods, and activities to personalize suggestions
+- Call the get_recommendations function if needed
+- Explain why you're recommending specific tracks`;
+        break;
+
+      case 'playlist_create':
+        systemContent += `
+- Help the user create a new playlist
+- Suggest a name based on the mood/activity if not provided
+- Call create_playlist function with appropriate tracks
+- Confirm playlist creation details`;
+        break;
+
+      case 'insight':
+        systemContent += `
+- Provide analysis of the user's listening habits
+- Use the analyze_listening_habits function
+- Highlight interesting patterns and trends
+- Give actionable insights about their music taste`;
+        break;
+
+      case 'refine':
+        systemContent += `
+- The user wants to refine previous recommendations
+- Ask clarifying questions about what they want to change
+- Adjust recommendations based on their feedback`;
+        break;
+
+      case 'feedback':
+        systemContent += `
+- Process the user's feedback on recommendations
+- Update their preferences based on likes/dislikes
+- Thank them for the feedback`;
+        break;
+
+      case 'mood':
+        systemContent += `
+- Focus on mood-based music recommendations
+- Consider the time of day and detected activities
+- Match the energy level to their current mood`;
+        break;
+
+      default:
+        systemContent += `
+- Provide helpful and conversational responses
+- If the request is music-related, guide them towards specific intents
+- Be friendly and engaging`;
+    }
+
+    systemContent += `
+
+Remember to be conversational, helpful, and always focus on music discovery and personalization.`;
+
+    return {
+      role: 'system',
+      content: systemContent,
+    };
+  }
+
+  /**
+   * Format recommendation response
+   */
+  _formatRecommendationResponse(recommendations, entities) {
+    if (recommendations.error) {
+      return `Sorry, I couldn't generate recommendations at the moment. ${recommendations.message || 'Please try again.'}`;
+    }
+
+    const tracks = recommendations.recommendations || [];
+    if (tracks.length === 0) {
+      return "I couldn't find any recommendations matching your criteria. Try describing your mood or preferred genre!";
+    }
+
+    let response = `🎵 Based on your request`;
+    if (entities.genres.length > 0) {
+      response += ` for ${entities.genres.join(', ')}`;
+    }
+    if (entities.moods.length > 0) {
+      response += ` with a ${entities.moods.join(', ')} mood`;
+    }
+    if (entities.activities.length > 0) {
+      response += ` for ${entities.activities.join(', ')}`;
+    }
+    response += `, here are some tracks you might enjoy:\n\n`;
+
+    tracks.slice(0, 5).forEach((track, index) => {
+      response += `${index + 1}. **${track.name}** by ${track.artist}\n`;
+      if (track.explanation) {
+        response += `   _${track.explanation}_\n`;
+      }
+    });
+
+    response += `\n💡 Would you like me to create a playlist with these tracks?`;
+    return response;
+  }
+
+  /**
+   * Format insight response
+   */
+  _formatInsightResponse(analysis, entities) {
+    if (analysis.error) {
+      return `Sorry, I couldn't analyze your listening habits at the moment. ${analysis.message || 'Please try again.'}`;
+    }
+
+    let response = `📊 Your Music Listening Analysis\n\n`;
+
+    if (analysis.analysis) {
+      const { top_genres, listening_patterns, audio_features_profile } = analysis.analysis;
+
+      if (top_genres && top_genres.length > 0) {
+        response += `**Top Genres:**\n`;
+        top_genres.slice(0, 5).forEach((genre, index) => {
+          response += `${index + 1}. ${genre.genre || genre} ${genre.count ? `(${genre.count} tracks)` : ''}\n`;
+        });
+        response += '\n';
+      }
+
+      if (listening_patterns) {
+        response += `**Listening Patterns:**\n`;
+        if (listening_patterns.most_active_hours && listening_patterns.most_active_hours.length > 0) {
+          const topHour = listening_patterns.most_active_hours[0];
+          response += `• Most active listening time: ${topHour.hour}:00 (${topHour.count} plays)\n`;
+        }
+        if (listening_patterns.total_listening_time) {
+          response += `• Total listening time: ${listening_patterns.total_listening_time} minutes\n`;
+        }
+        response += '\n';
+      }
+
+      if (audio_features_profile) {
+        response += `**Your Music Characteristics:**\n`;
+        if (audio_features_profile.energy) {
+          response += `• Energy level: ${(audio_features_profile.energy.average * 100).toFixed(0)}%\n`;
+        }
+        if (audio_features_profile.danceability) {
+          response += `• Danceability: ${(audio_features_profile.danceability.average * 100).toFixed(0)}%\n`;
+        }
+        if (audio_features_profile.valence) {
+          response += `• Positivity: ${(audio_features_profile.valence.average * 100).toFixed(0)}%\n`;
+        }
+        response += '\n';
+      }
+    }
+
+    if (analysis.insights && analysis.insights.length > 0) {
+      response += `**Insights:**\n`;
+      analysis.insights.forEach(insight => {
+        response += `• ${insight}\n`;
+      });
+    }
+
+    return response;
+  }
+
+  /**
+   * Process user feedback
+   */
+  async _processFeedback(entities, session) {
+    try {
+      const db = require('../database/mongodb').getDb();
+      const userPreferencesCollection = db.collection('user_preferences');
+
+      const feedback = {
+        user_id: session.userId,
+        timestamp: new Date(),
+        entities: entities,
+        session_id: session.sessionId,
+      };
+
+      // Determine sentiment
+      const positiveFeedback = ['like', 'love', 'good', 'great', 'awesome', 'perfect', 'thanks'];
+      const negativeFeedback = ['hate', 'dislike', 'bad', 'terrible', 'not good'];
+
+      const positiveCount = positiveFeedback.filter(word => 
+        entities.moods.some(mood => mood.includes(word))
+      ).length;
+      const negativeCount = negativeFeedback.filter(word => 
+        entities.moods.some(mood => mood.includes(word))
+      ).length;
+
+      feedback.sentiment = positiveCount > negativeCount ? 'positive' : 
+                          negativeCount > positiveCount ? 'negative' : 'neutral';
+
+      await userPreferencesCollection.insertOne(feedback);
+
+      // Update session context
+      session.context = session.context || {};
+      session.context.lastFeedback = feedback;
+
+      console.log(`📝 Processed ${feedback.sentiment} feedback for user ${session.userId}`);
+    } catch (error) {
+      console.error('Error processing feedback:', error);
+    }
   }
 
   /**

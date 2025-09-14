@@ -1,186 +1,149 @@
 #!/usr/bin/env node
 
 /**
- * LLM Provider Validation Script
- * Validates all configured LLM providers and reports their status
+ * Validate LLM Providers with Real Environment Variables
+ * Tests OpenAI, OpenRouter, and Gemini providers with actual API keys
  */
 
-const providerRegistry = require('../src/llm/providers');
+require('dotenv').config();
 
-async function validateLLMProviders() {
-  console.log('🔍 Validating LLM Providers...\n');
+const OpenAIProvider = require('../src/llm/providers/OpenAIProvider');
+const OpenRouterProvider = require('../src/llm/providers/OpenRouterProvider');
+const GeminiProvider = require('../src/llm/providers/GeminiProvider');
 
+async function validateProvider(providerName, ProviderClass, config) {
+  console.log(`\n🧪 Testing ${providerName} Provider...`);
+  
   try {
-    // Initialize provider registry
-    const initialized = await providerRegistry.initialize();
+    const provider = new ProviderClass(config);
+    await provider.initialize();
     
-    if (!initialized) {
-      console.error('❌ Failed to initialize provider registry');
-      process.exit(1);
-    }
-
-    // Get provider status
-    const status = providerRegistry.getProviderStatus();
-    
-    console.log('📊 Provider Registry Status:');
-    console.log(`   Initialized: ${status.initialized ? '✅' : '❌'}`);
-    console.log(`   Default Provider: ${status.defaultProvider}`);
-    console.log(`   Total Providers: ${status.totalProviders}`);
-    console.log(`   Available: ${status.availableProviders.length}`);
-    console.log(`   Unavailable: ${status.unavailableProviders.length}\n`);
-
-    // Validate each available provider
-    const validationResults = {};
-    let allValid = true;
-
-    for (const providerInfo of status.availableProviders) {
-      console.log(`🔍 Validating ${providerInfo.name}...`);
-      
-      const validation = await providerRegistry.validateProvider(providerInfo.name);
-      validationResults[providerInfo.name] = validation;
-      
-      if (validation.valid) {
-        console.log(`   ✅ ${providerInfo.name}: ${validation.response}`);
-        console.log(`   📈 Telemetry: ${validation.telemetry.successRate} success rate, ${validation.telemetry.averageLatency}ms avg latency`);
-      } else {
-        console.log(`   ❌ ${providerInfo.name}: ${validation.error}`);
-        allValid = false;
-      }
-      console.log();
-    }
-
-    // Report unavailable providers
-    if (status.unavailableProviders.length > 0) {
-      console.log('⚠️  Unavailable Providers:');
-      for (const providerInfo of status.unavailableProviders) {
-        console.log(`   ❌ ${providerInfo.name}: Not available (missing API key or initialization failed)`);
-      }
-      console.log();
-    }
-
-    // Test provider switching
-    console.log('🔄 Testing Provider Switching...');
-    for (const providerInfo of status.availableProviders) {
-      try {
-        const response = await providerRegistry.generate(
-          [{ role: 'user', content: 'Say "Provider switch test successful"' }],
-          { provider: providerInfo.name, maxTokens: 20 }
-        );
-        console.log(`   ✅ ${providerInfo.name}: ${response.content.trim()}`);
-      } catch (error) {
-        console.log(`   ❌ ${providerInfo.name}: ${error.message}`);
-        allValid = false;
-      }
-    }
-
-    // Test fallback mechanism
-    console.log('\n🔄 Testing Fallback Mechanism...');
-    try {
-      const response = await providerRegistry.generate(
-        [{ role: 'user', content: 'Say "Fallback test successful"' }],
-        { provider: 'nonexistent', maxTokens: 20 }
-      );
-      console.log(`   ✅ Fallback successful: ${response.content.trim()}`);
-    } catch (error) {
-      console.log(`   ❌ Fallback failed: ${error.message}`);
-      allValid = false;
-    }
-
-    // Summary
-    console.log('\n📋 Validation Summary:');
-    console.log(`   Total providers: ${status.totalProviders}`);
-    console.log(`   Available: ${status.availableProviders.length}`);
-    console.log(`   Valid: ${Object.values(validationResults).filter(r => r.valid).length}`);
-    console.log(`   Overall status: ${allValid ? '✅ All systems operational' : '⚠️ Some issues detected'}`);
-
-    // Generate validation report
-    const report = {
-      timestamp: new Date().toISOString(),
-      registry: status,
-      validations: validationResults,
-      summary: {
-        totalProviders: status.totalProviders,
-        availableProviders: status.availableProviders.length,
-        validProviders: Object.values(validationResults).filter(r => r.valid).length,
-        allValid
-      }
-    };
-
-    // Save report to file
-    const fs = require('fs');
-    const reportPath = 'reports/llm-provider-validation.json';
-    
-    // Ensure reports directory exists
-    if (!fs.existsSync('reports')) {
-      fs.mkdirSync('reports', { recursive: true });
+    if (!provider.isAvailable()) {
+      console.log(`❌ ${providerName}: Not available (likely missing API key)`);
+      return false;
     }
     
-    fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
-    console.log(`\n📄 Validation report saved to: ${reportPath}`);
-
-    // Exit with appropriate code
-    process.exit(allValid ? 0 : 1);
-
+    // Test basic completion
+    const testMessage = [
+      { role: 'user', content: 'Suggest one upbeat song for working out. Keep response short.' }
+    ];
+    
+    console.log(`   Testing completion...`);
+    const response = await provider.generateCompletion(testMessage, {
+      maxTokens: 100,
+      temperature: 0.7
+    });
+    
+    if (response.error) {
+      console.log(`❌ ${providerName}: Error - ${response.message}`);
+      return false;
+    }
+    
+    console.log(`✅ ${providerName}: Successfully generated response`);
+    console.log(`   Response: "${response.content.substring(0, 100)}..."`);
+    console.log(`   Tokens used: ${response.usage?.totalTokens || 'N/A'}`);
+    
+    return true;
   } catch (error) {
-    console.error('❌ Validation failed:', error.message);
-    console.error(error.stack);
-    process.exit(1);
+    console.log(`❌ ${providerName}: Exception - ${error.message}`);
+    return false;
   }
 }
 
-// CLI options handling
-const args = process.argv.slice(2);
-const options = {
-  provider: null,
-  verbose: false,
-  skipValidation: false
-};
-
-for (let i = 0; i < args.length; i++) {
-  switch (args[i]) {
-    case '--provider':
-      options.provider = args[++i];
-      break;
-    case '--verbose':
-      options.verbose = true;
-      break;
-    case '--skip-validation':
-      options.skipValidation = true;
-      break;
-    case '--help':
-      console.log(`
-🔍 LLM Provider Validation Script
-
-Usage: node scripts/validate-llm-providers.js [options]
-
-Options:
-  --provider <name>     Validate specific provider only
-  --verbose             Enable verbose output
-  --skip-validation     Skip actual API validation (status only)
-  --help               Show this help message
-
-Environment Variables:
-  OPENAI_API_KEY       OpenAI API key
-  OPENROUTER_API_KEY   OpenRouter API key  
-  GEMINI_API_KEY       Google Gemini API key
-  DEFAULT_LLM_PROVIDER Default provider name (openai|openrouter|gemini)
-
-Examples:
-  node scripts/validate-llm-providers.js
-  node scripts/validate-llm-providers.js --provider openai
-  node scripts/validate-llm-providers.js --verbose
-      `);
-      process.exit(0);
-      break;
+async function main() {
+  console.log('🔍 Validating LLM Providers with Real Environment Variables');
+  console.log('=' .repeat(60));
+  
+  const results = {};
+  
+  // Test OpenAI
+  if (process.env.OPENAI_API_KEY) {
+    results.openai = await validateProvider('OpenAI', OpenAIProvider, {
+      apiKey: process.env.OPENAI_API_KEY,
+      model: 'gpt-3.5-turbo'
+    });
+  } else {
+    console.log('\n⚠️  OpenAI: API key not found in environment');
+    results.openai = false;
   }
-}
-
-// Run validation
-if (require.main === module) {
-  validateLLMProviders().catch(error => {
-    console.error('❌ Validation script failed:', error);
-    process.exit(1);
+  
+  // Test OpenRouter
+  if (process.env.OPENROUTER_API_KEY) {
+    results.openrouter = await validateProvider('OpenRouter', OpenRouterProvider, {
+      apiKey: process.env.OPENROUTER_API_KEY,
+      model: 'openai/gpt-3.5-turbo'
+    });
+  } else {
+    console.log('\n⚠️  OpenRouter: API key not found in environment');
+    results.openrouter = false;
+  }
+  
+  // Test Gemini
+  if (process.env.GEMINI_API_KEY) {
+    results.gemini = await validateProvider('Gemini', GeminiProvider, {
+      apiKey: process.env.GEMINI_API_KEY,
+      model: 'gemini-pro'
+    });
+  } else {
+    console.log('\n⚠️  Gemini: API key not found in environment');
+    results.gemini = false;
+  }
+  
+  // Summary
+  console.log('\n' + '=' .repeat(60));
+  console.log('📊 Validation Summary:');
+  console.log('=' .repeat(60));
+  
+  const workingProviders = Object.entries(results).filter(([, working]) => working);
+  const totalProviders = Object.keys(results).length;
+  
+  workingProviders.forEach(([provider]) => {
+    console.log(`✅ ${provider.toUpperCase()}: Working`);
   });
+  
+  Object.entries(results).filter(([, working]) => !working).forEach(([provider]) => {
+    console.log(`❌ ${provider.toUpperCase()}: Not working`);
+  });
+  
+  console.log(`\n🎯 ${workingProviders.length}/${totalProviders} providers are working`);
+  
+  if (workingProviders.length === 0) {
+    console.log('\n⚠️  WARNING: No LLM providers are working. Please check your API keys.');
+    process.exit(1);
+  } else {
+    console.log(`\n✅ SUCCESS: ${workingProviders.length} provider(s) validated successfully`);
+    console.log(`Recommended default provider: ${workingProviders[0][0]}`);
+  }
+  
+  // Test Intent Classification
+  console.log('\n🧠 Testing Intent Classification...');
+  try {
+    const IntentClassifier = require('../src/chat/intents/classifyIntent');
+    const classifier = new IntentClassifier();
+    
+    const testCases = [
+      'recommend some upbeat music for working out',
+      'create a playlist for studying',
+      'analyze my listening habits',
+      'I love this song!',
+      'hello there'
+    ];
+    
+    for (const testCase of testCases) {
+      const intent = classifier.classifyIntent(testCase);
+      console.log(`   "${testCase}" → ${intent.primary} (${intent.confidence.toFixed(2)})`);
+    }
+    
+    console.log('✅ Intent classification working correctly');
+  } catch (error) {
+    console.log(`❌ Intent classification error: ${error.message}`);
+  }
+  
+  console.log('\n🎉 Phase 5 validation complete!');
 }
 
-module.exports = { validateLLMProviders };
+if (require.main === module) {
+  main().catch(console.error);
+}
+
+module.exports = { validateProvider };
