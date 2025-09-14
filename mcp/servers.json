@@ -1,0 +1,90 @@
+[
+  {
+    "name": "filesystem",
+    "url": "http://localhost:3001",
+    "critical": true,
+    "description": "Core filesystem operations for code management",
+    "timeoutMs": 5000,
+    "retries": 3,
+    "tags": ["core", "filesystem", "mcp"],
+    "healthEndpoint": "/health",
+    "category": "core"
+  },
+  {
+    "name": "enhanced-mcp-orchestrator", 
+    "url": "http://localhost:3002",
+    "critical": true,
+    "description": "Primary MCP orchestration and coordination",
+    "timeoutMs": 8000,
+    "retries": 3,
+    "tags": ["orchestrator", "mcp", "critical"],
+    "healthEndpoint": "/health",
+    "category": "orchestration"
+  },
+  {
+    "name": "package-management",
+    "url": "http://localhost:3003", 
+    "critical": false,
+    "description": "Automated package version management",
+    "timeoutMs": 10000,
+    "retries": 2,
+    "tags": ["packages", "automation", "mcp"],
+    "healthEndpoint": "/health",
+    "category": "automation"
+  },
+  {
+    "name": "code-sandbox",
+    "url": "http://localhost:3004",
+    "critical": false,
+    "description": "Secure code execution environment", 
+    "timeoutMs": 15000,
+    "retries": 2,
+    "tags": ["security", "execution", "mcp"],
+    "healthEndpoint": "/health",
+    "category": "execution"
+  },
+  {
+    "name": "analytics-server",
+    "url": "http://localhost:3005",
+    "critical": false,
+    "description": "Advanced analytics and telemetry",
+    "timeoutMs": 5000,
+    "retries": 2,
+    "tags": ["analytics", "metrics", "mcp"],
+    "healthEndpoint": "/health",
+    "category": "observability"
+  },
+  {
+    "name": "testing-automation",
+    "url": "http://localhost:3006",
+    "critical": false,
+    "description": "Automated testing and validation",
+    "timeoutMs": 20000,
+    "retries": 2,
+    "tags": ["testing", "automation", "mcp"],
+    "healthEndpoint": "/health", 
+    "category": "testing"
+  },
+  {
+    "name": "browser-automation",
+    "url": "http://localhost:3007",
+    "critical": false,
+    "description": "Enhanced browser automation capabilities",
+    "timeoutMs": 10000,
+    "retries": 2,
+    "tags": ["browser", "automation", "ui"],
+    "healthEndpoint": "/health",
+    "category": "automation"
+  },
+  {
+    "name": "creative-automation",
+    "url": "http://localhost:3008",
+    "critical": false,
+    "description": "Creative content generation and automation",
+    "timeoutMs": 15000,
+    "retries": 1,
+    "tags": ["creative", "content", "generation"],
+    "healthEndpoint": "/health",
+    "category": "content"
+  }
+]

@@ -1,0 +1,165 @@
+{
+  "version": "1.0.0",
+  "description": "EchoTune AI Product Architecture Taxonomy - Machine-readable folder contract",
+  "last_updated": "2025-01-17",
+  "folders": {
+    "src/": {
+      "plane": "product",
+      "description": "Core product implementation - main application logic",
+      "stability": "stable",
+      "public_interfaces": ["API endpoints", "service interfaces"],
+      "documentation": "Main source code with business logic"
+    },
+    "src/orchestration/": {
+      "plane": "product", 
+      "description": "High-level product flows - Chat-Recommendation-Spotify integration orchestrator",
+      "stability": "stable",
+      "public_interfaces": ["ChatRecommendationOrchestrator"],
+      "documentation": "Core product orchestration layer"
+    },
+    "src/spotify/": {
+      "plane": "product",
+      "description": "Spotify Web API integration and music data services",
+      "stability": "stable", 
+      "public_interfaces": ["SpotifyAPIService", "AudioFeaturesService"],
+      "documentation": "Spotify platform integration"
+    },
+    "src/chat/": {
+      "plane": "product",
+      "description": "Conversational AI and natural language music discovery",
+      "stability": "stable",
+      "public_interfaces": ["ChatBot", "ConversationManager", "LLMProviders"],
+      "documentation": "Chat and AI conversation management"
+    },
+    "src/recommendation/": {
+      "plane": "intelligence",
+      "description": "Multi-strategy recommendation engine and algorithms",
+      "stability": "evolving",
+      "public_interfaces": ["RecommendationEngine", "StrategyRegistry"],
+      "documentation": "AI/ML recommendation algorithms"
+    },
+    "src/database/": {
+      "plane": "platform",
+      "description": "Data persistence layer and schema management", 
+      "stability": "stable",
+      "public_interfaces": ["DatabaseManager", "Models"],
+      "documentation": "Database abstraction and models"
+    },
+    "src/cache/": {
+      "plane": "platform",
+      "description": "Redis caching layer for recommendations and user context",
+      "stability": "stable",
+      "public_interfaces": ["RecommendationCache", "CacheManager"],
+      "documentation": "Performance caching layer"
+    },
+    "src/ai/": {
+      "plane": "intelligence", 
+      "description": "AI/ML infrastructure and model management",
+      "stability": "stable",
+      "public_interfaces": ["AgentRouter", "ModelRegistry"],
+      "documentation": "AI provider management and routing"
+    },
+    "src/auth/": {
+      "plane": "platform",
+      "description": "Authentication and authorization services",
+      "stability": "stable",
+      "public_interfaces": ["AuthService", "OAuth"],
+      "documentation": "Security and authentication"
+    },
+    "src/api/": {
+      "plane": "presentation",
+      "description": "REST API endpoints and request handling",
+      "stability": "stable", 
+      "public_interfaces": ["Express routes", "OpenAPI spec"],
+      "documentation": "HTTP API layer"
+    },
+    "src/frontend/": {
+      "plane": "presentation",
+      "description": "React frontend components and UI",
+      "stability": "evolving",
+      "public_interfaces": ["React components", "UI patterns"],
+      "documentation": "User interface components"
+    },
+    "src/infra/": {
+      "plane": "automation",
+      "description": "Infrastructure services and enterprise automation",
+      "stability": "mature",
+      "public_interfaces": ["Service mesh", "Observability"],
+      "documentation": "Enterprise infrastructure"
+    },
+    "src/ml/": {
+      "plane": "intelligence",
+      "description": "Machine learning models and training pipelines", 
+      "stability": "evolving",
+      "public_interfaces": ["MLPipeline", "ModelTraining"],
+      "documentation": "ML model lifecycle"
+    },
+    "scripts/": {
+      "plane": "automation",
+      "description": "Development and deployment automation scripts",
+      "stability": "stable",
+      "public_interfaces": ["CLI scripts", "Automation tools"],
+      "documentation": "Development tooling"
+    },
+    "mcp-server/": {
+      "plane": "automation", 
+      "description": "Model Context Protocol automation and agent orchestration",
+      "stability": "mature",
+      "public_interfaces": ["MCP servers", "Agent tools"],
+      "documentation": "MCP automation ecosystem"
+    },
+    "docs/": {
+      "plane": "automation",
+      "description": "Documentation and architectural decision records",
+      "stability": "stable",
+      "public_interfaces": ["Markdown docs", "Architecture guides"],
+      "documentation": "Project documentation"
+    },
+    "tests/": {
+      "plane": "automation",
+      "description": "Test suites and quality assurance automation",
+      "stability": "stable",
+      "public_interfaces": ["Test runners", "Test utilities"],
+      "documentation": "Testing infrastructure"
+    }
+  },
+  "planes": {
+    "product": {
+      "description": "Core business logic and user-facing features",
+      "priority": "highest",
+      "change_frequency": "regular",
+      "coding_agent_focus": "primary"
+    },
+    "platform": {
+      "description": "Foundational services and infrastructure abstractions", 
+      "priority": "high",
+      "change_frequency": "moderate", 
+      "coding_agent_focus": "secondary"
+    },
+    "intelligence": {
+      "description": "AI/ML algorithms and recommendation logic",
+      "priority": "high",
+      "change_frequency": "regular",
+      "coding_agent_focus": "primary"
+    },
+    "presentation": {
+      "description": "User interfaces and API presentation layer",
+      "priority": "medium",
+      "change_frequency": "regular",
+      "coding_agent_focus": "secondary"
+    },
+    "automation": {
+      "description": "Development tools, infrastructure, and process automation",
+      "priority": "low",
+      "change_frequency": "low",
+      "coding_agent_focus": "avoid"
+    }
+  },
+  "coding_agent_guidelines": {
+    "primary_focus": ["src/orchestration/", "src/recommendation/", "src/chat/", "src/spotify/"],
+    "secondary_focus": ["src/database/", "src/cache/", "src/api/"],
+    "avoid_modification": ["src/infra/", "mcp-server/", "scripts/automation/"],
+    "safe_to_create": ["src/orchestration/", "src/recommendation/strategies/", "src/cache/", "src/chat/context/"],
+    "requires_approval": ["src/infra/", "mcp-server/enhanced-*", ".github/workflows/"]
+  }
+}

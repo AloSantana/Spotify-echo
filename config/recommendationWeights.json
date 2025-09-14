@@ -1,0 +1,43 @@
+{
+  "strategies": {
+    "collaborative": 0.4,
+    "content": 0.3,
+    "semantic": 0.2,
+    "diversityBonus": 0.1
+  },
+  "signals": {
+    "play": 1.0,
+    "like": 2.0,
+    "skip": -0.5,
+    "replay": 1.5,
+    "share": 2.5,
+    "save": 3.0,
+    "block": -5.0
+  },
+  "contextualWeights": {
+    "recentActivity": 1.2,
+    "sessionContext": 1.1,
+    "timeOfDay": {
+      "morning": { "energy": 1.2, "valence": 1.1 },
+      "afternoon": { "danceability": 1.1 },
+      "evening": { "valence": -0.1, "acousticness": 1.1 },
+      "night": { "energy": -0.2, "acousticness": 1.2 }
+    },
+    "dayOfWeek": {
+      "weekend": { "danceability": 1.2, "energy": 1.1 },
+      "weekday": { "focus": 1.1, "instrumentalness": 1.1 }
+    }
+  },
+  "diversityFactors": {
+    "genreSpread": 0.15,
+    "artistSpread": 0.10,
+    "temporalSpread": 0.05,
+    "moodVariation": 0.10
+  },
+  "qualityThresholds": {
+    "minScore": 0.1,
+    "confidenceThreshold": 0.3,
+    "diversityThreshold": 0.2,
+    "freshnessWeight": 0.05
+  }
+}
