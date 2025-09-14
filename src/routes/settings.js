@@ -99,15 +99,16 @@ router.put('/', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('Error updating user settings:', error);
     
-    if (error.message.includes('CONCURRENCY_CONFLICT')) {
+    if (error.code === 'VERSION_CONFLICT') {
       return res.status(409).json({
-        error: 'Concurrency conflict',
+        error: 'VERSION_CONFLICT',
         message: 'Settings were modified by another process. Please refresh and try again.',
-        currentSettings: error.currentSettings
+        serverVersion: error.serverVersion,
+        serverState: error.serverState
       });
     }
     
-    if (error.message.includes('Invalid') || error.message.includes('must be')) {
+    if (error.message.includes('Validation failed') || error.message.includes('must be')) {
       return res.status(400).json({
         error: 'Validation error',
         message: error.message
@@ -162,14 +163,16 @@ router.patch('/', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('Error partially updating user settings:', error);
     
-    if (error.message.includes('CONCURRENCY_CONFLICT')) {
+    if (error.code === 'VERSION_CONFLICT') {
       return res.status(409).json({
-        error: 'Concurrency conflict',
-        message: 'Settings were modified by another process. Please refresh and try again.'
+        error: 'VERSION_CONFLICT',
+        message: 'Settings were modified by another process. Please refresh and try again.',
+        serverVersion: error.serverVersion,
+        serverState: error.serverState
       });
     }
     
-    if (error.message.includes('Invalid') || error.message.includes('must be')) {
+    if (error.message.includes('Validation failed') || error.message.includes('must be')) {
       return res.status(400).json({
         error: 'Validation error',
         message: error.message
@@ -267,6 +270,62 @@ router.get('/defaults', (req, res) => {
     res.status(500).json({
       error: 'Internal server error',
       message: 'Failed to retrieve default settings'
+    });
+  }
+});
+
+/**
+ * GET /api/providers/status
+ * Get provider status and availability
+ */
+router.get('/providers/status', async (req, res) => {
+  try {
+    // This would normally check actual provider availability
+    // For now, providing a static implementation that can be extended
+    const providers = {
+      openai: {
+        id: 'openai',
+        name: 'OpenAI',
+        available: !!process.env.OPENAI_API_KEY,
+        default: true,
+        models: ['gpt-4o-mini', 'gpt-4o', 'gpt-3.5-turbo'],
+        reasonUnavailable: !process.env.OPENAI_API_KEY ? 'API key not configured' : null
+      },
+      openrouter: {
+        id: 'openrouter',
+        name: 'OpenRouter',
+        available: !!process.env.OPENROUTER_API_KEY,
+        default: false,
+        models: ['gpt-4o-mini', 'claude-3-haiku', 'llama-3.1-8b'],
+        reasonUnavailable: !process.env.OPENROUTER_API_KEY ? 'API key not configured' : null
+      },
+      gemini: {
+        id: 'gemini',
+        name: 'Google Gemini',
+        available: !!process.env.GEMINI_API_KEY,
+        default: false,
+        models: ['gemini-pro', 'gemini-pro-vision'],
+        reasonUnavailable: !process.env.GEMINI_API_KEY ? 'API key not configured' : null
+      }
+    };
+
+    // Find default provider
+    const defaultProvider = Object.values(providers).find(p => p.default && p.available)?.id || 'openai';
+
+    res.json({
+      success: true,
+      data: {
+        providers,
+        defaultProvider,
+        availableProviders: Object.values(providers).filter(p => p.available).map(p => p.id)
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error getting provider status:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to retrieve provider status'
     });
   }
 });
