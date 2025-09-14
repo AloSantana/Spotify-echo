@@ -146,27 +146,35 @@ class ContentAudioFeatureStrategy {
   // Private methods
 
   async _loadAudioFeatures() {
-    // In a real implementation, this would load from Spotify API or database
-    // For now, we'll generate mock audio features
-    console.log('Loading audio features database (mock implementation)');
+    const Database = require('../../database/Database');
+    const SpotifyAPI = require('../../spotify/SpotifyAPI');
     
-    const mockTracks = Array.from({length: 1000}, (_, i) => `track_${i}`);
-    
-    for (const trackId of mockTracks) {
-      this.trackFeatures.set(trackId, {
-        trackId,
-        acousticness: Math.random(),
-        danceability: Math.random(),
-        energy: Math.random(),
-        instrumentalness: Math.random(),
-        liveness: Math.random(),
-        loudness: -60 + Math.random() * 60, // dB range
-        speechiness: Math.random(),
-        tempo: 60 + Math.random() * 140, // BPM range
-        valence: Math.random(),
-        genre: ['rock', 'pop', 'jazz', 'electronic', 'classical'][Math.floor(Math.random() * 5)],
-        artist: `artist_${Math.floor(i / 10)}` // Group tracks by artist
-      });
+    try {
+      console.log('Loading real audio features from database and Spotify API...');
+      
+      const db = Database.getInstance();
+      const spotifyAPI = SpotifyAPI.getInstance();
+      
+      // Load cached audio features from database
+      const cachedFeatures = await db.collection('audio_features')
+        .find({})
+        .toArray();
+
+      for (const feature of cachedFeatures) {
+        this.trackFeatures.set(feature.trackId, feature);
+      }
+
+      console.log(`Loaded ${cachedFeatures.length} cached audio features`);
+
+      // If we have insufficient data, we could fetch more from Spotify API
+      // But for production, we should have pre-populated audio features
+      if (this.trackFeatures.size === 0) {
+        throw new Error('No audio features found. Content-based filtering requires Spotify audio feature data.');
+      }
+
+    } catch (error) {
+      console.error('Failed to load audio features:', error);
+      throw new Error(`Content-based strategy initialization failed: ${error.message}`);
     }
   }
 

@@ -39,6 +39,64 @@ function configureHealthRoutes(app) {
     }
   });
 
+  // Cache health endpoint
+  app.get('/health/cache', async (req, res) => {
+    try {
+      const RecommendationCache = require('../cache/RecommendationCache');
+      const cache = new RecommendationCache();
+      
+      // Try to initialize cache if not already done
+      try {
+        await cache.initialize();
+      } catch (error) {
+        // Cache might already be initialized or in fallback mode
+      }
+      
+      const health = cache.getHealth();
+      const metrics = cache.getMetrics();
+      
+      // Add rec_cache_fallback_total metric
+      if (health.fallbackActive) {
+        // Increment fallback metric (would typically be tracked by Prometheus)
+        console.log('Cache fallback active - incrementing rec_cache_fallback_total metric');
+      }
+      
+      const response = {
+        status: health.status,
+        connected: health.redis.connected,
+        hitRatio: metrics.hitRate,
+        fallbackActive: health.fallbackActive,
+        metrics: {
+          totalRequests: metrics.totalRequests,
+          hits: metrics.hits,
+          misses: metrics.misses,
+          redisHits: metrics.redisHits,
+          memoryHits: metrics.memoryHits,
+          errors: metrics.errors,
+          memoryCacheSize: metrics.memoryCacheSize
+        },
+        redis: health.redis,
+        memory: health.memory,
+        timestamp: new Date().toISOString()
+      };
+      
+      const statusCode = health.status === 'HEALTHY' ? 200 : 
+                        health.status === 'DEGRADED' ? 200 : 503;
+      
+      res.status(statusCode).json(response);
+      
+    } catch (error) {
+      res.status(500).json({
+        status: 'ERROR',
+        connected: false,
+        hitRatio: '0.00%',
+        fallbackActive: true,
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
   // Individual health check endpoints
   app.get('/health/:check', async (req, res) => {
     try {

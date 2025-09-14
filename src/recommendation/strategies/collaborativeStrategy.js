@@ -145,32 +145,55 @@ class CollaborativeStrategy {
   // Private methods
 
   async _loadUserInteractions() {
-    // In a real implementation, this would load from database
-    // For now, we'll use a mock dataset
-    console.log('Loading user interactions (mock implementation)');
+    const Database = require('../../database/Database');
     
-    // Mock some user interactions
-    const mockUsers = ['user1', 'user2', 'user3', 'user4', 'user5'];
-    const mockTracks = Array.from({length: 100}, (_, i) => `track_${i}`);
-    
-    for (const user of mockUsers) {
-      const interactions = [];
-      const numInteractions = Math.floor(Math.random() * 50) + 10;
+    try {
+      console.log('Loading real user interactions from database...');
       
-      for (let i = 0; i < numInteractions; i++) {
-        const track = mockTracks[Math.floor(Math.random() * mockTracks.length)];
-        const signals = ['play', 'like', 'skip', 'replay'];
-        const signal = signals[Math.floor(Math.random() * signals.length)];
-        
-        interactions.push({
-          trackId: track,
-          signal,
-          timestamp: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-          weight: this._signalToWeight(signal)
-        });
+      // Load real user interaction data from MongoDB
+      const db = Database.getInstance();
+      const userInteractions = await db.collection('user_interactions')
+        .aggregate([
+          {
+            $match: {
+              timestamp: { $gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) } // Last 90 days
+            }
+          },
+          {
+            $group: {
+              _id: '$userId',
+              interactions: {
+                $push: {
+                  trackId: '$trackId',
+                  signal: '$signal',
+                  weight: '$weight',
+                  timestamp: '$timestamp',
+                  sessionId: '$sessionId'
+                }
+              }
+            }
+          },
+          {
+            $match: {
+              'interactions': { $size: { $gte: this.options.minInteractions } }
+            }
+          }
+        ])
+        .toArray();
+
+      // Process and store the interactions
+      for (const user of userInteractions) {
+        this.userInteractions.set(user._id, user.interactions);
       }
-      
-      this.userInteractions.set(user, interactions);
+
+      if (this.userInteractions.size === 0) {
+        throw new Error('No user interaction data found. Collaborative filtering requires historical user data.');
+      }
+
+      console.log(`Loaded interactions for ${this.userInteractions.size} users`);
+    } catch (error) {
+      console.error('Failed to load user interactions:', error);
+      throw new Error(`Collaborative strategy initialization failed: ${error.message}`);
     }
   }
 
