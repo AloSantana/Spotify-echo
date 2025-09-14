@@ -18,6 +18,7 @@ const AutonomousUIAgent = lazy(() => import('./components/AutonomousUIAgent'));
 const EnhancedStreamingChatInterface = lazy(() => import('./components/EnhancedStreamingChatInterface'));
 const EnhancedProviderPanel = lazy(() => import('./components/EnhancedProviderPanel'));
 const GitHubInfo = lazy(() => import('./components/GitHubInfo'));
+const AdminMCPPanel = lazy(() => import('./components/AdminMCPPanel'));
 // import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LLMProvider } from './contexts/LLMContext';
 // import { DatabaseProvider } from './contexts/DatabaseContext';
@@ -45,6 +46,7 @@ const prefetchers = {
   settingsGeneral: () => import('./components/EnhancedConfigPanel'),
   settingsMobile: () => import('./components/MobileResponsiveManager'),
   settingsGithub: () => import('./components/GitHubInfo'),
+  settingsAdmin: () => import('./components/AdminMCPPanel'),
 };
 
 /**
@@ -490,6 +492,9 @@ function MainApplication({ initialTab = 'chat' }) {
 function SettingsTabManager() {
   const [settingsTab, setSettingsTab] = useState('general');
 
+  // Check if admin panel is enabled
+  const isAdminEnabled = process.env.REACT_APP_ENABLE_ADMIN_MCP_PANEL === 'true';
+
   return (
     <Box>
       <Tabs
@@ -500,12 +505,14 @@ function SettingsTabManager() {
         <Tab label="⚙️ General" value="general" />
         <Tab label="📱 Mobile & Responsive" value="mobile" />
         <Tab label="🐙 GitHub" value="github" />
+        {isAdminEnabled && <Tab label="🔧 Admin Panel" value="admin" />}
       </Tabs>
 
       <Suspense fallback={<div style={{ padding: '1rem' }}>Loading settings…</div>}>
         {settingsTab === 'general' && <EnhancedConfigPanel />}
         {settingsTab === 'mobile' && <MobileResponsiveManager />}
         {settingsTab === 'github' && <GitHubInfo />}
+        {settingsTab === 'admin' && isAdminEnabled && <AdminMCPPanel />}
       </Suspense>
     </Box>
   );
