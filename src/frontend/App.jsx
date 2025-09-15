@@ -1,6 +1,6 @@
 import OptimizedMusicComponent from './components/OptimizedMusicComponent.jsx';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AppBar, Toolbar, Container, Tabs, Tab, Box, Typography, Paper } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { AppBar, Toolbar, Container, Tabs, Tab, Box, Typography, Paper, CircularProgress } from '@mui/material';
 import React, { useState, Suspense, lazy } from 'react';
 import ThemeProvider, { ThemeToggle } from './components/ThemeProvider';
 // Convert heavy components to lazy-loaded chunks for better initial bundle size
@@ -19,7 +19,11 @@ const EnhancedStreamingChatInterface = lazy(() => import('./components/EnhancedS
 const EnhancedProviderPanel = lazy(() => import('./components/EnhancedProviderPanel'));
 const GitHubInfo = lazy(() => import('./components/GitHubInfo'));
 const AdminMCPPanel = lazy(() => import('./components/AdminMCPPanel'));
-// import { AuthProvider, useAuth } from './contexts/AuthContext';
+// Add auth components as non-lazy since they're needed immediately
+import AuthStatus, { AuthGuard } from './components/AuthStatus';
+import SpotifyLoginButton from './components/SpotifyLoginButton';
+import { AuthProvider } from './contexts/AuthContext';
+import { useAuth } from './contexts/AuthContext';
 import { LLMProvider } from './contexts/LLMContext';
 // import { DatabaseProvider } from './contexts/DatabaseContext';
 import './styles/App.css';
@@ -57,29 +61,33 @@ const prefetchers = {
 function App() {
   return (
     <ThemeProvider>
-      <LLMProvider>
-        <Router>
-          <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading…</div>}>
-            <Routes>
-              <Route path="/" element={<MainApplication />} />
-              <Route path="/chat" element={<MainApplication initialTab="chat" />} />
-              <Route
-                path="/recommendations"
-                element={<MainApplication initialTab="recommendations" />}
-              />
-              <Route path="/playlist" element={<MainApplication initialTab="playlist" />} />
-              <Route path="/playlists" element={<MainApplication initialTab="playlists" />} />
-              <Route path="/songs" element={<MainApplication initialTab="songs" />} />
-              <Route path="/discovery" element={<MainApplication initialTab="discovery" />} />
-              <Route path="/analytics" element={<MainApplication initialTab="analytics" />} />
-              <Route path="/insights" element={<MainApplication initialTab="insights" />} />
-              <Route path="/autonomous" element={<MainApplication initialTab="autonomous" />} />
-              <Route path="/settings" element={<MainApplication initialTab="settings" />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
-        </Router>
-      </LLMProvider>
+      <AuthProvider>
+        <LLMProvider>
+          <Router>
+            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading…</div>}>
+              <Routes>
+                <Route path="/" element={<MainApplication />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/auth/callback" element={<AuthCallbackHandler />} />
+                <Route path="/chat" element={<MainApplication initialTab="chat" />} />
+                <Route
+                  path="/recommendations"
+                  element={<MainApplication initialTab="recommendations" />}
+                />
+                <Route path="/playlist" element={<MainApplication initialTab="playlist" />} />
+                <Route path="/playlists" element={<MainApplication initialTab="playlists" />} />
+                <Route path="/songs" element={<MainApplication initialTab="songs" />} />
+                <Route path="/discovery" element={<MainApplication initialTab="discovery" />} />
+                <Route path="/analytics" element={<MainApplication initialTab="analytics" />} />
+                <Route path="/insights" element={<MainApplication initialTab="insights" />} />
+                <Route path="/autonomous" element={<MainApplication initialTab="autonomous" />} />
+                <Route path="/settings" element={<MainApplication initialTab="settings" />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
+          </Router>
+        </LLMProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
@@ -303,7 +311,20 @@ function MainApplication({ initialTab = 'chat' }) {
               Enhanced Experience
             </Typography>
           </Typography>
-          <ThemeToggle showCustomization />
+          
+          {/* Authentication Status */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <AuthStatus 
+              variant="compact" 
+              onNavigate={(path) => {
+                if (path.startsWith('/')) {
+                  // Handle navigation
+                  window.location.href = path;
+                }
+              }} 
+            />
+            <ThemeToggle showCustomization />
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -368,12 +389,26 @@ function MainApplication({ initialTab = 'chat' }) {
         >
           {currentTab === 'chat' && (
             <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
-              <EnhancedChatInterface
-                sessionId={sessionId}
-                onSendMessage={handleSendChatMessage}
-                onProvideFeedback={handleProvideFeedback}
-                loading={false}
-              />
+              <AuthGuard 
+                fallback={
+                  <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <Typography variant="h5" gutterBottom>
+                      Connect Spotify to Start Chatting
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                      Sign in with your Spotify account to access AI-powered music conversations
+                    </Typography>
+                    <SpotifyLoginButton />
+                  </Box>
+                }
+              >
+                <EnhancedChatInterface
+                  sessionId={sessionId}
+                  onSendMessage={handleSendChatMessage}
+                  onProvideFeedback={handleProvideFeedback}
+                  loading={false}
+                />
+              </AuthGuard>
             </Container>
           )}
 
@@ -421,13 +456,41 @@ function MainApplication({ initialTab = 'chat' }) {
 
           {currentTab === 'analytics' && (
             <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
-              <EnhancedAnalyticsDashboard />
+              <AuthGuard 
+                fallback={
+                  <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <Typography variant="h5" gutterBottom>
+                      Connect Spotify for Analytics
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                      View detailed analytics about your music listening habits
+                    </Typography>
+                    <SpotifyLoginButton />
+                  </Box>
+                }
+              >
+                <EnhancedAnalyticsDashboard />
+              </AuthGuard>
             </Container>
           )}
 
           {currentTab === 'insights' && (
             <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
-              <InsightsDashboard />
+              <AuthGuard 
+                fallback={
+                  <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <Typography variant="h5" gutterBottom>
+                      Connect Spotify for Insights
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                      Get personalized insights about your music preferences
+                    </Typography>
+                    <SpotifyLoginButton />
+                  </Box>
+                }
+              >
+                <InsightsDashboard />
+              </AuthGuard>
             </Container>
           )}
 
@@ -514,6 +577,78 @@ function SettingsTabManager() {
         {settingsTab === 'github' && <GitHubInfo />}
         {settingsTab === 'admin' && isAdminEnabled && <AdminMCPPanel />}
       </Suspense>
+    </Box>
+  );
+}
+
+/**
+ * Login Page Component
+ * Dedicated login page with full Spotify authentication interface
+ */
+function LoginPage() {
+  const navigate = useNavigate();
+  
+  return (
+    <Box sx={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #1DB954 0%, #1ed760 100%)',
+      p: 2
+    }}>
+      <Container maxWidth="sm">
+        <SpotifyLoginButton 
+          onAuthComplete={() => navigate('/')}
+          onAuthError={(error) => {
+            console.error('Login error:', error);
+            // Could show error notification here
+          }}
+        />
+      </Container>
+    </Box>
+  );
+}
+
+/**
+ * Auth Callback Handler Component
+ * Handles OAuth callback and redirects appropriately
+ */
+function AuthCallbackHandler() {
+  const navigate = useNavigate();
+  const { checkAuthStatus } = useAuth();
+  
+  React.useEffect(() => {
+    const handleCallback = async () => {
+      try {
+        // Let AuthContext handle the callback
+        await checkAuthStatus();
+        navigate('/');
+      } catch (error) {
+        console.error('Auth callback error:', error);
+        navigate('/login');
+      }
+    };
+    
+    handleCallback();
+  }, [checkAuthStatus, navigate]);
+  
+  return (
+    <Box sx={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center' 
+    }}>
+      <Box sx={{ textAlign: 'center' }}>
+        <CircularProgress size={60} />
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          Completing authentication...
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Please wait while we connect your Spotify account
+        </Typography>
+      </Box>
     </Box>
   );
 }

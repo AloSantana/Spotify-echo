@@ -478,7 +478,6 @@ app.use('/auth', authRoutes);
 app.use('/api/spotify', spotifyApiRoutes);
 app.use('/api', enhancedApiRoutes);
 app.use('/api/chat', chatRoutes_local);
-app.use('/', appRoutes);
 
 // Phase 6: Enterprise health monitoring routes
 const enterpriseHealthRoutes = require('./routes/enterprise-health');
@@ -555,7 +554,7 @@ app.use(
 // Input sanitization
 app.use(sanitizeInput);
 
-// Configure static file serving (extracted to routes/static.js)
+// Configure static file serving BEFORE app routes (extracted to routes/static.js)
 configureStaticRoutes(app);
 
 // Database connection middleware
@@ -682,6 +681,9 @@ if (realtimeEnabled && io) {
 
 
 
+
+// App routes (SPA routing) - must be AFTER static file serving
+app.use('/', appRoutes);
 
 // Error handling middleware
 // eslint-disable-next-line no-unused-vars
