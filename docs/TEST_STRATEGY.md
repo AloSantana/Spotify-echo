@@ -1,444 +1,197 @@
-# Test Strategy and Framework
+# Test Strategy for EchoTune AI
 
-This document outlines the comprehensive testing strategy for EchoTune AI, including test taxonomy, layer purposes, and guidelines for extending the test suite.
+## Overview
 
-## Test Taxonomy
+This document outlines the comprehensive testing strategy for EchoTune AI, covering all aspects of quality assurance, automation, and validation.
 
-### Layer Structure
+## Testing Philosophy
 
-Our testing framework follows a layered approach with distinct purposes and scopes:
+Our testing approach is built on the principle of **comprehensive validation** with **fail-fast feedback**. We implement a multi-layered testing strategy that ensures:
 
-```
-├── tests/unit/            # Isolated component testing
-├── tests/integration/     # Component interaction testing  
-├── tests/e2e/            # End-to-end user workflow testing
-├── tests/visual/         # UI regression and visual validation
-└── tests/performance/    # Performance and load testing
-```
+1. **Environment Integrity** - No placeholder secrets; real configuration validation
+2. **Provider Resilience** - Auto-detection and testing of all LLM providers
+3. **Functional Completeness** - End-to-end validation of recommendation engine
+4. **Visual Consistency** - Comprehensive screenshot capture and comparison
+5. **Performance Standards** - Latency monitoring with soft/hard thresholds
+6. **Deployment Readiness** - Docker and infrastructure validation
 
-### 1. Unit Tests (`tests/unit/`)
+## Test Architecture
 
-**Purpose**: Test individual functions, classes, and modules in isolation.
+### Schema v2 Reporting
 
-**Characteristics**:
-- Fast execution (< 1ms per test)
-- No external dependencies
-- Mock all external services
-- High code coverage target (>85%)
-
-**When to Add**:
-- New utility functions
-- Business logic functions
-- Data transformation methods
-- Algorithm implementations
-
-**Example Structure**:
-```javascript
-// tests/unit/services/RecommendationEngine.test.js
-describe('RecommendationEngine', () => {
-  test('should calculate similarity scores correctly', () => {
-    const engine = new RecommendationEngine();
-    const result = engine.calculateSimilarity(trackA, trackB);
-    expect(result).toBeBetween(0, 1);
-  });
-});
-```
-
-### 2. Integration Tests (`tests/integration/`)
-
-**Purpose**: Test interactions between components, APIs, and external services.
-
-**Characteristics**:
-- Test component boundaries
-- Use real databases (test instances)
-- Mock external APIs only when necessary
-- Medium execution time (< 5s per test)
-
-**When to Add**:
-- New API endpoints
-- Database schema changes
-- Service integrations
-- Authentication flows
-
-**Example Structure**:
-```javascript
-// tests/integration/api/chat.test.js
-describe('Chat API Integration', () => {
-  test('should process chat request and return recommendations', async () => {
-    const response = await request(app)
-      .post('/api/chat')
-      .send({ message: 'Recommend workout music' });
-    
-    expect(response.status).toBe(200);
-    expect(response.body.recommendations).toBeDefined();
-  });
-});
-```
-
-### 3. End-to-End Tests (`tests/e2e/`)
-
-**Purpose**: Test complete user workflows from browser perspective.
-
-**Characteristics**:
-- Real browser interactions
-- Full application stack
-- User-centric scenarios
-- Slower execution (30s-2min per test)
-
-**When to Add**:
-- New user features
-- Critical user paths
-- Cross-browser compatibility
-- Authentication workflows
-
-**Example Structure**:
-```typescript
-// tests/e2e/music-discovery.spec.ts
-test('should discover music through chat interface', async ({ page }) => {
-  await page.goto('/chat');
-  await page.fill('[data-testid="chat-input"]', 'Find me energetic workout music');
-  await page.click('[data-testid="send-button"]');
-  
-  await expect(page.locator('[data-testid="recommendations"]')).toBeVisible();
-});
-```
-
-### 4. Visual Tests (`tests/visual/`)
-
-**Purpose**: Detect unintended UI changes and ensure visual consistency.
-
-**Characteristics**:
-- Screenshot comparison
-- Multiple viewport sizes
-- Baseline management
-- Design regression detection
-
-**When to Add**:
-- New UI components
-- Layout changes
-- Theme updates
-- Responsive design features
-
-**Example Structure**:
-```typescript
-// tests/visual/chat-interface.spec.ts
-test('should match chat interface baseline', async ({ page }) => {
-  await page.goto('/chat');
-  await expect(page).toHaveScreenshot('chat-interface-desktop.png');
-});
-```
-
-### 5. Performance Tests (`tests/performance/`)
-
-**Purpose**: Validate application performance under various load conditions.
-
-**Characteristics**:
-- Latency measurements
-- Throughput testing
-- Resource utilization
-- Scalability validation
-
-**When to Add**:
-- New API endpoints
-- Database queries
-- Heavy computations
-- Critical user paths
-
-**Example Structure**:
-```typescript
-// tests/performance/recommendation-engine.spec.ts
-test('should generate recommendations within performance threshold', async () => {
-  const latencies = [];
-  for (let i = 0; i < 100; i++) {
-    const start = performance.now();
-    await generateRecommendations(userId);
-    latencies.push(performance.now() - start);
-  }
-  
-  const p95 = calculatePercentile(latencies, 95);
-  expect(p95).toBeLessThan(2000); // 2 second threshold
-});
-```
-
-## Test Selection Strategy
-
-### Intelligent Test Selection
-
-Our framework uses git diff analysis to intelligently select relevant tests:
-
-```javascript
-// Impact rules determine which tests run based on changes
-const impactRules = {
-  'src/recommendation/': ['unit', 'integration', 'performance'],
-  'src/chat/': ['unit', 'integration', 'e2e'],
-  'src/frontend/': ['visual', 'e2e'],
-  'package.json': ['unit', 'integration', 'e2e', 'performance'] // Critical changes
-};
-```
-
-### Test Execution Commands
-
-```bash
-# Smart test selection based on changes
-npm run test:all
-
-# Individual test layers
-npm run test:unit
-npm run test:integration
-npm run test:e2e
-npm run test:visual
-npm run test:perf
-
-# Test planning and reporting
-npm run test:plan        # Generate test selection matrix
-npm run test:report      # Collect consolidated results
-```
-
-## Adding New Tests
-
-### 1. Determine Test Layer
-
-Ask these questions to determine the appropriate test layer:
-
-- **Unit**: Does this test a single function/class in isolation?
-- **Integration**: Does this test interaction between components?
-- **E2E**: Does this test a complete user workflow?
-- **Visual**: Does this verify UI appearance?
-- **Performance**: Does this validate speed/efficiency?
-
-### 2. Follow Naming Conventions
-
-```
-tests/{layer}/{category}/{feature}.{spec|test}.{js|ts}
-
-Examples:
-tests/unit/services/RecommendationEngine.test.js
-tests/integration/api/chat.test.js
-tests/e2e/user-onboarding.spec.ts
-tests/visual/homepage.spec.ts
-tests/performance/api-latency.spec.ts
-```
-
-### 3. Use Test Utilities
-
-Leverage shared utilities for consistency:
-
-```javascript
-// Available in all tests
-import { testUtils, mocks } from '../setup/test-utils';
-
-// Create mock data
-const user = testUtils.createMockUser();
-const track = testUtils.createMockTrack();
-
-// Use mock services
-mocks.spotify.getTrack.mockResolvedValue(track);
-```
-
-### 4. Follow Test Structure
-
-```javascript
-describe('Feature Name', () => {
-  beforeEach(async () => {
-    // Setup for each test
-  });
-
-  afterEach(async () => {
-    // Cleanup after each test
-  });
-
-  test('should do something specific', async () => {
-    // Arrange
-    const input = createTestInput();
-    
-    // Act
-    const result = await functionUnderTest(input);
-    
-    // Assert
-    expect(result).toMatchExpectedOutput();
-  });
-});
-```
-
-## Performance Testing Guidelines
-
-### Performance Thresholds
-
-Thresholds are defined in `config/perf-thresholds.json`:
+All tests generate reports conforming to our standardized schema v2:
 
 ```json
 {
-  "api": {
-    "chat": {
-      "p95": 2000,     // 95th percentile < 2s
-      "errorRate": 0.05 // < 5% error rate
-    }
-  }
+  "schemaVersion": "2.0",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "runId": "run-1234567890-abcde",
+  "success": true,
+  "summary": {
+    "totalTests": 10,
+    "passedTests": 9,
+    "failedTests": 1,
+    "warningsCount": 2,
+    "errorsCount": 0
+  },
+  "env": { ... },
+  "providers": { ... },
+  "recommendation": { ... },
+  "docker": { ... },
+  "screenshots": { ... },
+  "performance": { ... }
 }
 ```
 
-### Writing Performance Tests
+## Test Layers
 
-```typescript
-test('API endpoint performance', async ({ page }) => {
-  const measurements = [];
-  
-  for (let i = 0; i < 10; i++) {
-    const start = performance.now();
-    const response = await page.evaluate(() => 
-      fetch('/api/endpoint').then(r => r.json())
-    );
-    measurements.push(performance.now() - start);
-  }
-  
-  const p95 = calculatePercentile(measurements, 95);
-  expect(p95).toBeLessThan(THRESHOLDS.api.endpoint.p95);
-});
-```
+### 1. Environment Validation (`scripts/env-validate.js`)
 
-## Visual Testing Guidelines
+**Purpose**: Ensures production-ready configuration before any testing begins.
 
-### Visual Baseline Management
+**Validation Rules**:
+- **Required Variables**: `MONGODB_URI`, `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `JWT_SECRET`
+- **Placeholder Detection**: Fails on patterns like `your_*`, `changeme`, `xxx...`
+- **Optional Providers**: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, etc.
+- **Test Bypass**: `SPOTIFY_TEST_ACCESS_TOKEN`, `SPOTIFY_TEST_REFRESH_TOKEN`
 
-```bash
-# After UI changes, approve new baselines
-npm run visual:approve
+**Failure Policy**: FAIL - Environment validation is a hard requirement.
 
-# Commit approved baselines
-git add visual-baseline/
-git commit -m "Update visual baselines for new feature"
-```
+**Output**: `reports/env-validation.json`
 
-### Visual Test Best Practices
+### 2. Provider Detection & Testing (`scripts/providers/detect-providers.js`)
 
-1. **Disable animations** for consistent screenshots
-2. **Use consistent test data** for repeatability
-3. **Test multiple viewports** (desktop/mobile)
-4. **Hide dynamic content** (timestamps, random IDs)
+**Purpose**: Auto-detects available LLM providers and validates connectivity.
 
-```typescript
-test('visual consistency', async ({ page }) => {
-  await page.goto('/feature');
-  
-  // Hide dynamic elements
-  await page.addStyleTag({
-    content: '.timestamp { display: none !important; }'
-  });
-  
-  // Wait for stability
-  await page.waitForLoadState('networkidle');
-  
-  await expect(page).toHaveScreenshot('feature-view.png');
-});
-```
+**Supported Providers**:
+- OpenAI (models endpoint)
+- Anthropic (Claude messages endpoint)
+- Google Gemini (Generative AI API)
+- Groq (OpenAI-compatible API)
+- Perplexity (chat completions)
+- Vertex AI (GCP authentication)
+- xAI/Grok (models endpoint)
+
+**Testing Strategy**:
+- Environment variable detection with placeholder filtering
+- Connectivity testing with appropriate endpoints
+- Latency measurement and ranking
+- Error categorization (auth, network, service)
+
+**Failure Policy**: WARN - No providers is acceptable; individual provider failures don't fail the build.
+
+**Output**: `reports/provider-status.json`, `reports/provider-latencies.json`
+
+### 3. Recommendation Engine Probe (`scripts/recommendation-probe.js`)
+
+**Purpose**: Validates the core music recommendation functionality.
+
+**Test Scenarios**:
+1. **Direct Endpoint Testing**: `GET /api/recommendations?strategy=hybrid`
+2. **Strategy Validation**: Tests `hybrid`, `collaborative`, `content-based`
+3. **Chat Fallback**: `POST /api/chat` with music request if direct endpoint fails
+4. **Metrics Collection**: Latency, recommendation count, fallback usage
+
+**Success Criteria**:
+- At least one recommendation strategy works OR chat fallback provides recommendations
+- Response times are reasonable (<15s for primary, <20s for fallback)
+
+**Failure Policy**: WARN - Recommendation issues don't fail the build but are flagged.
+
+**Output**: `reports/recommendation-engine.json`
+
+### 4. Playwright E2E Flows with Screenshots (`tests/e2e/comprehensive-flows.spec.js`)
+
+**Purpose**: Comprehensive browser-based testing with exhaustive screenshot capture.
+
+**Flow Coverage**:
+- **Authentication Flow** (`@auth`): Login, OAuth, callback handling
+- **Settings Flow** (`@settings`): Configuration, provider selection
+- **Chat Flow** (`@chat`): Message input, AI responses, provider switching
+- **Recommendations Flow** (`@recommendations`): Strategy selection, music display
+- **Error Flow** (`@errorflow`): 404 pages, network errors, JavaScript errors
+
+**Screenshot Strategy**:
+- **Every Step**: Screenshots captured for each test step
+- **Multiple Viewports**: Desktop (1280x800) and Mobile (390x844)
+- **Error Capture**: Automatic screenshots on page errors and console errors
+- **Organized Storage**: `BROWSERSCREENSHOT-TESTING/{runId}/{flow}/`
+
+**Naming Convention**: `{stepNumber}-{slug}-{viewport}.png`
+
+**Failure Policy**: WARN - E2E issues don't fail the build but provide valuable feedback.
+
+**Output**: `BROWSERSCREENSHOT-TESTING/`, `reports/screenshot-coverage.json`
+
+### 5. Docker Validation (`scripts/docker-validate.js`)
+
+**Purpose**: Validates containerization and deployment readiness.
+
+**Validation Steps**:
+1. **Build**: Docker image build with timing and size measurement
+2. **Run**: Container startup with environment injection
+3. **Health Check**: Endpoint availability within 2-minute timeout
+4. **Endpoint Testing**: `/health`, `/api/chat`, `/api/recommendations`
+5. **Log Collection**: Container logs capture for debugging
+
+**Environment Strategy**:
+- Minimal required environment for Docker testing
+- Real secrets where available, test defaults otherwise
+- Health check with progressive backoff (40 attempts, 3s intervals)
+
+**Failure Policy**: FAIL - Docker validation failures indicate deployment issues.
+
+**Output**: `reports/docker-validation.json`, `reports/docker-logs/`
+
+### 6. Performance Smoke Testing (`scripts/perf-smoke-test.js`)
+
+**Purpose**: Validates system performance under typical load.
+
+**Test Parameters**:
+- **Request Count**: 10 sequential chat requests
+- **Metrics**: p50, p95, min, max, average latency
+- **Provider Analysis**: Performance comparison across providers
+- **Thresholds**: Soft warning at p95>3500ms, hard fail at p95>5000ms (if enforced)
+
+**Test Messages**: Varied music requests to simulate real usage:
+- "Can you recommend some music?"
+- "Suggest jazz music for studying"
+- "I want upbeat music for working out"
+
+**Threshold Policy**:
+- **Soft Threshold**: p95 > 3500ms → Warning
+- **Hard Threshold**: p95 > 5000ms → Failure (only if `ENFORCE_PERF_THRESHOLDS=true`)
+
+**Failure Policy**: CONDITIONAL - Fails only if hard thresholds are enforced and exceeded.
+
+**Output**: `reports/perf-chat.json`
+
+## Failure Policies
+
+### Hard Failures (Build Breaking)
+- Environment validation failures
+- Docker build/runtime failures (if not skipped)
+- Hard performance threshold violations (when enforced)
+- Report aggregation failures
+
+### Soft Failures (Warnings Only)
+- No providers enabled
+- Individual provider connectivity issues
+- E2E test failures
+- Soft performance threshold violations
+- Missing baseline images
+- Recommendation fallback usage
 
 ## Quality Gates
 
-### Coverage Requirements
+### Merge Requirements
+- All required environment variables valid (no placeholders)
+- At least one provider working OR test bypass tokens available
+- Basic recommendation functionality (direct endpoint OR chat fallback)
 
-- **Unit Tests**: 85% line coverage minimum
-- **Integration Tests**: All API endpoints covered
-- **E2E Tests**: All critical user paths covered
-- **Visual Tests**: All major UI states covered
+### Optional Validations
+- Docker build and runtime success
+- E2E flows complete with screenshot coverage
+- Performance within acceptable thresholds
 
-### Performance Requirements
-
-- **API Response Time**: P95 < 2 seconds
-- **Page Load Time**: < 3 seconds
-- **Memory Usage**: No memory leaks detected
-
-### Test Success Criteria
-
-Tests must pass these criteria to merge:
-
-1. All selected tests pass (>95% pass rate)
-2. No new test failures introduced
-3. Coverage thresholds maintained
-4. Performance thresholds met
-5. Visual differences within acceptable range
-
-## Continuous Integration
-
-### Test Matrix Selection
-
-The CI system automatically selects tests based on:
-
-- **Changed files**: Runs relevant test layers
-- **Pull request scope**: Scales test execution
-- **Branch type**: Different rules for main vs feature branches
-
-### Parallel Execution
-
-Tests run in parallel across multiple dimensions:
-
-- **Browser**: Chromium, Firefox, Safari
-- **Viewport**: Desktop, Mobile
-- **Environment**: Test, Staging
-
-### Artifact Collection
-
-All test runs produce:
-
-- Test results (JSON, JUnit)
-- Coverage reports (HTML, LCOV)
-- Screenshots (success/failure)
-- Performance metrics (timing, memory)
-- Consolidated reports (JSON, Markdown)
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Flaky tests**: Use retry mechanisms and better waits
-2. **Slow tests**: Optimize test data and mocking
-3. **Visual differences**: Check for animations or dynamic content
-4. **Performance variance**: Use multiple measurements and percentiles
-
-### Debugging Tests
-
-```bash
-# Run tests in debug mode
-npm run test:e2e -- --debug
-
-# Generate detailed reports
-npm run test:report
-
-# View visual differences
-open reports/visual-diff/
-```
-
-### Test Environment Issues
-
-```bash
-# Validate environment setup
-node scripts/env-validate.js
-
-# Check test dependencies
-npm run test:plan
-
-# Verify test selection
-cat reports/test-matrix.json
-```
-
-## Future Enhancements
-
-### Planned Improvements
-
-1. **Contract Testing**: OpenAPI schema validation
-2. **A/B Test Support**: Statistical significance testing
-3. **Chaos Testing**: Fault injection and resilience
-4. **Historical Trends**: Performance regression tracking
-
-### Contributing
-
-When adding new test types or frameworks:
-
-1. Update this documentation
-2. Add to test selection matrix
-3. Include in CI pipeline
-4. Update quality gates
-5. Provide examples and utilities
-
----
-
-For specific questions about testing strategy, consult the team or refer to existing test examples in each layer.
+This strategy ensures comprehensive validation while maintaining rapid development feedback.

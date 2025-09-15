@@ -18,6 +18,36 @@ reports/*
 !reports/.gitkeep
 !reports/README.md
 
+# === COMPREHENSIVE TESTING FRAMEWORK ARTIFACTS ===
+# Screenshot testing artifacts
+BROWSERSCREENSHOT-TESTING/
+visual-baseline/*.png.tmp
+artifacts/
+test-results/
+
+# Docker validation logs
+reports/docker-logs/
+
+# Generated test reports (keep structure, ignore content)
+reports/env-validation.json
+reports/provider-status.json
+reports/provider-latencies.json
+reports/recommendation-engine.json
+reports/docker-validation.json
+reports/perf-chat.json
+reports/screenshot-coverage.json
+reports/test-run-report.json
+reports/test-run-report.md
+
+# Playwright artifacts
+playwright-report/
+test-results/
+.playwright/
+
+# Performance and test logs
+*.log
+app.pid
+
 # VS Code specific performance optimizations
 .vscode/workspace-state.vscode-workspace
 .vscode/.browse.VC.db*
