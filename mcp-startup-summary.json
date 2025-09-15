@@ -1,10 +1,10 @@
 {
-  "startup_time": "2025-09-15T18:32:10.036Z",
+  "startup_time": "2025-09-15T18:58:00.394Z",
   "status": "completed",
   "mcp_servers": {
-    "total": 4,
+    "total": 5,
     "running": 0,
-    "config_file": "/home/runner/work/Spotify-echo/Spotify-echo/.copilot/mcp-config.json",
+    "config_file": "/tmp/mcp-merged-config.json",
     "log_file": "/home/runner/work/Spotify-echo/Spotify-echo/mcp-startup.log"
   },
   "api_validation": {

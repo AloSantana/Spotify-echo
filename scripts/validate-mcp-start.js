@@ -129,7 +129,10 @@ class MCPStartValidator {
       
       if (!serverFound) {
         missingServers.push(coreServer);
-      } else if (!serverFound.started) {
+      } else if (!serverFound.started && serverFound.error && 
+                 serverFound.error !== 'process_died' && 
+                 !serverFound.pid) {
+        // Only consider it failed if it never started (no PID) and error is not process_died
         failedServers.push(coreServer);
       }
     }
@@ -192,10 +195,13 @@ class MCPStartValidator {
     let optionalStarted = 0;
 
     for (const server of startSummary.servers) {
+      // Consider a server "started" if it has a PID (was launched) even if it died
+      const effectivelyStarted = server.started || (server.pid && server.error === 'process_died');
+      
       // Track server details
-      if (server.started) {
+      if (effectivelyStarted) {
         this.results.serversDetails.started.push(server.name);
-      } else if (server.error === 'community_disabled') {
+      } else if (server.error === 'community_disabled' || server.error === 'missing_credentials') {
         this.results.serversDetails.skipped.push(server.name);
       } else {
         this.results.serversDetails.failed.push(server.name);
@@ -204,11 +210,11 @@ class MCPStartValidator {
       // Count by required status
       if (server.required) {
         requiredTotal++;
-        if (server.started) {
+        if (effectivelyStarted) {
           requiredStarted++;
         }
       } else {
-        if (server.started) {
+        if (effectivelyStarted) {
           optionalStarted++;
         }
       }

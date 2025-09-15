@@ -1,0 +1,266 @@
+name: 🧪 MCP Integration Hardening Test Suite
+
+on:
+  push:
+    paths:
+      - 'scripts/**'
+      - 'start-mcp-servers.sh'
+      - '.copilot/**'
+      - 'docs/**'
+      - 'mcp-servers/**'
+      - '.github/workflows/mcp-hardening-test.yml'
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - 'start-mcp-servers.sh'
+      - '.copilot/**'
+      - 'docs/**'
+      - 'mcp-servers/**'
+      - '.github/workflows/mcp-hardening-test.yml'
+
+jobs:
+  mcp-hardening-validation:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test_variant:
+          - name: "core-only"
+            description: "Core servers only (community disabled)"
+            enable_community: "0"
+            strict_required: "false"
+            expected_community: "false"
+          - name: "community-enabled"
+            description: "All servers including community (community enabled)"
+            enable_community: "1"
+            strict_required: "false" 
+            expected_community: "true"
+          - name: "strict-community"
+            description: "All servers with strict validation (fails on required server failure)"
+            enable_community: "1"
+            strict_required: "true"
+            expected_community: "true"
+          - name: "secrets-gating"
+            description: "Test secrets-aware gating (missing credentials)"
+            enable_community: "1"
+            strict_required: "false"
+            clear_secrets: "true"
+            expected_community: "false"
+
+    name: 🧪 ${{ matrix.test_variant.name }} (${{ matrix.test_variant.description }})
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: |
+          npm install
+          # Install jq for configuration merging
+          sudo apt-get update && sudo apt-get install -y jq
+
+      - name: 🔑 Setup Test Environment
+        run: |
+          # Create basic .env for testing (with dummy values)
+          cat > .env << EOF
+          # Test environment variables
+          SPOTIFY_CLIENT_ID=test_client_id
+          SPOTIFY_CLIENT_SECRET=test_client_secret
+          GITHUB_TOKEN=test_github_token
+          BRAVE_API_KEY=test_brave_key
+          BROWSERBASE_API_KEY=test_browserbase_key
+          BROWSERBASE_PROJECT_ID=test_project_id
+          PERPLEXITY_API_KEY=test_perplexity_key
+          EOF
+          
+          # Clear secrets for secrets-gating test
+          if [ "${{ matrix.test_variant.clear_secrets }}" = "true" ]; then
+            echo "# Secrets cleared for testing" > .env
+          fi
+
+      - name: 🏗️ Prepare MCP Infrastructure
+        run: |
+          # Ensure reports directory exists
+          mkdir -p reports
+          
+          # Ensure core MCP server implementations exist
+          mkdir -p mcp-servers/filesystem
+          mkdir -p mcp-servers/sqlite
+          
+          # Verify core config exists
+          if [ ! -f .copilot/mcp-config.json ]; then
+            echo "❌ Core MCP config not found"
+            exit 1
+          fi
+          
+          # Verify community config exists
+          if [ ! -f .copilot/mcp-config.community.json ]; then
+            echo "❌ Community MCP config not found"
+            exit 1
+          fi
+
+      - name: 🧪 Run MCP Smoke Test
+        env:
+          ENABLE_COMMUNITY_MCP: ${{ matrix.test_variant.enable_community }}
+          MCP_STRICT_REQUIRED: ${{ matrix.test_variant.strict_required }}
+        run: |
+          echo "🧪 Running MCP smoke test with configuration:"
+          echo "  ENABLE_COMMUNITY_MCP: $ENABLE_COMMUNITY_MCP"
+          echo "  MCP_STRICT_REQUIRED: $MCP_STRICT_REQUIRED"
+          echo "  Expected community: ${{ matrix.test_variant.expected_community }}"
+          
+          # Run smoke test and capture output
+          bash scripts/mcp-smoke-test.sh > smoke_test_output.log 2>&1 || {
+            echo "❌ Smoke test failed for variant: ${{ matrix.test_variant.name }}"
+            echo "📋 Smoke test output:"
+            cat smoke_test_output.log
+            
+            echo "📋 Reports directory contents:"
+            ls -la reports/ || echo "No reports directory"
+            
+            echo "📋 Start summary (if exists):"
+            cat reports/mcp-start-summary.json 2>/dev/null || echo "No start summary"
+            
+            exit 1
+          }
+
+      - name: 📊 Validate Results
+        env:
+          EXPECTED_COMMUNITY: ${{ matrix.test_variant.expected_community }}
+        run: |
+          echo "📊 Validating test results..."
+          
+          # Check if summary files were created
+          if [ ! -f reports/mcp-start-summary.json ]; then
+            echo "❌ Start summary not created"
+            exit 1
+          fi
+          
+          # Parse the MCP_SMOKE_RESULT line
+          if ! grep -q "MCP_SMOKE_RESULT" smoke_test_output.log; then
+            echo "❌ No MCP_SMOKE_RESULT found in output"
+            cat smoke_test_output.log
+            exit 1
+          fi
+          
+          # Extract metrics
+          RESULT_LINE=$(grep "MCP_SMOKE_RESULT" smoke_test_output.log)
+          echo "📋 Result line: $RESULT_LINE"
+          
+          # Parse individual values
+          REQUIRED_STARTED=$(echo "$RESULT_LINE" | grep -o 'required_started=[0-9]*' | cut -d= -f2)
+          REQUIRED_TOTAL=$(echo "$RESULT_LINE" | grep -o 'required_total=[0-9]*' | cut -d= -f2)
+          OPTIONAL_STARTED=$(echo "$RESULT_LINE" | grep -o 'optional_started=[0-9]*' | cut -d= -f2)
+          COMMUNITY_INCLUDED=$(echo "$RESULT_LINE" | grep -o 'community_included=[a-z]*' | cut -d= -f2)
+          
+          echo "📊 Parsed metrics:"
+          echo "  Required started: $REQUIRED_STARTED"
+          echo "  Required total: $REQUIRED_TOTAL"
+          echo "  Optional started: $OPTIONAL_STARTED" 
+          echo "  Community included: $COMMUNITY_INCLUDED"
+          
+          # Validate core baseline (required servers)
+          if [ "$REQUIRED_TOTAL" -lt 3 ]; then
+            echo "❌ Expected at least 3 required servers, got $REQUIRED_TOTAL"
+            exit 1
+          fi
+          
+          # For non-secrets-gating tests, require all core servers to start
+          if [ "${{ matrix.test_variant.clear_secrets }}" != "true" ]; then
+            if [ "$REQUIRED_STARTED" != "$REQUIRED_TOTAL" ]; then
+              echo "❌ Not all required servers started: $REQUIRED_STARTED/$REQUIRED_TOTAL"
+              cat reports/mcp-start-summary.json
+              exit 1
+            fi
+          fi
+          
+          # Validate community expectation
+          if [ "$COMMUNITY_INCLUDED" != "$EXPECTED_COMMUNITY" ]; then
+            echo "❌ Community inclusion mismatch: expected $EXPECTED_COMMUNITY, got $COMMUNITY_INCLUDED"
+            exit 1
+          fi
+          
+          echo "✅ All validations passed for variant: ${{ matrix.test_variant.name }}"
+
+      - name: 📋 Upload Artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mcp-test-results-${{ matrix.test_variant.name }}
+          path: |
+            reports/
+            smoke_test_output.log
+            mcp-startup.log
+            /tmp/mcp-*.log
+          retention-days: 7
+
+  mcp-integration-summary:
+    runs-on: ubuntu-latest
+    needs: mcp-hardening-validation
+    if: always()
+    
+    steps:
+      - name: 📊 Test Summary
+        run: |
+          echo "🎯 MCP Integration Hardening Test Summary"
+          echo "========================================"
+          echo "All test variants completed."
+          echo "Check individual job results for details."
+
+  # Additional validation job for documentation and configuration consistency
+  mcp-config-validation:
+    runs-on: ubuntu-latest
+    name: 📋 Configuration & Documentation Validation
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔍 Validate Configuration Files
+        run: |
+          echo "🔍 Validating MCP configuration files..."
+          
+          # Check if all required config files exist
+          for config in .copilot/mcp-config.json .copilot/mcp-config.community.json; do
+            if [ ! -f "$config" ]; then
+              echo "❌ Missing configuration file: $config"
+              exit 1
+            fi
+            
+            # Validate JSON structure
+            if ! python3 -m json.tool "$config" > /dev/null 2>&1; then
+              echo "❌ Invalid JSON in $config"
+              exit 1
+            fi
+            
+            echo "✅ Valid configuration: $config"
+          done
+
+      - name: 📖 Check Documentation Consistency
+        run: |
+          echo "📖 Checking documentation consistency..."
+          
+          # Verify smoke test script exists and is executable
+          if [ ! -f scripts/mcp-smoke-test.sh ]; then
+            echo "❌ Missing smoke test script"
+            exit 1
+          fi
+          
+          if [ ! -x scripts/mcp-smoke-test.sh ]; then
+            echo "❌ Smoke test script not executable"
+            exit 1
+          fi
+          
+          # Verify validation script exists
+          if [ ! -f scripts/validate-mcp-start.js ]; then
+            echo "❌ Missing validation script"
+            exit 1
+          fi
+          
+          echo "✅ All required scripts present and properly configured"
