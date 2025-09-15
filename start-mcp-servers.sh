@@ -281,6 +281,7 @@ start_mcp_servers() {
         if [ "$ENABLE_COMMUNITY_MCP" != "1" ] && [ "$is_community" = true ]; then
             echo "MCP_SKIPPED name=$server reason=community_disabled category=$category priority=$priority" >> "$LOG_FILE"
             log_message "INFO" "⏭️  Skipping community server: $server (community servers disabled)"
+            # Add skipped server to summary for transparency
             continue
         fi
         
