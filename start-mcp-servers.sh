@@ -16,7 +16,28 @@ NC='\033[0m' # No Color
 
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MCP_CONFIG_FILE="${SCRIPT_DIR}/mcp-servers-config.json"
+
+# Enhanced Configuration Loading with .copilot fallback
+load_mcp_config() {
+    local primary_config="${SCRIPT_DIR}/.copilot/mcp-config.json"
+    local fallback_config="${SCRIPT_DIR}/.copilot/mcp-config.example.json"
+    local legacy_config="${SCRIPT_DIR}/mcp-servers-config.json"
+    
+    if [ -f "$primary_config" ]; then
+        MCP_CONFIG_FILE="$primary_config"
+        log_message "INFO" "📁 Using primary MCP config: $primary_config"
+    elif [ -f "$fallback_config" ]; then
+        MCP_CONFIG_FILE="$fallback_config"
+        log_message "INFO" "📋 Using fallback MCP config: $fallback_config"
+    elif [ -f "$legacy_config" ]; then
+        MCP_CONFIG_FILE="$legacy_config"
+        log_message "INFO" "📜 Using legacy MCP config: $legacy_config"
+    else
+        log_error "❌ No MCP configuration file found. Expected: $primary_config or $fallback_config"
+        exit 1
+    fi
+}
+
 LOG_FILE="${SCRIPT_DIR}/mcp-startup.log"
 HEALTH_CHECK_TIMEOUT=30
 VALIDATION_REPORT="${SCRIPT_DIR}/mcp-validation-report.json"
@@ -130,35 +151,136 @@ validate_api_keys() {
     echo "{\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ)\",\"api_validation\":[$(IFS=,; echo "${validation_results[*]}")],\"total_keys\":${#validation_results[@]}}" > "$VALIDATION_REPORT"
 }
 
+# Generate MCP capabilities report using bootstrap script
+generate_capabilities_report() {
+    print_section "📋 Generating MCP Capabilities Report"
+    
+    if [ -f "${SCRIPT_DIR}/scripts/mcp-agent-bootstrap.js" ]; then
+        log_message "INFO" "Running MCP bootstrap script..."
+        
+        # Run bootstrap script to generate capabilities report
+        node "${SCRIPT_DIR}/scripts/mcp-agent-bootstrap.js" --structured > /tmp/mcp-bootstrap-output.log 2>&1
+        
+        if [ $? -eq 0 ]; then
+            log_message "INFO" "✅ MCP capabilities report generated successfully"
+            
+            # Extract structured output for shell integration
+            if [ -f /tmp/mcp-bootstrap-output.log ]; then
+                grep "MCP_" /tmp/mcp-bootstrap-output.log >> "$LOG_FILE" 2>/dev/null || true
+            fi
+        else
+            log_warning "⚠️  MCP bootstrap script failed, continuing without report"
+        fi
+    else
+        log_warning "⚠️  MCP bootstrap script not found, skipping capabilities report"
+    fi
+}
+
+# Parse MCP configuration with fallback support
+parse_mcp_config() {
+    local config_file="$1"
+    
+    # Check if jq is available
+    if command -v jq >/dev/null 2>&1; then
+        # Use jq for robust JSON parsing
+        jq -r '.mcpServers | keys[]' "$config_file" 2>/dev/null
+    else
+        # Fallback to simple grep/sed parsing
+        log_warning "⚠️  jq not available, using fallback parsing"
+        grep -o '"[^"]*"[[:space:]]*:[[:space:]]*{' "$config_file" | sed 's/"//g' | sed 's/[[:space:]]*:[[:space:]]*{//' || echo ""
+    fi
+}
+
+# Get server configuration with fallback parsing
+get_server_config() {
+    local config_file="$1"
+    local server_name="$2"
+    local config_key="$3"
+    
+    if command -v jq >/dev/null 2>&1; then
+        # Use jq for robust JSON parsing
+        case "$config_key" in
+            "command")
+                jq -r ".mcpServers.$server_name.command // \"unknown\"" "$config_file" 2>/dev/null
+                ;;
+            "args")
+                jq -r ".mcpServers.$server_name.args[]? // empty" "$config_file" 2>/dev/null | tr '\n' ' '
+                ;;
+            "env")
+                jq -r ".mcpServers.$server_name.env // {} | to_entries[] | \"\(.key)=\(.value)\"" "$config_file" 2>/dev/null || echo ""
+                ;;
+            "category")
+                jq -r ".mcpServers.$server_name.category // \"unknown\"" "$config_file" 2>/dev/null
+                ;;
+            "required")
+                jq -r ".mcpServers.$server_name.required // false" "$config_file" 2>/dev/null
+                ;;
+            "priority")
+                jq -r ".mcpServers.$server_name.priority // 99" "$config_file" 2>/dev/null
+                ;;
+        esac
+    else
+        # Simple fallback parsing
+        echo "unknown"
+    fi
+}
+
 # Start MCP servers
 start_mcp_servers() {
     print_section "🚀 Starting MCP Servers"
+    
+    # Load configuration
+    load_mcp_config
     
     if [ ! -f "$MCP_CONFIG_FILE" ]; then
         log_error "MCP configuration file not found: $MCP_CONFIG_FILE"
         exit 1
     fi
     
-    # Parse and start each server
-    local servers=$(cat "$MCP_CONFIG_FILE" | jq -r '.mcpServers | keys[]')
+    # Generate capabilities report before starting servers
+    generate_capabilities_report
+    
+    # Parse server list with fallback support
+    local servers=$(parse_mcp_config "$MCP_CONFIG_FILE")
     local started_servers=()
     
+    if [ -z "$servers" ]; then
+        log_error "❌ No MCP servers found in configuration"
+        exit 1
+    fi
+    
+    log_message "INFO" "📝 Found servers in config: $servers"
+    
     for server in $servers; do
-        log_message "INFO" "Starting MCP server: $server"
+        # Structured logging before starting each server
+        local category=$(get_server_config "$MCP_CONFIG_FILE" "$server" "category")
+        local required=$(get_server_config "$MCP_CONFIG_FILE" "$server" "required")
+        local priority=$(get_server_config "$MCP_CONFIG_FILE" "$server" "priority")
+        
+        echo "MCP_START name=$server category=$category required=$required priority=$priority" >> "$LOG_FILE"
+        log_message "INFO" "🔄 Starting MCP server: $server (category=$category, required=$required, priority=$priority)"
         
         # Get server configuration
-        local command=$(cat "$MCP_CONFIG_FILE" | jq -r ".mcpServers.$server.command")
-        local args=$(cat "$MCP_CONFIG_FILE" | jq -r ".mcpServers.$server.args[]" | tr '\n' ' ')
+        local command=$(get_server_config "$MCP_CONFIG_FILE" "$server" "command")
+        local args=$(get_server_config "$MCP_CONFIG_FILE" "$server" "args")
+        local env_vars=$(get_server_config "$MCP_CONFIG_FILE" "$server" "env")
         
-        # Set environment variables if present
-        local env_vars=$(cat "$MCP_CONFIG_FILE" | jq -r ".mcpServers.$server.env // {} | to_entries[] | \"\(.key)=\(.value)\"" 2>/dev/null || echo "")
+        # Validate command
+        if [ "$command" = "unknown" ] || [ -z "$command" ]; then
+            log_error "❌ Invalid command for server $server, skipping"
+            continue
+        fi
         
-        # Check if server directory exists
-        local server_path="${SCRIPT_DIR}/mcp-servers/${server}"
-        if [ ! -d "$server_path" ]; then
-            log_warning "Server directory not found: $server_path - creating placeholder"
-            mkdir -p "$server_path"
-            echo 'console.log("MCP server '${server}' placeholder - implement actual server");' > "$server_path/index.js"
+        # Check if server directory exists (for node-based servers)
+        if [ "$command" = "node" ] && [[ "$args" == *"mcp-servers/"* ]]; then
+            local script_path=$(echo "$args" | awk '{print $1}')
+            local server_path="${SCRIPT_DIR}/$(dirname "$script_path")"
+            
+            if [ ! -d "$server_path" ]; then
+                log_warning "Server directory not found: $server_path - creating placeholder"
+                mkdir -p "$server_path"
+                echo 'console.log("MCP server '${server}' placeholder - implement actual server");' > "$server_path/index.js"
+            fi
         fi
         
         # Start server in background
@@ -174,6 +296,9 @@ start_mcp_servers() {
         
         started_servers+=("$server:$server_pid")
         log_message "INFO" "✅ Started $server with PID $server_pid"
+        
+        # Structured logging after successful start
+        echo "MCP_STARTED name=$server pid=$server_pid timestamp=$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ)" >> "$LOG_FILE"
         
         # Brief delay between server starts
         sleep 2
