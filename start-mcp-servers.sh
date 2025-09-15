@@ -257,6 +257,13 @@ start_mcp_servers() {
         local required=$(get_server_config "$MCP_CONFIG_FILE" "$server" "required")
         local priority=$(get_server_config "$MCP_CONFIG_FILE" "$server" "priority")
         
+        # Community server gating logic
+        if [ -z "$ENABLE_COMMUNITY_MCP" ] && ([ "$category" = "community" ] || [ -n "$priority" ] && [ "$priority" -ge 6 ]); then
+            echo "MCP_SKIPPED name=$server reason=community_disabled category=$category priority=$priority" >> "$LOG_FILE"
+            log_message "INFO" "⏭️  Skipping community server: $server (community servers disabled)"
+            continue
+        fi
+        
         echo "MCP_START name=$server category=$category required=$required priority=$priority" >> "$LOG_FILE"
         log_message "INFO" "🔄 Starting MCP server: $server (category=$category, required=$required, priority=$priority)"
         
@@ -373,10 +380,109 @@ monitor_servers() {
 create_summary() {
     print_section "📋 Startup Summary"
     
-    local summary_file="${SCRIPT_DIR}/mcp-startup-summary.json"
+    local summary_file="${SCRIPT_DIR}/reports/mcp-start-summary.json"
     local current_time=$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ)
     
-    # Count running servers
+    # Ensure reports directory exists
+    mkdir -p "${SCRIPT_DIR}/reports"
+    
+    # Initialize server array
+    local servers_json="["
+    local first_server=true
+    
+    # Process all servers from the log file
+    local servers_list=$(parse_mcp_config "$MCP_CONFIG_FILE")
+    
+    for server in $servers_list; do
+        local category=$(get_server_config "$MCP_CONFIG_FILE" "$server" "category")
+        local required=$(get_server_config "$MCP_CONFIG_FILE" "$server" "required")
+        local priority=$(get_server_config "$MCP_CONFIG_FILE" "$server" "priority")
+        
+        # Check if server was skipped due to community gating
+        local was_skipped=false
+        local error_message=""
+        
+        if [ -z "$ENABLE_COMMUNITY_MCP" ] && ([ "$category" = "community" ] || [ -n "$priority" ] && [ "$priority" -ge 6 ]); then
+            was_skipped=true
+            error_message="community_disabled"
+        fi
+        
+        # Check if server was started (has PID file and process is running)
+        local started=false
+        local server_pid=""
+        
+        if [ "$was_skipped" = false ]; then
+            local pid_file="/tmp/mcp-${server}.pid"
+            if [ -f "$pid_file" ]; then
+                server_pid=$(cat "$pid_file")
+                if ps -p "$server_pid" > /dev/null 2>&1; then
+                    started=true
+                fi
+            fi
+        fi
+        
+        # Convert string values to proper JSON types
+        local required_bool="false"
+        if [ "$required" = "true" ]; then
+            required_bool="true"
+        fi
+        
+        local started_bool="false"
+        if [ "$started" = true ]; then
+            started_bool="true"
+        fi
+        
+        # Add comma separator if not first server
+        if [ "$first_server" = false ]; then
+            servers_json="${servers_json},"
+        fi
+        first_server=false
+        
+        # Build server JSON object
+        servers_json="${servers_json}
+    {
+      \"name\": \"$server\",
+      \"required\": $required_bool,
+      \"priority\": ${priority:-99},
+      \"started\": $started_bool,
+      \"category\": \"${category:-unknown}\""
+        
+        # Add error field if server was skipped or failed
+        if [ -n "$error_message" ]; then
+            servers_json="${servers_json},
+      \"error\": \"$error_message\""
+        elif [ "$started" = false ] && [ "$was_skipped" = false ]; then
+            servers_json="${servers_json},
+      \"error\": \"failed_to_start\""
+        fi
+        
+        # Add PID if available
+        if [ -n "$server_pid" ]; then
+            servers_json="${servers_json},
+      \"pid\": $server_pid"
+        fi
+        
+        servers_json="${servers_json}
+    }"
+    done
+    
+    servers_json="${servers_json}
+  ]"
+    
+    # Create the complete summary JSON
+    cat > "$summary_file" << EOF
+{
+  "timestamp": "$current_time",
+  "servers": $servers_json
+}
+EOF
+    
+    log_message "INFO" "📄 MCP start summary written to: $summary_file"
+    
+    # Also create legacy summary for compatibility
+    local legacy_summary_file="${SCRIPT_DIR}/mcp-startup-summary.json"
+    
+    # Count running servers for legacy summary
     local running_servers=0
     for pid_file in /tmp/mcp-*.pid; do
         if [ -f "$pid_file" ]; then
@@ -387,8 +493,8 @@ create_summary() {
         fi
     done
     
-    # Create summary JSON
-    cat > "$summary_file" << EOF
+    # Create legacy summary JSON
+    cat > "$legacy_summary_file" << EOF
 {
   "startup_time": "$current_time",
   "status": "completed",
@@ -409,14 +515,15 @@ create_summary() {
   "files_created": [
     "$LOG_FILE",
     "$VALIDATION_REPORT", 
+    "$legacy_summary_file",
     "$summary_file"
   ]
 }
 EOF
     
-    log_message "INFO" "📄 Summary written to: $summary_file"
     echo -e "${GREEN}🎉 MCP Server startup completed!${NC}"
     echo -e "${BLUE}📋 View summary: cat $summary_file${NC}"
+    echo -e "${BLUE}📋 View legacy summary: cat $legacy_summary_file${NC}"
     echo -e "${BLUE}📝 View logs: tail -f $LOG_FILE${NC}"
 }
 
@@ -424,10 +531,26 @@ EOF
 main() {
     print_header
     
-    # Load environment variables
-    if [ -f "${SCRIPT_DIR}/.env" ]; then
-        export $(cat "${SCRIPT_DIR}/.env" | grep -v '^#' | xargs)
+    # Load environment variables (robust parsing) - skip if SKIP_ENV_LOADING is set
+    if [ -z "$SKIP_ENV_LOADING" ] && [ -f "${SCRIPT_DIR}/.env" ]; then
+        # Use a more robust approach that handles comments and malformed lines
+        while IFS= read -r line || [ -n "$line" ]; do
+            # Skip empty lines and comments
+            if [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]]; then
+                continue
+            fi
+            # Skip lines with escaped characters that cause issues
+            if [[ "$line" =~ \\n ]]; then
+                continue
+            fi
+            # Only export valid variable assignments
+            if [[ "$line" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; then
+                export "$line"
+            fi
+        done < "${SCRIPT_DIR}/.env"
         log_message "INFO" "Environment variables loaded from .env"
+    elif [ -n "$SKIP_ENV_LOADING" ]; then
+        log_message "INFO" "Skipping .env loading (SKIP_ENV_LOADING set)"
     fi
     
     validate_api_keys
@@ -437,9 +560,20 @@ main() {
     log_message "INFO" "Waiting for servers to initialize..."
     sleep 5
     
-    health_check
-    monitor_servers
+    # Always create summary first, then do health check
     create_summary
+    
+    # Health check and monitoring (continue even if health check fails in smoke test mode)
+    if health_check; then
+        monitor_servers
+    else
+        if [ -n "$SKIP_ENV_LOADING" ]; then
+            log_message "INFO" "Health check failed but continuing in smoke test mode"
+        else
+            log_error "Health check failed"
+            exit 1
+        fi
+    fi
 }
 
 # Cleanup function

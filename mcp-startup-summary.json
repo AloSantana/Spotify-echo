@@ -1,11 +1,11 @@
 {
-  "startup_time": "2025-09-15T16:49:55.713Z",
+  "startup_time": "2025-09-15T17:24:23.861Z",
   "status": "completed",
   "mcp_servers": {
-    "total": 9,
-    "running": 3,
+    "total": 8,
+    "running": 0,
     "config_file": "/home/runner/work/Spotify-echo/Spotify-echo/.copilot/mcp-config.example.json",
-    "log_file": "logs/app.log"
+    "log_file": "/home/runner/work/Spotify-echo/Spotify-echo/mcp-startup.log"
   },
   "api_validation": {
     "report_file": "/home/runner/work/Spotify-echo/Spotify-echo/mcp-validation-report.json",
@@ -16,8 +16,9 @@
     "pid_file": "/tmp/mcp-monitor.pid"
   },
   "files_created": [
-    "logs/app.log",
+    "/home/runner/work/Spotify-echo/Spotify-echo/mcp-startup.log",
     "/home/runner/work/Spotify-echo/Spotify-echo/mcp-validation-report.json", 
-    "/home/runner/work/Spotify-echo/Spotify-echo/mcp-startup-summary.json"
+    "/home/runner/work/Spotify-echo/Spotify-echo/mcp-startup-summary.json",
+    "/home/runner/work/Spotify-echo/Spotify-echo/reports/mcp-start-summary.json"
   ]
 }
