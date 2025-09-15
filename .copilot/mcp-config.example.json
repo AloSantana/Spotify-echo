@@ -40,12 +40,12 @@
       }
     },
     "memory": {
-      "command": "node",
-      "args": ["mcp-servers/memory/index.js"],
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-memory"],
       "capabilities": ["context-storage", "session-management"],
       "category": "core",
       "required": true,
-      "priority": 2,
+      "priority": 1,
       "plannedUsage": [
         "Context preservation across sessions",
         "User session state management",
@@ -188,9 +188,9 @@
       "command": "npx",
       "args": ["@modelcontextprotocol/server-sequential-thinking"],
       "capabilities": ["structured-reasoning", "problem-solving"],
-      "category": "enhanced",
-      "required": false,
-      "priority": 4,
+      "category": "core",
+      "required": true,
+      "priority": 1,
       "plannedUsage": [
         "Complex problem decomposition",
         "Step-by-step reasoning",

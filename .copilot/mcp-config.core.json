@@ -1,0 +1,109 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "node",
+      "args": ["mcp-servers/filesystem/index.js"],
+      "env": {
+        "WORKSPACE_ROOT": "."
+      },
+      "capabilities": ["file-operations", "directory-management"],
+      "category": "core",
+      "required": true,
+      "priority": 1,
+      "plannedUsage": [
+        "File operations and directory management",
+        "Source code reading and writing",
+        "Configuration file management",
+        "Log file access and analysis"
+      ],
+      "healthCheck": {
+        "endpoint": "http://localhost:3010/health",
+        "timeout": 5000
+      }
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-memory"],
+      "capabilities": ["context-storage", "session-management"],
+      "category": "core",
+      "required": true,
+      "priority": 1,
+      "plannedUsage": [
+        "Context preservation across sessions",
+        "User session state management",
+        "Conversation history storage",
+        "Knowledge base maintenance"
+      ],
+      "healthCheck": {
+        "endpoint": "http://localhost:3013/health",
+        "timeout": 5000
+      }
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-sequential-thinking"],
+      "capabilities": ["structured-reasoning", "problem-solving"],
+      "category": "core",
+      "required": true,
+      "priority": 1,
+      "plannedUsage": [
+        "Complex problem decomposition",
+        "Step-by-step reasoning",
+        "Decision tree analysis",
+        "Structured problem solving"
+      ],
+      "healthCheck": {
+        "command": "node -e \"console.log('sequential-thinking available')\"",
+        "timeout": 3000
+      }
+    },
+    "git": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-git", "--repository", "."],
+      "capabilities": ["version-control", "branch-management", "commit-operations"],
+      "category": "core",
+      "required": true,
+      "priority": 1,
+      "plannedUsage": [
+        "Git operations and version control",
+        "Branch management and merging",
+        "Commit history analysis",
+        "Repository status checking"
+      ],
+      "healthCheck": {
+        "command": "git --version",
+        "timeout": 3000
+      }
+    }
+  },
+  "orchestrator": {
+    "enabled": true,
+    "port": 3002,
+    "healthCheckInterval": 30000,
+    "retryAttempts": 3,
+    "retryDelay": 5000,
+    "startupTimeout": 60000,
+    "gracefulShutdownTimeout": 30000
+  },
+  "monitoring": {
+    "enabled": true,
+    "metricsPort": 3003,
+    "alerting": {
+      "enabled": true,
+      "thresholds": {
+        "responseTime": 5000,
+        "errorRate": 0.05,
+        "uptime": 0.99
+      }
+    },
+    "logging": {
+      "level": "info",
+      "file": "mcp-startup.log",
+      "rotation": {
+        "enabled": true,
+        "maxSize": "100mb",
+        "maxFiles": 10
+      }
+    }
+  }
+}
