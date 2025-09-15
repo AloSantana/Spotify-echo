@@ -115,13 +115,38 @@ The summary line contains key metrics:
 
 ## Testing Failure Scenarios
 
+### Simulating a Strict Failure
+
 To test the strict mode failure path, you can temporarily edit the MCP configuration:
 
-1. Open `.copilot/mcp-config.json` 
-2. Change a required server's command to something invalid (e.g., `"command": "invalid-command"`)
-3. Run: `MCP_STRICT_REQUIRED=true bash scripts/mcp-smoke-test.sh`
-4. Verify the test fails as expected
-5. Restore the original configuration
+1. **Back up the configuration:**
+   ```bash
+   cp .copilot/mcp-config.example.json .copilot/mcp-config.example.json.bak
+   ```
+
+2. **Edit the filesystem command** (make it invalid):
+   ```bash
+   # Change "command": "node" to "command": "nonexistent-command" for filesystem server
+   sed -i.bak 's/"command": "node"/"command": "nonexistent-command"/' .copilot/mcp-config.example.json
+   ```
+
+3. **Run strict mode test:**
+   ```bash
+   MCP_STRICT_REQUIRED=true bash scripts/mcp-smoke-test.sh
+   ```
+
+4. **Expect failure** with exit code > 0 and message referencing the failed required server
+
+5. **Restore the configuration:**
+   ```bash
+   mv .copilot/mcp-config.example.json.bak .copilot/mcp-config.example.json
+   ```
+
+**Expected output:**
+```
+[ERROR] Validation failed: Strict mode failure: 3/4 required servers started
+[ERROR] 🚨 Smoke test failed at validation stage
+```
 
 ## Troubleshooting
 

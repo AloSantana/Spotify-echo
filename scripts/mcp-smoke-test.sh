@@ -22,7 +22,7 @@ REPORTS_DIR="${ROOT_DIR}/reports"
 
 # Environment variables with defaults
 MCP_STRICT_REQUIRED="${MCP_STRICT_REQUIRED:-false}"
-ENABLE_COMMUNITY_MCP="${ENABLE_COMMUNITY_MCP:-}"
+ENABLE_COMMUNITY_MCP="${ENABLE_COMMUNITY_MCP:-1}"
 
 # Output files
 CAPABILITIES_REPORT="${REPORTS_DIR}/mcp-capabilities.json"
@@ -52,9 +52,10 @@ print_header() {
     echo "🧪 MCP SMOKE TEST"
     echo "═══════════════════════════════════════════════════════════════"
     echo -e "${NC}"
+    echo "[mcp-smoke] mode: community=${ENABLE_COMMUNITY_MCP} strict=${MCP_STRICT_REQUIRED}"
     echo "Environment:"
     echo "  MCP_STRICT_REQUIRED: ${MCP_STRICT_REQUIRED}"
-    echo "  ENABLE_COMMUNITY_MCP: ${ENABLE_COMMUNITY_MCP:-<unset>}"
+    echo "  ENABLE_COMMUNITY_MCP: ${ENABLE_COMMUNITY_MCP}"
     echo "  Reports directory: ${REPORTS_DIR}"
     echo ""
 }
@@ -210,11 +211,11 @@ case "${1:-}" in
         echo ""
         echo "Environment variables:"
         echo "  MCP_STRICT_REQUIRED     Fail if any required server fails to start (default: false)"
-        echo "  ENABLE_COMMUNITY_MCP    Include community/tier 3 servers (default: unset/disabled)"
+        echo "  ENABLE_COMMUNITY_MCP    Include community/tier 3 servers (default: 1/enabled)"
         echo ""
         echo "Examples:"
-        echo "  $0                                    # Basic smoke test"
-        echo "  ENABLE_COMMUNITY_MCP=1 $0           # Include community servers"
+        echo "  $0                                    # Basic smoke test (community enabled)"
+        echo "  ENABLE_COMMUNITY_MCP=0 $0           # Disable community servers"
         echo "  MCP_STRICT_REQUIRED=true $0         # Strict mode"
         exit 0
         ;;

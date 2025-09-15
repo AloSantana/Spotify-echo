@@ -958,7 +958,11 @@ Fast validation of MCP (Model Context Protocol) server readiness and graceful de
 Run the basic smoke test to verify MCP bootstrap and startup orchestration:
 
 ```bash
+# Basic smoke test (community servers enabled by default)
 bash scripts/mcp-smoke-test.sh
+
+# Disable community servers
+ENABLE_COMMUNITY_MCP=0 bash scripts/mcp-smoke-test.sh
 ```
 
 ### Advanced Testing
@@ -966,7 +970,7 @@ bash scripts/mcp-smoke-test.sh
 Include community servers and enable strict mode:
 
 ```bash
-# Include community/tier 3 servers
+# Enable community/tier 3 servers (default behavior)
 ENABLE_COMMUNITY_MCP=1 bash scripts/mcp-smoke-test.sh
 
 # Strict mode - fail if any required server fails
@@ -983,6 +987,13 @@ The smoke test outputs a summary line with key metrics:
 ```
 MCP_SMOKE_RESULT required_started=4 required_total=4 optional_started=8 community_included=true
 ```
+
+### Core Server Validation
+
+The smoke test validates these foundational servers:
+- **filesystem**: File operations and directory management
+- **memory**: Context storage and session management  
+- **sequential-thinking**: Structured reasoning and problem solving
 
 For complete testing guide and troubleshooting: **[📖 MCP Quick Test Guide](docs/MCP_QUICKTEST.md)**
 

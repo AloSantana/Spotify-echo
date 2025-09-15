@@ -17,6 +17,10 @@ NC='\033[0m' # No Color
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Environment variables with defaults - ENABLE_COMMUNITY_MCP defaults to 1 (enabled)
+ENABLE_COMMUNITY_MCP="${ENABLE_COMMUNITY_MCP:-1}"
+MCP_STRICT_REQUIRED="${MCP_STRICT_REQUIRED:-false}"
+
 # Enhanced Configuration Loading with .copilot fallback
 load_mcp_config() {
     local primary_config="${SCRIPT_DIR}/.copilot/mcp-config.json"
@@ -75,6 +79,17 @@ log_warning() {
     local message=$1
     echo "$(date '+%Y-%m-%d %H:%M:%S') - [WARN] $message" >> "$LOG_FILE"
     echo -e "${YELLOW}[WARN] $message${NC}"
+}
+
+# Check if server is a community server
+is_community_server() {
+    local server_name="$1"
+    case "$server_name" in
+        brave-search|browserbase|perplexity|perplexity-mcp|enhanced-browser-research|spotify-integration|github-repos|github)
+            return 0 ;;
+        *)
+            return 1 ;;
+    esac
 }
 
 # Validate API keys
@@ -257,8 +272,13 @@ start_mcp_servers() {
         local required=$(get_server_config "$MCP_CONFIG_FILE" "$server" "required")
         local priority=$(get_server_config "$MCP_CONFIG_FILE" "$server" "priority")
         
-        # Community server gating logic
-        if [ -z "$ENABLE_COMMUNITY_MCP" ] && ([ "$category" = "community" ] || [ -n "$priority" ] && [ "$priority" -ge 6 ]); then
+        # Community server gating logic - updated to check both config and hardcoded list
+        local is_community=false
+        if [ "$category" = "community" ] || [ -n "$priority" ] && [ "$priority" -ge 6 ] || is_community_server "$server"; then
+            is_community=true
+        fi
+        
+        if [ "$ENABLE_COMMUNITY_MCP" != "1" ] && [ "$is_community" = true ]; then
             echo "MCP_SKIPPED name=$server reason=community_disabled category=$category priority=$priority" >> "$LOG_FILE"
             log_message "INFO" "⏭️  Skipping community server: $server (community servers disabled)"
             continue
@@ -402,7 +422,12 @@ create_summary() {
         local was_skipped=false
         local error_message=""
         
-        if [ -z "$ENABLE_COMMUNITY_MCP" ] && ([ "$category" = "community" ] || [ -n "$priority" ] && [ "$priority" -ge 6 ]); then
+        local is_community=false
+        if [ "$category" = "community" ] || [ -n "$priority" ] && [ "$priority" -ge 6 ] || is_community_server "$server"; then
+            is_community=true
+        fi
+        
+        if [ "$ENABLE_COMMUNITY_MCP" != "1" ] && [ "$is_community" = true ]; then
             was_skipped=true
             error_message="community_disabled"
         fi

@@ -22,9 +22,12 @@ jobs:
     
     strategy:
       matrix:
-        enableCommunity: [false, true]
+        variant:
+          - { enableCommunity: false, strict: false, name: "basic" }
+          - { enableCommunity: true, strict: false, name: "community" }
+          - { enableCommunity: true, strict: true, name: "strict-community" }
         
-    name: MCP Smoke Test (Community=${{ matrix.enableCommunity }})
+    name: MCP Smoke Test (${{ matrix.variant.name }})
     
     steps:
       - name: Checkout repository
@@ -44,25 +47,32 @@ jobs:
           chmod +x scripts/mcp-smoke-test.sh
           chmod +x start-mcp-servers.sh
           
-      - name: Run MCP Smoke Test (Community=${{ matrix.enableCommunity }})
+      - name: Run MCP Smoke Test (${{ matrix.variant.name }})
         run: |
-          if [ "${{ matrix.enableCommunity }}" = "true" ]; then
+          if [ "${{ matrix.variant.enableCommunity }}" = "true" ]; then
             export ENABLE_COMMUNITY_MCP=1
             echo "Running smoke test with community servers enabled"
           else
+            export ENABLE_COMMUNITY_MCP=0
             echo "Running smoke test with community servers disabled"
           fi
           
+          if [ "${{ matrix.variant.strict }}" = "true" ]; then
+            export MCP_STRICT_REQUIRED=true
+            echo "Running smoke test in strict mode"
+          else
+            export MCP_STRICT_REQUIRED=false
+            echo "Running smoke test in standard mode"
+          fi
+          
+          echo "Final environment: ENABLE_COMMUNITY_MCP=$ENABLE_COMMUNITY_MCP MCP_STRICT_REQUIRED=$MCP_STRICT_REQUIRED"
           bash scripts/mcp-smoke-test.sh
-        env:
-          # Disable strict mode for CI to allow some servers to fail gracefully
-          MCP_STRICT_REQUIRED: false
           
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: mcp-smoke-test-reports-community-${{ matrix.enableCommunity }}
+          name: mcp-smoke-test-reports-${{ matrix.variant.name }}
           path: |
             reports/
             *.log
@@ -71,7 +81,7 @@ jobs:
       - name: Display test results
         if: always()
         run: |
-          echo "### MCP Smoke Test Results (Community=${{ matrix.enableCommunity }})" >> $GITHUB_STEP_SUMMARY
+          echo "### MCP Smoke Test Results (${{ matrix.variant.name }})" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           if [ -f "reports/mcp-start-summary.json" ]; then

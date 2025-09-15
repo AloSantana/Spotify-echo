@@ -13,6 +13,11 @@ data/Streaming_History_Audio_*.json
 data/merged_data_*.csv
 data/*_combined.csv
 
+# Reports directory - ignore generated files but keep structure
+reports/*
+!reports/.gitkeep
+!reports/README.md
+
 # VS Code specific performance optimizations
 .vscode/workspace-state.vscode-workspace
 .vscode/.browse.VC.db*

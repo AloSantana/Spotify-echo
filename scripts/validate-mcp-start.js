@@ -22,8 +22,19 @@ class MCPStartValidator {
       requiredStarted: 0,
       requiredTotal: 0,
       optionalStarted: 0,
-      communityIncluded: false
+      communityIncluded: false,
+      coreBaselineOk: false,
+      serversMissing: []
     };
+    
+    // Core baseline servers that must be present
+    this.coreBaselineServers = ['filesystem', 'memory', 'sequential-thinking'];
+    
+    // Community servers list for detection
+    this.communityServers = [
+      'brave-search', 'browserbase', 'perplexity', 'perplexity-mcp', 
+      'enhanced-browser-research', 'spotify-integration', 'github-repos', 'github'
+    ];
   }
 
   /**
@@ -99,7 +110,38 @@ class MCPStartValidator {
   }
 
   /**
-   * Detect community servers from capabilities or start summary
+   * Validate core baseline servers are present and started
+   */
+  validateCoreBaseline(startSummary) {
+    const serverNames = startSummary.servers.map(s => s.name.toLowerCase());
+    const missingServers = [];
+    const failedServers = [];
+    
+    for (const coreServer of this.coreBaselineServers) {
+      const serverFound = startSummary.servers.find(s => 
+        s.name.toLowerCase() === coreServer.toLowerCase()
+      );
+      
+      if (!serverFound) {
+        missingServers.push(coreServer);
+      } else if (!serverFound.started) {
+        failedServers.push(coreServer);
+      }
+    }
+    
+    this.results.serversMissing = [...missingServers, ...failedServers];
+    this.results.coreBaselineOk = missingServers.length === 0 && failedServers.length === 0;
+    
+    if (!this.results.coreBaselineOk) {
+      const errorMessage = `Core baseline validation failed. Missing: [${missingServers.join(', ')}], Failed: [${failedServers.join(', ')}]`;
+      throw new Error(errorMessage);
+    }
+    
+    return true;
+  }
+
+  /**
+   * Detect community servers from capabilities or start summary (enhanced)
    */
   detectCommunityServers(capabilities, startSummary) {
     let communityFound = false;
@@ -107,17 +149,19 @@ class MCPStartValidator {
     // Check capabilities for community servers
     if (capabilities && capabilities.servers) {
       for (const server of capabilities.servers) {
-        if (server.category === 'community' || server.tier === 3) {
+        if (server.category === 'community' || server.tier === 3 || 
+            this.communityServers.includes(server.name.toLowerCase())) {
           communityFound = true;
           break;
         }
       }
     }
 
-    // Check start summary for community servers or tier 3
+    // Check start summary for community servers
     if (startSummary && startSummary.servers) {
       for (const server of startSummary.servers) {
-        if (server.category === 'community' || server.tier === 3 || server.priority >= 6) {
+        if (server.category === 'community' || server.tier === 3 || 
+            server.priority >= 6 || this.communityServers.includes(server.name.toLowerCase())) {
           communityFound = true;
           break;
         }
@@ -166,6 +210,10 @@ class MCPStartValidator {
       this.validateStartSummary(startSummary);
       this.logInfo('Start summary structure validation passed');
 
+      // Validate core baseline servers
+      this.validateCoreBaseline(startSummary);
+      this.logInfo('Core baseline validation passed');
+
       // Read capabilities (optional)
       let capabilities = null;
       try {
@@ -180,6 +228,14 @@ class MCPStartValidator {
       this.results.requiredStarted = serverCounts.requiredStarted;
       this.results.requiredTotal = serverCounts.requiredTotal;
       this.results.optionalStarted = serverCounts.optionalStarted;
+
+      // Sanity guard for no required servers
+      if (this.results.requiredTotal === 0) {
+        this.logInfo('[validate] WARN: No required servers defined; check config integrity.');
+        if (this.strictRequired) {
+          throw new Error('No required servers defined in configuration');
+        }
+      }
 
       // Detect community servers
       this.results.communityIncluded = this.detectCommunityServers(capabilities, startSummary);
