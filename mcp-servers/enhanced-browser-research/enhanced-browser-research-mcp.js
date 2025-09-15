@@ -149,16 +149,16 @@ class EnhancedBrowserResearchMCPServer {
             detailed: {
                 summary: `Detailed analysis of ${topic}`,
                 sources: ['academic sources', 'industry reports', 'news articles'],
-                keyPoints: [`Detailed insight 1`, `Detailed insight 2`, `Detailed insight 3`],
+                keyPoints: ['Detailed insight 1', 'Detailed insight 2', 'Detailed insight 3'],
                 statistics: { relevance: 85, confidence: 78 }
             },
             comprehensive: {
                 summary: `Comprehensive research report on ${topic}`,
                 sources: ['academic papers', 'industry reports', 'expert interviews', 'market data'],
-                keyPoints: [`Comprehensive finding 1`, `Comprehensive finding 2`, `Comprehensive finding 3`],
+                keyPoints: ['Comprehensive finding 1', 'Comprehensive finding 2', 'Comprehensive finding 3'],
                 statistics: { relevance: 92, confidence: 88 },
                 trends: [`Trend 1 in ${topic}`, `Trend 2 in ${topic}`],
-                recommendations: [`Recommendation 1`, `Recommendation 2`]
+                recommendations: ['Recommendation 1', 'Recommendation 2']
             }
         };
 

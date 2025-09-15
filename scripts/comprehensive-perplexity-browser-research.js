@@ -319,7 +319,7 @@ Please provide:
       });
 
       // Research MCP protocol specifically
-      const mcpQuery = `Research Model Context Protocol (MCP) latest developments, best practices, and integration patterns for AI applications in 2025`;
+      const mcpQuery = 'Research Model Context Protocol (MCP) latest developments, best practices, and integration patterns for AI applications in 2025';
 
       const mcpResearch = await this.perplexityClient.search(mcpQuery, {
         model: 'sonar-pro',
@@ -365,7 +365,7 @@ Please provide:
       });
 
       // Research AI integration patterns
-      const aiIntegrationQuery = `Research best practices for integrating multiple AI providers (OpenAI, Gemini, Claude, Perplexity) in a music discovery platform with real-time features`;
+      const aiIntegrationQuery = 'Research best practices for integrating multiple AI providers (OpenAI, Gemini, Claude, Perplexity) in a music discovery platform with real-time features';
 
       const aiPatterns = await this.perplexityClient.search(aiIntegrationQuery, {
         model: 'sonar-pro',

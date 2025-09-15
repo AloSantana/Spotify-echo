@@ -448,7 +448,7 @@ class EnhancedMCPEcosystemOptimizer extends EventEmitter {
    * Generate enhanced system prompt
    */
   generateSystemPrompt(topic, options) {
-    const basePrompt = `You are an expert research assistant and technical advisor with deep knowledge across multiple domains.`;
+    const basePrompt = 'You are an expert research assistant and technical advisor with deep knowledge across multiple domains.';
     
     const domainSpecificPrompts = {
       'code': 'Focus on code quality, best practices, performance optimization, and maintainability.',

@@ -370,7 +370,7 @@ class EnhancedIntegrationTester {
 
             // Step 3: Search validation with Brave
             if (process.env.BRAVE_API_KEY) {
-                const searchResponse = await fetch(`https://api.search.brave.com/res/v1/web/search?q=music+recommendation+algorithms+2024&count=3`, {
+                const searchResponse = await fetch('https://api.search.brave.com/res/v1/web/search?q=music+recommendation+algorithms+2024&count=3', {
                     headers: {
                         'Accept': 'application/json',
                         'X-Subscription-Token': process.env.BRAVE_API_KEY
@@ -639,12 +639,12 @@ The system demonstrates **${report.healthLevel}** integration health with compre
         
         const report = await this.generateReport();
         
-        console.log(`\n📊 Final Results:`);
+        console.log('\n📊 Final Results:');
         console.log(`Overall Score: ${report.overallScore}/100 (${report.healthLevel})`);
         console.log(`Operational Tests: ${report.summary.operational}/${report.summary.total}`);
-        console.log(`\n📄 Reports saved:`);
-        console.log(`- enhanced-integration-test-report.json`);
-        console.log(`- ENHANCED_INTEGRATION_TEST_REPORT.md`);
+        console.log('\n📄 Reports saved:');
+        console.log('- enhanced-integration-test-report.json');
+        console.log('- ENHANCED_INTEGRATION_TEST_REPORT.md');
 
         return report;
     }

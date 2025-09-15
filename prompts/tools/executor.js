@@ -373,7 +373,7 @@ class PromptExecutor {
           throw new Error('Perplexity authentication failed (check PERPLEXITY_API_KEY and permissions)');
         }
         if (status === 400) {
-          throw new Error(`Perplexity rejected the request (400). Check model, messages, or payload format.`);
+          throw new Error('Perplexity rejected the request (400). Check model, messages, or payload format.');
         }
         if (status === 429) {
           throw new Error('Perplexity rate limit reached (429). Try again later or reduce request frequency.');

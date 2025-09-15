@@ -64,10 +64,10 @@ describe('CSP (Content Security Policy)', () => {
       expect(cspHeader).toBeDefined();
 
       // Check for required directives
-      expect(cspHeader).toContain("default-src 'self'");
-      expect(cspHeader).toContain("object-src 'none'");
-      expect(cspHeader).toContain("frame-ancestors 'none'");
-      expect(cspHeader).toContain("base-uri 'self'");
+      expect(cspHeader).toContain('default-src \'self\'');
+      expect(cspHeader).toContain('object-src \'none\'');
+      expect(cspHeader).toContain('frame-ancestors \'none\'');
+      expect(cspHeader).toContain('base-uri \'self\'');
     });
 
     test('should allow inline scripts and styles in report-only mode', async () => {
@@ -78,8 +78,8 @@ describe('CSP (Content Security Policy)', () => {
       const cspHeader = response.headers['content-security-policy-report-only'];
       
       // Should allow unsafe-inline for development/testing
-      expect(cspHeader).toContain("script-src 'self' 'unsafe-inline'");
-      expect(cspHeader).toContain("style-src 'self' 'unsafe-inline'");
+      expect(cspHeader).toContain('script-src \'self\' \'unsafe-inline\'');
+      expect(cspHeader).toContain('style-src \'self\' \'unsafe-inline\'');
     });
 
     test('should include data: and https: sources for images', async () => {
@@ -88,7 +88,7 @@ describe('CSP (Content Security Policy)', () => {
         .expect(200);
 
       const cspHeader = response.headers['content-security-policy-report-only'];
-      expect(cspHeader).toContain("img-src 'self' data: https:");
+      expect(cspHeader).toContain('img-src \'self\' data: https:');
     });
 
     test('should apply to all endpoints', async () => {
@@ -137,7 +137,7 @@ describe('CSP (Content Security Policy)', () => {
         .expect(200);
 
       const cspHeader = response.headers['content-security-policy-report-only'];
-      expect(cspHeader).toContain("connect-src 'self'");
+      expect(cspHeader).toContain('connect-src \'self\'');
     });
 
     test('should include font-src directive', async () => {
@@ -146,7 +146,7 @@ describe('CSP (Content Security Policy)', () => {
         .expect(200);
 
       const cspHeader = response.headers['content-security-policy-report-only'];
-      expect(cspHeader).toContain("font-src 'self'");
+      expect(cspHeader).toContain('font-src \'self\'');
     });
   });
 
@@ -193,7 +193,7 @@ describe('CSP (Content Security Policy)', () => {
         .get('/internal/health');
 
       const cspHeader = response.headers['content-security-policy-report-only'];
-      expect(cspHeader).toContain("object-src 'none'");
+      expect(cspHeader).toContain('object-src \'none\'');
     });
 
     test('should prevent framing', async () => {
@@ -201,7 +201,7 @@ describe('CSP (Content Security Policy)', () => {
         .get('/internal/health');
 
       const cspHeader = response.headers['content-security-policy-report-only'];
-      expect(cspHeader).toContain("frame-ancestors 'none'");
+      expect(cspHeader).toContain('frame-ancestors \'none\'');
     });
 
     test('should restrict base URI', async () => {
@@ -209,7 +209,7 @@ describe('CSP (Content Security Policy)', () => {
         .get('/internal/health');
 
       const cspHeader = response.headers['content-security-policy-report-only'];
-      expect(cspHeader).toContain("base-uri 'self'");
+      expect(cspHeader).toContain('base-uri \'self\'');
     });
 
     test('should be report-only mode not enforcing', async () => {

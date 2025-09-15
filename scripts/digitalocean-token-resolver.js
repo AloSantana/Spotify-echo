@@ -217,7 +217,7 @@ fi
         
         try {
             await execAsync(`chmod +x "${scriptPath}"`);
-            console.log(`📄 Created validation script: validate-do-token.sh`);
+            console.log('📄 Created validation script: validate-do-token.sh');
             console.log('   Run: ./validate-do-token.sh');
         } catch (error) {
             console.log('⚠️  Could not make script executable:', error.message);

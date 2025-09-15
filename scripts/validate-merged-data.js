@@ -320,7 +320,7 @@ class DataValidationSuite {
         const markdownPath = path.join(__dirname, '..', 'COMPREHENSIVE_DATA_VALIDATION_REPORT.md');
         fs.writeFileSync(markdownPath, markdownReport);
         
-        console.log(`✅ Reports saved:`);
+        console.log('✅ Reports saved:');
         console.log(`  📄 JSON: ${reportPath}`);
         console.log(`  📝 Markdown: ${markdownPath}`);
         
@@ -458,7 +458,7 @@ ${Object.entries(report.collections).map(([name, info]) =>
     `### ${name}
 - **Documents:** ${info.documents.toLocaleString()}
 - **Indexes:** ${info.indexes.length}
-${info.documents > 0 ? `- **Status:** ✅ Operational` : `- **Status:** ⚪ Empty`}`
+${info.documents > 0 ? '- **Status:** ✅ Operational' : '- **Status:** ⚪ Empty'}`
 ).join('\n\n')}
 
 ## 🔍 Data Quality Analysis

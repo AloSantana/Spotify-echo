@@ -372,13 +372,13 @@ class MCPRegistryUpdater {
   generateSummaryReport() {
     const servers = Object.values(this.registry.servers);
     
-    let report = `# MCP Registry Summary\n\n`;
+    let report = '# MCP Registry Summary\n\n';
     report += `**Last Updated:** ${this.registry.lastUpdated}\n\n`;
-    report += `## Overview\n\n`;
+    report += '## Overview\n\n';
     report += `- **Total Servers:** ${this.registry.totalServers}\n`;
     report += `- **Active Servers:** ${this.registry.activeServers}\n\n`;
     
-    report += `## Status Distribution\n\n`;
+    report += '## Status Distribution\n\n';
     for (const [status, count] of Object.entries(this.registry.statusCounts || {})) {
       const emoji = {
         active: '✅',
@@ -393,12 +393,12 @@ class MCPRegistryUpdater {
       report += `- ${emoji} **${status}**: ${count}\n`;
     }
     
-    report += `\n## Categories\n\n`;
+    report += '\n## Categories\n\n';
     for (const [category, count] of Object.entries(this.registry.categories || {})) {
       report += `- **${category}**: ${count} servers\n`;
     }
     
-    report += `\n## Server Details\n\n`;
+    report += '\n## Server Details\n\n';
     
     // Group servers by category
     const serversByCategory = {};

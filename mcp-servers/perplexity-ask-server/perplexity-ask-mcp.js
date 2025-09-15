@@ -993,9 +993,9 @@ class PerplexityAskMCPServer {
   generateUpdatedSections(topic, currentContent, researchContent) {
     return {
       introduction: `Updated introduction based on latest research about ${topic}`,
-      main_content: `Enhanced content incorporating 2025 best practices`,
-      examples: `Current examples and use cases from recent research`,
-      references: `Updated references and citations`
+      main_content: 'Enhanced content incorporating 2025 best practices',
+      examples: 'Current examples and use cases from recent research',
+      references: 'Updated references and citations'
     };
   }
 

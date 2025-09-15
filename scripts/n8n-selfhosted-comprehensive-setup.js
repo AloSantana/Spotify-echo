@@ -661,14 +661,14 @@ CMD ["node", "server.js"]
 `;
         
         const analyticsPackageJson = {
-            "name": "mcp-analytics-server",
-            "version": "1.0.0",
-            "description": "MCP Analytics Server for EchoTune AI",
-            "main": "server.js",
-            "dependencies": {
-                "@modelcontextprotocol/sdk": "^0.4.0",
-                "express": "^4.18.2",
-                "axios": "^1.6.0"
+            'name': 'mcp-analytics-server',
+            'version': '1.0.0',
+            'description': 'MCP Analytics Server for EchoTune AI',
+            'main': 'server.js',
+            'dependencies': {
+                '@modelcontextprotocol/sdk': '^0.4.0',
+                'express': '^4.18.2',
+                'axios': '^1.6.0'
             }
         };
         
@@ -1122,7 +1122,7 @@ OPENAI_API_KEY=your-openai-key
         console.log(`❌ Failed: ${report.summary.failedSteps} steps`);
         console.log(`📍 Working Dir: ${report.workingDirectory}`);
         console.log(`🌐 Target Instance: ${report.targetInstance}`);
-        console.log(`📄 Report saved: n8n-setup-report.json`);
+        console.log('📄 Report saved: n8n-setup-report.json');
         
         return report;
     }

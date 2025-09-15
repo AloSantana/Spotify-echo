@@ -337,11 +337,11 @@ metadata:
 
     app.listen(port, () => {
       console.log(`🚀 Prompt API server running on port ${port}`);
-      console.log(`📚 API endpoints:`);
-      console.log(`  GET  /api/prompts - List prompts`);
-      console.log(`  POST /api/prompts/execute - Execute prompt`);
-      console.log(`  POST /api/prompts/test - Test prompt`);
-      console.log(`  GET  /health - Health check`);
+      console.log('📚 API endpoints:');
+      console.log('  GET  /api/prompts - List prompts');
+      console.log('  POST /api/prompts/execute - Execute prompt');
+      console.log('  POST /api/prompts/test - Test prompt');
+      console.log('  GET  /health - Health check');
     });
   }
 

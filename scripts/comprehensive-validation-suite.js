@@ -297,7 +297,7 @@ ${this.results.overall.score < 100 ?
     
     displayResults() {
         console.log('═'.repeat(60));
-        console.log(`🎯 COMPREHENSIVE VALIDATION RESULTS`);
+        console.log('🎯 COMPREHENSIVE VALIDATION RESULTS');
         console.log('═'.repeat(60));
         console.log(`📊 Overall Score: ${this.results.overall.score}/100 (${this.results.overall.status})`);
         console.log(`⏱️  Execution Time: ${Date.now() - this.startTime}ms`);

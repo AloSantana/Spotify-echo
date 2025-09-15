@@ -181,7 +181,7 @@ class Grok4ConnectivityTester {
     }
 
     try {
-      console.log(`  🔄 Testing advanced model with Grok-like capabilities via Perplexity...`);
+      console.log('  🔄 Testing advanced model with Grok-like capabilities via Perplexity...');
       
       const testQuery = 'You are an advanced AI model with analytical capabilities. Respond with "Advanced AI model operational via Perplexity" to confirm';
       const response = await this.makePerplexityRequest(testQuery, this.grokModel, {
@@ -224,7 +224,7 @@ class Grok4ConnectivityTester {
     }
 
     try {
-      console.log(`  🔄 Testing Sonar-Pro model for research capabilities...`);
+      console.log('  🔄 Testing Sonar-Pro model for research capabilities...');
       
       const testQuery = 'Search for latest information about EchoTune AI project architecture. Limit to 50 tokens.';
       const response = await this.makePerplexityRequest(testQuery, this.sonarModel, {
@@ -389,7 +389,7 @@ class Grok4ConnectivityTester {
       try {
         // First try with Grok-4 if available
         let model = this.results.grokModelAvailable ? this.grokModel : this.sonarModel;
-        const researchQuery = `Analyze this EchoTune AI repository: it's a music recommendation system with Spotify integration, AI/ML features, and MCP automation. Provide 3 key architectural insights. Keep under 120 tokens.`;
+        const researchQuery = 'Analyze this EchoTune AI repository: it\'s a music recommendation system with Spotify integration, AI/ML features, and MCP automation. Provide 3 key architectural insights. Keep under 120 tokens.';
         
         const response = await this.makePerplexityRequest(researchQuery, model, {
           max_tokens: 120,
@@ -413,7 +413,7 @@ class Grok4ConnectivityTester {
       try {
         console.log('  🔄 Testing comprehensive repository analysis...');
         
-        const analysisQuery = `As an expert code reviewer, analyze this EchoTune AI project structure: Node.js backend, React frontend, MongoDB database, Spotify API integration, Perplexity AI research, and MCP automation servers. What are the top 2 recommendations for improvement? Keep under 100 tokens.`;
+        const analysisQuery = 'As an expert code reviewer, analyze this EchoTune AI project structure: Node.js backend, React frontend, MongoDB database, Spotify API integration, Perplexity AI research, and MCP automation servers. What are the top 2 recommendations for improvement? Keep under 100 tokens.';
         
         const response = await this.makePerplexityRequest(analysisQuery, this.sonarModel, {
           max_tokens: 100,

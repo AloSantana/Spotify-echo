@@ -134,7 +134,7 @@ class ClaudeOpusCommandProcessor {
                 temperature: options.temperature || command.temperature
             };
 
-            console.log(`📋 Configuration:`);
+            console.log('📋 Configuration:');
             console.log(`   Command: ${commandType}`);
             console.log(`   Target: ${config.target || 'Repository-wide'}`);
             console.log(`   Extended Thinking: ${config.extendedThinking}`);
@@ -154,7 +154,7 @@ class ClaudeOpusCommandProcessor {
             return result;
 
         } catch (error) {
-            console.error(`❌ Claude Opus 4.1 command failed:`, error.message);
+            console.error('❌ Claude Opus 4.1 command failed:', error.message);
             
             const executionTime = Date.now() - startTime;
             this.updateMetrics(false, executionTime, null);
@@ -548,27 +548,27 @@ Please check the full report for troubleshooting steps.` : `**Key Insights**: Ad
 
     // Command-specific system prompts
     getDeepReasoningPrompt() {
-        return `**DEEP REASONING MODE**: Focus on comprehensive analytical reasoning with step-by-step problem decomposition. Use your extended thinking capabilities to thoroughly analyze complex patterns, relationships, and implications. Break down problems into logical components and provide systematic analysis.`;
+        return '**DEEP REASONING MODE**: Focus on comprehensive analytical reasoning with step-by-step problem decomposition. Use your extended thinking capabilities to thoroughly analyze complex patterns, relationships, and implications. Break down problems into logical components and provide systematic analysis.';
     }
 
     getExtendedThinkingPrompt() {
-        return `**EXTENDED THINKING MODE**: Utilize your extended thinking capabilities to work through complex problems methodically. Show your reasoning process, consider multiple approaches, and arrive at well-considered conclusions. Demonstrate your thinking transparency.`;
+        return '**EXTENDED THINKING MODE**: Utilize your extended thinking capabilities to work through complex problems methodically. Show your reasoning process, consider multiple approaches, and arrive at well-considered conclusions. Demonstrate your thinking transparency.';
     }
 
     getAdvancedCodingPrompt() {
-        return `**ADVANCED CODING MODE**: Apply your industry-leading coding capabilities. Plan and execute complex development tasks end-to-end. Adapt to the codebase style, maintain high code quality, and provide production-ready implementations. Focus on best practices, scalability, and maintainability.`;
+        return '**ADVANCED CODING MODE**: Apply your industry-leading coding capabilities. Plan and execute complex development tasks end-to-end. Adapt to the codebase style, maintain high code quality, and provide production-ready implementations. Focus on best practices, scalability, and maintainability.';
     }
 
     getAgentWorkflowPrompt() {
-        return `**AGENT WORKFLOW MODE**: Design and implement agentic workflows for complex, multi-step tasks. Focus on automation, orchestration, and intelligent decision-making. Create workflows that can operate autonomously with minimal human intervention.`;
+        return '**AGENT WORKFLOW MODE**: Design and implement agentic workflows for complex, multi-step tasks. Focus on automation, orchestration, and intelligent decision-making. Create workflows that can operate autonomously with minimal human intervention.';
     }
 
     getArchitecturalAnalysisPrompt() {
-        return `**ARCHITECTURAL ANALYSIS MODE**: Conduct comprehensive architectural analysis. Examine system design, scalability, maintainability, security, and performance. Recommend improvements and identify optimization opportunities. Consider both current state and future evolution.`;
+        return '**ARCHITECTURAL ANALYSIS MODE**: Conduct comprehensive architectural analysis. Examine system design, scalability, maintainability, security, and performance. Recommend improvements and identify optimization opportunities. Consider both current state and future evolution.';
     }
 
     getLongHorizonPrompt() {
-        return `**LONG HORIZON MODE**: Apply your capabilities for sustained performance on long-running tasks. Break down complex objectives into manageable steps, maintain focus throughout extended analysis, and provide comprehensive solutions for multi-faceted challenges.`;
+        return '**LONG HORIZON MODE**: Apply your capabilities for sustained performance on long-running tasks. Break down complex objectives into manageable steps, maintain focus throughout extended analysis, and provide comprehensive solutions for multi-faceted challenges.';
     }
 }
 

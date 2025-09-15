@@ -158,7 +158,7 @@ class AutomationWorkflowDemo {
       
       const extractionTime = Date.now() - startTime;
       console.log(`  ✅ Data extraction completed in ${extractionTime}ms`);
-      console.log(`  📋 Extracted Data:`);
+      console.log('  📋 Extracted Data:');
       console.log(`    - Title: "${extractedData.title}"`);
       console.log(`    - Heading: "${extractedData.heading}"`);
       console.log(`    - Paragraphs: ${extractedData.paragraphs.length} found`);
@@ -233,7 +233,7 @@ class AutomationWorkflowDemo {
       
       const auditTime = Date.now() - startTime;
       console.log(`  ✅ Performance audit completed in ${auditTime}ms`);
-      console.log(`  📊 Performance Analysis:`);
+      console.log('  📊 Performance Analysis:');
       console.log(`    - DNS Lookup: ${performanceData.timing.dnsLookup}ms`);
       console.log(`    - TCP Connect: ${performanceData.timing.tcpConnect}ms`);
       console.log(`    - Request: ${performanceData.timing.request}ms`);

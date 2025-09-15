@@ -520,19 +520,19 @@ class EnhancedMCPOrchestrator {
     
     this.app.listen(this.port, () => {
       console.log(`🚀 Enhanced MCP Orchestrator running on http://localhost:${this.port}`);
-      console.log(`📚 Available endpoints:`);
-      console.log(`  GET  /health                 - System health status`);
-      console.log(`  GET  /servers                - List all servers`);
-      console.log(`  POST /servers/start-all      - Start all servers`);
-      console.log(`  POST /servers/stop-all       - Stop all servers`);
-      console.log(`  POST /servers/:name/start    - Start specific server`);
-      console.log(`  POST /servers/:name/stop     - Stop specific server`);
-      console.log(`  POST /servers/:name/restart  - Restart specific server`);
-      console.log(`  POST /analysis/run           - Run continuous analysis`);
-      console.log(`  GET  /analysis/status        - Analysis system status`);
-      console.log(`  POST /research               - Perplexity research query`);
-      console.log(`  POST /analyze                - Grok-4 code analysis`);
-      console.log(`  GET  /metrics                - System metrics`);
+      console.log('📚 Available endpoints:');
+      console.log('  GET  /health                 - System health status');
+      console.log('  GET  /servers                - List all servers');
+      console.log('  POST /servers/start-all      - Start all servers');
+      console.log('  POST /servers/stop-all       - Stop all servers');
+      console.log('  POST /servers/:name/start    - Start specific server');
+      console.log('  POST /servers/:name/stop     - Stop specific server');
+      console.log('  POST /servers/:name/restart  - Restart specific server');
+      console.log('  POST /analysis/run           - Run continuous analysis');
+      console.log('  GET  /analysis/status        - Analysis system status');
+      console.log('  POST /research               - Perplexity research query');
+      console.log('  POST /analyze                - Grok-4 code analysis');
+      console.log('  GET  /metrics                - System metrics');
     });
   }
 

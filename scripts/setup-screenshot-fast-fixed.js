@@ -47,13 +47,13 @@ class ScreenshotWebsiteFast {
         const configPath = path.join(this.projectRoot, 'mcp-servers', 'screenshot-website', 'config.json');
         
         const config = {
-            name: "screenshot-website-fast",
-            version: "1.0.0",
-            description: "High-speed screenshot generation for EchoTune AI",
+            name: 'screenshot-website-fast',
+            version: '1.0.0',
+            description: 'High-speed screenshot generation for EchoTune AI',
             capabilities: this.config.capabilities,
             server: {
                 port: this.config.port,
-                host: "localhost"
+                host: 'localhost'
             },
             testing: {
                 visualRegression: true,

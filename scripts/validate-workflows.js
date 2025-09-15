@@ -65,7 +65,7 @@ class WorkflowValidator {
             this.checkSecrets(filename, workflow);
             this.checkOptimizationOpportunities(filename, workflow);
 
-            console.log(`  ✅ Syntax valid`);
+            console.log('  ✅ Syntax valid');
             this.results.valid++;
 
         } catch (error) {
@@ -180,7 +180,7 @@ class WorkflowValidator {
         // Check for condition optimizations
         if (workflowStr.includes('if:') && workflowStr.includes('github.event_name')) {
             // This is good - conditional execution
-            console.log(`  ⚡ Uses conditional execution`);
+            console.log('  ⚡ Uses conditional execution');
         }
     }
 

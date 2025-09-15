@@ -28,7 +28,7 @@ async function validateProvider(providerName, ProviderClass, config) {
       { role: 'user', content: 'Suggest one upbeat song for working out. Keep response short.' }
     ];
     
-    console.log(`   Testing completion...`);
+    console.log('   Testing completion...');
     const response = await provider.generateCompletion(testMessage, {
       maxTokens: 100,
       temperature: 0.7

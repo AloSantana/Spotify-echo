@@ -162,7 +162,7 @@ class ComprehensiveIntegrationOrchestrator {
             return result;
             
         } catch (error) {
-            console.error(`      ❌ Backend optimization failed:`, error.message);
+            console.error('      ❌ Backend optimization failed:', error.message);
             this.integrationState.backend = 'failed';
             return { success: false, error: error.message };
         }
@@ -188,7 +188,7 @@ class ComprehensiveIntegrationOrchestrator {
             return result;
             
         } catch (error) {
-            console.error(`      ❌ Frontend optimization failed:`, error.message);
+            console.error('      ❌ Frontend optimization failed:', error.message);
             this.integrationState.frontend = 'failed';
             return { success: false, error: error.message };
         }
@@ -223,7 +223,7 @@ class ComprehensiveIntegrationOrchestrator {
             return { success: successRate >= 0.8, results: validationResults, successRate };
             
         } catch (error) {
-            console.error(`      ❌ Integration validation failed:`, error.message);
+            console.error('      ❌ Integration validation failed:', error.message);
             this.integrationState.integration = 'failed';
             return { success: false, error: error.message };
         }
@@ -455,7 +455,7 @@ class ComprehensiveIntegrationOrchestrator {
             return { success: overallScore >= 85, results: performanceTests, overallScore };
             
         } catch (error) {
-            console.error(`      ❌ Performance testing failed:`, error.message);
+            console.error('      ❌ Performance testing failed:', error.message);
             return { success: false, error: error.message };
         }
     }
@@ -635,7 +635,7 @@ class ComprehensiveIntegrationOrchestrator {
             return { success: successRate >= 0.9, results: securityChecks, successRate };
             
         } catch (error) {
-            console.error(`      ❌ Security validation failed:`, error.message);
+            console.error('      ❌ Security validation failed:', error.message);
             return { success: false, error: error.message };
         }
     }
@@ -846,7 +846,7 @@ class ComprehensiveIntegrationOrchestrator {
             };
             
         } catch (error) {
-            console.error(`      ❌ Final integration failed:`, error.message);
+            console.error('      ❌ Final integration failed:', error.message);
             return { success: false, error: error.message };
         }
     }

@@ -404,7 +404,7 @@ class GCPCredentialsConfigurator {
       return false;
     }
 
-    console.log(`📋 Configuration:`);
+    console.log('📋 Configuration:');
     console.log(`   Project ID: ${this.config.projectId}`);
     console.log(`   Repository: ${repoName}`);
 

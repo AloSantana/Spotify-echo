@@ -161,7 +161,7 @@ class VertexAIBootstrap {
     
     // Check pool
     const poolResult = this.runCommand(
-      `gcloud iam workload-identity-pools describe github-actions --location=global`,
+      'gcloud iam workload-identity-pools describe github-actions --location=global',
       { silent: true, throwOnError: false }
     );
 
@@ -172,7 +172,7 @@ class VertexAIBootstrap {
 
     // Check provider
     const providerResult = this.runCommand(
-      `gcloud iam workload-identity-pools providers describe github-oidc --workload-identity-pool=github-actions --location=global`,
+      'gcloud iam workload-identity-pools providers describe github-oidc --workload-identity-pool=github-actions --location=global',
       { silent: true, throwOnError: false }
     );
 
@@ -362,8 +362,8 @@ class VertexAIBootstrap {
     console.log('- name: Authenticate to Google Cloud');
     console.log('  uses: google-github-actions/auth@v2');
     console.log('  with:');
-    console.log(`    workload_identity_provider: \${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}`);
-    console.log(`    service_account: \${{ secrets.GCP_SERVICE_ACCOUNT }}`);
+    console.log('    workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}');
+    console.log('    service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}');
     console.log('```');
   }
 

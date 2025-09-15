@@ -44,7 +44,7 @@ class LintingFixer {
       // 5. Run final lint check
       await this.runFinalLintCheck();
       
-      console.log(`✅ Linting fixes completed!`);
+      console.log('✅ Linting fixes completed!');
       console.log(`📊 Summary: Fixed ${this.fixedIssues} issues in ${this.fixedFiles} files`);
       
     } catch (error) {

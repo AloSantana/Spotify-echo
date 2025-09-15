@@ -29,10 +29,10 @@ async function finalValidation() {
         console.log('📡 Making real API call...');
         const result = await api.research('EchoTune AI music recommendation system analysis');
         
-        console.log(`✅ API Call Successful`);
+        console.log('✅ API Call Successful');
         console.log(`📏 Response Length: ${result.content.length} characters`);
         console.log(`🤖 Model Used: ${result.model}`);
-        console.log(`⏱️  Response Time: Available`);
+        console.log('⏱️  Response Time: Available');
         console.log(`📝 Content Preview: "${result.content.substring(0, 100)}..."`);
         
     } catch (error) {
@@ -52,7 +52,7 @@ async function finalValidation() {
         const testResult = await orchestrator.makeRealPerplexityCall('Test autonomous integration');
         
         if (testResult.success) {
-            console.log(`✅ Autonomous integration working`);
+            console.log('✅ Autonomous integration working');
             console.log(`📄 Summary: ${testResult.summary}`);
             console.log(`🎯 Key Points: ${testResult.keyPoints?.length || 0} identified`);
         } else {

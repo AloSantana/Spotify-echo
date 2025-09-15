@@ -344,7 +344,7 @@ finally:
         case 'javascript':
           try {
             // Use Node.js syntax check
-            execSync(`node -c`, { input: code, timeout: 2000 });
+            execSync('node -c', { input: code, timeout: 2000 });
           } catch (error) {
             validationResult = {
               valid: false,

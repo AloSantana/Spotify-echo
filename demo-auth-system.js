@@ -35,8 +35,8 @@ async function demonstrateAuthSystem() {
   });
   console.log('✅ Authorization URL generated with PKCE:');
   console.log(`   State: ${authUrl.state.substring(0, 16)}...`);
-  console.log(`   URL contains: code_challenge, state, PKCE parameters`);
-  console.log(`   Scopes: user-read-private, user-read-email, playlist-modify-public`);
+  console.log('   URL contains: code_challenge, state, PKCE parameters');
+  console.log('   Scopes: user-read-private, user-read-email, playlist-modify-public');
 
   // 3. Simulate state validation
   console.log('\n3. 🔍 Testing State Validation...');

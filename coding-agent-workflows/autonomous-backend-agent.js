@@ -808,7 +808,7 @@ module.exports = optimizeAuthentication;
             }
             
         } catch (error) {
-            console.error(`        ❌ Failed to apply optimization:`, error.message);
+            console.error('        ❌ Failed to apply optimization:', error.message);
         }
     }
 
@@ -847,10 +847,10 @@ module.exports = optimizeAuthentication;
             }
             
             await fs.writeFile(serverPath, serverContent);
-            console.log(`        🔧 Updated server.js with middleware registration`);
+            console.log('        🔧 Updated server.js with middleware registration');
             
         } catch (error) {
-            console.error(`        ❌ Failed to update middleware registration:`, error.message);
+            console.error('        ❌ Failed to update middleware registration:', error.message);
         }
     }
 

@@ -360,7 +360,7 @@ describe('MongoDBManager Admin Tools', () => {
 
       const result = await mongoDBManager.exportCollectionData('nonexistent');
       
-      expect(result.error).toBe("Collection 'nonexistent' not found");
+      expect(result.error).toBe('Collection \'nonexistent\' not found');
       expect(result.count).toBe(0);
       expect(result.data).toEqual([]);
       expect(result.recommendations).toContain('Verify collection name spelling');

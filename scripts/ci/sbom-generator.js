@@ -266,7 +266,7 @@ class SBOMGenerator {
       violations
     };
 
-    console.log(`\n🎯 Vulnerability Budget Validation:`);
+    console.log('\n🎯 Vulnerability Budget Validation:');
     if (budgetValidation.passed) {
       console.log('✅ All vulnerability budgets met');
     } else {

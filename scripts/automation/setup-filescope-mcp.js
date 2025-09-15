@@ -60,9 +60,9 @@ class FileScopeMCPSetup {
         const configPath = path.join(this.projectRoot, 'mcp-servers', 'filescope-config.json');
         
         const config = {
-            name: "echotune-filescope",
-            version: "1.0.0",
-            description: "Advanced file operations for EchoTune AI with security scoping",
+            name: 'echotune-filescope',
+            version: '1.0.0',
+            description: 'Advanced file operations for EchoTune AI with security scoping',
             capabilities: {
                 fileOperations: {
                     read: true,
@@ -86,8 +86,8 @@ class FileScopeMCPSetup {
             },
             server: {
                 port: this.config.port,
-                host: "localhost",
-                protocol: "http"
+                host: 'localhost',
+                protocol: 'http'
             }
         };
 

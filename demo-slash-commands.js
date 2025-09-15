@@ -54,31 +54,31 @@ async function runDemo() {
             const endTime = Date.now();
 
             if (result.success) {
-                console.log(`✅ Status: SUCCESS`);
+                console.log('✅ Status: SUCCESS');
                 console.log(`⏱️  Duration: ${endTime - startTime}ms`);
                 console.log(`🎯 Command Mapped: ${result.command}`);
                 
                 if (result.summary) {
-                    console.log(`📊 Summary:`);
+                    console.log('📊 Summary:');
                     Object.entries(result.summary).forEach(([key, value]) => {
                         console.log(`   ${key}: ${value}`);
                     });
                 }
 
                 if (result.nextActions && result.nextActions.length > 0) {
-                    console.log(`🎯 Next Actions:`);
+                    console.log('🎯 Next Actions:');
                     result.nextActions.slice(0, 3).forEach(action => {
                         console.log(`   • ${action}`);
                     });
                 }
             } else {
-                console.log(`❌ Status: FAILED`);
+                console.log('❌ Status: FAILED');
                 console.log(`🔍 Error: ${result.error}`);
                 console.log(`💡 Suggestion: ${result.suggestion}`);
             }
 
         } catch (error) {
-            console.log(`❌ Status: ERROR`);
+            console.log('❌ Status: ERROR');
             console.log(`🔍 Details: ${error.message}`);
         }
 

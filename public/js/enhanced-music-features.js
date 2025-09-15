@@ -600,10 +600,10 @@ class EnhancedMusicFeatures {
         
         const suggestions = [
             `EchoTune ${timeOfDay} Mix`,
-            `AI Curated Playlist`,
-            `My EchoTune Discoveries`,
+            'AI Curated Playlist',
+            'My EchoTune Discoveries',
             `Personal Mix ${now.toLocaleDateString()}`,
-            `AI Recommendations`
+            'AI Recommendations'
         ];
         
         return suggestions[Math.floor(Math.random() * suggestions.length)];

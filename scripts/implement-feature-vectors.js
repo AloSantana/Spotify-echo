@@ -481,8 +481,8 @@ class FeatureVectorProcessor {
       console.log(`   🎵 Tracks with audio features: ${tracksWithAudioFeatures}`);
       console.log(`   🧮 Tracks with feature vectors: ${tracksWithVectors}`);
       console.log(`   📈 ML Readiness: ${mlReadiness}%`);
-      console.log(`   🎭 Mood distribution:`, Object.keys(report.moodDistribution).map(mood => `${mood}: ${report.moodDistribution[mood]}`).join(', '));
-      console.log(`   📄 Report saved to: FEATURE_VECTORS_REPORT.json`);
+      console.log('   🎭 Mood distribution:', Object.keys(report.moodDistribution).map(mood => `${mood}: ${report.moodDistribution[mood]}`).join(', '));
+      console.log('   📄 Report saved to: FEATURE_VECTORS_REPORT.json');
       
       return report;
       

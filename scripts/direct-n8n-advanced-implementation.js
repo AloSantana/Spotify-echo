@@ -271,7 +271,7 @@ class DirectN8nAdvancedImplementation {
         };
 
         this.implementationResults.workflows_created.push(workflowDefinition);
-        console.log(`✅ Created advanced coding agent workflow`);
+        console.log('✅ Created advanced coding agent workflow');
         console.log(`   📍 Webhook: ${workflowDefinition.webhook_endpoint}`);
         
         return workflowDefinition;
@@ -428,7 +428,7 @@ return [{ json: cacheData }];
         };
 
         this.implementationResults.workflows_created.push(workflowDefinition);
-        console.log(`✅ Created advanced multimodal AI workflow`);
+        console.log('✅ Created advanced multimodal AI workflow');
         console.log(`   📍 Webhook: ${workflowDefinition.webhook_endpoint}`);
         
         return workflowDefinition;
@@ -570,7 +570,7 @@ return [{ json: healthReport }];
         };
 
         this.implementationResults.workflows_created.push(workflowDefinition);
-        console.log(`✅ Created advanced monitoring workflow`);
+        console.log('✅ Created advanced monitoring workflow');
         console.log(`   ⏰ Schedule: ${workflowDefinition.schedule}`);
         
         return workflowDefinition;
@@ -791,7 +791,7 @@ return [{ json: healthReport }];
             markdownReport
         );
         
-        console.log(`✅ Implementation results saved:`);
+        console.log('✅ Implementation results saved:');
         console.log(`   📄 advanced-n8n-implementation-${timestamp}.json`);
         console.log(`   📄 advanced-n8n-workflows-${timestamp}.json`);
         console.log(`   📄 advanced-n8n-implementation-${timestamp}.md`);

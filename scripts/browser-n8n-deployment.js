@@ -79,8 +79,8 @@ class BrowserN8nDeployment {
         
         console.log(`✅ Browser session created: ${this.deploymentResults.browser_session.session_id}`);
         console.log(`   📍 Target URL: ${this.n8nUrl}`);
-        console.log(`   📺 Viewport: 1920x1080`);
-        console.log(`   🎥 Recording: Enabled`);
+        console.log('   📺 Viewport: 1920x1080');
+        console.log('   🎥 Recording: Enabled');
     }
 
     async simulateLogin() {
@@ -100,9 +100,9 @@ class BrowserN8nDeployment {
             await this.delay(1000); // Simulate step execution time
         }
         
-        console.log(`✅ Login simulation completed`);
+        console.log('✅ Login simulation completed');
         console.log(`   👤 User: ${this.credentials.email}`);
-        console.log(`   🎯 Status: Authenticated`);
+        console.log('   🎯 Status: Authenticated');
     }
 
     async simulateCredentialCreation() {
@@ -191,7 +191,7 @@ class BrowserN8nDeployment {
             console.log(`     ✅ Created: ${cred.name} (ID: ${createdCredential.id})`);
         }
         
-        console.log(`\n✅ Credential creation simulation completed`);
+        console.log('\n✅ Credential creation simulation completed');
         console.log(`   📊 Total credentials created: ${this.deploymentResults.credentials_created.length}`);
     }
 
@@ -331,7 +331,7 @@ class BrowserN8nDeployment {
             }
         }
         
-        console.log(`\n✅ Workflow deployment simulation completed`);
+        console.log('\n✅ Workflow deployment simulation completed');
         console.log(`   📊 Total workflows deployed: ${this.deploymentResults.workflows_deployed.length}`);
     }
 
@@ -390,7 +390,7 @@ class BrowserN8nDeployment {
             console.log(`     ${test.result === 'success' ? '✅' : '❌'} ${test.name}: ${test.result.toUpperCase()}`);
         }
         
-        console.log(`\n✅ Validation simulation completed`);
+        console.log('\n✅ Validation simulation completed');
         console.log(`   📊 Tests passed: ${this.deploymentResults.validation_tests.filter(t => t.status === 'passed').length}/${this.deploymentResults.validation_tests.length}`);
     }
 
@@ -494,7 +494,7 @@ class BrowserN8nDeployment {
             markdownReport
         );
         
-        console.log(`✅ Browser deployment results saved:`);
+        console.log('✅ Browser deployment results saved:');
         console.log(`   📄 browser-n8n-deployment-${timestamp}.json`);
         console.log(`   📄 browser-deployed-workflows-${timestamp}.json`);
         console.log(`   📄 browser-n8n-deployment-${timestamp}.md`);

@@ -236,23 +236,23 @@ class MCPServersValidator {
         const mdReportPath = path.join(process.cwd(), 'MCP_SERVERS_VALIDATION_REPORT.md');
         fs.writeFileSync(mdReportPath, mdReport);
         
-        console.log(`\n📄 Reports generated:`);
+        console.log('\n📄 Reports generated:');
         console.log(`   - JSON: ${reportPath}`);
         console.log(`   - Markdown: ${mdReportPath}`);
     }
 
     generateMarkdownReport(report) {
-        let md = `# MCP Servers Validation Report\n\n`;
+        let md = '# MCP Servers Validation Report\n\n';
         md += `**Generated**: ${report.timestamp}\n\n`;
         
-        md += `## Summary\n\n`;
+        md += '## Summary\n\n';
         md += `- **Total Servers**: ${report.summary.total}\n`;
         md += `- **✅ Passed**: ${report.summary.passed}\n`;
         md += `- **❌ Failed**: ${report.summary.failed}\n`;
         md += `- **⚠️ Skipped**: ${report.summary.skipped}\n`;
         md += `- **Success Rate**: ${report.summary.successRate}%\n\n`;
         
-        md += `## Server Details\n\n`;
+        md += '## Server Details\n\n';
         
         report.servers.forEach(server => {
             const statusEmoji = server.status === 'PASSED' ? '✅' : 
@@ -271,7 +271,7 @@ class MCPServersValidator {
                 md += `- **Message**: ${server.message}\n`;
             }
             
-            md += `\n`;
+            md += '\n';
         });
         
         return md;

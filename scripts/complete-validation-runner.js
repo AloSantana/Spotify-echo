@@ -442,7 +442,7 @@ ${Object.entries(summary.featureStatus).filter(([, status]) => status === 'faile
       
       this.log('📊 Validation complete!');
       this.log(`📄 Report: ${this.baseDir}/complete-validation-report.json`);
-      this.log(`📋 Summary: validation-summary.md`);
+      this.log('📋 Summary: validation-summary.md');
       this.log(`📸 Screenshots: BROWSERTESTIMAGES/${this.runId}/`);
       
       return report;

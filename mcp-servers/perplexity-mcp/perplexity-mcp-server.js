@@ -1190,7 +1190,7 @@ class PerplexityMCPServer {
     }
     
     if (workflow.parallel_queries) {
-      output += `**Parallel Processing:** Enabled\n`;
+      output += '**Parallel Processing:** Enabled\n';
     }
     
     output += '\n**Execution Steps:**\n';

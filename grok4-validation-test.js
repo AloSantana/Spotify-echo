@@ -540,7 +540,7 @@ async function main() {
         
         const results = await validator.runValidationSuite();
         
-        console.log(`\n🎉 Validation Complete!`);
+        console.log('\n🎉 Validation Complete!');
         console.log(`📊 Overall Score: ${results.overallScore}%`);
         console.log(`🔍 Grok-4 Status: ${results.grok4Status}`);
         console.log(`✅ Tests Passed: ${results.validationSummary.passedTests}/${results.validationSummary.totalTests}`);

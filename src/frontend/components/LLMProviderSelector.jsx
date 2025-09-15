@@ -134,7 +134,7 @@ const LLMProviderSelector = ({
     return (
       <Card 
         key={providerId}
-        variant={isSelected ? "elevation" : "outlined"}
+        variant={isSelected ? 'elevation' : 'outlined'}
         sx={{ 
           mb: 2, 
           border: isSelected ? `2px solid ${provider.color}` : undefined,

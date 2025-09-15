@@ -267,7 +267,7 @@ class AnalyticsMCP {
       content: [
         {
           type: 'text',
-          text: `## Event Tracked Successfully\n\n` +
+          text: '## Event Tracked Successfully\n\n' +
                 `**Event:** ${eventName}\n` +
                 `**Timestamp:** ${event.timestamp}\n` +
                 `**User ID:** ${userId || 'anonymous'}\n` +
@@ -343,24 +343,24 @@ class AnalyticsMCP {
       content: [
         {
           type: 'text',
-          text: `## Performance Metrics Analysis\n\n` +
+          text: '## Performance Metrics Analysis\n\n' +
                 `**Component:** ${analysis.component}\n` +
                 `**Time Range:** ${timeRange}\n` +
                 `**Events Analyzed:** ${analysis.eventCount}\n\n` +
-                `### Metrics:\n` +
+                '### Metrics:\n' +
                 Object.entries(analysis.metrics).map(([metric, data]) => {
                   if (metric === 'response_time') {
-                    return `**Response Time:**\n` +
+                    return '**Response Time:**\n' +
                            `- Average: ${data.average?.toFixed(2)}ms\n` +
                            `- Min/Max: ${data.min}ms / ${data.max}ms\n` +
                            `- P95: ${data.p95?.toFixed(2)}ms\n` +
                            `- P99: ${data.p99?.toFixed(2)}ms`;
                   } else if (metric === 'throughput') {
-                    return `**Throughput:**\n` +
+                    return '**Throughput:**\n' +
                            `- ${data.requestsPerHour?.toFixed(2)} requests/hour\n` +
                            `- ${data.requestsPerMinute?.toFixed(2)} requests/minute`;
                   } else if (metric === 'error_rate') {
-                    return `**Error Rate:**\n` +
+                    return '**Error Rate:**\n' +
                            `- Total Errors: ${data.total_errors}\n` +
                            `- Error Rate: ${data.error_percentage?.toFixed(2)}%`;
                   }
@@ -462,7 +462,7 @@ class AnalyticsMCP {
       content: [
         {
           type: 'text',
-          text: `## System Health Monitor\n\n` +
+          text: '## System Health Monitor\n\n' +
                 `${statusEmoji} **Overall Status:** ${healthChecks.status}\n` +
                 `**Uptime:** ${this.formatUptime(healthChecks.uptime)}\n` +
                 `**Check Type:** ${checkType}\n\n` +
@@ -564,7 +564,7 @@ class AnalyticsMCP {
           type: 'text',
           text: `## A/B Test Analysis: ${testName}\n\n` +
                 `**Confidence Level:** ${(confidenceLevel * 100)}%\n\n` +
-                `### Variant Performance:\n` +
+                '### Variant Performance:\n' +
                 analysis.variants.map((variant, index) => 
                   `**${variant.name}** ${index === 0 ? '(Control)' : '(Treatment)'}\n` +
                   `- Conversions: ${variant.conversions}\n` +
@@ -572,7 +572,7 @@ class AnalyticsMCP {
                   `- Conversion Rate: ${(variant.conversionRate * 100).toFixed(2)}%\n`
                 ).join('\n') +
                 (analysis.statisticalSignificance ? 
-                  `\n### Statistical Analysis:\n` +
+                  '\n### Statistical Analysis:\n' +
                   `**Result:** ${analysis.statisticalSignificance.isSignificant ? '✅ Statistically Significant' : '❌ Not Statistically Significant'}\n` +
                   `**Lift:** ${analysis.statisticalSignificance.liftPercent > 0 ? '+' : ''}${analysis.statisticalSignificance.liftPercent.toFixed(2)}%\n` +
                   `**P-Value:** ${analysis.statisticalSignificance.pValue.toFixed(4)}\n` +
@@ -806,7 +806,7 @@ class AnalyticsMCP {
     let output = '';
     
     if (analysis.engagement) {
-      output += `### Engagement Metrics:\n`;
+      output += '### Engagement Metrics:\n';
       output += `- Average Session Duration: ${analysis.engagement.avgSessionDuration}\n`;
       output += `- Average Events per Session: ${analysis.engagement.avgEventsPerSession}\n`;
       output += `- Bounce Rate: ${analysis.engagement.bounceRate}\n`;
@@ -814,20 +814,20 @@ class AnalyticsMCP {
     }
 
     if (analysis.retention) {
-      output += `### Retention Analysis:\n`;
+      output += '### Retention Analysis:\n';
       output += `- Day 1 Retention: ${analysis.retention.day1}\n`;
       output += `- Day 7 Retention: ${analysis.retention.day7}\n`;
       output += `- Day 30 Retention: ${analysis.retention.day30}\n\n`;
     }
 
     if (analysis.featureUsage) {
-      output += `### Feature Usage:\n`;
+      output += '### Feature Usage:\n';
       output += analysis.featureUsage.map((item, index) => 
         `${index + 1}. ${item.feature}: ${item.count} uses`).join('\n') + '\n\n';
     }
 
     if (analysis.musicPreferences) {
-      output += `### Music Preferences:\n`;
+      output += '### Music Preferences:\n';
       output += `- Top Genres: ${analysis.musicPreferences.topGenres.join(', ')}\n`;
       output += `- Avg Tracks/Session: ${analysis.musicPreferences.avgTracksPerSession}\n`;
       output += `- Skip Rate: ${analysis.musicPreferences.skipRate}\n`;
@@ -882,7 +882,7 @@ class AnalyticsMCP {
     markdown += `**Time Range:** ${report.timeRange}\n\n`;
 
     if (report.userEngagement) {
-      markdown += `## User Engagement\n`;
+      markdown += '## User Engagement\n';
       markdown += `- Total Users: ${report.userEngagement.totalUsers}\n`;
       markdown += `- Active Users: ${report.userEngagement.activeUsers}\n`;
       markdown += `- Avg Session Duration: ${report.userEngagement.avgSessionDuration}\n`;
@@ -890,7 +890,7 @@ class AnalyticsMCP {
     }
 
     if (report.systemPerformance) {
-      markdown += `## System Performance\n`;
+      markdown += '## System Performance\n';
       markdown += `- Uptime: ${report.systemPerformance.uptime}\n`;
       markdown += `- Avg Response Time: ${report.systemPerformance.avgResponseTime}\n`;
       markdown += `- Error Rate: ${report.systemPerformance.errorRate}\n`;
@@ -898,7 +898,7 @@ class AnalyticsMCP {
     }
 
     if (report.musicAnalytics) {
-      markdown += `## Music Analytics\n`;
+      markdown += '## Music Analytics\n';
       markdown += `- Total Tracks: ${report.musicAnalytics.totalTracks.toLocaleString()}\n`;
       markdown += `- Unique Artists: ${report.musicAnalytics.uniqueArtists.toLocaleString()}\n`;
       markdown += `- Top Genre: ${report.musicAnalytics.topGenre}\n`;
@@ -906,7 +906,7 @@ class AnalyticsMCP {
     }
 
     if (report.recommendations) {
-      markdown += `## Recommendations\n`;
+      markdown += '## Recommendations\n';
       markdown += report.recommendations.map(rec => `- ${rec}`).join('\n');
     }
 

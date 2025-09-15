@@ -220,12 +220,12 @@ class PackageVersionMCP {
         content: [
           {
             type: 'text',
-            text: `## Package Version Analysis\n\n` +
+            text: '## Package Version Analysis\n\n' +
                   `**Summary:** ${summary.outdated}/${summary.total} packages need updates\n` +
                   `- 🔴 Major updates: ${summary.critical}\n` +
                   `- 🟡 Minor updates: ${summary.minor}\n` +
                   `- 🟢 Patch updates: ${summary.patch}\n\n` +
-                  `### Detailed Results:\n` +
+                  '### Detailed Results:\n' +
                   results.map(pkg => {
                     if (pkg.error) {
                       return `❌ **${pkg.name}**: ${pkg.error}`;
@@ -285,18 +285,18 @@ class PackageVersionMCP {
         content: [
           {
             type: 'text',
-            text: `## Security Audit Report\n\n` +
+            text: '## Security Audit Report\n\n' +
                   `**Summary:** ${results.summary.total} potential issues found\n` +
                   `- 🔴 High: ${results.summary.high}\n` +
                   `- 🟡 Medium: ${results.summary.medium}\n` +
                   `- 🟢 Low: ${results.summary.low}\n\n` +
-                  `### Vulnerabilities:\n` +
+                  '### Vulnerabilities:\n' +
                   (results.vulnerabilities.length > 0 ? 
                     results.vulnerabilities.map(vuln => 
                       `🔴 **${vuln.package}** (${vuln.version}): ${vuln.issue}`
                     ).join('\n') : 
                     '✅ No known vulnerabilities detected\n') +
-                  `\n### Security Recommendations:\n` +
+                  '\n### Security Recommendations:\n' +
                   results.recommendations.map(rec => `• ${rec}`).join('\n')
           }
         ]
@@ -324,7 +324,7 @@ class PackageVersionMCP {
         commands.push(`# Safe patch updates:\nnpm update ${safeUpdates.map(pkg => pkg.name).join(' ')}`);
       }
       if (riskUpdates.length > 0) {
-        commands.push(`# Manual review required:\n` + 
+        commands.push('# Manual review required:\n' + 
           riskUpdates.map(pkg => `npm install ${pkg.name}@${pkg.latestVersion}  # ${pkg.updateType} update`).join('\n'));
       }
     } else if (ecosystem === 'pip') {
@@ -332,7 +332,7 @@ class PackageVersionMCP {
         commands.push(`# Safe patch updates:\npip install --upgrade ${safeUpdates.map(pkg => pkg.name).join(' ')}`);
       }
       if (riskUpdates.length > 0) {
-        commands.push(`# Manual review required:\n` + 
+        commands.push('# Manual review required:\n' + 
           riskUpdates.map(pkg => `pip install ${pkg.name}==${pkg.latestVersion}  # ${pkg.updateType} update`).join('\n'));
       }
     }
@@ -341,8 +341,8 @@ class PackageVersionMCP {
       content: [
         {
           type: 'text',
-          text: `## Dependency Update Commands\n\n` +
-                `### Summary:\n` +
+          text: '## Dependency Update Commands\n\n' +
+                '### Summary:\n' +
                 `- Safe updates: ${safeUpdates.length}\n` +
                 `- Review required: ${riskUpdates.length}\n\n` +
                 `### Commands:\n\`\`\`bash\n${commands.join('\n\n')}\n\`\`\``
@@ -440,7 +440,7 @@ class PackageVersionMCP {
       content: [
         {
           type: 'text',
-          text: `## EchoTune AI Dependency Validation\n\n` +
+          text: '## EchoTune AI Dependency Validation\n\n' +
                 `${statusIcon(results.spotify.status)} **Spotify Integration**: ${results.spotify.status}\n` +
                 (results.spotify.issues.length > 0 ? `   ${results.spotify.issues.join(', ')}\n` : '') +
                 `${statusIcon(results.mongodb.status)} **MongoDB Support**: ${results.mongodb.status}\n` +

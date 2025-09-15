@@ -261,9 +261,9 @@ class EnhancedMCPOrchestrator {
     this.app.listen(this.port, () => {
       console.log(`🎯 Enhanced MCP Orchestrator running on http://localhost:${this.port}`);
       console.log('Available endpoints:');
-      console.log(`  GET  /health - Overall system health`);
-      console.log(`  GET  /servers - Server status information`);
-      console.log(`  POST /start-all - Start all configured servers`);
+      console.log('  GET  /health - Overall system health');
+      console.log('  GET  /servers - Server status information');
+      console.log('  POST /start-all - Start all configured servers');
     });
   }
 }

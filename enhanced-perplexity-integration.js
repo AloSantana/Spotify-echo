@@ -120,7 +120,7 @@ class EnhancedPerplexityIntegration {
         try {
             // Parse the command to extract intent, model, and parameters
             const parsedCommand = await this.commandParser.parse(command);
-            console.log(`📋 Parsed Command:`, JSON.stringify(parsedCommand, null, 2));
+            console.log('📋 Parsed Command:', JSON.stringify(parsedCommand, null, 2));
 
             // Execute the appropriate workflow
             const result = await this.executeWorkflow(parsedCommand);
@@ -136,7 +136,7 @@ class EnhancedPerplexityIntegration {
             return response;
             
         } catch (error) {
-            console.error(`❌ Error processing command:`, error);
+            console.error('❌ Error processing command:', error);
             return {
                 success: false,
                 error: error.message,

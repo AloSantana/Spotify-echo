@@ -37,7 +37,7 @@ async function debugBrowserbaseAPI() {
         
         if (accountResponse.ok) {
             const accountData = await accountResponse.json();
-            console.log(`   Account data:`, JSON.stringify(accountData, null, 2));
+            console.log('   Account data:', JSON.stringify(accountData, null, 2));
         } else {
             const errorText = await accountResponse.text();
             console.log(`   Error: ${errorText}`);
@@ -60,7 +60,7 @@ async function debugBrowserbaseAPI() {
                 projects.forEach((project, index) => {
                     console.log(`   Project ${index + 1}: ${project.id} - ${project.name || 'Unnamed'}`);
                     if (project.id === PROJECT_ID) {
-                        console.log(`   ✅ Target project ID found!`);
+                        console.log('   ✅ Target project ID found!');
                     }
                 });
                 

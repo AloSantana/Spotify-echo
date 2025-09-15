@@ -74,7 +74,7 @@ class ComprehensivePerplexityValidator {
                 let data = '';
                 
                 console.log(`  📊 HTTP Status: ${res.statusCode}`);
-                console.log(`  📋 Response Headers:`, Object.keys(res.headers));
+                console.log('  📋 Response Headers:', Object.keys(res.headers));
 
                 res.on('data', (chunk) => {
                     data += chunk;
@@ -89,7 +89,7 @@ class ComprehensivePerplexityValidator {
                         const response = JSON.parse(data);
                         
                         if (res.statusCode === 200) {
-                            console.log(`  ✅ API call successful!`);
+                            console.log('  ✅ API call successful!');
                             console.log(`  📄 Response Preview: ${JSON.stringify(response, null, 2).substring(0, 300)}...`);
                             
                             this.testResults.summary.apiCallsMade++;
@@ -167,7 +167,7 @@ class ComprehensivePerplexityValidator {
             test.endTime = Date.now();
             test.duration = test.endTime - test.startTime;
 
-            console.log(`  ✅ Basic connectivity test PASSED`);
+            console.log('  ✅ Basic connectivity test PASSED');
             console.log(`  📝 Response: "${responseText}"`);
             console.log(`  🔍 Connection confirmed: ${connectionConfirmed ? '✅ Yes' : '⚠️ Partial'}`);
 
@@ -254,7 +254,7 @@ class ComprehensivePerplexityValidator {
                 test.endTime = Date.now();
                 test.duration = test.endTime - test.startTime;
 
-                console.log(`  ✅ Model test PASSED`);
+                console.log('  ✅ Model test PASSED');
                 console.log(`  📏 Response Length: ${responseText.length} characters`);
                 console.log(`  🎯 Relevant Content: ${hasRelevantContent ? '✅ Yes' : '⚠️ No'}`);
                 console.log(`  📝 Response Preview: "${responseText.substring(0, 150)}..."`);
@@ -338,7 +338,7 @@ Use web search to get current information and provide specific, actionable recom
             test.endTime = Date.now();
             test.duration = test.endTime - test.startTime;
 
-            console.log(`  ✅ Repository analysis test PASSED`);
+            console.log('  ✅ Repository analysis test PASSED');
             console.log(`  📏 Response Length: ${responseText.length} characters`);
             console.log(`  🌐 Web Search Content: ${hasWebSearchContent ? '✅ Yes' : '⚠️ No'}`);
             console.log(`  🎵 Spotify Content: ${hasSpotifyContent ? '✅ Yes' : '⚠️ No'}`);
@@ -347,7 +347,7 @@ Use web search to get current information and provide specific, actionable recom
             
             // Save full response for analysis
             await fs.writeFile('perplexity-repository-analysis-full.txt', responseText);
-            console.log(`  💾 Full analysis saved to: perplexity-repository-analysis-full.txt`);
+            console.log('  💾 Full analysis saved to: perplexity-repository-analysis-full.txt');
 
             this.testResults.summary.passed++;
 
@@ -406,7 +406,7 @@ Use web search to get current information and provide specific, actionable recom
             test.endTime = Date.now();
             test.duration = test.endTime - test.startTime;
 
-            console.log(`  ✅ Streaming test PASSED (non-streaming mode)`);
+            console.log('  ✅ Streaming test PASSED (non-streaming mode)');
             console.log(`  📝 Response: "${responseText.substring(0, 150)}..."`);
 
             this.testResults.summary.passed++;
@@ -475,11 +475,11 @@ Use web search to get current information and provide specific, actionable recom
 
         // Overall status
         if (this.testResults.summary.failed === 0 && this.testResults.summary.apiCallsMade > 0) {
-            console.log(`\n🎉 PERPLEXITY API INTEGRATION: ✅ FULLY FUNCTIONAL`);
+            console.log('\n🎉 PERPLEXITY API INTEGRATION: ✅ FULLY FUNCTIONAL');
         } else if (this.testResults.summary.passed > 0 && this.testResults.summary.apiCallsMade > 0) {
-            console.log(`\n⚠️  PERPLEXITY API INTEGRATION: 🔶 PARTIALLY FUNCTIONAL`);
+            console.log('\n⚠️  PERPLEXITY API INTEGRATION: 🔶 PARTIALLY FUNCTIONAL');
         } else {
-            console.log(`\n❌ PERPLEXITY API INTEGRATION: ❌ NOT FUNCTIONAL`);
+            console.log('\n❌ PERPLEXITY API INTEGRATION: ❌ NOT FUNCTIONAL');
         }
 
         console.log('\n📄 DETAILED RESULTS:');
@@ -514,12 +514,12 @@ Use web search to get current information and provide specific, actionable recom
         };
 
         await fs.writeFile('perplexity-comprehensive-test-results.json', JSON.stringify(reportData, null, 2));
-        console.log(`\n💾 Detailed results saved to: perplexity-comprehensive-test-results.json`);
+        console.log('\n💾 Detailed results saved to: perplexity-comprehensive-test-results.json');
 
         // Generate markdown report
         const markdownReport = this.generateMarkdownReport(reportData);
         await fs.writeFile('PERPLEXITY_INTEGRATION_VALIDATION_REPORT.md', markdownReport);
-        console.log(`📋 Markdown report saved to: PERPLEXITY_INTEGRATION_VALIDATION_REPORT.md`);
+        console.log('📋 Markdown report saved to: PERPLEXITY_INTEGRATION_VALIDATION_REPORT.md');
 
         return reportData;
     }

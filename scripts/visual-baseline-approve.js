@@ -27,7 +27,7 @@ class VisualBaselineApprover {
     
     if (screenshots.length === 0) {
       console.log('❌ No screenshots found to approve');
-      console.log(`   Run visual tests first: npm run test:visual`);
+      console.log('   Run visual tests first: npm run test:visual');
       return;
     }
     
@@ -91,7 +91,7 @@ class VisualBaselineApprover {
       
       // Check if baseline already exists
       if (fs.existsSync(baselinePath)) {
-        console.log(`   ⚠️  Baseline exists - will overwrite`);
+        console.log('   ⚠️  Baseline exists - will overwrite');
       }
       
       // Copy screenshot to baseline
@@ -104,7 +104,7 @@ class VisualBaselineApprover {
         action: fs.existsSync(baselinePath) ? 'updated' : 'created'
       });
       
-      console.log(`   ✅ Approved as baseline\n`);
+      console.log('   ✅ Approved as baseline\n');
       
     } catch (error) {
       console.log(`   ❌ Error: ${error.message}\n`);

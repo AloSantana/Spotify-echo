@@ -496,7 +496,7 @@ class TestReportAggregator {
 
     this.aggregatedReport.success = requiredPassed;
 
-    console.log(`\n📊 Overall Results:`);
+    console.log('\n📊 Overall Results:');
     console.log(`  Tests: ${passedTests}/${totalTests} passed`);
     console.log(`  Warnings: ${this.aggregatedReport.summary.warningsCount}`);
     console.log(`  Failures: ${this.aggregatedReport.summary.errorsCount}`);
@@ -519,16 +519,16 @@ class TestReportAggregator {
   generateMarkdown() {
     const report = this.aggregatedReport;
     
-    let md = `# Test Run Report\n\n`;
+    let md = '# Test Run Report\n\n';
     md += `**Run ID:** ${report.runId}  \n`;
     md += `**Timestamp:** ${report.timestamp}  \n`;
     md += `**Schema Version:** ${report.schemaVersion}  \n`;
     md += `**Overall Status:** ${report.success ? '✅ PASSED' : '❌ FAILED'}  \n\n`;
 
     // Summary
-    md += `## Summary\n\n`;
-    md += `| Metric | Value |\n`;
-    md += `|--------|-------|\n`;
+    md += '## Summary\n\n';
+    md += '| Metric | Value |\n';
+    md += '|--------|-------|\n';
     md += `| Total Tests | ${report.summary.totalTests} |\n`;
     md += `| Passed | ${report.summary.passedTests} |\n`;
     md += `| Failed | ${report.summary.failedTests} |\n`;
@@ -536,14 +536,14 @@ class TestReportAggregator {
     md += `| Errors | ${report.summary.errorsCount} |\n\n`;
 
     // Environment
-    md += `## Environment Validation\n\n`;
+    md += '## Environment Validation\n\n';
     md += `**Status:** ${this.statusIcon(report.env.success)}  \n`;
     md += `**Required Variables:** ${report.env.requiredValid}/${report.env.totalRequired} valid  \n`;
     md += `**Optional Providers:** ${report.env.optionalValid} available  \n`;
     md += `**Test Bypass Tokens:** ${report.env.testBypassAvailable}  \n\n`;
 
     // Providers
-    md += `## Provider Detection\n\n`;
+    md += '## Provider Detection\n\n';
     md += `**Status:** ${this.statusIcon(report.providers.success)}  \n`;
     md += `**Providers:** ${report.providers.working}/${report.providers.available} working  \n`;
     
@@ -551,19 +551,19 @@ class TestReportAggregator {
       md += `**Fastest Response:** ${report.providers.stats.fastest}ms  \n`;
     }
     
-    md += `\n### Provider Details\n\n`;
-    md += `| Provider | Status | Latency |\n`;
-    md += `|----------|--------|----------|\n`;
+    md += '\n### Provider Details\n\n';
+    md += '| Provider | Status | Latency |\n';
+    md += '|----------|--------|----------|\n';
     
     Object.entries(report.providers.providers || {}).forEach(([key, provider]) => {
       const status = provider.working ? '✅' : provider.available ? '❌' : '➖';
       const latency = provider.latency ? `${provider.latency}ms` : 'N/A';
       md += `| ${provider.name || key} | ${status} | ${latency} |\n`;
     });
-    md += `\n`;
+    md += '\n';
 
     // Recommendations
-    md += `## Recommendation Engine\n\n`;
+    md += '## Recommendation Engine\n\n';
     md += `**Status:** ${this.statusIcon(report.recommendation.success)}  \n`;
     md += `**Hybrid Available:** ${report.recommendation.hybridAvailable ? '✅' : '❌'}  \n`;
     md += `**Recommendation Count:** ${report.recommendation.recommendationCount}  \n`;
@@ -572,7 +572,7 @@ class TestReportAggregator {
 
     // Docker (if tested)
     if (report.docker.success !== null) {
-      md += `## Docker Validation\n\n`;
+      md += '## Docker Validation\n\n';
       md += `**Status:** ${this.statusIcon(report.docker.success)}  \n`;
       md += `**Build:** ${report.docker.buildSuccess ? '✅' : '❌'} (${report.docker.buildDuration}ms)  \n`;
       md += `**Health Check:** ${report.docker.healthCheckSuccess ? '✅' : '❌'} (${report.docker.healthCheckDuration}ms)  \n`;
@@ -580,12 +580,12 @@ class TestReportAggregator {
       if (report.docker.imageSize) {
         md += `**Image Size:** ${report.docker.imageSize}  \n`;
       }
-      md += `\n`;
+      md += '\n';
     }
 
     // Performance (if tested)
     if (report.performance.success !== null) {
-      md += `## Performance Testing\n\n`;
+      md += '## Performance Testing\n\n';
       md += `**Status:** ${this.statusIcon(report.performance.success)}  \n`;
       md += `**Tests:** ${report.performance.testCount} requests  \n`;
       md += `**Success Rate:** ${report.performance.successRate}%  \n`;
@@ -593,45 +593,45 @@ class TestReportAggregator {
       md += `**Latency p95:** ${report.performance.p95}ms  \n`;
       
       if (report.performance.softThresholdExceeded) {
-        md += `**Soft Threshold:** ⚠️ Exceeded  \n`;
+        md += '**Soft Threshold:** ⚠️ Exceeded  \n';
       }
       if (report.performance.hardThresholdExceeded) {
-        md += `**Hard Threshold:** ❌ Exceeded  \n`;
+        md += '**Hard Threshold:** ❌ Exceeded  \n';
       }
       
       if (report.performance.fastestProvider) {
         md += `**Fastest Provider:** ${report.performance.fastestProvider}  \n`;
       }
-      md += `\n`;
+      md += '\n';
     }
 
     // Screenshots (if tested)
     if (report.screenshots.success !== null && report.screenshots.totalSteps > 0) {
-      md += `## Screenshot Coverage\n\n`;
+      md += '## Screenshot Coverage\n\n';
       md += `**Total Steps:** ${report.screenshots.totalSteps}  \n`;
       md += `**Errors Captured:** ${report.screenshots.totalErrors}  \n`;
       
-      md += `\n### Flow Coverage\n\n`;
-      md += `| Flow | Steps |\n`;
-      md += `|------|-------|\n`;
+      md += '\n### Flow Coverage\n\n';
+      md += '| Flow | Steps |\n';
+      md += '|------|-------|\n';
       Object.entries(report.screenshots.flows).forEach(([flow, steps]) => {
         md += `| ${flow} | ${steps} |\n`;
       });
-      md += `\n`;
+      md += '\n';
     }
 
     // Warnings
     if (report.warnings.length > 0) {
-      md += `## Warnings\n\n`;
+      md += '## Warnings\n\n';
       report.warnings.forEach(warning => {
         md += `- ⚠️ ${warning}\n`;
       });
-      md += `\n`;
+      md += '\n';
     }
 
     // Failures
     if (report.failures.length > 0) {
-      md += `## Failures\n\n`;
+      md += '## Failures\n\n';
       report.failures.forEach(failure => {
         md += `### ${failure.component}\n\n`;
         if (failure.errors && Array.isArray(failure.errors)) {
@@ -641,21 +641,21 @@ class TestReportAggregator {
         } else if (failure.error) {
           md += `- ❌ ${failure.error}\n`;
         }
-        md += `\n`;
+        md += '\n';
       });
     }
 
     // TODO Section
-    md += `## TODO (Deferred)\n\n`;
-    md += `- [ ] Contract tests for API endpoints\n`;
-    md += `- [ ] Visual diff gating with baseline images\n`;
-    md += `- [ ] Performance trends and regression detection\n`;
-    md += `- [ ] Semantic similarity testing for AI responses\n`;
-    md += `- [ ] Load testing with concurrent users\n`;
-    md += `- [ ] Security testing and vulnerability scanning\n\n`;
+    md += '## TODO (Deferred)\n\n';
+    md += '- [ ] Contract tests for API endpoints\n';
+    md += '- [ ] Visual diff gating with baseline images\n';
+    md += '- [ ] Performance trends and regression detection\n';
+    md += '- [ ] Semantic similarity testing for AI responses\n';
+    md += '- [ ] Load testing with concurrent users\n';
+    md += '- [ ] Security testing and vulnerability scanning\n\n';
 
     // Metadata
-    md += `## Metadata\n\n`;
+    md += '## Metadata\n\n';
     md += `**Node Version:** ${report.metadata.nodeVersion}  \n`;
     md += `**Platform:** ${report.metadata.platform} (${report.metadata.arch})  \n`;
     md += `**Environment:** ${report.metadata.environment}  \n`;

@@ -460,7 +460,7 @@ class ComprehensiveAPIValidator {
                 throw new Error('Brave Search API key not found');
             }
 
-            const response = await fetch(`https://api.search.brave.com/res/v1/web/search?q=test&count=1`, {
+            const response = await fetch('https://api.search.brave.com/res/v1/web/search?q=test&count=1', {
                 headers: {
                     'Accept': 'application/json',
                     'Accept-Encoding': 'gzip',
@@ -771,12 +771,12 @@ class ComprehensiveAPIValidator {
         
         const report = await this.generateReport();
         
-        console.log(`\n📊 Final Results:`);
+        console.log('\n📊 Final Results:');
         console.log(`Overall Score: ${report.overallScore}/100 (${report.healthLevel})`);
         console.log(`Operational Services: ${report.summary.operational}/${report.summary.total}`);
-        console.log(`\n📄 Reports saved:`);
-        console.log(`- comprehensive-api-validation-report.json`);
-        console.log(`- COMPREHENSIVE_API_VALIDATION_REPORT.md`);
+        console.log('\n📄 Reports saved:');
+        console.log('- comprehensive-api-validation-report.json');
+        console.log('- COMPREHENSIVE_API_VALIDATION_REPORT.md');
 
         return report;
     }

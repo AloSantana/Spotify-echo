@@ -131,7 +131,7 @@ class N8nWebhookValidator {
                 this.testResults.testsPass++;
             } else if (response.status === 404) {
                 console.log(`   ⚠️  Endpoint not found (404): ${endpoint.name}`);
-                console.log(`      This is expected if the workflow hasn't been created yet`);
+                console.log('      This is expected if the workflow hasn\'t been created yet');
                 result.success = false;
                 result.error = 'Endpoint not found - workflow may not be created yet';
             } else {
@@ -184,10 +184,10 @@ class N8nWebhookValidator {
             };
             
             if (result.success) {
-                console.log(`   ✅ Success: n8n instance is healthy`);
+                console.log('   ✅ Success: n8n instance is healthy');
                 this.testResults.testsPass++;
             } else {
-                console.log(`   ❌ Failed: n8n instance unhealthy`);
+                console.log('   ❌ Failed: n8n instance unhealthy');
                 this.testResults.testsFail++;
             }
             

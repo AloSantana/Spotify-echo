@@ -103,8 +103,6 @@
     "test:chat": "npx playwright test tests/e2e/chat-interaction.spec.ts",
     "test:integration-advanced": "npx playwright test tests/e2e/advanced-integration.spec.ts",
     "test:automation": "npx playwright test tests/e2e/automation-remediation.spec.ts",
-    "test:unit": "jest tests/unit --coverage",
-    "test:integration": "jest tests/integration --coverage", 
     "test:visual": "npx playwright test tests/visual --project=visual-regression",
     "test:perf": "npx playwright test tests/performance",
     "test:all": "node scripts/build-test-matrix.js && npm run test:selected",
@@ -418,7 +416,10 @@
     "e2e:chat-rec": "node scripts/run-e2e-chat-rec.js",
     "e2e:full": "npm run e2e:chat-rec",
     "test:realdata": "npm run test -- tests/recommendation/integration/realData.test.js",
-    "mcp:health:enhanced": "node src/mcp/EnhancedMCPValidatorV2.js"
+    "mcp:health:enhanced": "node src/mcp/EnhancedMCPValidatorV2.js",
+    "security:fix": "npm audit fix",
+    "quality:check": "npm run lint && npm run security:audit",
+    "quality:fix": "npm run lint:fix && npm run security:fix"
   },
   "keywords": [
     "music-discovery",

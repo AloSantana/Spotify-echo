@@ -33,9 +33,9 @@ class MockProviderIntegrationTest {
       this.provider = new MockProvider({});
       await this.provider.initialize();
 
-      console.log(`✅ Mock provider initialized successfully.`);
+      console.log('✅ Mock provider initialized successfully.');
       console.log(`   Model: ${this.provider.defaultModel}`);
-      console.log(`   Mode: Mock (no API calls)`);
+      console.log('   Mode: Mock (no API calls)');
       this.results.initialization = true;
       return true;
     } catch (error) {
@@ -95,15 +95,15 @@ class MockProviderIntegrationTest {
 
     // Simulate the check logic but adapt for mock provider
     if (!isUsingVertex && !expectedMode) {
-      console.log(`✅ Provider is correctly in Mock mode (non-Vertex configuration).`);
+      console.log('✅ Provider is correctly in Mock mode (non-Vertex configuration).');
       this.results.vertexModeCheck = true;
     } else if (isUsingVertex === expectedMode) {
       console.log(`✅ Provider is correctly in ${expectedMode ? 'Vertex AI' : 'Google AI Studio'} mode.`);
       this.results.vertexModeCheck = true;
     } else {
-      console.log(`⚠️  Mock provider mode check - simulating Vertex mode verification.`);
+      console.log('⚠️  Mock provider mode check - simulating Vertex mode verification.');
       console.log(`   Expected: ${expectedMode ? 'Vertex AI' : 'Google AI Studio'} mode`);
-      console.log(`   Mock provider: Always uses mock responses`);
+      console.log('   Mock provider: Always uses mock responses');
       this.results.vertexModeCheck = true; // Pass for mock provider
     }
   }
@@ -130,7 +130,7 @@ class MockProviderIntegrationTest {
     console.log(`\n📈 Overall Score: ${passedTests}/${totalTests} tests passed`);
     
     if (passedTests === totalTests) {
-      console.log(`🎉 All tests passed! Mock provider implementation follows PR Reviewer Guide patterns correctly.`);
+      console.log('🎉 All tests passed! Mock provider implementation follows PR Reviewer Guide patterns correctly.');
     } else {
       console.log('❌ Some tests failed. Please review the errors above.');
     }

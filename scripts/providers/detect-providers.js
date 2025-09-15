@@ -331,7 +331,7 @@ class ProviderDetector {
       const latencyPath = path.join(reportsDir, 'provider-latencies.json');
       fs.writeFileSync(latencyPath, JSON.stringify(latencyReport, null, 2));
 
-      console.log(`\n📄 Reports written:`);
+      console.log('\n📄 Reports written:');
       console.log(`  Status: ${statusPath}`);
       console.log(`  Latencies: ${latencyPath}`);
 

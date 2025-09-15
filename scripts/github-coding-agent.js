@@ -235,7 +235,7 @@ class GitHubCodingAgent {
       }
     }
     
-    console.log(`\n📈 IMPLEMENTATION RESULTS:`);
+    console.log('\n📈 IMPLEMENTATION RESULTS:');
     console.log(`   ✅ Completed: ${this.completedTasks.length}`);
     console.log(`   ❌ Failed: ${this.failedTasks.length}`);
     console.log(`   ⏭️ Skipped: ${this.skippedTasks.length}`);

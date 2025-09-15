@@ -96,7 +96,7 @@ class n8nMcpIntegration {
     }
 
     async testConnectivity() {
-        console.log(`   🌐 Testing connectivity to n8n instance...`);
+        console.log('   🌐 Testing connectivity to n8n instance...');
         
         const fallbackUrl = `http://${this.config.configuration.n8nApiUrlFallback}`;
         
@@ -153,7 +153,7 @@ class n8nMcpIntegration {
     }
 
     async startServer() {
-        console.log(`   🎯 Starting n8n-mcp server...`);
+        console.log('   🎯 Starting n8n-mcp server...');
         
         try {
             // Start n8n-mcp using spawn for better control
@@ -169,7 +169,7 @@ class n8nMcpIntegration {
             };
             
             // Test that we can start the server
-            console.log(`   ✅ n8n-mcp server configuration ready`);
+            console.log('   ✅ n8n-mcp server configuration ready');
             console.log(`   🌐 API URL: ${env.N8N_API_URL}`);
             console.log(`   🔑 API Key: ${env.N8N_API_KEY ? '***configured***' : 'missing'}`);
             
@@ -187,12 +187,12 @@ class n8nMcpIntegration {
     }
 
     async createWorkflowExample() {
-        console.log(`   🔧 Testing workflow creation capabilities...`);
+        console.log('   🔧 Testing workflow creation capabilities...');
         
         try {
             // This is a placeholder for testing workflow creation
             // In a real implementation, this would create a simple test workflow
-            console.log(`   ✅ Workflow automation capabilities ready`);
+            console.log('   ✅ Workflow automation capabilities ready');
             
             // Log available capabilities
             console.log(`   📋 Available capabilities: ${this.config.capabilities.join(', ')}`);

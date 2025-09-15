@@ -109,9 +109,9 @@ async function runComprehensiveTest() {
     // Generate comprehensive report
     console.log('=== Test Summary ===');
     console.log(`✅ Perplexity API integration is ${service.apiKey ? 'CONFIGURED' : 'NOT CONFIGURED'}`);
-    console.log(`✅ Service initialization: SUCCESS`);
-    console.log(`✅ Multiple research methods tested: SUCCESS`);
-    console.log(`✅ Cache system operational: SUCCESS`);
+    console.log('✅ Service initialization: SUCCESS');
+    console.log('✅ Multiple research methods tested: SUCCESS');
+    console.log('✅ Cache system operational: SUCCESS');
     
     // Create test results artifact for the perplexity-enhancements folder
     const testResults = {

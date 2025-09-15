@@ -819,7 +819,7 @@ class EnhancedBrowserResearchMCP {
   }
 
   formatGeneratedTasks(tasks) {
-    let output = `# 📋 Generated Development Tasks\n\n`;
+    let output = '# 📋 Generated Development Tasks\n\n';
     output += `**Total Tasks:** ${tasks.length}\n`;
     output += `**Generated:** ${new Date().toLocaleString()}\n\n`;
 
@@ -829,11 +829,11 @@ class EnhancedBrowserResearchMCP {
       output += `**Category:** ${task.category}\n`;
       output += `**Estimated Effort:** ${task.estimatedEffort}\n\n`;
       output += `**Description:** ${task.description}\n\n`;
-      output += `**Acceptance Criteria:**\n`;
+      output += '**Acceptance Criteria:**\n';
       task.acceptanceCriteria.forEach(criteria => {
         output += `- [ ] ${criteria}\n`;
       });
-      output += `\n---\n\n`;
+      output += '\n---\n\n';
     });
 
     return output;
@@ -934,7 +934,7 @@ class EnhancedBrowserResearchMCP {
   }
 
   formatBrowserResults(results, evidence) {
-    let output = `# 🤖 Browser Automation Results\n\n`;
+    let output = '# 🤖 Browser Automation Results\n\n';
     
     const successfulActions = results.filter(r => r.success).length;
     output += `**Success Rate:** ${successfulActions}/${results.length} (${Math.round(successfulActions / results.length * 100)}%)\n`;
@@ -957,7 +957,7 @@ class EnhancedBrowserResearchMCP {
         output += `   Extracted: ${result.extractedText.substring(0, 100)}...\n`;
       }
       
-      output += `\n`;
+      output += '\n';
     });
 
     return output;
@@ -1223,7 +1223,7 @@ class EnhancedBrowserResearchMCP {
     output += `**Confidence Score:** ${(results.confidenceScore * 100).toFixed(1)}%\n\n`;
 
     // Perplexity results
-    output += `## 📚 Research Findings\n\n`;
+    output += '## 📚 Research Findings\n\n';
     Object.entries(results.perplexityData).forEach(([questionId, data]) => {
       output += `### ${questionId.charAt(0).toUpperCase() + questionId.slice(1)}\n`;
       if (data.error) {
@@ -1231,18 +1231,18 @@ class EnhancedBrowserResearchMCP {
       } else {
         output += `${data.response}\n\n`;
         if (data.citations && data.citations.length > 0) {
-          output += `**Sources:**\n`;
+          output += '**Sources:**\n';
           data.citations.forEach((citation, index) => {
             output += `${index + 1}. ${citation.title || 'Unknown'} - ${citation.url}\n`;
           });
-          output += `\n`;
+          output += '\n';
         }
       }
     });
 
     // Browser verification results
     if (results.browserVerification) {
-      output += `## 🌐 Source Verification\n\n`;
+      output += '## 🌐 Source Verification\n\n';
       output += `**Verified Sources:** ${results.browserVerification.verifiedSources}/${results.browserVerification.totalSources}\n\n`;
       
       results.browserVerification.results.forEach((result, index) => {
@@ -1250,7 +1250,7 @@ class EnhancedBrowserResearchMCP {
         output += `   ${result.verified ? '✅ Verified' : '❌ Unverified'} (${(result.confidence * 100).toFixed(1)}% confidence)\n`;
         output += `   URL: ${result.url}\n`;
         if (result.error) output += `   Error: ${result.error}\n`;
-        output += `\n`;
+        output += '\n';
       });
     }
 
@@ -1258,20 +1258,20 @@ class EnhancedBrowserResearchMCP {
   }
 
   formatAnalysisResults(results) {
-    let output = `# 📊 Repository Analysis Results\n\n`;
+    let output = '# 📊 Repository Analysis Results\n\n';
     output += `**Analysis Type:** ${results.analysisType}\n`;
     output += `**Timestamp:** ${results.timestamp}\n\n`;
 
     // Structure analysis
-    output += `## 🏗️ Structure Analysis\n\n`;
+    output += '## 🏗️ Structure Analysis\n\n';
     output += `**Total Files:** ${results.structure.totalFiles}\n\n`;
-    output += `**File Types:**\n`;
+    output += '**File Types:**\n';
     Object.entries(results.structure.fileTypes).forEach(([type, count]) => {
       output += `- ${type}: ${count}\n`;
     });
 
     // Code quality
-    output += `\n## 💻 Code Quality\n\n`;
+    output += '\n## 💻 Code Quality\n\n';
     output += `**Code Files:** ${results.codeQuality.totalCodeFiles}\n`;
     output += `**Total Lines:** ${results.codeQuality.totalLines}\n`;
     output += `**Total Functions:** ${results.codeQuality.totalFunctions}\n`;
@@ -1279,14 +1279,14 @@ class EnhancedBrowserResearchMCP {
     output += `**Complexity:** ${results.codeQuality.complexity}\n`;
 
     if (results.codeQuality.issues.length > 0) {
-      output += `\n**Issues Found:**\n`;
+      output += '\n**Issues Found:**\n';
       results.codeQuality.issues.forEach(issue => {
         output += `- ${issue.file}: ${issue.type}\n`;
       });
     }
 
     // Recommendations
-    output += `\n## 💡 Recommendations\n\n`;
+    output += '\n## 💡 Recommendations\n\n';
     results.recommendations.forEach((rec, index) => {
       output += `${index + 1}. **${rec.title}** (${rec.priority})\n`;
       output += `   ${rec.description}\n\n`;
@@ -1296,7 +1296,7 @@ class EnhancedBrowserResearchMCP {
   }
 
   formatValidationResults(results) {
-    let output = `# 🧪 Validation Results\n\n`;
+    let output = '# 🧪 Validation Results\n\n';
     output += `**Test Suite:** ${results.testSuite}\n`;
     output += `**Timestamp:** ${results.timestamp}\n\n`;
 
@@ -1311,9 +1311,9 @@ class EnhancedBrowserResearchMCP {
         const status = test.passed ? '✅' : '❌';
         output += `${status} **${test.name}**`;
         if (test.error) output += ` - Error: ${test.error}`;
-        output += `\n`;
+        output += '\n';
       });
-      output += `\n`;
+      output += '\n';
     });
 
     return output;

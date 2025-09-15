@@ -325,23 +325,23 @@ class MCPDiscoveryEngine {
         const text = `${candidate.description} ${candidate.name}`.toLowerCase();
 
         if (text.match(/music|spotify|audio/)) {
-            suggestions.push("High priority: Direct relevance to EchoTune AI music features");
+            suggestions.push('High priority: Direct relevance to EchoTune AI music features');
         }
         
         if (text.match(/test|browser|automation/)) {
-            suggestions.push("Medium priority: Useful for CI/CD and testing workflows");
+            suggestions.push('Medium priority: Useful for CI/CD and testing workflows');
         }
         
         if (text.match(/security|lint|analysis/)) {
-            suggestions.push("Medium priority: Code quality and security improvements");
+            suggestions.push('Medium priority: Code quality and security improvements');
         }
         
         if (text.match(/database|analytics/)) {
-            suggestions.push("Low priority: Infrastructure and monitoring enhancements");
+            suggestions.push('Low priority: Infrastructure and monitoring enhancements');
         }
 
         if (suggestions.length === 0) {
-            suggestions.push("Evaluate: Review documentation for specific use cases");
+            suggestions.push('Evaluate: Review documentation for specific use cases');
         }
 
         return suggestions.join('; ');

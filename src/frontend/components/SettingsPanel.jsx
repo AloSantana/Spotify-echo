@@ -164,9 +164,9 @@ const SettingsPanel = ({ userId, onSettingsChange }) => {
         
         if (response.status === 409 && errorData.error === 'VERSION_CONFLICT') {
           setError(
-            `Settings were modified by another session. ` +
+            'Settings were modified by another session. ' +
             `Server version: ${errorData.serverVersion}. ` +
-            `Please refresh to see the latest changes.`
+            'Please refresh to see the latest changes.'
           );
           return;
         }
@@ -549,7 +549,7 @@ const SettingsPanel = ({ userId, onSettingsChange }) => {
               </Grid>
 
               <Alert 
-                severity={Math.abs(weightSum - 1.0) > 0.01 ? "warning" : "success"} 
+                severity={Math.abs(weightSum - 1.0) > 0.01 ? 'warning' : 'success'} 
                 sx={{ mt: 3 }}
               >
                 <Typography variant="body2">

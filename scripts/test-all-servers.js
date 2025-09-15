@@ -467,13 +467,13 @@ class ServerTester {
         fs.writeFileSync(reportPath, JSON.stringify(this.results, null, 2));
 
         // Generate Markdown report
-        let markdown = `# 🚀 Server Testing Report\n\n`;
+        let markdown = '# 🚀 Server Testing Report\n\n';
         markdown += `**Generated:** ${this.results.timestamp}\n`;
         markdown += `**Total Tests:** ${this.results.summary.total}\n`;
         markdown += `**Passed:** ${this.results.summary.passed} ✅\n`;
         markdown += `**Failed:** ${this.results.summary.failed} ❌\n\n`;
 
-        markdown += `## Test Results\n\n`;
+        markdown += '## Test Results\n\n';
 
         Object.entries(this.results.tests).forEach(([testName, result]) => {
             const status = result.status === 'passed' ? '✅' : '❌';
@@ -490,12 +490,12 @@ class ServerTester {
             } else {
                 markdown += `- **Error**: ${result.error}\n`;
             }
-            markdown += `\n`;
+            markdown += '\n';
         });
 
         fs.writeFileSync(markdownReportPath, markdown);
 
-        this.log(`📊 Reports generated:`, 'success');
+        this.log('📊 Reports generated:', 'success');
         this.log(`   JSON: ${reportPath}`, 'info');
         this.log(`   Markdown: ${markdownReportPath}`, 'info');
     }

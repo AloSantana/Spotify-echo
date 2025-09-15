@@ -188,7 +188,7 @@ class DockerValidator {
             encoding: 'utf8',
             timeout: 10000
           });
-          this.log(`✅ Root endpoint responding`);
+          this.log('✅ Root endpoint responding');
           this.results.healthCheck = true;
           return true;
         } catch (rootError) {

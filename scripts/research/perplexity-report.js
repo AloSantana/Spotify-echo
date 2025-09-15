@@ -483,7 +483,7 @@ ${content}${cursorSection}
     const endTime = performance.now();
     const duration = Math.round(endTime - browserResearch.startTime);
     
-    log(`✅ Enhanced research report posted successfully`);
+    log('✅ Enhanced research report posted successfully');
     log(`📊 Total analysis time: ${duration}ms`);
     log(`🔍 Browser research: ${browserEnabled ? 'Enabled' : 'Disabled'}`);
     

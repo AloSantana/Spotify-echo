@@ -493,7 +493,7 @@ class ComprehensiveAPITester {
                 status: '✅ VALIDATED',
                 responseTime: `${Math.round(endTime - startTime)}ms`,
                 features: ['IDE integration', 'MCP server connection', 'Coding agent support'],
-                testData: `Key format valid: 68 characters starting with 'key_'`
+                testData: 'Key format valid: 68 characters starting with \'key_\''
             });
 
         } catch (error) {
@@ -555,7 +555,7 @@ class ComprehensiveAPITester {
                 status: '✅ WORKING',
                 responseTime: `${Math.round(endTime - startTime)}ms`,
                 features: ['High-speed caching', 'Session storage', 'Performance optimization'],
-                testData: `Ping successful, Set/Get operations working`,
+                testData: 'Ping successful, Set/Get operations working',
                 connectionDetails: {
                     host: 'redis-11786.crce175.eu-north-1-1.ec2.redns.redis-cloud.com:11786',
                     username: 'default',

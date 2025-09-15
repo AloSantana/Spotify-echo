@@ -74,9 +74,9 @@ class AutonomousValidationSuite {
       for (const feature of expectedFeatures) {
         if (content.includes(feature)) {
           featuresFound++;
-          this.pass(testName + ` Feature: ${feature}`, `Feature implemented`);
+          this.pass(testName + ` Feature: ${feature}`, 'Feature implemented');
         } else {
-          this.warn(testName + ` Feature: ${feature}`, `Feature not found or different implementation`);
+          this.warn(testName + ` Feature: ${feature}`, 'Feature not found or different implementation');
         }
       }
 

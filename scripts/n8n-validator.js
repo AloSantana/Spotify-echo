@@ -153,7 +153,7 @@ class N8nValidator {
         
         if (validation) {
             console.log(`✅ N8N Instance: ${this.apiUrl}`);
-            console.log(`✅ API Authentication: Working`);
+            console.log('✅ API Authentication: Working');
             console.log(`✅ Total Workflows: ${validation.workflows}`);
             console.log(`✅ EchoTune Workflows: ${validation.echotuneWorkflows}`);
             console.log(`✅ Active Workflows: ${validation.activeWorkflows}`);
@@ -168,7 +168,7 @@ class N8nValidator {
             console.log('\n🌐 ACCESS INFORMATION:');
             console.log(`   URL: ${this.apiUrl}`);
             console.log(`   Login: ${process.env.N8N_USERNAME || 'willexmen8@gmail.com'}`);
-            console.log(`   Password: [Configured in environment]`);
+            console.log('   Password: [Configured in environment]');
             
             console.log('\n🔗 API ENDPOINTS:');
             console.log(`   📍 Spotify Data: ${this.apiUrl}/webhook/spotify-data-processing`);

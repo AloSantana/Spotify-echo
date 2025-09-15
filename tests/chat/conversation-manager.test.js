@@ -30,7 +30,7 @@ describe('Enhanced ConversationManager', () => {
 
   describe('Entity Extraction', () => {
     test('should extract music genres from text', () => {
-      const text = "I love rock music and electronic beats";
+      const text = 'I love rock music and electronic beats';
       const entities = conversationManager.extractMusicEntities(text);
       
       expect(entities.genres).toContain('rock');
@@ -38,7 +38,7 @@ describe('Enhanced ConversationManager', () => {
     });
 
     test('should extract mood indicators', () => {
-      const text = "I'm feeling happy and energetic today";
+      const text = 'I\'m feeling happy and energetic today';
       const entities = conversationManager.extractMusicEntities(text);
       
       expect(entities.moods).toContain('happy');
@@ -46,7 +46,7 @@ describe('Enhanced ConversationManager', () => {
     });
 
     test('should extract activity indicators', () => {
-      const text = "Music for working out and studying";
+      const text = 'Music for working out and studying';
       const entities = conversationManager.extractMusicEntities(text);
       
       expect(entities.activities).toContain('working out');
@@ -66,7 +66,7 @@ describe('Enhanced ConversationManager', () => {
     });
 
     test('should detect mood-based intent', () => {
-      const intent = conversationManager.detectUserIntent("I'm feeling sad", 'user');
+      const intent = conversationManager.detectUserIntent('I\'m feeling sad', 'user');
       expect(intent).toBe('mood_based');
     });
 

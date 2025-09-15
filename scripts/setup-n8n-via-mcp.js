@@ -526,7 +526,7 @@ N8N_MCP_PORT=3019
             console.log('\n📋 Summary:');
             console.log(`   🌐 n8n Instance: ${process.env.N8N_API_URL}`);
             console.log(`   📊 Existing Workflows: ${this.workflows.length}`);
-            console.log(`   🛠️  MCP Tools: 39 available tools`);
+            console.log('   🛠️  MCP Tools: 39 available tools');
             console.log(`   📝 Integration Script: ${scriptPath}`);
             console.log(`   📚 Documentation: ${docPath}`);
             

@@ -1446,10 +1446,10 @@ Remember to be conversational, helpful, and always focus on music discovery and 
 
     const tracks = recommendations.recommendations || [];
     if (tracks.length === 0) {
-      return "I couldn't find any recommendations matching your criteria. Try describing your mood or preferred genre!";
+      return 'I couldn\'t find any recommendations matching your criteria. Try describing your mood or preferred genre!';
     }
 
-    let response = `🎵 Based on your request`;
+    let response = '🎵 Based on your request';
     if (entities.genres.length > 0) {
       response += ` for ${entities.genres.join(', ')}`;
     }
@@ -1459,7 +1459,7 @@ Remember to be conversational, helpful, and always focus on music discovery and 
     if (entities.activities.length > 0) {
       response += ` for ${entities.activities.join(', ')}`;
     }
-    response += `, here are some tracks you might enjoy:\n\n`;
+    response += ', here are some tracks you might enjoy:\n\n';
 
     tracks.slice(0, 5).forEach((track, index) => {
       response += `${index + 1}. **${track.name}** by ${track.artist}\n`;
@@ -1468,7 +1468,7 @@ Remember to be conversational, helpful, and always focus on music discovery and 
       }
     });
 
-    response += `\n💡 Would you like me to create a playlist with these tracks?`;
+    response += '\n💡 Would you like me to create a playlist with these tracks?';
     return response;
   }
 
@@ -1480,13 +1480,13 @@ Remember to be conversational, helpful, and always focus on music discovery and 
       return `Sorry, I couldn't analyze your listening habits at the moment. ${analysis.message || 'Please try again.'}`;
     }
 
-    let response = `📊 Your Music Listening Analysis\n\n`;
+    let response = '📊 Your Music Listening Analysis\n\n';
 
     if (analysis.analysis) {
       const { top_genres, listening_patterns, audio_features_profile } = analysis.analysis;
 
       if (top_genres && top_genres.length > 0) {
-        response += `**Top Genres:**\n`;
+        response += '**Top Genres:**\n';
         top_genres.slice(0, 5).forEach((genre, index) => {
           response += `${index + 1}. ${genre.genre || genre} ${genre.count ? `(${genre.count} tracks)` : ''}\n`;
         });
@@ -1494,7 +1494,7 @@ Remember to be conversational, helpful, and always focus on music discovery and 
       }
 
       if (listening_patterns) {
-        response += `**Listening Patterns:**\n`;
+        response += '**Listening Patterns:**\n';
         if (listening_patterns.most_active_hours && listening_patterns.most_active_hours.length > 0) {
           const topHour = listening_patterns.most_active_hours[0];
           response += `• Most active listening time: ${topHour.hour}:00 (${topHour.count} plays)\n`;
@@ -1506,7 +1506,7 @@ Remember to be conversational, helpful, and always focus on music discovery and 
       }
 
       if (audio_features_profile) {
-        response += `**Your Music Characteristics:**\n`;
+        response += '**Your Music Characteristics:**\n';
         if (audio_features_profile.energy) {
           response += `• Energy level: ${(audio_features_profile.energy.average * 100).toFixed(0)}%\n`;
         }
@@ -1521,7 +1521,7 @@ Remember to be conversational, helpful, and always focus on music discovery and 
     }
 
     if (analysis.insights && analysis.insights.length > 0) {
-      response += `**Insights:**\n`;
+      response += '**Insights:**\n';
       analysis.insights.forEach(insight => {
         response += `• ${insight}\n`;
       });

@@ -77,10 +77,10 @@ async function validateDockerFix() {
         // Stage 2: Test Container Startup
         console.log('🚀 Stage 2: Testing container startup...');
         try {
-            const containerId = execSync(`docker run -d --name echotune-fix-test -p 3001:3000 \
+            const containerId = execSync('docker run -d --name echotune-fix-test -p 3001:3000 \
                 -e NODE_ENV=production \
                 -e PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
-                echotune-fix-test:latest`, {
+                echotune-fix-test:latest', {
                 encoding: 'utf8'
             }).trim();
             

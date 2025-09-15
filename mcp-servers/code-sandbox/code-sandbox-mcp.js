@@ -227,7 +227,7 @@ class CodeSandboxMCP {
         content: [
           {
             type: 'text',
-            text: `## JavaScript Execution Result\n\n` +
+            text: '## JavaScript Execution Result\n\n' +
                   `**Session ID:** ${sessionId}\n` +
                   `**Execution Time:** ${result.executionTime}ms\n\n` +
                   `### Output:\n\`\`\`\n${result.stdout}\n\`\`\`\n` +
@@ -271,7 +271,7 @@ class CodeSandboxMCP {
           content: [
             {
               type: 'text',
-              text: `## TypeScript Compilation Error\n\n` +
+              text: '## TypeScript Compilation Error\n\n' +
                     `**Session ID:** ${sessionId}\n\n` +
                     `### Compilation Errors:\n\`\`\`\n${compileResult.stderr}\n\`\`\`\n`
             }
@@ -286,9 +286,9 @@ class CodeSandboxMCP {
         content: [
           {
             type: 'text',
-            text: `## TypeScript Execution Result\n\n` +
+            text: '## TypeScript Execution Result\n\n' +
                   `**Session ID:** ${sessionId}\n` +
-                  `**Compilation:** ✅ Success\n` +
+                  '**Compilation:** ✅ Success\n' +
                   `**Execution Time:** ${execResult.executionTime}ms\n\n` +
                   `### Output:\n\`\`\`\n${execResult.stdout}\n\`\`\`\n` +
                   (execResult.stderr ? `### Runtime Errors:\n\`\`\`\n${execResult.stderr}\n\`\`\`\n` : '') +
@@ -326,7 +326,7 @@ class CodeSandboxMCP {
         content: [
           {
             type: 'text',
-            text: `## Python Execution Result\n\n` +
+            text: '## Python Execution Result\n\n' +
                   `**Session ID:** ${sessionId}\n` +
                   `**Allowed Packages:** ${allowPackages.join(', ')}\n` +
                   `**Execution Time:** ${result.executionTime}ms\n\n` +
@@ -439,19 +439,19 @@ class CodeSandboxMCP {
       content: [
         {
           type: 'text',
-          text: `## EchoTune AI Code Validation\n\n` +
+          text: '## EchoTune AI Code Validation\n\n' +
                 `**Language:** ${language}\n` +
                 `**Check Type:** ${checkType || 'general'}\n` +
                 `**Grade:** ${gradeInfo.emoji} ${gradeInfo.grade} (${score}/100) - ${gradeInfo.label}\n\n` +
                 (issues.length > 0 ? `### Issues Found:\n${issues.map(issue => `• ${issue}`).join('\n')}\n\n` : '') +
                 (recommendations.length > 0 ? `### Recommendations:\n${recommendations.map(rec => `• ${rec}`).join('\n')}\n\n` : '') +
                 (issues.length === 0 && recommendations.length === 0 ? '✅ **No issues found!** Code follows best practices.\n\n' : '') +
-                `### EchoTune AI Best Practices:\n` +
-                `• Always use environment variables for API keys\n` +
-                `• Implement comprehensive error handling for external APIs\n` +
-                `• Use async/await patterns for database operations\n` +
-                `• Validate and sanitize all user inputs\n` +
-                `• Add logging for debugging and monitoring`
+                '### EchoTune AI Best Practices:\n' +
+                '• Always use environment variables for API keys\n' +
+                '• Implement comprehensive error handling for external APIs\n' +
+                '• Use async/await patterns for database operations\n' +
+                '• Validate and sanitize all user inputs\n' +
+                '• Add logging for debugging and monitoring'
         }
       ]
     };
@@ -546,11 +546,11 @@ runTests();
         content: [
           {
             type: 'text',
-            text: `## API Endpoint Test Results\n\n` +
+            text: '## API Endpoint Test Results\n\n' +
                   `**Session ID:** ${sessionId}\n` +
                   `**Tests Passed:** ${passedTests}/${totalTests}\n` +
                   `**Success Rate:** ${totalTests > 0 ? ((passedTests / totalTests) * 100).toFixed(1) : 0}%\n\n` +
-                  `### Test Details:\n` +
+                  '### Test Details:\n' +
                   testResults.map((test, index) => {
                     const status = test.passed ? '✅' : '❌';
                     const method = test.testCase?.method || 'N/A';

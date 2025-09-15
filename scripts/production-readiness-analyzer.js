@@ -63,7 +63,7 @@ class ProductionReadinessAnalyzer {
         console.log('🚀 Starting Comprehensive Production Readiness Analysis');
         console.log('=' .repeat(60));
         console.log(`📅 Analysis Date: ${new Date().toLocaleString()}`);
-        console.log(`🏗️  Project: EchoTune AI`);
+        console.log('🏗️  Project: EchoTune AI');
         console.log(`📂 Root: ${this.projectRoot}`);
         console.log('=' .repeat(60));
 
@@ -1394,7 +1394,7 @@ if (require.main === module) {
         .then((results) => {
             console.log('\n🎉 Analysis completed successfully!');
             console.log(`📊 Overall readiness: ${results.metrics.overall_readiness_score}%`);
-            console.log(`📋 View detailed report: PRODUCTION_READINESS_ANALYSIS.md`);
+            console.log('📋 View detailed report: PRODUCTION_READINESS_ANALYSIS.md');
             
             // Exit with appropriate code
             process.exit(results.overall_status === 'not_ready' ? 1 : 0);

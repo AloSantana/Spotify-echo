@@ -248,7 +248,7 @@ Use web search to get current information and provide specific, actionable insig
             test.passed = true;
             test.endTime = Date.now();
 
-            console.log(`  ✅ Repository analysis PASSED`);
+            console.log('  ✅ Repository analysis PASSED');
             console.log(`  📏 Response Length: ${content.length} characters`);
             console.log(`  🌐 Current Info: ${hasCurrentInfo ? '✅' : '❌'}`);
             console.log(`  🎵 Spotify Content: ${hasSpotifyInfo ? '✅' : '❌'}`);
@@ -259,7 +259,7 @@ Use web search to get current information and provide specific, actionable insig
 
             // Save full analysis for reference
             await fs.writeFile('perplexity-repository-analysis.txt', content);
-            console.log(`  💾 Full analysis saved to: perplexity-repository-analysis.txt`);
+            console.log('  💾 Full analysis saved to: perplexity-repository-analysis.txt');
 
             this.testResults.summary.passed++;
 
@@ -343,7 +343,7 @@ Format as a numbered list with task title, description, effort estimate, and pri
             test.passed = true;
             test.endTime = Date.now();
 
-            console.log(`  ✅ Task generation PASSED`);
+            console.log('  ✅ Task generation PASSED');
             console.log(`  📏 Content Length: ${content.length} characters`);
             console.log(`  📝 Numbered Tasks: ${hasNumberedTasks ? '✅' : '❌'}`);
             console.log(`  📊 Effort Estimates: ${hasEffortEstimates ? '✅' : '❌'}`);
@@ -354,7 +354,7 @@ Format as a numbered list with task title, description, effort estimate, and pri
 
             // Save generated tasks
             await fs.writeFile('perplexity-generated-tasks.txt', content);
-            console.log(`  💾 Generated tasks saved to: perplexity-generated-tasks.txt`);
+            console.log('  💾 Generated tasks saved to: perplexity-generated-tasks.txt');
 
             this.testResults.summary.passed++;
 
@@ -686,7 +686,7 @@ module.exports = WorkingPerplexityAPI;
         };
 
         await fs.writeFile('working-perplexity-test-results.json', JSON.stringify(reportData, null, 2));
-        console.log(`\n💾 Detailed results saved to: working-perplexity-test-results.json`);
+        console.log('\n💾 Detailed results saved to: working-perplexity-test-results.json');
 
         // Generate markdown report
         const markdownReport = `# Working Perplexity API Integration Test Report
@@ -737,7 +737,7 @@ ${test.hasWebSearchContent ? '- **Web Search**: ✅ Active' : ''}
 `;
 
         await fs.writeFile('WORKING_PERPLEXITY_INTEGRATION_REPORT.md', markdownReport);
-        console.log(`📋 Markdown report saved to: WORKING_PERPLEXITY_INTEGRATION_REPORT.md`);
+        console.log('📋 Markdown report saved to: WORKING_PERPLEXITY_INTEGRATION_REPORT.md');
 
         return reportData;
     }

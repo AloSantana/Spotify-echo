@@ -87,11 +87,11 @@ class MCPResearchValidationSuite {
             const analyzerContent = await fs.readFile(analyzerPath, 'utf8');
             
             const grok4Indicators = [
-                "model: 'grok-4'",
-                "validationModel: 'grok-4'",
-                "Grok-4",
-                "You are Grok-4",
-                "perplexity"
+                'model: \'grok-4\'',
+                'validationModel: \'grok-4\'',
+                'Grok-4',
+                'You are Grok-4',
+                'perplexity'
             ];
             
             const foundIndicators = grok4Indicators.filter(indicator => 
@@ -423,7 +423,7 @@ class MCPResearchValidationSuite {
         }
 
         conclusions.push(`📊 Overall validation score: ${score.weightedScore.toFixed(1)}% (Grade: ${score.grade})`);
-        conclusions.push(`🤖 Grok-4 integration: CONFIRMED and VALIDATED`);
+        conclusions.push('🤖 Grok-4 integration: CONFIRMED and VALIDATED');
         
         return conclusions;
     }
@@ -535,7 +535,7 @@ ${report.recommendations.map(rec => `- ${rec}`).join('\n')}
             console.log('==========================================');
             console.log(`📋 Validation Report: ${reportPath}`);
             console.log(`📊 JSON Data: ${jsonPath}`);
-            console.log(`🤖 Grok-4 Status: ✅ VALIDATED`);
+            console.log('🤖 Grok-4 Status: ✅ VALIDATED');
             console.log(`⚡ Validation Score: ${overallScore.weightedScore.toFixed(1)}% (${overallScore.grade})`);
             console.log(`🏆 Certification: ${overallScore.certification}`);
             console.log('==========================================\n');

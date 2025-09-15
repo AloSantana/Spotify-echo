@@ -310,7 +310,7 @@ class EnvironmentValidator {
       this.warnings.forEach(warning => console.log(`  ${warning}`));
     }
 
-    console.log(`\n📊 Summary:`);
+    console.log('\n📊 Summary:');
     console.log(`  ✅ Required variables valid: ${report.summary.requiredValid}/${report.summary.totalRequired}`);
     console.log(`  🔌 Optional providers available: ${report.summary.optionalValid}/${report.summary.optionalProviders}`);
     console.log(`  🚀 Test bypass tokens: ${report.summary.testBypassAvailable}/${this.testBypassVars.length}`);

@@ -330,7 +330,7 @@ class MCPIntegrationTester {
     const avgDuration = tests.length > 0 ? 
       tests.reduce((total, test) => total + test.duration, 0) / tests.length : 0;
     
-    summaryText += `\n⚡ Performance:\n`;
+    summaryText += '\n⚡ Performance:\n';
     summaryText += `  • Average test duration: ${avgDuration.toFixed(1)}ms\n`;
     summaryText += `  • Total execution time: ${tests.reduce((total, test) => total + test.duration, 0)}ms\n`;
     

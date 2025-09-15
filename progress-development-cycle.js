@@ -267,21 +267,21 @@ class DevelopmentProgressCycle {
         const planned = this.tasks.filter(t => t.status === 'planned');
         const backlog = this.tasks.filter(t => t.status === 'backlog');
 
-        console.log(`📋 Tasks Overview:`);
+        console.log('📋 Tasks Overview:');
         console.log(`   ✅ Completed: ${completed.length}`);
         console.log(`   🔧 In Progress: ${inProgress.length}`);
         console.log(`   📋 Planned: ${planned.length}`);
         console.log(`   📚 Backlog: ${backlog.length}`);
         console.log('');
 
-        console.log(`📈 Progress Metrics:`);
+        console.log('📈 Progress Metrics:');
         console.log(`   🎯 Overall completion: ${this.roadmap.completionRate}%`);
         console.log(`   ⏱️  Time spent: ${this.roadmap.totalTimeSpent} hours`);
         console.log(`   📊 Next milestone: ${this.roadmap.nextMilestone}`);
         console.log('');
 
         if (completed.length > 0) {
-            console.log(`✅ Recently Completed Tasks:`);
+            console.log('✅ Recently Completed Tasks:');
             completed.forEach(task => {
                 console.log(`   - ${task.title} (${task.area})`);
             });
@@ -289,7 +289,7 @@ class DevelopmentProgressCycle {
         }
 
         if (inProgress.length > 0) {
-            console.log(`🔧 Currently In Progress:`);
+            console.log('🔧 Currently In Progress:');
             inProgress.forEach(task => {
                 console.log(`   - ${task.title} (${task.progress}%)`);
             });

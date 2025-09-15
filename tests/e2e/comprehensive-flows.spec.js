@@ -93,7 +93,7 @@ class ScreenshotManager {
       
       console.log(`💥 Error captured: ${flowType}/${filename}`);
     } catch (screenshotError) {
-      console.error(`❌ Error screenshot failed:`, screenshotError.message);
+      console.error('❌ Error screenshot failed:', screenshotError.message);
     }
   }
 
@@ -142,7 +142,7 @@ test.afterAll(async () => {
   const summaryPath = path.join(reportsDir, 'screenshot-coverage.json');
   fs.writeFileSync(summaryPath, JSON.stringify(report, null, 2));
   
-  console.log(`\n📈 E2E Flow Summary:`);
+  console.log('\n📈 E2E Flow Summary:');
   console.log(`Total steps captured: ${report.totalSteps}`);
   console.log(`Screenshots by flow: auth=${report.summary.authSteps}, settings=${report.summary.settingsSteps}, chat=${report.summary.chatSteps}, recommendations=${report.summary.recommendationsSteps}, errorflow=${report.summary.errorflowSteps}`);
   console.log(`Errors captured: ${report.summary.totalErrors}`);

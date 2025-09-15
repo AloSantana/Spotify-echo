@@ -49,8 +49,8 @@ async function validateIntegration() {
         // Test 2: Gemini Provider
         console.log('\n2️⃣ Testing Gemini LLM Provider...');
         const chatResponse = await axios.post(`${BASE_URL}/api/chat/message`, {
-            message: "Test: Please respond with just 'Gemini provider working' to confirm functionality.",
-            sessionId: "validation-test"
+            message: 'Test: Please respond with just \'Gemini provider working\' to confirm functionality.',
+            sessionId: 'validation-test'
         }, { timeout: 10000 });
         
         if (chatResponse.data.success && chatResponse.data.provider === 'gemini') {

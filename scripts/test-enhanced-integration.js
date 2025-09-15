@@ -260,7 +260,7 @@ async function testClaudeOpusEnhancements() {
           model: 'claude-opus-4-1'
         });
         
-        const content = `<thinking>This is internal reasoning.</thinking>Here is the final answer.`;
+        const content = '<thinking>This is internal reasoning.</thinking>Here is the final answer.';
         const result = provider.extractThinkingTokens(content, 'claude-opus-4-1');
         
         return result.count > 0 && 
@@ -304,7 +304,7 @@ async function testMetricsCollection() {
     const hasGeminiMetrics = metrics.includes('echotune_ai_gemini_requests_total');
     const hasOpusMetrics = metrics.includes('echotune_ai_opus_reasoning_tokens_total');
     
-    console.log(`✅ Metrics collection working`);
+    console.log('✅ Metrics collection working');
     console.log(`   Gemini metrics: ${hasGeminiMetrics ? 'found' : 'missing'}`);
     console.log(`   Opus metrics: ${hasOpusMetrics ? 'found' : 'missing'}`);
     

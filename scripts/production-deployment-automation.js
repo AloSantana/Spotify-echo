@@ -260,7 +260,7 @@ ${report.summary.errors === 0 ?
             this.log('🎉 Production Deployment Completed Successfully!', 'success');
             
             const report = this.generateDeploymentReport();
-            this.log(`📊 Deployment report saved to: PRODUCTION_DEPLOYMENT_REPORT.md`, 'info');
+            this.log('📊 Deployment report saved to: PRODUCTION_DEPLOYMENT_REPORT.md', 'info');
             
             return report;
             

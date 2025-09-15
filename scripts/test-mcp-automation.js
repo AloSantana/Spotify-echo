@@ -468,30 +468,30 @@ class MCPAutomationTester {
         await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
         
         // Generate markdown report
-        let mdReport = `# 🤖 MCP Automation Integration Test Report\n\n`;
+        let mdReport = '# 🤖 MCP Automation Integration Test Report\n\n';
         mdReport += `**Generated:** ${report.timestamp}\n`;
         mdReport += `**Total Tests:** ${report.total_tests}\n`;
         mdReport += `**Success Rate:** ${report.success_rate}%\n\n`;
         
-        mdReport += `## 📊 Test Summary\n\n`;
+        mdReport += '## 📊 Test Summary\n\n';
         mdReport += `- ✅ **Passed:** ${report.passed_tests}\n`;
         mdReport += `- ❌ **Failed:** ${report.failed_tests}\n\n`;
         
-        mdReport += `## 📋 Test Results\n\n`;
+        mdReport += '## 📋 Test Results\n\n';
         
         this.testResults.forEach(result => {
             const status = result.status === 'PASSED' ? '✅' : '❌';
             mdReport += `### ${status} ${result.test}\n\n`;
             
             if (result.status === 'PASSED' && result.details) {
-                mdReport += `**Details:**\n`;
+                mdReport += '**Details:**\n';
                 Object.entries(result.details).forEach(([key, value]) => {
                     mdReport += `- ${key}: ${value}\n`;
                 });
             } else if (result.status === 'FAILED') {
                 mdReport += `**Error:** ${result.error}\n`;
             }
-            mdReport += `\n`;
+            mdReport += '\n';
         });
         
         const mdReportPath = path.join(this.tempDir, 'mcp-automation-test-report.md');

@@ -115,7 +115,7 @@ class ComprehensiveDataMerger {
                 this.log(`  ${config.target.db}.${config.target.collection}: ${targetCount} documents`, 'debug');
 
                 if (sourceCount === 0) {
-                    this.log(`    Warning: Source collection is empty`, 'warn');
+                    this.log('    Warning: Source collection is empty', 'warn');
                 }
             }
 
@@ -396,7 +396,7 @@ class ComprehensiveDataMerger {
         const markdownReport = this.generateMarkdownReport();
         fs.writeFileSync(mdReportPath, markdownReport);
         
-        this.log(`Comprehensive merge reports saved:`, 'info');
+        this.log('Comprehensive merge reports saved:', 'info');
         this.log(`  JSON: ${reportPath}`, 'info'); 
         this.log(`  Markdown: ${mdReportPath}`, 'info');
         

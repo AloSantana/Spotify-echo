@@ -376,7 +376,7 @@ class PerformanceTester {
           recommendations.push({
             type: 'regression',
             scenario: name,
-            message: `Performance regression detected since baseline`,
+            message: 'Performance regression detected since baseline',
             suggestions: [
               'Review recent code changes',
               'Check for new dependencies or database migrations',
@@ -451,7 +451,7 @@ class PerformanceTester {
       });
     }
     
-    console.log(`\n📄 Detailed report saved to: reports/performance-smoke-test.json`);
+    console.log('\n📄 Detailed report saved to: reports/performance-smoke-test.json');
   }
 }
 

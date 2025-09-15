@@ -1027,7 +1027,7 @@ if (require.main === module) {
             console.log('\n🎉 MCP Production Automation Completed!');
             console.log(`🤖 MCP servers available: ${Object.values(results.mcp_servers).filter(s => s.status === 'available').length}`);
             console.log(`🔧 Optimizations applied: ${results.optimizations_applied.length}`);
-            console.log(`📋 View detailed report: MCP_PRODUCTION_AUTOMATION_REPORT.md`);
+            console.log('📋 View detailed report: MCP_PRODUCTION_AUTOMATION_REPORT.md');
             
             // Exit with success
             process.exit(0);

@@ -761,7 +761,7 @@ return [{ json: alert }];
             
             if (existingWorkflow) {
                 console.log(`   ⚠️  Workflow "${workflow.name}" already exists (ID: ${existingWorkflow.id})`);
-                console.log(`   🔄 Updating existing workflow...`);
+                console.log('   🔄 Updating existing workflow...');
                 
                 const response = await axios.put(`${this.apiUrl}/api/v1/workflows/${existingWorkflow.id}`, workflow, {
                     headers: this.baseHeaders,

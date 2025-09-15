@@ -374,7 +374,7 @@ class N8nTemplateAnalyzerConfigurator {
                 } else {
                     // Store the configuration for manual creation
                     this.report.workflows.created.push(workflowConfig);
-                    console.log(`      📝 Workflow configuration prepared for manual creation`);
+                    console.log('      📝 Workflow configuration prepared for manual creation');
                 }
                 
                 this.report.status.workflowsCreated++;
@@ -395,7 +395,7 @@ class N8nTemplateAnalyzerConfigurator {
             }
         }
         
-        console.log(`\n   📊 Configuration Results:`);
+        console.log('\n   📊 Configuration Results:');
         console.log(`      ✅ Successfully configured: ${this.report.status.workflowsCreated}`);
         console.log(`      ❌ Failed configurations: ${this.report.workflows.failed.length}`);
     }

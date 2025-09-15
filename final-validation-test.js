@@ -51,7 +51,7 @@ async function runFinalValidation() {
         console.log('\n🔬 Test 2: Repository Analysis Capability');
         console.log('------------------------------------------');
         
-        const repoContext = `Test repository analysis for validation`;
+        const repoContext = 'Test repository analysis for validation';
         const repoAnalysis = await automation.analyzeRepositoryForAutomation(repoContext);
         
         if (repoAnalysis.success) {
@@ -68,7 +68,7 @@ async function runFinalValidation() {
         console.log('\n📋 Test 3: Roadmap Generation & Task Creation');
         console.log('----------------------------------------------');
         
-        const roadmapContext = `Current roadmap: Basic features implemented, need enhancement`;
+        const roadmapContext = 'Current roadmap: Basic features implemented, need enhancement';
         const roadmapAnalysis = await automation.analyzeRoadmapForUpdates(roadmapContext, 'Sample insights');
         
         if (roadmapAnalysis.success) {

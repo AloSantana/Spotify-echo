@@ -778,7 +778,7 @@ ${this.automationResults.screenshots.map(screenshot =>
 
             await fs.writeFile(mdReportPath, mdReport);
 
-            console.log(`   ✅ Automation reports generated:`);
+            console.log('   ✅ Automation reports generated:');
             console.log(`      - JSON: ${jsonReportPath}`);
             console.log(`      - Markdown: ${mdReportPath}`);
 

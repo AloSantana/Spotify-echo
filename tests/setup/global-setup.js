@@ -362,12 +362,12 @@ expect.extend({
     
     if (pass) {
       return {
-        message: () => `Expected response not to be a valid API response`,
+        message: () => 'Expected response not to be a valid API response',
         pass: true,
       };
     } else {
       return {
-        message: () => `Expected response to be a valid API response with 'status' and 'data'/'error' properties`,
+        message: () => 'Expected response to be a valid API response with \'status\' and \'data\'/\'error\' properties',
         pass: false,
       };
     }
@@ -399,8 +399,8 @@ expect.extend({
     
     return {
       message: () => pass 
-        ? `Expected response not to be a valid MCP response`
-        : `Expected response to be a valid MCP response with 'result'/'error' and 'id' properties`,
+        ? 'Expected response not to be a valid MCP response'
+        : 'Expected response to be a valid MCP response with \'result\'/\'error\' and \'id\' properties',
       pass,
     };
   }
