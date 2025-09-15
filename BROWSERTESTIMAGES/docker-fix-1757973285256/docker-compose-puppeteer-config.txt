@@ -1,0 +1,16 @@
+DOCKER COMPOSE PUPPETEER CONFIGURATION
+=====================================
+
+✅ Production Environment Variables:
+- PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+- PUPPETEER_SKIP_DOWNLOAD=true  
+- PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
+✅ Development Configuration:
+- Same variables applied to docker-compose.yml
+- Compatible with docker-compose.production.yml
+
+✅ Runtime Benefits:
+- No Puppeteer download during container startup
+- Uses system-installed Chromium
+- Reduced build time and image size

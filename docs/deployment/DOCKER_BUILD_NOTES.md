@@ -1,5 +1,38 @@
 # EchoTune AI - Docker Build Notes
 
+## Puppeteer Fix (Latest Update)
+
+**✅ Docker Build Issue Fixed**: The concurrent Puppeteer installation issue has been resolved!
+
+### Problem
+Docker builds were failing due to Puppeteer trying to download Chromium during `npm install`, causing concurrent download conflicts and build failures.
+
+### Solution
+Added environment variables to skip Puppeteer downloads and use system-installed Chromium:
+
+```dockerfile
+# Skip Puppeteer download during install
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
+# Install Chromium via Alpine package manager
+RUN apk add --no-cache chromium
+
+# Configure Puppeteer to use system Chromium
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+```
+
+### Testing
+Run the Docker fix validation:
+```bash
+npm run test:docker-fix
+```
+
+### Docker Compose Configuration
+Both `docker-compose.yml` and `docker-compose.production.yml` now include Puppeteer environment variables for consistent behavior.
+
+---
+
 ## Production Build
 The Dockerfile now uses `requirements-production.txt` which includes only the essential dependencies needed for the core application to run. This avoids complex scientific package compilation issues in Alpine Linux.
 

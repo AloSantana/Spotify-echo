@@ -16,6 +16,9 @@ COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
 # 2) Install deps
 # ------------------------------
 FROM base AS deps
+# Skip Puppeteer download during install to prevent Docker build failures
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 # Prefer npm; support others if lockfiles present
 RUN if [ -f package-lock.json ]; then npm ci --legacy-peer-deps; \
     elif [ -f pnpm-lock.yaml ]; then npm i -g pnpm && pnpm i --frozen-lockfile; \
@@ -27,6 +30,9 @@ RUN if [ -f package-lock.json ]; then npm ci --legacy-peer-deps; \
 # ------------------------------
 FROM base AS prod-deps
 COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
+# Skip Puppeteer download during production install
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 RUN if [ -f package-lock.json ]; then npm ci --omit=dev --legacy-peer-deps; \
     elif [ -f pnpm-lock.yaml ]; then npm i -g pnpm && pnpm i --frozen-lockfile --prod; \
     elif [ -f yarn.lock ]; then npm i -g yarn && YARN_PRODUCTION=true yarn --frozen-lockfile; \
@@ -55,8 +61,9 @@ ENV NODE_ENV=production \
     BUILD_SHA=${BUILD_SHA} \
     BUILD_TIME=${BUILD_TIME}
 
-# Install curl/wget and runtime libs for native modules
-RUN apk add --no-cache curl wget libstdc++
+# Install curl/wget and runtime libs for native modules, plus Chromium for Puppeteer
+RUN apk add --no-cache curl wget libstdc++ chromium
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 # Create non-root user
 RUN addgroup -S nodeapp && adduser -S nodeapp -G nodeapp
