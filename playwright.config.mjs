@@ -34,8 +34,8 @@ export default defineConfig({
   ],
   
   /* Global setup and teardown */
-  globalSetup: require.resolve('./tests/setup/global-setup.js'),
-  globalTeardown: require.resolve('./tests/setup/global-teardown.js'),
+  globalSetup: './tests/setup/global-setup.js',
+  globalTeardown: './tests/setup/global-teardown.js',
   
   /* Shared settings for all projects */
   use: {
