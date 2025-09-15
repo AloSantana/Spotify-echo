@@ -1,8 +1,8 @@
 {
-  "startup_time": "2025-09-15T18:58:00.394Z",
+  "startup_time": "2025-09-15T19:09:22.052Z",
   "status": "completed",
   "mcp_servers": {
-    "total": 5,
+    "total": 6,
     "running": 0,
     "config_file": "/tmp/mcp-merged-config.json",
     "log_file": "/home/runner/work/Spotify-echo/Spotify-echo/mcp-startup.log"
