@@ -10,6 +10,13 @@ const ExplainableRecommendations = lazy(() => import('./components/ExplainableRe
 const EnhancedChatInterface = lazy(() => import('./components/EnhancedChatInterface'));
 const EnhancedMusicDiscovery = lazy(() => import('./components/EnhancedMusicDiscovery'));
 const EnhancedAnalyticsDashboard = lazy(() => import('./components/EnhancedAnalyticsDashboard'));
+
+// New enhanced UI components
+const AdvancedMusicControlCenter = lazy(() => import('./components/AdvancedMusicControlCenter'));
+const EnhancedMusicDiscoveryDashboard = lazy(() => import('./components/EnhancedMusicDiscoveryDashboard'));
+const AdvancedAnalyticsVisualizationDashboard = lazy(() => import('./components/AdvancedAnalyticsVisualizationDashboard'));
+const ModernChatInterface = lazy(() => import('./components/ModernChatInterface'));
+const AdvancedPlaylistManagement = lazy(() => import('./components/AdvancedPlaylistManagement'));
 const InsightsDashboard = lazy(() => import('./components/InsightsDashboard'));
 const SongsPage = lazy(() => import('./components/SongsPage'));
 const MobileResponsiveManager = lazy(() => import('./components/MobileResponsiveManager'));
@@ -288,6 +295,93 @@ function MainApplication({ initialTab = 'chat' }) {
     };
   };
 
+  // Mock playlists data
+  const mockPlaylists = [
+    {
+      id: 'playlist1',
+      name: 'My Favorites',
+      description: 'All my favorite tracks',
+      image: '/playlist1.jpg',
+      isPublic: true,
+      collaborative: false,
+      owner: 'You',
+      collaborators: [],
+      trackCount: 25,
+      duration: 6720,
+      lastModified: new Date('2024-01-07'),
+      tags: ['favorites', 'mixed']
+    }
+  ];
+
+  // Additional handler functions for enhanced components
+  const onPlayTrack = useCallback((track) => {
+    console.log('Playing track:', track);
+    // Handle track playback
+  }, []);
+
+  const onLikeTrack = useCallback((trackId, liked) => {
+    console.log('Toggling like for track:', trackId, liked);
+    // Handle track like/unlike
+  }, []);
+
+  const onShareTrack = useCallback((track) => {
+    console.log('Sharing track:', track);
+    // Handle track sharing
+  }, []);
+
+  const handleDiscoverMusic = useCallback(async (discoveryParams) => {
+    console.log('Discovering music with params:', discoveryParams);
+    // Mock discovery results
+    return mockRecommendations;
+  }, []);
+
+  const handleTimeRangeChange = useCallback((timeRange) => {
+    console.log('Time range changed:', timeRange);
+  }, []);
+
+  const handleExportData = useCallback(() => {
+    console.log('Exporting analytics data');
+  }, []);
+
+  const handleRefreshData = useCallback(() => {
+    console.log('Refreshing analytics data');
+  }, []);
+
+  const handleCreatePlaylist = useCallback(async (playlistData) => {
+    console.log('Creating playlist:', playlistData);
+    return { success: true, playlistId: `playlist_${Date.now()}` };
+  }, []);
+
+  const handleUpdatePlaylist = useCallback(async (playlistId, updates) => {
+    console.log('Updating playlist:', playlistId, updates);
+    return { success: true };
+  }, []);
+
+  const handleDeletePlaylist = useCallback(async (playlistId) => {
+    console.log('Deleting playlist:', playlistId);
+    return { success: true };
+  }, []);
+
+  const handleCollaboratePlaylist = useCallback(async (playlistId, collaborators) => {
+    console.log('Adding collaborators to playlist:', playlistId, collaborators);
+    return { success: true };
+  }, []);
+
+  const handleReorderTracks = useCallback(async (playlistId, reorderedTracks) => {
+    console.log('Reordering tracks in playlist:', playlistId, reorderedTracks);
+    return { success: true };
+  }, []);
+
+  const handleAddTrack = useCallback(async (playlistId, track) => {
+    console.log('Adding track to playlist:', playlistId, track);
+    return { success: true };
+  }, []);
+
+  const handleRemoveTrack = useCallback(async (playlistId, trackId) => {
+    console.log('Removing track from playlist:', playlistId, trackId);
+    return { success: true };
+  }, []);
+
   const handlePrefetch = (tab) => {
     const run = prefetchers[tab];
     if (run) {
@@ -402,10 +496,12 @@ function MainApplication({ initialTab = 'chat' }) {
                   </Box>
                 }
               >
-                <EnhancedChatInterface
+                <ModernChatInterface
                   sessionId={sessionId}
                   onSendMessage={handleSendChatMessage}
-                  onProvideFeedback={handleProvideFeedback}
+                  onPlayTrack={onPlayTrack}
+                  onLikeTrack={onLikeTrack}
+                  onShareTrack={onShareTrack}
                   loading={false}
                 />
               </AuthGuard>
@@ -425,13 +521,20 @@ function MainApplication({ initialTab = 'chat' }) {
 
           {currentTab === 'playlist' && (
             <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
-              <PlaylistBuilder
-                initialTracks={[]}
-                recommendations={mockRecommendations}
-                onSave={handleSavePlaylist}
-                onShare={handleSharePlaylist}
-                onGetExplanation={handleGetExplanation}
-                onProvideFeedback={handleProvideFeedback}
+              <AdvancedPlaylistManagement
+                playlists={mockPlaylists}
+                tracks={mockRecommendations}
+                onCreatePlaylist={handleCreatePlaylist}
+                onUpdatePlaylist={handleUpdatePlaylist}
+                onDeletePlaylist={handleDeletePlaylist}
+                onPlayTrack={onPlayTrack}
+                onLikeTrack={onLikeTrack}
+                onSharePlaylist={handleSharePlaylist}
+                onCollaboratePlaylist={handleCollaboratePlaylist}
+                onReorderTracks={handleReorderTracks}
+                onAddTrack={handleAddTrack}
+                onRemoveTrack={handleRemoveTrack}
+                loading={false}
               />
             </Container>
           )}
@@ -450,7 +553,13 @@ function MainApplication({ initialTab = 'chat' }) {
 
           {currentTab === 'discovery' && (
             <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
-              <EnhancedMusicDiscovery />
+              <EnhancedMusicDiscoveryDashboard
+                onDiscoverMusic={handleDiscoverMusic}
+                onPlayTrack={onPlayTrack}
+                onLikeTrack={onLikeTrack}
+                onShareTrack={onShareTrack}
+                loading={false}
+              />
             </Container>
           )}
 
@@ -469,7 +578,13 @@ function MainApplication({ initialTab = 'chat' }) {
                   </Box>
                 }
               >
-                <EnhancedAnalyticsDashboard />
+                <AdvancedAnalyticsVisualizationDashboard
+                  timeRange="month"
+                  onTimeRangeChange={handleTimeRangeChange}
+                  onExportData={handleExportData}
+                  onRefreshData={handleRefreshData}
+                  loading={false}
+                />
               </AuthGuard>
             </Container>
           )}
