@@ -4,6 +4,7 @@
  */
 
 const MongoDBManager = require('../database/mongodb-manager');
+const logger = require('../api/utils/logger');
 
 class UserSettingsService {
   constructor() {
@@ -30,10 +31,10 @@ class UserSettingsService {
       // Create indexes
       await this.createIndexes();
       
-      console.log('✅ UserSettingsService initialized');
+      logger.info('UserSettingsService initialized');
       return true;
     } catch (error) {
-      console.error('❌ Failed to initialize UserSettingsService:', error);
+      logger.error('Failed to initialize UserSettingsService', { error: error.message });
       throw error;
     }
   }
@@ -43,9 +44,9 @@ class UserSettingsService {
       // Create compound index for efficient lookups
       await this.collection.createIndex({ userId: 1 }, { unique: true });
       await this.collection.createIndex({ updatedAt: -1 });
-      console.log('✅ User settings indexes created');
+      logger.info('User settings indexes created');
     } catch (error) {
-      console.warn('⚠️ Failed to create user settings indexes:', error.message);
+      logger.error('Failed to create user settings indexes', { error: error.message });
     }
   }
 
@@ -113,7 +114,7 @@ class UserSettingsService {
         isDefault: false
       };
     } catch (error) {
-      console.error('Error getting user settings:', error);
+      logger.error('Error getting user settings', { userId, error: error.message });
       throw new Error(`Failed to get user settings: ${error.message}`);
     }
   }
@@ -131,18 +132,29 @@ class UserSettingsService {
         await this.initialize();
       }
 
+      // Extract updatedAt from request body for primary concurrency control
+      const clientUpdatedAt = updates.updatedAt;
+      const cleanUpdates = { ...updates };
+      delete cleanUpdates.updatedAt; // Remove from updates to avoid overwriting server timestamp
+
       // Validate updates
-      this.validateSettings(updates);
+      this.validateSettings(cleanUpdates);
 
       const now = new Date();
       const updateDoc = {
-        ...updates,
+        ...cleanUpdates,
         updatedAt: now
       };
 
       // Build query with optimistic concurrency check
       const query = { userId };
-      if (lastUpdated) {
+      
+      // Primary concurrency control: use updatedAt from request body
+      if (clientUpdatedAt) {
+        query.updatedAt = { $lte: new Date(clientUpdatedAt) };
+      } 
+      // Fallback concurrency control: use If-Unmodified-Since header (legacy compatibility)
+      else if (lastUpdated) {
         query.updatedAt = { $lte: new Date(lastUpdated) };
       }
 
@@ -173,17 +185,18 @@ class UserSettingsService {
       if (!result.value) {
         // Concurrency conflict detected
         const currentSettings = await this.getUserSettings(userId);
-        throw new Error('Settings were modified by another process. Please refresh and try again.', {
-          code: 'CONCURRENCY_CONFLICT',
-          currentSettings
-        });
+        const error = new Error('Settings were modified by another process. Please refresh and try again.');
+        error.code = 'VERSION_CONFLICT';
+        error.serverVersion = currentSettings.updatedAt;
+        error.serverState = currentSettings;
+        throw error;
       }
 
-      console.log(`✅ Updated settings for user ${userId}`);
+      logger.info('Updated settings for user', { userId });
       return result.value;
     } catch (error) {
-      console.error('Error updating user settings:', error);
-      if (error.message.includes('CONCURRENCY_CONFLICT')) {
+      logger.error('Error updating user settings', { userId, error: error.message });
+      if (error.code === 'VERSION_CONFLICT') {
         throw error;
       }
       throw new Error(`Failed to update user settings: ${error.message}`);
@@ -264,10 +277,10 @@ class UserSettingsService {
         throw new Error('User settings not found');
       }
 
-      console.log(`✅ Deleted settings for user ${userId}`);
+      logger.info('Deleted settings for user', { userId });
       return true;
     } catch (error) {
-      console.error('Error deleting user settings:', error);
+      logger.error('Error deleting user settings', { userId, error: error.message });
       throw new Error(`Failed to delete user settings: ${error.message}`);
     }
   }
@@ -292,7 +305,7 @@ class UserSettingsService {
 
       return settings;
     } catch (error) {
-      console.error('Error getting bulk user settings:', error);
+      logger.error('Error getting bulk user settings', { userIds: userIds?.length, error: error.message });
       throw new Error(`Failed to get bulk user settings: ${error.message}`);
     }
   }
@@ -372,7 +385,7 @@ class UserSettingsService {
         privacyOptIn: 0
       };
     } catch (error) {
-      console.error('Error getting usage statistics:', error);
+      logger.error('Error getting usage statistics', { error: error.message });
       throw new Error(`Failed to get usage statistics: ${error.message}`);
     }
   }

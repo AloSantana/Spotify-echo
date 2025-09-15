@@ -639,6 +639,11 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/system', systemRoutes);
 app.use('/api/settings', llmProvidersRoutes); // Enhanced LLM provider management
 app.use('/api/settings', advancedSettingsRoutes); // Advanced Settings UI API
+
+// Legacy user-settings routes for backward compatibility
+const legacyUserSettingsRoutes = require('./routes/user-settings');
+app.use('/api/user-settings', legacyUserSettingsRoutes); // Legacy compatibility routes
+
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/insights', insightsRoutes); // Enhanced Spotify insights with caching and pagination
 app.use('/api/feedback', feedbackRoutes); // New feedback system

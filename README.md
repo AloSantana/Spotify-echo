@@ -106,6 +106,50 @@ graph TB
 
 ---
 
+## 🚀 Phase 3: User Settings System
+
+### 🎯 Phase 3 Status: Implementation Complete
+
+**Phase 3: User Settings System – Implementation complete (pending final docs alignment)**
+
+Phase 3 introduces a comprehensive user settings system that enables personalized music discovery through configurable LLM providers, recommendation strategy weights, privacy controls, and playlist defaults.
+
+**Key Features Implemented:**
+- ✅ **Multi-Provider LLM Configuration**: Switch between OpenAI, Gemini, OpenRouter, and Mock providers
+- ✅ **Recommendation Strategy Weights**: Fine-tune collaborative, content-based, semantic, and diversity algorithms  
+- ✅ **Privacy Controls**: Granular control over data collection and analytics sharing
+- ✅ **Playlist Defaults**: Customizable templates and auto-sync preferences
+- ✅ **Optimistic Concurrency Control**: Conflict resolution with `updatedAt` timestamps
+- ✅ **Provider Fallback Logic**: Automatic provider switching when services are unavailable
+- ✅ **Comprehensive API**: RESTful endpoints with consistent error responses
+
+**Documentation:**
+- 📖 [Phase 3 Technical Specification](docs/phase3.md)
+- 👤 [User Settings Guide](docs/USER_SETTINGS.md)
+- 🔗 **Implementation PR**: [#37 - feat: Implement Phase 3 User Settings & Backend Integration](https://github.com/primoscope/Spotify-echo/pull/37)
+
+### 📊 Phase 3 Architecture
+
+```mermaid
+graph TB
+    A[User Settings UI] --> B[Settings API /api/settings]
+    B --> C[UserSettingsService]
+    C --> D[MongoDB Collection]
+    
+    B --> E[Provider Validation]
+    B --> F[Concurrency Control]
+    B --> G[Privacy Gating]
+    
+    H[Recommendation Engine] --> C
+    I[LLM Providers] --> E
+    J[Analytics System] --> G
+    
+    K[Legacy Routes /api/user-settings] --> B
+    L[Provider Status /api/providers/status] --> M[Provider Health Check]
+```
+
+---
+
 ## 🌟 Overview
 
 EchoTune AI is a sophisticated music recommendation platform that combines the power of Spotify's music catalog with cutting-edge AI technologies. It provides personalized music discovery through conversational interfaces, advanced machine learning algorithms, and comprehensive analytics.
