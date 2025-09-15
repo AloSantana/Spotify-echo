@@ -8,6 +8,7 @@ const Ajv = require('ajv');
 const addFormats = require('ajv-formats');
 const fs = require('fs');
 const path = require('path');
+const logger = require('../api/utils/logger');
 
 class UserSettingsService {
   constructor() {
@@ -39,10 +40,10 @@ class UserSettingsService {
       // Create indexes
       await this.createIndexes();
       
-      console.log('✅ UserSettingsService initialized');
+      logger.info('UserSettingsService initialized');
       return true;
     } catch (error) {
-      console.error('❌ Failed to initialize UserSettingsService:', error);
+      logger.error('Failed to initialize UserSettingsService', { error: error.message });
       throw error;
     }
   }
@@ -52,9 +53,9 @@ class UserSettingsService {
       // Create compound index for efficient lookups
       await this.collection.createIndex({ userId: 1 }, { unique: true });
       await this.collection.createIndex({ updatedAt: -1 });
-      console.log('✅ User settings indexes created');
+      logger.info('User settings indexes created');
     } catch (error) {
-      console.warn('⚠️ Failed to create user settings indexes:', error.message);
+      logger.error('Failed to create user settings indexes', { error: error.message });
     }
   }
 
@@ -220,7 +221,7 @@ class UserSettingsService {
         isDefault: false
       };
     } catch (error) {
-      console.error('Error getting user settings:', error);
+      logger.error('Error getting user settings', { userId, error: error.message });
       throw new Error(`Failed to get user settings: ${error.message}`);
     }
   }
@@ -238,65 +239,56 @@ class UserSettingsService {
         await this.initialize();
       }
 
-      // Validate and sanitize updates
+      // Validate and sanitize updates first using our enhanced AJV validation
       const sanitizedUpdates = this.validateAndNormalizeSettings(updates);
+
+      // Extract updatedAt from request body for primary concurrency control
+      const clientUpdatedAt = sanitizedUpdates.updatedAt || expectedUpdatedAt;
+      const cleanUpdates = { ...sanitizedUpdates };
+      delete cleanUpdates.updatedAt; // Remove from updates to avoid overwriting server timestamp
 
       const now = new Date();
       const updateDoc = {
-        ...sanitizedUpdates,
+        ...cleanUpdates,
         updatedAt: now
       };
 
-      // Check if user exists first
-      const existingUser = await this.collection.findOne({ userId });
-      
-      if (!existingUser) {
-        // New user - create with defaults merged
-        const defaultSettings = this.getDefaultSettings();
-        const newUserDoc = {
-          userId,
-          ...defaultSettings,
-          ...updateDoc,
-          createdAt: now,
-          updatedAt: now
-        };
-
-        const result = await this.collection.insertOne(newUserDoc);
-        return { ...newUserDoc, _id: result.insertedId };
-      }
-
-      // Existing user - check optimistic concurrency
+      // Build query with optimistic concurrency check
       const query = { userId };
-      if (expectedUpdatedAt) {
-        // Convert to Date if string
-        const expectedDate = new Date(expectedUpdatedAt);
-        const actualDate = new Date(existingUser.updatedAt);
-        
-        if (actualDate.getTime() !== expectedDate.getTime()) {
-          // Version conflict - return current state
-          const conflictError = new Error('VERSION_CONFLICT');
-          conflictError.code = 'VERSION_CONFLICT';
-          conflictError.serverVersion = existingUser.updatedAt;
-          conflictError.serverState = existingUser;
-          throw conflictError;
-        }
+      
+      // Primary concurrency control: use updatedAt from request body or expectedUpdatedAt
+      if (clientUpdatedAt) {
+        query.updatedAt = { $lte: new Date(clientUpdatedAt) };
+      } 
+      // Fallback concurrency control: use If-Unmodified-Since header (legacy compatibility)
+      else if (expectedUpdatedAt) {
+        query.updatedAt = { $lte: new Date(expectedUpdatedAt) };
       }
 
       const result = await this.collection.findOneAndUpdate(
         query,
         { $set: updateDoc },
-        { returnDocument: 'after' }
+        { returnDocument: 'after', upsert: true }
       );
 
       if (!result.value) {
-        throw new Error('Failed to update user settings');
+        // Concurrency conflict detected
+        const currentSettings = await this.getUserSettings(userId);
+        const error = new Error('Settings were modified by another process. Please refresh and try again.');
+        error.code = 'VERSION_CONFLICT';
+        error.serverVersion = currentSettings.updatedAt;
+        error.serverState = currentSettings;
+        throw error;
       }
 
-      console.log(`✅ Updated settings for user ${userId}`);
+      logger.info('Updated settings for user', { userId });
       return result.value;
     } catch (error) {
-      console.error('Error updating user settings:', error);
-      throw error;
+      logger.error('Error updating user settings', { userId, error: error.message });
+      if (error.code === 'VERSION_CONFLICT') {
+        throw error;
+      }
+      throw new Error(`Failed to update user settings: ${error.message}`);
     }
   }
 
@@ -393,15 +385,68 @@ class UserSettingsService {
   }
 
   /**
-   * Legacy validation method - now mostly handled by AJV
+   * Legacy validation method - enhanced with main branch compatibility
+   * Fallback validation when AJV is not available or fails
    */
   validateSettings(settings) {
-    // This method is kept for backward compatibility
-    // Most validation is now handled by validateAndNormalizeSettings
+    // First try AJV validation if available
     try {
       this.validateAndNormalizeSettings(settings);
+      return; // If AJV succeeds, we're done
     } catch (error) {
-      throw error;
+      // If AJV fails, continue with manual validation as fallback
+      logger.warn('AJV validation failed, using manual validation', { error: error.message });
+    }
+
+    // Manual validation for backward compatibility
+    // Validate LLM provider
+    if (settings.llmProvider) {
+      const validProviders = ['openai', 'openrouter', 'gemini'];
+      if (!validProviders.includes(settings.llmProvider)) {
+        throw new Error(`Invalid LLM provider: ${settings.llmProvider}. Must be one of: ${validProviders.join(', ')}`);
+      }
+    }
+
+    // Validate strategy weights
+    if (settings.strategyWeights) {
+      const weights = settings.strategyWeights;
+      const requiredKeys = ['collaborative', 'content', 'semantic', 'diversity'];
+      
+      for (const key of requiredKeys) {
+        if (key in weights) {
+          const value = weights[key];
+          if (typeof value !== 'number' || value < 0 || value > 1) {
+            throw new Error(`Strategy weight ${key} must be a number between 0 and 1`);
+          }
+        }
+      }
+
+      // Check that weights sum to approximately 1 (allowing for floating point precision)
+      const validKeys = Object.keys(weights).filter(k => requiredKeys.includes(k));
+      if (validKeys.length === requiredKeys.length) {
+        const sum = validKeys.reduce((acc, key) => acc + weights[key], 0);
+        if (Math.abs(sum - 1.0) > 0.01) {
+          throw new Error('Strategy weights must sum to 1.0');
+        }
+      }
+    }
+
+    // Validate privacy settings
+    if (settings.privacy) {
+      const privacy = settings.privacy;
+      ['storeHistory', 'shareAnalytics', 'enableTelemetry'].forEach(key => {
+        if (key in privacy && typeof privacy[key] !== 'boolean') {
+          throw new Error(`Privacy setting ${key} must be a boolean`);
+        }
+      });
+    }
+
+    // Validate preferences
+    if (settings.preferences) {
+      const prefs = settings.preferences;
+      if (prefs.maxRecommendations && (typeof prefs.maxRecommendations !== 'number' || prefs.maxRecommendations < 1 || prefs.maxRecommendations > 100)) {
+        throw new Error('maxRecommendations must be a number between 1 and 100');
+      }
     }
   }
 
@@ -424,10 +469,10 @@ class UserSettingsService {
         throw new Error('User settings not found');
       }
 
-      console.log(`✅ Deleted settings for user ${userId}`);
+      logger.info('Deleted settings for user', { userId });
       return true;
     } catch (error) {
-      console.error('Error deleting user settings:', error);
+      logger.error('Error deleting user settings', { userId, error: error.message });
       throw new Error(`Failed to delete user settings: ${error.message}`);
     }
   }
@@ -452,7 +497,7 @@ class UserSettingsService {
 
       return settings;
     } catch (error) {
-      console.error('Error getting bulk user settings:', error);
+      logger.error('Error getting bulk user settings', { userIds: userIds?.length, error: error.message });
       throw new Error(`Failed to get bulk user settings: ${error.message}`);
     }
   }
@@ -532,7 +577,7 @@ class UserSettingsService {
         privacyOptIn: 0
       };
     } catch (error) {
-      console.error('Error getting usage statistics:', error);
+      logger.error('Error getting usage statistics', { error: error.message });
       throw new Error(`Failed to get usage statistics: ${error.message}`);
     }
   }

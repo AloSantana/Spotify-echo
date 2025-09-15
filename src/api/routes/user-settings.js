@@ -12,13 +12,13 @@ const settingsService = new UserSettingsService();
 
 // Middleware to ensure user authentication
 const requireAuth = (req, res, next) => {
-  // Extract user ID from request (assuming it's set by auth middleware)
-  const userId = req.user?.id || req.headers['x-user-id'] || req.query.userId;
+  // Extract user ID from request (only secure methods)
+  const userId = req.user?.id || req.headers['x-user-id'];
   
   if (!userId) {
     return res.status(401).json({
       error: 'Authentication required',
-      message: 'User ID must be provided'
+      message: 'User ID must be provided via a secure method'
     });
   }
   
@@ -26,9 +26,10 @@ const requireAuth = (req, res, next) => {
   next();
 };
 
-// Middleware for admin operations
+// Middleware for admin operations - enhanced security
 const requireAdmin = (req, res, next) => {
-  const isAdmin = req.user?.role === 'admin' || req.headers['x-admin-key'] === process.env.ADMIN_SECRET_KEY;
+  // Only allow role-based admin access for security
+  const isAdmin = req.user?.role === 'admin';
   
   if (!isAdmin) {
     return res.status(403).json({
@@ -138,9 +139,24 @@ router.patch('/', requireAuth, async (req, res) => {
       });
     }
 
-    // For PATCH, we only update the provided fields
+    // Helper for deep merging objects
+    const deepMerge = (target, source) => {
+      const output = { ...target };
+      if (target && typeof target === 'object' && source && typeof source === 'object') {
+        Object.keys(source).forEach(key => {
+          if (source[key] && typeof source[key] === 'object' && key in target) {
+            output[key] = deepMerge(target[key], source[key]);
+          } else {
+            output[key] = source[key];
+          }
+        });
+      }
+      return output;
+    };
+
+    // For PATCH, we only update the provided fields using deep merge
     const currentSettings = await settingsService.getUserSettings(req.userId);
-    const mergedUpdates = { ...currentSettings, ...updates };
+    const mergedUpdates = deepMerge(currentSettings, updates);
     
     // Remove sensitive fields
     delete mergedUpdates.userId;
@@ -309,8 +325,9 @@ router.get('/providers/status', async (req, res) => {
       }
     };
 
-    // Find default provider
-    const defaultProvider = Object.values(providers).find(p => p.default && p.available)?.id || 'openai';
+    // Find default provider - select first available if default is unavailable
+    const availableProviders = Object.values(providers).filter(p => p.available);
+    const defaultProvider = availableProviders.find(p => p.default)?.id || availableProviders[0]?.id || null;
 
     res.json({
       success: true,

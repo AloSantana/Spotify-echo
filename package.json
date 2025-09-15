@@ -83,6 +83,7 @@
     "build:frontend": "vite build",
     "preview": "vite preview",
     "test": "jest --config tests/jest.config.js",
+    "test:coverage": "jest --config tests/jest.config.js --coverage",
     "test:watch": "jest --watch",
     "test:integration": "jest tests/integration --coverage",
     "test:unit": "jest tests/unit --coverage",

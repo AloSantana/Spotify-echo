@@ -6,6 +6,7 @@
 const express = require('express');
 const router = express.Router();
 const UserSettingsService = require('../services/UserSettingsService');
+const logger = require('../api/utils/logger');
 
 // Initialize settings service
 const settingsService = new UserSettingsService();
@@ -54,9 +55,9 @@ router.get('/', requireAuth, async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error getting user settings:', error);
+    logger.error('Error getting user settings', { userId: req.userId, error: error.message });
     res.status(500).json({
-      error: 'Internal server error',
+      error: 'INTERNAL_SERVER_ERROR',
       message: 'Failed to retrieve user settings'
     });
   }
@@ -97,12 +98,12 @@ router.put('/', requireAuth, async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error updating user settings:', error);
+    logger.error('Error updating user settings', { userId: req.userId, error: error.message });
     
     if (error.code === 'VERSION_CONFLICT') {
       return res.status(409).json({
         error: 'VERSION_CONFLICT',
-        message: 'Settings were modified by another process. Please refresh and try again.',
+        message: error.message,
         serverVersion: error.serverVersion,
         serverState: error.serverState
       });
@@ -110,13 +111,13 @@ router.put('/', requireAuth, async (req, res) => {
     
     if (error.message.includes('Validation failed') || error.message.includes('must be')) {
       return res.status(400).json({
-        error: 'Validation error',
+        error: 'VALIDATION_ERROR',
         message: error.message
       });
     }
 
     res.status(500).json({
-      error: 'Internal server error',
+      error: 'INTERNAL_SERVER_ERROR',
       message: 'Failed to update user settings'
     });
   }
@@ -161,12 +162,12 @@ router.patch('/', requireAuth, async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error partially updating user settings:', error);
+    logger.error('Error partially updating user settings', { userId: req.userId, error: error.message });
     
     if (error.code === 'VERSION_CONFLICT') {
       return res.status(409).json({
         error: 'VERSION_CONFLICT',
-        message: 'Settings were modified by another process. Please refresh and try again.',
+        message: error.message,
         serverVersion: error.serverVersion,
         serverState: error.serverState
       });
@@ -174,13 +175,13 @@ router.patch('/', requireAuth, async (req, res) => {
     
     if (error.message.includes('Validation failed') || error.message.includes('must be')) {
       return res.status(400).json({
-        error: 'Validation error',
+        error: 'VALIDATION_ERROR',
         message: error.message
       });
     }
 
     res.status(500).json({
-      error: 'Internal server error',
+      error: 'INTERNAL_SERVER_ERROR',
       message: 'Failed to partially update user settings'
     });
   }
@@ -200,7 +201,7 @@ router.delete('/', requireAuth, async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error deleting user settings:', error);
+    logger.error('Error deleting user settings', { userId: req.userId, error: error.message });
     
     if (error.message.includes('not found')) {
       return res.status(404).json({
@@ -266,9 +267,9 @@ router.get('/defaults', (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error getting default settings:', error);
+    logger.error('Error getting default settings', { error: error.message });
     res.status(500).json({
-      error: 'Internal server error',
+      error: 'INTERNAL_SERVER_ERROR',
       message: 'Failed to retrieve default settings'
     });
   }
@@ -348,9 +349,9 @@ router.get('/admin/stats', requireAdmin, async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error getting usage statistics:', error);
+    logger.error('Error getting usage statistics', { error: error.message });
     res.status(500).json({
-      error: 'Internal server error',
+      error: 'INTERNAL_SERVER_ERROR',
       message: 'Failed to retrieve usage statistics'
     });
   }
@@ -384,9 +385,9 @@ router.get('/admin/bulk', requireAdmin, async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error getting bulk user settings:', error);
+    logger.error('Error getting bulk user settings', { error: error.message });
     res.status(500).json({
-      error: 'Internal server error',
+      error: 'INTERNAL_SERVER_ERROR',
       message: 'Failed to retrieve bulk user settings'
     });
   }
@@ -396,11 +397,11 @@ router.get('/admin/bulk', requireAdmin, async (req, res) => {
  * Error handling middleware
  */
 router.use((error, req, res, next) => {
-  console.error('Settings API error:', error);
+  logger.error('Settings API error', { error: error.message, stack: error.stack });
   
   if (!res.headersSent) {
     res.status(500).json({
-      error: 'Internal server error',
+      error: 'INTERNAL_SERVER_ERROR',
       message: 'An unexpected error occurred',
       timestamp: new Date().toISOString()
     });
