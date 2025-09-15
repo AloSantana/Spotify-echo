@@ -26,6 +26,9 @@ const EnhancedStreamingChatInterface = lazy(() => import('./components/EnhancedS
 const EnhancedProviderPanel = lazy(() => import('./components/EnhancedProviderPanel'));
 const GitHubInfo = lazy(() => import('./components/GitHubInfo'));
 const AdminMCPPanel = lazy(() => import('./components/AdminMCPPanel'));
+// Add new backend-connected components
+const ConnectedChatInterface = lazy(() => import('./components/ConnectedChatInterface'));
+const BackendConnectedSettings = lazy(() => import('./components/BackendConnectedSettings'));
 // Add auth components as non-lazy since they're needed immediately
 import AuthStatus, { AuthGuard } from './components/AuthStatus';
 import SpotifyLoginButton from './components/SpotifyLoginButton';
@@ -431,6 +434,7 @@ function MainApplication({ initialTab = 'chat' }) {
             aria-label="EchoTune AI navigation"
           >
             <Tab label="🤖 AI Chat" value="chat" onMouseEnter={() => handlePrefetch('chat')} />
+            <Tab label="🔗 Connected Chat" value="connected-chat" onMouseEnter={() => handlePrefetch('chat')} />
             <Tab
               label="🎯 Recommendations"
               value="recommendations"
@@ -505,6 +509,12 @@ function MainApplication({ initialTab = 'chat' }) {
                   loading={false}
                 />
               </AuthGuard>
+            </Container>
+          )}
+
+          {currentTab === 'connected-chat' && (
+            <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
+              <ConnectedChatInterface />
             </Container>
           )}
 
@@ -668,7 +678,7 @@ function MainApplication({ initialTab = 'chat' }) {
  * Manages sub-tabs for different configuration areas
  */
 function SettingsTabManager() {
-  const [settingsTab, setSettingsTab] = useState('general');
+  const [settingsTab, setSettingsTab] = useState('backend'); // Default to backend config
 
   // Check if admin panel is enabled
   const isAdminEnabled = process.env.REACT_APP_ENABLE_ADMIN_MCP_PANEL === 'true';
@@ -680,6 +690,7 @@ function SettingsTabManager() {
         onChange={(event, newValue) => setSettingsTab(newValue)}
         sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}
       >
+        <Tab label="🚀 Backend Config" value="backend" />
         <Tab label="⚙️ General" value="general" />
         <Tab label="📱 Mobile & Responsive" value="mobile" />
         <Tab label="🐙 GitHub" value="github" />
@@ -687,6 +698,7 @@ function SettingsTabManager() {
       </Tabs>
 
       <Suspense fallback={<div style={{ padding: '1rem' }}>Loading settings…</div>}>
+        {settingsTab === 'backend' && <BackendConnectedSettings />}
         {settingsTab === 'general' && <EnhancedConfigPanel />}
         {settingsTab === 'mobile' && <MobileResponsiveManager />}
         {settingsTab === 'github' && <GitHubInfo />}

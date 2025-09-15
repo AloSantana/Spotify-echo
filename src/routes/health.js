@@ -13,7 +13,7 @@ const healthChecker = new HealthCheckSystem();
 // Comprehensive health check endpoint (bypass rate limiting)
 router.get('/', async (req, res) => {
   try {
-    const healthResults = await healthChecker.runHealthChecks();
+    const healthResults = await healthChecker.runAllChecks();
     
     // Determine overall status
     const allPassed = Object.values(healthResults).every(result => 
