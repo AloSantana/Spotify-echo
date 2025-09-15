@@ -6,20 +6,19 @@
 const express = require('express');
 const router = express.Router();
 const UserSettingsService = require('../services/UserSettingsService');
-const logger = require('../api/utils/logger');
 
 // Initialize settings service
 const settingsService = new UserSettingsService();
 
 // Middleware to ensure user authentication
 const requireAuth = (req, res, next) => {
-  // Extract user ID from request (assuming it's set by auth middleware)
-  const userId = req.user?.id || req.headers['x-user-id'] || req.query.userId;
+  // Extract user ID from request (only secure methods)
+  const userId = req.user?.id || req.headers['x-user-id'];
   
   if (!userId) {
     return res.status(401).json({
       error: 'Authentication required',
-      message: 'User ID must be provided'
+      message: 'User ID must be provided via a secure method'
     });
   }
   
@@ -27,9 +26,10 @@ const requireAuth = (req, res, next) => {
   next();
 };
 
-// Middleware for admin operations
+// Middleware for admin operations - enhanced security
 const requireAdmin = (req, res, next) => {
-  const isAdmin = req.user?.role === 'admin' || req.headers['x-admin-key'] === process.env.ADMIN_SECRET_KEY;
+  // Only allow role-based admin access for security
+  const isAdmin = req.user?.role === 'admin';
   
   if (!isAdmin) {
     return res.status(403).json({
@@ -55,9 +55,9 @@ router.get('/', requireAuth, async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    logger.error('Error getting user settings', { userId: req.userId, error: error.message });
+    console.error('Error getting user settings:', error);
     res.status(500).json({
-      error: 'INTERNAL_SERVER_ERROR',
+      error: 'Internal server error',
       message: 'Failed to retrieve user settings'
     });
   }
@@ -98,12 +98,12 @@ router.put('/', requireAuth, async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    logger.error('Error updating user settings', { userId: req.userId, error: error.message });
+    console.error('Error updating user settings:', error);
     
     if (error.code === 'VERSION_CONFLICT') {
       return res.status(409).json({
         error: 'VERSION_CONFLICT',
-        message: error.message,
+        message: 'Settings were modified by another process. Please refresh and try again.',
         serverVersion: error.serverVersion,
         serverState: error.serverState
       });
@@ -111,13 +111,13 @@ router.put('/', requireAuth, async (req, res) => {
     
     if (error.message.includes('Validation failed') || error.message.includes('must be')) {
       return res.status(400).json({
-        error: 'VALIDATION_ERROR',
+        error: 'Validation error',
         message: error.message
       });
     }
 
     res.status(500).json({
-      error: 'INTERNAL_SERVER_ERROR',
+      error: 'Internal server error',
       message: 'Failed to update user settings'
     });
   }
@@ -139,9 +139,24 @@ router.patch('/', requireAuth, async (req, res) => {
       });
     }
 
-    // For PATCH, we only update the provided fields
+    // Helper for deep merging objects
+    const deepMerge = (target, source) => {
+      const output = { ...target };
+      if (target && typeof target === 'object' && source && typeof source === 'object') {
+        Object.keys(source).forEach(key => {
+          if (source[key] && typeof source[key] === 'object' && key in target) {
+            output[key] = deepMerge(target[key], source[key]);
+          } else {
+            output[key] = source[key];
+          }
+        });
+      }
+      return output;
+    };
+
+    // For PATCH, we only update the provided fields using deep merge
     const currentSettings = await settingsService.getUserSettings(req.userId);
-    const mergedUpdates = { ...currentSettings, ...updates };
+    const mergedUpdates = deepMerge(currentSettings, updates);
     
     // Remove sensitive fields
     delete mergedUpdates.userId;
@@ -162,12 +177,12 @@ router.patch('/', requireAuth, async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    logger.error('Error partially updating user settings', { userId: req.userId, error: error.message });
+    console.error('Error partially updating user settings:', error);
     
     if (error.code === 'VERSION_CONFLICT') {
       return res.status(409).json({
         error: 'VERSION_CONFLICT',
-        message: error.message,
+        message: 'Settings were modified by another process. Please refresh and try again.',
         serverVersion: error.serverVersion,
         serverState: error.serverState
       });
@@ -175,13 +190,13 @@ router.patch('/', requireAuth, async (req, res) => {
     
     if (error.message.includes('Validation failed') || error.message.includes('must be')) {
       return res.status(400).json({
-        error: 'VALIDATION_ERROR',
+        error: 'Validation error',
         message: error.message
       });
     }
 
     res.status(500).json({
-      error: 'INTERNAL_SERVER_ERROR',
+      error: 'Internal server error',
       message: 'Failed to partially update user settings'
     });
   }
@@ -201,7 +216,7 @@ router.delete('/', requireAuth, async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    logger.error('Error deleting user settings', { userId: req.userId, error: error.message });
+    console.error('Error deleting user settings:', error);
     
     if (error.message.includes('not found')) {
       return res.status(404).json({
@@ -267,9 +282,9 @@ router.get('/defaults', (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    logger.error('Error getting default settings', { error: error.message });
+    console.error('Error getting default settings:', error);
     res.status(500).json({
-      error: 'INTERNAL_SERVER_ERROR',
+      error: 'Internal server error',
       message: 'Failed to retrieve default settings'
     });
   }
@@ -310,8 +325,9 @@ router.get('/providers/status', async (req, res) => {
       }
     };
 
-    // Find default provider
-    const defaultProvider = Object.values(providers).find(p => p.default && p.available)?.id || 'openai';
+    // Find default provider - select first available if default is unavailable
+    const availableProviders = Object.values(providers).filter(p => p.available);
+    const defaultProvider = availableProviders.find(p => p.default)?.id || availableProviders[0]?.id || null;
 
     res.json({
       success: true,
@@ -349,9 +365,9 @@ router.get('/admin/stats', requireAdmin, async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    logger.error('Error getting usage statistics', { error: error.message });
+    console.error('Error getting usage statistics:', error);
     res.status(500).json({
-      error: 'INTERNAL_SERVER_ERROR',
+      error: 'Internal server error',
       message: 'Failed to retrieve usage statistics'
     });
   }
@@ -385,9 +401,9 @@ router.get('/admin/bulk', requireAdmin, async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    logger.error('Error getting bulk user settings', { error: error.message });
+    console.error('Error getting bulk user settings:', error);
     res.status(500).json({
-      error: 'INTERNAL_SERVER_ERROR',
+      error: 'Internal server error',
       message: 'Failed to retrieve bulk user settings'
     });
   }
@@ -397,11 +413,11 @@ router.get('/admin/bulk', requireAdmin, async (req, res) => {
  * Error handling middleware
  */
 router.use((error, req, res, next) => {
-  logger.error('Settings API error', { error: error.message, stack: error.stack });
+  console.error('Settings API error:', error);
   
   if (!res.headersSent) {
     res.status(500).json({
-      error: 'INTERNAL_SERVER_ERROR',
+      error: 'Internal server error',
       message: 'An unexpected error occurred',
       timestamp: new Date().toISOString()
     });

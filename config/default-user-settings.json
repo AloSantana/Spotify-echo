@@ -1,0 +1,27 @@
+{
+  "llmProvider": "openai",
+  "llmModel": "gpt-4o-mini",
+  "providerOverride": null,
+  "strategyWeights": {
+    "collaborative": 0.333333,
+    "content": 0.333333,
+    "semantic": 0.333334,
+    "diversity": 0.1
+  },
+  "privacy": {
+    "storeHistory": true,
+    "shareAnalytics": false,
+    "enableTelemetry": true
+  },
+  "playlistDefaults": {
+    "public": false,
+    "descriptionTemplate": "AI-generated playlist by EchoTune",
+    "autoSync": true
+  },
+  "preferences": {
+    "maxRecommendations": 20,
+    "enableExplanations": true,
+    "autoRefresh": false,
+    "compactMode": false
+  }
+}
