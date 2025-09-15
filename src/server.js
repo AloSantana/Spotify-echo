@@ -636,6 +636,7 @@ app.use('/api/spotify', spotifyRoutes);
 app.use('/api/providers', providersRoutes);
 app.use('/api/database', databaseRoutes);
 app.use('/api/playlists', playlistRoutes);
+app.use('/api/settings', settingsRoutes);
 app.use('/api/user-settings', userSettingsRoutes);
 app.use('/api/system', systemRoutes);
 // Note: LLM providers and advanced settings moved to sub-paths to avoid conflicts
