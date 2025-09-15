@@ -5,7 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
-const UserSettingsService = require('../services/UserSettingsService');
+const UserSettingsService = require('../../services/UserSettingsService');
 
 // Initialize settings service
 const settingsService = new UserSettingsService();

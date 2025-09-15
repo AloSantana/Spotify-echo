@@ -522,6 +522,90 @@ We follow [Semantic Versioning](https://semver.org/):
 - **Minor releases**: Monthly feature updates
 - **Patch releases**: As needed for critical bugs
 
+## 🔧 MCP Server Development
+
+EchoTune AI uses Model Context Protocol (MCP) servers to enhance development workflows. Here's how to add new MCP servers:
+
+### Adding a New MCP Server
+
+1. **Create Server Directory**
+   ```bash
+   mkdir mcp-servers/your-server-name
+   cd mcp-servers/your-server-name
+   ```
+
+2. **Follow Existing Patterns**
+   - Study existing servers in `mcp-servers/` directory
+   - Use the MCP SDK: `npm install @modelcontextprotocol/sdk`
+   - Implement health checks and validation endpoints
+
+3. **Basic Server Structure**
+   ```javascript
+   // index.js
+   const { Server } = require('@modelcontextprotocol/sdk/server');
+   
+   class YourMCPServer {
+     constructor() {
+       this.server = new Server({
+         name: 'your-server-name',
+         version: '1.0.0'
+       });
+     }
+     
+     async start() {
+       // Server implementation
+     }
+   }
+   ```
+
+4. **Add Configuration**
+   - Update `mcp-config/mcp-servers-config.json`
+   - Add health check endpoint
+   - Include in orchestrator configuration
+
+5. **Testing & Validation**
+   ```bash
+   # Test your server
+   npm run mcp:test:your-server
+   
+   # Run smoke test
+   bash scripts/mcp-smoke-test.sh
+   
+   # Full validation
+   npm run mcp:validate:all
+   ```
+
+### MCP Server Guidelines
+
+- **Health Checks**: Always implement `/health` endpoint
+- **Error Handling**: Comprehensive error handling and logging
+- **Performance**: Stay within performance budgets (<500ms response time)
+- **Documentation**: Include README.md with usage examples
+- **Security**: Follow security best practices for external integrations
+
+### Integrated MCP Servers
+
+Current MCP servers in the ecosystem:
+- **Package Management**: Dependency updates and security scanning
+- **Analytics Server**: Performance monitoring and insights
+- **Testing Automation**: Continuous validation and quality assurance
+- **File Operations**: Secure file handling with directory scoping
+- **Browser Automation**: UI testing and screenshot capabilities
+- **Sentry Integration**: Error tracking and monitoring
+
+For detailed MCP information, see: [MCP Quick Test Guide](docs/MCP_QUICKTEST.md)
+
+## 📚 Additional Resources
+
+- [AI Platform Guide](docs/AI_PLATFORM.md) - Multi-provider AI integration
+- [GitHub Coding Agent](docs/CODING_AGENT.md) - Agent workflows and commands
+- [MCP Integration](docs/MCP_QUICKTEST.md) - MCP server validation and testing
+- [Detailed Roadmap](docs/ROADMAP.md) - Development roadmap and phases
+- [API Documentation](docs/api/) - REST API reference
+- [Architecture Guide](docs/ARCHITECTURE.md) - System architecture
+- [Deployment Guide](docs/DEPLOYMENT.md) - Production deployment
+- [Testing Guide](docs/TESTING_POLICY.md) - Testing standards
+
 ---
 
 ## 🙏 Thank You
