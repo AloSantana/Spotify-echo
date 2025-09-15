@@ -24,7 +24,12 @@ class MCPStartValidator {
       optionalStarted: 0,
       communityIncluded: false,
       coreBaselineOk: false,
-      serversMissing: []
+      serversMissing: [],
+      serversDetails: {
+        started: [],
+        failed: [],
+        skipped: []
+      }
     };
     
     // Core baseline servers that must be present
@@ -141,10 +146,11 @@ class MCPStartValidator {
   }
 
   /**
-   * Detect community servers from capabilities or start summary (enhanced)
+   * Detect community servers from capabilities or start summary (enhanced detection)
    */
   detectCommunityServers(capabilities, startSummary) {
     let communityFound = false;
+    let communityServersFound = [];
 
     // Check capabilities for community servers
     if (capabilities && capabilities.servers) {
@@ -152,27 +158,33 @@ class MCPStartValidator {
         if (server.category === 'community' || server.tier === 3 || 
             this.communityServers.includes(server.name.toLowerCase())) {
           communityFound = true;
-          break;
+          communityServersFound.push(server.name);
         }
       }
     }
 
-    // Check start summary for community servers
+    // Check start summary for community servers (enhanced parsing)
     if (startSummary && startSummary.servers) {
       for (const server of startSummary.servers) {
         if (server.category === 'community' || server.tier === 3 || 
             server.priority >= 6 || this.communityServers.includes(server.name.toLowerCase())) {
           communityFound = true;
-          break;
+          if (!communityServersFound.includes(server.name)) {
+            communityServersFound.push(server.name);
+          }
         }
       }
+    }
+
+    if (communityFound) {
+      this.logInfo(`Community servers detected: ${communityServersFound.join(', ')}`);
     }
 
     return communityFound;
   }
 
   /**
-   * Count server statistics from start summary
+   * Count server statistics from start summary (enhanced with details)
    */
   countServers(startSummary) {
     let requiredStarted = 0;
@@ -180,6 +192,16 @@ class MCPStartValidator {
     let optionalStarted = 0;
 
     for (const server of startSummary.servers) {
+      // Track server details
+      if (server.started) {
+        this.results.serversDetails.started.push(server.name);
+      } else if (server.error === 'community_disabled') {
+        this.results.serversDetails.skipped.push(server.name);
+      } else {
+        this.results.serversDetails.failed.push(server.name);
+      }
+
+      // Count by required status
       if (server.required) {
         requiredTotal++;
         if (server.started) {
@@ -253,6 +275,7 @@ class MCPStartValidator {
       }
 
       this.logInfo(`Validation completed: ${this.results.requiredStarted}/${this.results.requiredTotal} required, ${this.results.optionalStarted} optional, community=${this.results.communityIncluded}`);
+      this.logInfo(`Server details - Started: [${this.results.serversDetails.started.join(', ')}], Failed: [${this.results.serversDetails.failed.join(', ')}], Skipped: [${this.results.serversDetails.skipped.join(', ')}]`);
       
       // Output JSON result to stdout
       console.log(JSON.stringify(this.results));

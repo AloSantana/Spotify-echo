@@ -81,7 +81,7 @@ log_warning() {
     echo -e "${YELLOW}[WARN] $message${NC}"
 }
 
-# Check if server is a community server
+# Check if server is a community server (enhanced detection)
 is_community_server() {
     local server_name="$1"
     case "$server_name" in
@@ -272,16 +272,28 @@ start_mcp_servers() {
         local required=$(get_server_config "$MCP_CONFIG_FILE" "$server" "required")
         local priority=$(get_server_config "$MCP_CONFIG_FILE" "$server" "priority")
         
-        # Community server gating logic - updated to check both config and hardcoded list
+        # Ensure we have valid values with defaults
+        if [ -z "$category" ] || [ "$category" = "unknown" ]; then
+            category="core"  # Default for servers without explicit category
+        fi
+        if [ -z "$required" ] || [ "$required" = "unknown" ]; then
+            required="true"  # Default for servers without explicit required flag
+        fi
+        if [ -z "$priority" ] || [ "$priority" = "unknown" ]; then
+            priority="1"  # Default priority
+        fi
+        
+        # Community server gating logic - enhanced with proper skip semantics
         local is_community=false
         if [ "$category" = "community" ] || [ -n "$priority" ] && [ "$priority" -ge 6 ] || is_community_server "$server"; then
             is_community=true
         fi
         
         if [ "$ENABLE_COMMUNITY_MCP" != "1" ] && [ "$is_community" = true ]; then
-            echo "MCP_SKIPPED name=$server reason=community_disabled category=$category priority=$priority" >> "$LOG_FILE"
-            log_message "INFO" "⏭️  Skipping community server: $server (community servers disabled)"
-            # Add skipped server to summary for transparency
+            # Structured skip logging with detailed reason
+            echo "MCP_SKIPPED name=$server reason=community_disabled category=$category priority=$priority tier=community enable_community_mcp=$ENABLE_COMMUNITY_MCP" >> "$LOG_FILE"
+            log_message "INFO" "⏭️  Skipping community server: $server (community servers disabled - set ENABLE_COMMUNITY_MCP=1 to enable)"
+            # Skip will be included in summary with proper started=false status
             continue
         fi
         
@@ -305,9 +317,29 @@ start_mcp_servers() {
             local server_path="${SCRIPT_DIR}/$(dirname "$script_path")"
             
             if [ ! -d "$server_path" ]; then
-                log_warning "Server directory not found: $server_path - creating placeholder"
+                log_warning "Server directory not found: $server_path - creating TODO stub"
                 mkdir -p "$server_path"
-                echo 'console.log("MCP server '${server}' placeholder - implement actual server");' > "$server_path/index.js"
+                cat > "$server_path/index.js" << 'EOF'
+#!/usr/bin/env node
+/**
+ * TODO: Implement MCP Server
+ * 
+ * This is a placeholder stub that was auto-generated.
+ * Replace this file with a functioning MCP server implementation.
+ * 
+ * Required implementation:
+ * - Import MCP SDK components
+ * - Define server capabilities and tools
+ * - Handle tool execution requests
+ * - Export proper MCP server interface
+ * 
+ * See existing servers in mcp-servers/ directory for examples.
+ */
+
+console.error(`TODO: MCP server '${process.argv[1]}' needs implementation`);
+console.error('This is a placeholder stub - replace with functioning MCP server');
+process.exit(1);
+EOF
             fi
         fi
         
