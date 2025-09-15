@@ -1,0 +1,93 @@
+{
+  "version": "1.0.0",
+  "description": "Performance thresholds for EchoTune AI testing framework",
+  "thresholds": {
+    "api": {
+      "chat": {
+        "p50": 1000,
+        "p95": 2000,
+        "maxLatency": 5000,
+        "errorRate": 0.05
+      },
+      "recommendations": {
+        "p50": 1500,
+        "p95": 3000,
+        "maxLatency": 8000,
+        "errorRate": 0.03
+      },
+      "auth": {
+        "p50": 500,
+        "p95": 1500,
+        "maxLatency": 3000,
+        "errorRate": 0.01
+      },
+      "settings": {
+        "p50": 300,
+        "p95": 1000,
+        "maxLatency": 2000,
+        "errorRate": 0.02
+      }
+    },
+    "database": {
+      "mongodb": {
+        "connectionTime": 2000,
+        "queryTime": 500,
+        "insertTime": 300
+      },
+      "redis": {
+        "connectionTime": 500,
+        "getTime": 50,
+        "setTime": 100
+      }
+    },
+    "memory": {
+      "maxHeapIncrease": 50,
+      "maxTotalMemory": 500,
+      "gcPressure": 0.1
+    },
+    "ui": {
+      "pageLoad": {
+        "initial": 3000,
+        "navigation": 2000,
+        "reload": 1500
+      },
+      "interaction": {
+        "clickResponse": 200,
+        "formSubmission": 1000,
+        "ajaxRequest": 2000
+      }
+    },
+    "visual": {
+      "maxDiffPixels": 100,
+      "diffThreshold": 0.2,
+      "maxDiffPercent": 0.1
+    }
+  },
+  "enforcement": {
+    "ENFORCE_PERF_THRESHOLDS": "false",
+    "FAIL_ON_THRESHOLD_BREACH": "false",
+    "LOG_PERFORMANCE_WARNINGS": "true"
+  },
+  "environments": {
+    "development": {
+      "multiplier": 2.0,
+      "description": "Relaxed thresholds for development"
+    },
+    "test": {
+      "multiplier": 1.5,
+      "description": "Slightly relaxed for test environments"
+    },
+    "production": {
+      "multiplier": 1.0,
+      "description": "Strict production thresholds"
+    }
+  },
+  "lastUpdated": "2024-09-15T20:00:00.000Z",
+  "notes": [
+    "All time values are in milliseconds",
+    "Error rates are decimal percentages (0.05 = 5%)",
+    "Memory values are in MB",
+    "Thresholds can be multiplied by environment factor",
+    "Set ENFORCE_PERF_THRESHOLDS=true to fail tests on breach"
+  ]
+}

@@ -1,94 +1,172 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
+ * Enhanced Playwright Configuration for EchoTune AI
+ * Supports E2E, Visual Regression, and Browser Automation Testing
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-  testDir: './tests/e2e',
+  testDir: './tests',
+  
+  /* Test directories for different test types */
+  testMatch: [
+    '**/tests/e2e/**/*.spec.ts',
+    '**/tests/visual/**/*.spec.ts'
+  ],
+  
   /* Run tests in files in parallel */
   fullyParallel: true,
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  
+  /* Fail the build on CI if you accidentally left test.only in the source code */
   forbidOnly: !!process.env.CI,
+  
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
+  
+  /* Opt out of parallel tests on CI */
   workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+  
+  /* Reporter to use */
   reporter: [
-    ['html'],
-    ['json', { outputFile: 'test-results/test-results.json' }],
-    ['junit', { outputFile: 'test-results/test-results.xml' }]
+    ['html', { outputFolder: 'playwright-report' }],
+    ['json', { outputFile: 'reports/playwright-results.json' }],
+    ['junit', { outputFile: 'reports/playwright-results.xml' }]
   ],
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  
+  /* Global setup and teardown */
+  globalSetup: require.resolve('./tests/setup/global-setup.js'),
+  globalTeardown: require.resolve('./tests/setup/global-teardown.js'),
+  
+  /* Shared settings for all projects */
   use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
+    /* Base URL to use in actions like `await page.goto('/')` */
     baseURL: process.env.BASE_URL || 'http://localhost:3000',
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    /* Collect trace when retrying the failed test */
     trace: 'on-first-retry',
     
-    /* Screenshot on failure */
-    screenshot: 'only-on-failure',
+    /* Screenshot settings - capture on failure and for visual tests */
+    screenshot: {
+      mode: 'only-on-failure',
+      fullPage: true
+    },
     
     /* Video on failure */
     video: 'retain-on-failure',
+    
+    /* Custom viewport for consistent testing */
+    viewport: { width: 1280, height: 800 },
+    
+    /* Ignore HTTPS errors in development */
+    ignoreHTTPSErrors: true,
+    
+    /* Navigation timeout */
+    navigationTimeout: 30 * 1000,
+    
+    /* Action timeout */
+    actionTimeout: 10 * 1000,
   },
 
-  /* Configure projects for major browsers */
+  /* Configure projects for major browsers and viewports */
   projects: [
+    // Setup project for authentication
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'setup',
+      testMatch: '**/tests/setup/auth.setup.ts',
+    },
+    
+    // Desktop browsers
+    {
+      name: 'desktop-chromium',
+      use: { 
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 800 }
+      },
+      dependencies: ['setup'],
     },
 
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      name: 'desktop-firefox',
+      use: { 
+        ...devices['Desktop Firefox'],
+        viewport: { width: 1280, height: 800 }
+      },
+      dependencies: ['setup'],
     },
 
     {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      name: 'desktop-webkit',
+      use: { 
+        ...devices['Desktop Safari'],
+        viewport: { width: 1280, height: 800 }
+      },
+      dependencies: ['setup'],
     },
 
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
+    // Mobile viewports
+    {
+      name: 'mobile-chrome',
+      use: { 
+        ...devices['Pixel 5'],
+        viewport: { width: 390, height: 844 }
+      },
+      dependencies: ['setup'],
+    },
+    
+    {
+      name: 'mobile-safari',
+      use: { 
+        ...devices['iPhone 12'],
+        viewport: { width: 390, height: 844 }
+      },
+      dependencies: ['setup'],
+    },
 
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
+    // Visual regression specific project
+    {
+      name: 'visual-regression',
+      testMatch: '**/tests/visual/**/*.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 800 },
+        // Ensure consistent rendering for visual tests
+        deviceScaleFactor: 1,
+        hasTouch: false,
+      },
+      dependencies: ['setup'],
+    },
   ],
 
-  /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://127.0.0.1:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
-
-  /* Global setup and teardown */
-  // globalSetup: require.resolve('./tests/global-setup'),
-  // globalTeardown: require.resolve('./tests/global-teardown'),
+  /* Run local dev server before starting tests */
+  webServer: {
+    command: 'npm run start',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
+  },
   
-  /* Output directory for test artifacts */
-  outputDir: 'artifacts/screenshots',
+  /* Output directories for test artifacts */
+  outputDir: 'artifacts/test-results',
   
   /* Timeout settings */
-  timeout: 30 * 1000, // 30 seconds per test
+  timeout: 60 * 1000, // 60 seconds per test
   expect: {
-    timeout: 5 * 1000, // 5 seconds for assertions
+    timeout: 10 * 1000, // 10 seconds for assertions
+    // Visual comparison settings
+    toHaveScreenshot: {
+      threshold: 0.2,
+      maxDiffPixels: 100,
+    },
+    toMatchScreenshot: {
+      threshold: 0.2,
+      maxDiffPixels: 100,
+    },
+  },
+  
+  /* Metadata */
+  metadata: {
+    framework: 'EchoTune AI Testing Framework',
+    version: '1.0.0',
+    testTypes: ['e2e', 'visual-regression', 'browser-automation']
   },
 });
