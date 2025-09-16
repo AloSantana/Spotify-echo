@@ -11,14 +11,14 @@
       "task_id": "task_2",
       "title": "TypeScript Migration Plan for High-Change Backend Modules",
       "status": "attempted",
-      "complexity": 5
+      "complexity": 6
     },
     {
       "task_id": "task_3",
       "title": "Expand Jest Integration/Security Tests for MCP Endpoints",
       "status": "attempted",
-      "complexity": 6
+      "complexity": 5
     }
   ],
-  "timestamp": "Mon Sep 15 18:35:06 UTC 2025"
+  "timestamp": "Tue Sep 16 01:45:17 UTC 2025"
 }

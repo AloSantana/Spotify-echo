@@ -3,98 +3,136 @@
     {
       "id": "task_1",
       "title": "Persist Rolling Window Metrics to Redis",
-      "description": "Implement logic to persist API latency and error metrics in a rolling window to Redis for durability and multi-instance aggregation. This enables consistent performance monitoring across deployments.",
+      "description": "Implement persistence of API latency and error metrics to Redis for durability and multi-instance aggregation. This will allow metrics to survive restarts and be shared across horizontally scaled instances.",
       "priority": "high",
       "estimated_time": "60-90 minutes",
       "files_to_modify": [
         "scripts/bench/api-latency.js",
-        "src/utils/metrics.js",
+        "src/api/middleware/metrics.js",
         "src/config/redis.js"
       ],
       "implementation_steps": [
-        "Add Redis connection logic (if not present) in src/config/redis.js.",
-        "Update scripts/bench/api-latency.js to write rolling window metrics to Redis after each run.",
-        "Modify src/utils/metrics.js to read/write rolling metrics from/to Redis.",
-        "Test persistence by simulating multiple instances and verifying aggregation."
+        "Add Redis client initialization in src/config/redis.js if not present.",
+        "Update metrics middleware to write rolling window data to Redis after each request.",
+        "On server start, load existing metrics from Redis into in-memory structures.",
+        "Update scripts/bench/api-latency.js to optionally read from Redis for reporting.",
+        "Test with Redis running locally to ensure durability and aggregation work as expected."
       ],
       "complexity_score": 7
     },
     {
       "id": "task_2",
       "title": "TypeScript Migration Plan for High-Change Backend Modules",
-      "description": "Draft and commit a migration plan for converting backend modules with high change rates (e.g., src/api/routes/*, src/chat/*) to TypeScript, including a prioritized file list and migration checklist.",
+      "description": "Draft and begin implementing a TypeScript migration plan for backend modules with high change-rate, focusing on `src/api/routes/*` and `src/chat/*`.",
       "priority": "medium",
-      "estimated_time": "30-45 minutes",
+      "estimated_time": "60 minutes",
       "files_to_modify": [
-        "MIGRATION_PLAN.md",
         "src/api/routes/*",
-        "src/chat/*"
+        "src/chat/*",
+        "tsconfig.json"
       ],
       "implementation_steps": [
-        "Audit src/api/routes/* and src/chat/* for current JS usage.",
-        "Create MIGRATION_PLAN.md outlining migration order, blockers, and type coverage goals.",
-        "Add TypeScript config if not present.",
-        "Commit plan and initial type definitions for one small module as a template."
-      ],
-      "complexity_score": 5
-    },
-    {
-      "id": "task_3",
-      "title": "Expand Jest Integration/Security Tests for MCP Endpoints",
-      "description": "Add new Jest tests to cover MCP endpoints and provider health checks, focusing on integration and basic security (e.g., auth required, error handling).",
-      "priority": "high",
-      "estimated_time": "45-60 minutes",
-      "files_to_modify": [
-        "tests/integration/mcpEndpoints.test.js",
-        "src/api/routes/providers.js"
-      ],
-      "implementation_steps": [
-        "Identify untested MCP endpoints and provider health routes.",
-        "Write integration tests for endpoint responses, error cases, and auth checks.",
-        "Run tests and ensure coverage is reported.",
-        "Document new tests in WORKFLOW_STATE.md."
+        "Create tsconfig.json with appropriate settings for incremental migration.",
+        "Rename one or two small files in src/api/routes/ to .ts and add type annotations for function signatures and key objects.",
+        "Fix any type errors and ensure tests pass.",
+        "Document migration steps and guidelines in a new MIGRATION.md file."
       ],
       "complexity_score": 6
     },
     {
+      "id": "task_3",
+      "title": "Expand Jest Integration/Security Tests for MCP Endpoints",
+      "description": "Add additional Jest tests to cover MCP endpoints and provider health checks, focusing on integration and basic security (e.g., input validation, error handling).",
+      "priority": "high",
+      "estimated_time": "45-60 minutes",
+      "files_to_modify": [
+        "tests/integration/mcp.test.js",
+        "src/api/routes/providers.js"
+      ],
+      "implementation_steps": [
+        "Identify untested MCP endpoints and provider health routes.",
+        "Write new Jest tests for these endpoints, including edge cases and error scenarios.",
+        "Run tests and ensure coverage increases.",
+        "Document new tests in WORKFLOW_STATE.md."
+      ],
+      "complexity_score": 5
+    },
+    {
       "id": "task_4",
-      "title": "EnhancedChatInterface: Provider Quick-Switch and Badge",
-      "description": "Add a provider quick-switch dropdown and current provider badge to EnhancedChatInterface.jsx using the useLLM() hook.",
+      "title": "Containerize Node Backend and React Frontend with Dockerfiles",
+      "description": "Write simple Dockerfiles for the Node backend and React frontend, and add a docker-compose.yml for local development.",
       "priority": "medium",
+      "estimated_time": "60 minutes",
+      "files_to_modify": [
+        "Dockerfile.backend",
+        "Dockerfile.frontend",
+        "docker-compose.yml"
+      ],
+      "implementation_steps": [
+        "Create Dockerfile for Node backend: use official Node image, copy files, install dependencies, set CMD.",
+        "Create Dockerfile for React frontend: use Node image for build, then serve with nginx or similar.",
+        "Write docker-compose.yml to orchestrate both services for local development.",
+        "Test build and run locally, update documentation."
+      ],
+      "complexity_score": 6
+    },
+    {
+      "id": "task_5",
+      "title": "EnhancedChatInterface: Provider Quick-Switch and Badge",
+      "description": "Add a provider quick-switch UI in EnhancedChatInterface.jsx using useLLM(), and display the current provider as a chip/badge.",
+      "priority": "high",
       "estimated_time": "30-45 minutes",
       "files_to_modify": [
         "frontend/components/EnhancedChatInterface.jsx"
       ],
       "implementation_steps": [
-        "Import and use useLLM() to access provider state.",
-        "Add a dropdown for provider selection and a badge showing the current provider.",
-        "Wire up onChange to trigger provider switch.",
-        "Test UI updates and provider switching."
+        "Import and use useLLM() hook to access provider switching logic.",
+        "Add a dropdown or button group for quick provider switching.",
+        "Display the current provider as a chip or badge in the chat interface.",
+        "Test UI interactions and update mock data if needed."
       ],
       "complexity_score": 4
     },
     {
-      "id": "task_5",
+      "id": "task_6",
       "title": "EnhancedMusicDiscovery: Mood Sliders and Mini Feature Visualization",
-      "description": "Implement client-only mood sliders and a radar/sparkline visualization for moodSettings in EnhancedMusicDiscovery.jsx.",
+      "description": "Implement mood sliders and a client-only radar/sparkline visualization for moodSettings values in EnhancedMusicDiscovery.jsx.",
       "priority": "medium",
       "estimated_time": "45-60 minutes",
       "files_to_modify": [
         "frontend/components/EnhancedMusicDiscovery.jsx"
       ],
       "implementation_steps": [
-        "Add slider components for moodSettings (e.g., energy, valence).",
-        "Integrate a radar or sparkline chart library for visualization.",
-        "Bind slider values to chart updates.",
-        "Test for responsiveness and usability."
+        "Add slider components for mood settings (e.g., energy, valence).",
+        "Implement a radar or sparkline chart using a lightweight charting library or custom SVG.",
+        "Bind slider values to the visualization and ensure real-time updates.",
+        "Test UI responsiveness and accessibility."
       ],
       "complexity_score": 5
+    },
+    {
+      "id": "task_7",
+      "title": "EnhancedAnalyticsDashboard: Sparkline Components for Metrics",
+      "description": "Add sparkline components to EnhancedAnalyticsDashboard.jsx for overview metrics, using mock fallback data if live data is unavailable.",
+      "priority": "low",
+      "estimated_time": "30-45 minutes",
+      "files_to_modify": [
+        "frontend/components/EnhancedAnalyticsDashboard.jsx"
+      ],
+      "implementation_steps": [
+        "Select or implement a simple sparkline component.",
+        "Integrate sparklines for top metrics (e.g., API latency, user engagement).",
+        "Fallback to mock data if API is not available.",
+        "Test rendering and update documentation."
+      ],
+      "complexity_score": 3
     }
   ],
   "next_research_topics": [
-    "Implementing circuit breaker pattern for provider failover in Node.js",
-    "MongoDB compound and TTL indexes for analytics optimization",
-    "OpenTelemetry distributed tracing integration for Node.js/React apps"
+    "Circuit breaker pattern for provider failover in Node.js",
+    "Request correlation IDs for distributed tracing",
+    "MongoDB compound and TTL indexes for analytics",
+    "OpenTelemetry integration for Node.js services"
   ],
   "completion_percentage": 75
 }
