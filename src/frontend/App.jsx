@@ -29,6 +29,10 @@ const AdminMCPPanel = lazy(() => import('./components/AdminMCPPanel'));
 // Add new backend-connected components
 const ConnectedChatInterface = lazy(() => import('./components/ConnectedChatInterface'));
 const BackendConnectedSettings = lazy(() => import('./components/BackendConnectedSettings'));
+// Add comprehensive system components
+const ComprehensiveSystemSettings = lazy(() => import('./components/ComprehensiveSystemSettings'));
+const EnhancedSpotifyWebPlayer = lazy(() => import('./components/EnhancedSpotifyWebPlayer'));
+const RealTimeSystemMonitoring = lazy(() => import('./components/RealTimeSystemMonitoring'));
 // Add auth components as non-lazy since they're needed immediately
 import AuthStatus, { AuthGuard } from './components/AuthStatus';
 import SpotifyLoginButton from './components/SpotifyLoginButton';
@@ -466,6 +470,8 @@ function MainApplication({ initialTab = 'chat' }) {
               value="insights"
               onMouseEnter={() => handlePrefetch('insights')}
             />
+            <Tab label="🎵 Spotify Player" value="spotify-player" />
+            <Tab label="📊 System Monitor" value="system-monitor" />
             <Tab
               label="🤖 Autonomous"
               value="autonomous"
@@ -619,6 +625,32 @@ function MainApplication({ initialTab = 'chat' }) {
             </Container>
           )}
 
+          {currentTab === 'spotify-player' && (
+            <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
+              <AuthGuard 
+                fallback={
+                  <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <Typography variant="h5" gutterBottom>
+                      🔐 Spotify Authentication Required
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                      Please log in with Spotify to access the web player and control your music playback.
+                    </Typography>
+                    <SpotifyLoginButton />
+                  </Box>
+                }
+              >
+                <EnhancedSpotifyWebPlayer />
+              </AuthGuard>
+            </Container>
+          )}
+
+          {currentTab === 'system-monitor' && (
+            <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
+              <RealTimeSystemMonitoring />
+            </Container>
+          )}
+
           {currentTab === 'autonomous' && (
             <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -691,6 +723,7 @@ function SettingsTabManager() {
         sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}
       >
         <Tab label="🚀 Backend Config" value="backend" />
+        <Tab label="🏢 System Settings" value="comprehensive" />
         <Tab label="⚙️ General" value="general" />
         <Tab label="📱 Mobile & Responsive" value="mobile" />
         <Tab label="🐙 GitHub" value="github" />
@@ -699,6 +732,7 @@ function SettingsTabManager() {
 
       <Suspense fallback={<div style={{ padding: '1rem' }}>Loading settings…</div>}>
         {settingsTab === 'backend' && <BackendConnectedSettings />}
+        {settingsTab === 'comprehensive' && <ComprehensiveSystemSettings />}
         {settingsTab === 'general' && <EnhancedConfigPanel />}
         {settingsTab === 'mobile' && <MobileResponsiveManager />}
         {settingsTab === 'github' && <GitHubInfo />}
