@@ -1,7 +1,7 @@
 
 # Task: TypeScript Migration Plan for High-Change Backend Modules
-# Description: Draft and commit a migration plan for converting backend modules with high change rates (e.g., src/api/routes/*, src/chat/*) to TypeScript, including a prioritized file list and migration checklist.
-# Files to modify: ['MIGRATION_PLAN.md', 'src/api/routes/*', 'src/chat/*']
+# Description: Draft and begin implementing a TypeScript migration plan for backend modules with high change-rate, focusing on `src/api/routes/*` and `src/chat/*`.
+# Files to modify: ['src/api/routes/*', 'src/chat/*', 'tsconfig.json']
 
 print("Implementing: TypeScript Migration Plan for High-Change Backend Modules")
 
