@@ -480,6 +480,12 @@ app.use('/api/spotify', spotifyApiRoutes);
 app.use('/api', enhancedApiRoutes);
 app.use('/api/chat', chatRoutes_local);
 
+// Enhanced Medium Priority Routes
+const enhancedPerformanceRoutes = require('./api/routes/enhanced-performance');
+const enhancedTestingRoutes = require('./api/routes/enhanced-testing');
+app.use('/api/performance', enhancedPerformanceRoutes);
+app.use('/api/testing', enhancedTestingRoutes);
+
 // Phase 6: Enterprise health monitoring routes
 const enterpriseHealthRoutes = require('./routes/enterprise-health');
 app.use('/health', enterpriseHealthRoutes);

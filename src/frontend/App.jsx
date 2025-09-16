@@ -33,6 +33,10 @@ const BackendConnectedSettings = lazy(() => import('./components/BackendConnecte
 const ComprehensiveSystemSettings = lazy(() => import('./components/ComprehensiveSystemSettings'));
 const EnhancedSpotifyWebPlayer = lazy(() => import('./components/EnhancedSpotifyWebPlayer'));
 const RealTimeSystemMonitoring = lazy(() => import('./components/RealTimeSystemMonitoring'));
+// Add new enhanced components for Medium Priority features
+const EnhancedModernChatInterface = lazy(() => import('./components/EnhancedModernChatInterface'));
+const AdvancedPerformanceMonitoring = lazy(() => import('./components/AdvancedPerformanceMonitoring'));
+const ComprehensiveTestingExpansion = lazy(() => import('./components/ComprehensiveTestingExpansion'));
 // Add auth components as non-lazy since they're needed immediately
 import AuthStatus, { AuthGuard } from './components/AuthStatus';
 import SpotifyLoginButton from './components/SpotifyLoginButton';
@@ -438,7 +442,7 @@ function MainApplication({ initialTab = 'chat' }) {
             aria-label="EchoTune AI navigation"
           >
             <Tab label="🤖 AI Chat" value="chat" onMouseEnter={() => handlePrefetch('chat')} />
-            <Tab label="🔗 Connected Chat" value="connected-chat" onMouseEnter={() => handlePrefetch('chat')} />
+            <Tab label="🔗 Enhanced Chat" value="enhanced-chat" onMouseEnter={() => handlePrefetch('chat')} />
             <Tab
               label="🎯 Recommendations"
               value="recommendations"
@@ -471,7 +475,8 @@ function MainApplication({ initialTab = 'chat' }) {
               onMouseEnter={() => handlePrefetch('insights')}
             />
             <Tab label="🎵 Spotify Player" value="spotify-player" />
-            <Tab label="📊 System Monitor" value="system-monitor" />
+            <Tab label="⚡ Performance" value="performance-monitor" />
+            <Tab label="🧪 Testing" value="testing-dashboard" />
             <Tab
               label="🤖 Autonomous"
               value="autonomous"
@@ -507,6 +512,33 @@ function MainApplication({ initialTab = 'chat' }) {
                 }
               >
                 <ModernChatInterface
+                  sessionId={sessionId}
+                  onSendMessage={handleSendChatMessage}
+                  onPlayTrack={onPlayTrack}
+                  onLikeTrack={onLikeTrack}
+                  onShareTrack={onShareTrack}
+                  loading={false}
+                />
+              </AuthGuard>
+            </Container>
+          )}
+
+          {currentTab === 'enhanced-chat' && (
+            <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
+              <AuthGuard 
+                fallback={
+                  <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <Typography variant="h5" gutterBottom>
+                      Connect Spotify for Enhanced AI Chat
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                      Sign in with your Spotify account to access the enhanced AI chat with provider selection and configuration
+                    </Typography>
+                    <SpotifyLoginButton />
+                  </Box>
+                }
+              >
+                <EnhancedModernChatInterface
                   sessionId={sessionId}
                   onSendMessage={handleSendChatMessage}
                   onPlayTrack={onPlayTrack}
@@ -642,6 +674,18 @@ function MainApplication({ initialTab = 'chat' }) {
               >
                 <EnhancedSpotifyWebPlayer />
               </AuthGuard>
+            </Container>
+          )}
+
+          {currentTab === 'performance-monitor' && (
+            <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
+              <AdvancedPerformanceMonitoring />
+            </Container>
+          )}
+
+          {currentTab === 'testing-dashboard' && (
+            <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
+              <ComprehensiveTestingExpansion />
             </Container>
           )}
 
