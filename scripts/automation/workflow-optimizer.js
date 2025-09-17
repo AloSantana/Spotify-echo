@@ -168,7 +168,7 @@ class WorkflowOptimizer {
       }
     }
 
-    console.log(`🔍 Analysis complete:`);
+    console.log('🔍 Analysis complete:');
     console.log(`  • Found ${redundancyCount} redundancy patterns`);
     console.log(`  • Identified ${this.analysis.redundantWorkflows.length} optimization opportunities\n`);
   }
@@ -241,7 +241,7 @@ class WorkflowOptimizer {
     console.log('📊 Optimization Plan:');
     optimizations.forEach((opt, index) => {
       console.log(`\n${index + 1}. ${opt.description}`);
-      console.log(`   Benefits:`);
+      console.log('   Benefits:');
       opt.benefits.forEach(benefit => console.log(`   • ${benefit}`));
       console.log(`   Implementation: ${opt.implementation}`);
     });
@@ -272,7 +272,7 @@ class WorkflowOptimizer {
     const reportPath = path.join(process.cwd(), 'workflow-optimization-report.json');
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
     
-    console.log(`\n💾 Optimization report saved to: workflow-optimization-report.json`);
+    console.log('\n💾 Optimization report saved to: workflow-optimization-report.json');
     
     return report;
   }

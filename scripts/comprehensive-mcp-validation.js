@@ -555,7 +555,7 @@ class ComprehensiveMCPValidator {
       if (productionFiles.length === 0) {
         console.log('  ✅ No placeholders found in production files - all data appears to be real');
       } else {
-        console.log(`  ⚠️  Found placeholders in production files:`);
+        console.log('  ⚠️  Found placeholders in production files:');
         productionFiles.forEach(item => {
           console.log(`    - ${item.file}: ${item.count} placeholders`);
         });

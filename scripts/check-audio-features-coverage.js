@@ -172,7 +172,7 @@ async function createFallbackDataset(tracks) {
       // Create sanitized track with essential features
       const sanitized = {
         id: `fallback_${Math.random().toString(36).substr(2, 9)}`,
-        name: "Sample Track",
+        name: 'Sample Track',
         audio_features: {}
       };
       
@@ -208,7 +208,7 @@ async function createFallbackDataset(tracks) {
   while (fallbackTracks.length < 10) {
     fallbackTracks.push({
       id: `fallback_default_${fallbackTracks.length}`,
-      name: "Default Sample Track",
+      name: 'Default Sample Track',
       audio_features: {
         danceability: 0.5 + (Math.random() - 0.5) * 0.3,
         energy: 0.5 + (Math.random() - 0.5) * 0.3,

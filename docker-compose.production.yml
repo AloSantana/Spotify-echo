@@ -14,6 +14,9 @@ services:
       - REDIS_URL=${REDIS_URL}
       - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
       - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+      - PUPPETEER_SKIP_DOWNLOAD=true
+      - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
     depends_on:
       - mongodb
       - redis

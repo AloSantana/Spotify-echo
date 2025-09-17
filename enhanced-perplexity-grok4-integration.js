@@ -164,7 +164,7 @@ class EnhancedPerplexityGrok4Integration {
         let enhancedPrompt = prompt;
 
         if (modelName === 'grok-4-equivalent' || this.models[modelName]?.grokEquivalent) {
-            const grokPrefix = `Using Grok-4 equivalent reasoning capabilities via Perplexity Pro's sonar-pro with enhanced prompting, `;
+            const grokPrefix = 'Using Grok-4 equivalent reasoning capabilities via Perplexity Pro\'s sonar-pro with enhanced prompting, ';
             enhancedPrompt = grokPrefix + prompt;
 
             // Add research mode specific instructions

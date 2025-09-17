@@ -331,8 +331,8 @@ budget_mgr = BudgetManager(Path('.perplexity'))
 # Test budget check
 status = budget_mgr.check_budget()
 print(f"Budget status: {status['status']}")
-print(f"Weekly budget: ` + "${status['weekly_budget']:.2f}" + `")
-print(f"Current cost: ` + "${status['total_cost']:.4f}" + `")
+print(f"Weekly budget: ` + '${status[\'weekly_budget\']:.2f}' + `")
+print(f"Current cost: ` + '${status[\'total_cost\']:.4f}' + `")
 print(f"Budget used: {status['budget_used_pct']:.1f}%")
 
 # Test week key generation

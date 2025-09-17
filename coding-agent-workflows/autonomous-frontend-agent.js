@@ -1016,7 +1016,7 @@ export default accessibilityUtils;
             }
             
         } catch (error) {
-            console.error(`        ❌ Failed to apply optimization:`, error.message);
+            console.error('        ❌ Failed to apply optimization:', error.message);
         }
     }
 
@@ -1045,11 +1045,11 @@ export default accessibilityUtils;
                 }
                 
                 await fs.writeFile(appPath, appContent);
-                console.log(`        🔧 Updated App.jsx with component import`);
+                console.log('        🔧 Updated App.jsx with component import');
             }
             
         } catch (error) {
-            console.error(`        ❌ Failed to update component imports:`, error.message);
+            console.error('        ❌ Failed to update component imports:', error.message);
         }
     }
 

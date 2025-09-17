@@ -220,8 +220,8 @@ describe('SecurityManager', () => {
     });
 
     test('should detect SQL injection attempts', () => {
-      const sqlInjection = "'; DROP TABLE users; --";
-      const normalInput = "Just a normal string";
+      const sqlInjection = '\'; DROP TABLE users; --';
+      const normalInput = 'Just a normal string';
 
       expect(securityManager.inputValidator.detectSQLInjection(sqlInjection)).toBe(true);
       expect(securityManager.inputValidator.detectSQLInjection(normalInput)).toBe(false);
@@ -236,7 +236,7 @@ describe('SecurityManager', () => {
     });
 
     test('should validate input comprehensively', () => {
-      const sqlInjection = "'; DROP TABLE users; --";
+      const sqlInjection = '\'; DROP TABLE users; --';
       const xssInput = '<script>alert("xss")</script>';
       const normalInput = 'Normal input text';
 

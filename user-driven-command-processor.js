@@ -129,7 +129,7 @@ class UserDrivenCommandProcessor {
         try {
             // Parse the command
             const parsedCommand = this.parseNaturalLanguageCommand(commandText);
-            console.log(`📋 Parsed Command:`, JSON.stringify(parsedCommand, null, 2));
+            console.log('📋 Parsed Command:', JSON.stringify(parsedCommand, null, 2));
 
             // Validate and enhance the command
             const validatedCommand = await this.validateAndEnhanceCommand(parsedCommand);
@@ -166,7 +166,7 @@ class UserDrivenCommandProcessor {
 
         } catch (error) {
             const executionTime = Date.now() - startTime;
-            console.error(`❌ Command processing error:`, error);
+            console.error('❌ Command processing error:', error);
             
             this.updateSessionMetrics(false, executionTime);
             

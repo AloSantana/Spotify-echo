@@ -607,7 +607,7 @@ class SpotifyMCPServer {
                `**Genres:** ${info.genres.join(', ')}\n` +
                `**Popularity:** ${info.popularity}/100\n` +
                `**Followers:** ${info.followers.toLocaleString()}\n\n` +
-               `**Top Tracks:**\n` +
+               '**Top Tracks:**\n' +
                info.top_tracks.map((track, index) => 
                    `${index + 1}. ${track.name} (${track.popularity}/100)`
                ).join('\n');
@@ -619,7 +619,7 @@ class SpotifyMCPServer {
                `**Duration:** ${Math.round(info.duration_ms / 1000)}s\n` +
                `**Popularity:** ${info.popularity}/100\n` +
                `**Explicit:** ${info.explicit ? 'Yes' : 'No'}\n\n` +
-               `**Audio Features:**\n` +
+               '**Audio Features:**\n' +
                `• Danceability: ${(info.audio_features.danceability * 100).toFixed(1)}%\n` +
                `• Energy: ${(info.audio_features.energy * 100).toFixed(1)}%\n` +
                `• Valence (mood): ${(info.audio_features.valence * 100).toFixed(1)}%\n` +
@@ -633,10 +633,10 @@ class SpotifyMCPServer {
             return `❌ Analysis error: ${analysis.error}`;
         }
 
-        let output = `📊 **Listening History Analysis**\n\n`;
+        let output = '📊 **Listening History Analysis**\n\n';
         output += `**Tracks Analyzed:** ${analysis.totalTracks}\n\n`;
         
-        output += `**Average Audio Profile:**\n`;
+        output += '**Average Audio Profile:**\n';
         output += `• Energy: ${(analysis.avgFeatures.energy * 100).toFixed(1)}%\n`;
         output += `• Danceability: ${(analysis.avgFeatures.danceability * 100).toFixed(1)}%\n`;
         output += `• Valence (mood): ${(analysis.avgFeatures.valence * 100).toFixed(1)}%\n`;
@@ -644,7 +644,7 @@ class SpotifyMCPServer {
         output += `• Acousticness: ${(analysis.avgFeatures.acousticness * 100).toFixed(1)}%\n\n`;
 
         if (analysis.topGenres.length > 0) {
-            output += `**Top Genres:**\n`;
+            output += '**Top Genres:**\n';
             analysis.topGenres.forEach((item, index) => {
                 output += `${index + 1}. ${item.genre} (${item.count} tracks)\n`;
             });
@@ -652,7 +652,7 @@ class SpotifyMCPServer {
         }
 
         if (analysis.topArtists.length > 0) {
-            output += `**Top Artists:**\n`;
+            output += '**Top Artists:**\n';
             analysis.topArtists.forEach((item, index) => {
                 output += `${index + 1}. ${item.artist} (${item.count} tracks)\n`;
             });
@@ -660,7 +660,7 @@ class SpotifyMCPServer {
         }
 
         if (analysis.insights.length > 0) {
-            output += `**Music Insights:**\n`;
+            output += '**Music Insights:**\n';
             analysis.insights.forEach(insight => {
                 output += `• ${insight}\n`;
             });

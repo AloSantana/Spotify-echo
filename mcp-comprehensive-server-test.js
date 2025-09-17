@@ -305,38 +305,38 @@ class MCPServerTestSuite {
         
         const packageData = {
           name: `echotune-mcp-${serverName}`,
-          version: "1.0.0",
+          version: '1.0.0',
           description: serverConfig.description,
           main: path.basename(serverConfig.path),
           scripts: {
             start: `node ${path.basename(serverConfig.path)}`,
-            test: "echo \"No tests yet\" && exit 0"
+            test: 'echo "No tests yet" && exit 0'
           },
           dependencies: {
-            "@modelcontextprotocol/sdk": "^0.5.0",
-            "express": "^4.18.2",
-            "dotenv": "^16.0.3"
+            '@modelcontextprotocol/sdk': '^0.5.0',
+            'express': '^4.18.2',
+            'dotenv': '^16.0.3'
           }
         };
 
         // Add TypeScript dependencies if needed
         if (serverConfig.isTypeScript) {
-          packageData.dependencies.typescript = "^5.0.0";
-          packageData.dependencies["@types/node"] = "^20.0.0";
-          packageData.scripts.build = "tsc";
-          packageData.scripts.start = "tsc && node dist/index.js";
+          packageData.dependencies.typescript = '^5.0.0';
+          packageData.dependencies['@types/node'] = '^20.0.0';
+          packageData.scripts.build = 'tsc';
+          packageData.scripts.start = 'tsc && node dist/index.js';
         }
 
         // Add specific dependencies based on server type
         if (serverName === 'browserbase') {
-          packageData.dependencies.playwright = "^1.40.0";
+          packageData.dependencies.playwright = '^1.40.0';
         } else if (serverName === 'github-repos-manager') {
-          packageData.dependencies.octokit = "^3.0.0";
+          packageData.dependencies.octokit = '^3.0.0';
         } else if (serverName === 'perplexity-mcp') {
-          packageData.dependencies.axios = "^1.6.0";
+          packageData.dependencies.axios = '^1.6.0';
         } else if (serverName === 'analytics-server') {
-          packageData.dependencies.mongodb = "^6.0.0";
-          packageData.dependencies.redis = "^4.6.0";
+          packageData.dependencies.mongodb = '^6.0.0';
+          packageData.dependencies.redis = '^4.6.0';
         }
 
         fs.writeFileSync(packageJsonPath, JSON.stringify(packageData, null, 2));
@@ -416,22 +416,22 @@ class MCPServerTestSuite {
     
     const startupScripts = {
       // Individual server startup scripts
-      "mcp:start:all": "concurrently \"npm run mcp:filesystem\" \"npm run mcp:memory\" \"npm run mcp:sequential-thinking\" \"npm run mcp:github-repos\" \"npm run mcp:brave-search\" \"npm run mcpperplexity\" \"npm run mcp:analytics\" \"npm run mcp:browserbase\" \"npm run mcp:code-sandbox\"",
+      'mcp:start:all': 'concurrently "npm run mcp:filesystem" "npm run mcp:memory" "npm run mcp:sequential-thinking" "npm run mcp:github-repos" "npm run mcp:brave-search" "npm run mcpperplexity" "npm run mcp:analytics" "npm run mcp:browserbase" "npm run mcp:code-sandbox"',
       
       // Enhanced individual scripts
-      "mcp:test:all": "node mcp-comprehensive-server-test.js",
-      "mcp:validate:all": "node mcp-comprehensive-server-test.js --validate-only",
-      "mcp:health:all": "node scripts/mcp-health-monitor.js",
+      'mcp:test:all': 'node mcp-comprehensive-server-test.js',
+      'mcp:validate:all': 'node mcp-comprehensive-server-test.js --validate-only',
+      'mcp:health:all': 'node scripts/mcp-health-monitor.js',
       
       // New orchestrated startup
-      "mcp:orchestrated-start": "node mcp-server/enhanced-mcp-orchestrator.js --start-all"
+      'mcp:orchestrated-start': 'node mcp-server/enhanced-mcp-orchestrator.js --start-all'
     };
 
     // Write to package.json update suggestions
     const suggestions = {
       timestamp: new Date().toISOString(),
       suggestedScripts: startupScripts,
-      instructions: "Add these scripts to package.json for comprehensive MCP server management"
+      instructions: 'Add these scripts to package.json for comprehensive MCP server management'
     };
 
     fs.writeFileSync('mcp-startup-script-suggestions.json', JSON.stringify(suggestions, null, 2));
@@ -451,25 +451,25 @@ class MCPServerTestSuite {
   }
 
   generateMarkdownReport() {
-    let markdown = `# MCP Server Comprehensive Test Report\n\n`;
+    let markdown = '# MCP Server Comprehensive Test Report\n\n';
     markdown += `**Generated:** ${this.results.timestamp}\n\n`;
     
     // Summary
-    markdown += `## 🎯 Executive Summary\n\n`;
+    markdown += '## 🎯 Executive Summary\n\n';
     markdown += `- **Total Servers:** ${this.results.totalServers}\n`;
     markdown += `- **Configured:** ${this.results.summary.configurationRate}\n`;
     markdown += `- **Operational:** ${this.results.summary.operationalRate}\n`;
     markdown += `- **Overall Score:** ${this.results.summary.overallScore}/100 (${this.results.summary.readinessLevel})\n\n`;
 
     // Detailed results
-    markdown += `## 📋 Server Details\n\n`;
+    markdown += '## 📋 Server Details\n\n';
     
     for (const [serverName, result] of Object.entries(this.results.servers)) {
       const status = result.configured ? '✅ CONFIGURED' : '❌ NEEDS_SETUP';
       markdown += `### ${serverName} - ${status}\n\n`;
       markdown += `**Description:** ${result.description}\n\n`;
       
-      markdown += `**Configuration Status:**\n`;
+      markdown += '**Configuration Status:**\n';
       markdown += `- File Exists: ${result.fileExists ? '✅' : '❌'}\n`;
       markdown += `- Package.json: ${result.packageExists ? '✅' : '❌'}\n`;
       markdown += `- Startable: ${result.startable ? '✅' : '❌'}\n`;
@@ -477,20 +477,20 @@ class MCPServerTestSuite {
       markdown += `- Responsive: ${result.responsive ? '✅' : '❌'}\n\n`;
 
       if (result.errors.length > 0) {
-        markdown += `**Issues Found:**\n`;
+        markdown += '**Issues Found:**\n';
         result.errors.forEach(error => {
           markdown += `- ${error}\n`;
         });
         markdown += '\n';
       }
 
-      markdown += `**Use Cases:**\n`;
+      markdown += '**Use Cases:**\n';
       result.useCases.forEach(useCase => {
         markdown += `- ${useCase}\n`;
       });
       
       markdown += `\n**Expected Tools:** ${result.expectedTools.join(', ')}\n\n`;
-      markdown += `---\n\n`;
+      markdown += '---\n\n';
     }
 
     return markdown;

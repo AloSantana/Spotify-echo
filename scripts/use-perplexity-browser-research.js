@@ -48,8 +48,8 @@ class IntegratedPerplexityBrowserResearch {
       artifacts: []
     };
     
-    console.log(`\n🚀 Integrated Perplexity Browser Research & Autonomous Development`);
-    console.log(`===============================================================`);
+    console.log('\n🚀 Integrated Perplexity Browser Research & Autonomous Development');
+    console.log('===============================================================');
     console.log(`📋 Session: ${this.sessionId}`);
     console.log(`🎯 Topic: ${this.options.topic}`);
     console.log(`🌐 Browser Research: ${this.options.enableBrowserResearch ? 'Enabled' : 'Disabled'}`);

@@ -137,7 +137,7 @@ class ComprehensiveValidationSuite {
                 const result = await apiTest.test();
                 
                 if (result.success) {
-                    console.log(`    ✅ Passed`);
+                    console.log('    ✅ Passed');
                     testSuite.score++;
                 } else {
                     console.log(`    ❌ Failed: ${result.error || 'Test failed'}`);
@@ -259,7 +259,7 @@ class ComprehensiveValidationSuite {
                 const result = await grok4Test.test();
                 
                 if (result.success) {
-                    console.log(`    ✅ Passed`);
+                    console.log('    ✅ Passed');
                     testSuite.score++;
                 } else {
                     console.log(`    ❌ Failed: ${result.error || 'Test failed'}`);
@@ -517,10 +517,10 @@ class ComprehensiveValidationSuite {
                 const result = await check.test();
                 
                 if (result.success) {
-                    console.log(`    ✅ Compliant`);
+                    console.log('    ✅ Compliant');
                     testSuite.score++;
                 } else {
-                    console.log(`    ❌ Non-compliant`);
+                    console.log('    ❌ Non-compliant');
                 }
                 
                 testSuite.tests.push({

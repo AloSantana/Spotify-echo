@@ -20,6 +20,10 @@ services:
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:${PORT:-3000}}
       # Internal service URLs for app
       REDIS_URL: ${REDIS_URL:-redis://:${REDIS_PASSWORD:-echotune_redis_pass}@redis:6379}
+      # Puppeteer configuration
+      PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium-browser
+      PUPPETEER_SKIP_DOWNLOAD: "true"
+      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
     ports:
       - "${PORT:-3000}:3000"
     depends_on:

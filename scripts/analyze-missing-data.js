@@ -328,7 +328,7 @@ class MissingDataAnalyzer {
         const markdownReport = this.generateMarkdownReport();
         fs.writeFileSync(mdReportPath, markdownReport);
         
-        this.log(`Missing data analysis reports saved:`, 'info');
+        this.log('Missing data analysis reports saved:', 'info');
         this.log(`  JSON: ${reportPath}`, 'info'); 
         this.log(`  Markdown: ${mdReportPath}`, 'info');
         

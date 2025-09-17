@@ -50,7 +50,7 @@ function main() {
 	writeFile(path.join(outDir, 'CURSOR_GENERATED.md'), summary);
 
 	// Environment Keys doc (best-effort from update-env-config.js)
-	const envDoc = `# Environment Keys (excerpt)\n\n- PERPLEXITY_API_KEY (research)\n- BRAVE_API_KEY (search)\n- BROWSERBASE_API_KEY / _PROJECT_ID / _SESSION_ID (optional UI automation)\n- OPENAI_API_KEY / ANTHROPIC_API_KEY (LLMs)\n\nStore secrets outside VCS and export before running workflows.\n`;
+	const envDoc = '# Environment Keys (excerpt)\n\n- PERPLEXITY_API_KEY (research)\n- BRAVE_API_KEY (search)\n- BROWSERBASE_API_KEY / _PROJECT_ID / _SESSION_ID (optional UI automation)\n- OPENAI_API_KEY / ANTHROPIC_API_KEY (LLMs)\n\nStore secrets outside VCS and export before running workflows.\n';
 	writeFile(path.join(outDir, 'ENV_KEYS.md'), envDoc);
 
 	// External sync placeholder

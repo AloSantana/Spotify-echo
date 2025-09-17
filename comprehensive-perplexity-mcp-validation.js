@@ -239,7 +239,7 @@ class ComprehensiveValidationSuite {
                 analysisLength: analysisResult.analysis.response.length
             };
             
-            console.log(`   ✅ Repository Analysis: WORKING`);
+            console.log('   ✅ Repository Analysis: WORKING');
             console.log(`   📁 Files: ${analysisResult.structure.totalFiles}, Dirs: ${analysisResult.structure.directories.length}`);
             console.log(`   🛠️  Frameworks: ${analysisResult.structure.frameworks.join(', ')}`);
             console.log(`   💡 Recommendations: ${analysisResult.recommendations.length}`);

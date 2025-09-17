@@ -188,7 +188,7 @@ class AdvancedN8nCodingAgentWorkflows {
                             model: 'llama-3.1-sonar-huge-128k-online',
                             messages: [{
                                 role: 'user',
-                                content: `Analyze this coding request and provide comprehensive research and implementation guidance: {{$json.request}}`
+                                content: 'Analyze this coding request and provide comprehensive research and implementation guidance: {{$json.request}}'
                             }],
                             max_tokens: 4000,
                             temperature: 0.1,
@@ -248,7 +248,7 @@ class AdvancedN8nCodingAgentWorkflows {
                                 content: 'You are an expert coding agent. Generate high-quality, production-ready code based on the research and requirements provided.'
                             }, {
                                 role: 'user',
-                                content: `Based on this research: {{$('Analyze Request with Perplexity').first().json.choices[0].message.content}}\n\nAnd additional context: {{$('Research with Brave Search').first().json}}\n\nGenerate code for: {{$('Coding Request Webhook').first().json.request}}`
+                                content: 'Based on this research: {{$(\'Analyze Request with Perplexity\').first().json.choices[0].message.content}}\n\nAnd additional context: {{$(\'Research with Brave Search\').first().json}}\n\nGenerate code for: {{$(\'Coding Request Webhook\').first().json.request}}'
                             }],
                             max_tokens: 4000,
                             temperature: 0.1
@@ -307,7 +307,7 @@ class AdvancedN8nCodingAgentWorkflows {
                             model: 'anthropic/claude-3.5-sonnet',
                             messages: [{
                                 role: 'user',
-                                content: `Review and validate this generated code: {{$('Generate Code with Cursor API').first().json.choices[0].message.content}}\n\nExecution results: {{$('Execute Code in E2B Sandbox').first().json}}\n\nProvide quality assessment, improvements, and final recommendations.`
+                                content: 'Review and validate this generated code: {{$(\'Generate Code with Cursor API\').first().json.choices[0].message.content}}\n\nExecution results: {{$(\'Execute Code in E2B Sandbox\').first().json}}\n\nProvide quality assessment, improvements, and final recommendations.'
                             }],
                             max_tokens: 2000
                         }
@@ -519,7 +519,7 @@ class AdvancedN8nCodingAgentWorkflows {
                                 content: 'You are a multimodal AI agent capable of processing text, images, audio, and web interactions.'
                             }, {
                                 role: 'user',
-                                content: `Combine these insights:\n\nGemini Analysis: {{$('Analyze with Gemini Vision').first().json}}\n\nBrowser Session: {{$('Browser Automation with Browserbase').first().json}}\n\nOriginal Request: {{$('Multimodal Request Webhook').first().json.prompt}}\n\nProvide comprehensive multimodal analysis and actionable recommendations.`
+                                content: 'Combine these insights:\n\nGemini Analysis: {{$(\'Analyze with Gemini Vision\').first().json}}\n\nBrowser Session: {{$(\'Browser Automation with Browserbase\').first().json}}\n\nOriginal Request: {{$(\'Multimodal Request Webhook\').first().json.prompt}}\n\nProvide comprehensive multimodal analysis and actionable recommendations.'
                             }],
                             max_tokens: 4000,
                             temperature: 0.2
@@ -726,7 +726,7 @@ class AdvancedN8nCodingAgentWorkflows {
                                 content: 'You are conducting a comprehensive second-pass research analysis. Build upon the initial research to provide deeper insights.'
                             }, {
                                 role: 'user',
-                                content: `Based on this initial research: {{$('Initial Perplexity Research').first().json.choices[0].message.content}}\n\nConduct deeper analysis of: {{$('Research Request Webhook').first().json.research_topic}}\n\nFocus on: implementation details, best practices, recent developments, and practical applications.`
+                                content: 'Based on this initial research: {{$(\'Initial Perplexity Research\').first().json.choices[0].message.content}}\n\nConduct deeper analysis of: {{$(\'Research Request Webhook\').first().json.research_topic}}\n\nFocus on: implementation details, best practices, recent developments, and practical applications.'
                             }],
                             max_tokens: 4000,
                             temperature: 0.05,
@@ -795,7 +795,7 @@ return [{ json: researchData }];
                                 content: 'You are generating a comprehensive research analysis report. Synthesize all research data into actionable insights and recommendations.'
                             }, {
                                 role: 'user',
-                                content: `Generate a comprehensive research report for: {{$('Research Request Webhook').first().json.research_topic}}\n\nInitial Research: {{$('Initial Perplexity Research').first().json.choices[0].message.content}}\n\nDeep Analysis: {{$('Deep Research Analysis').first().json.choices[0].message.content}}\n\nBrowser Research: {{$('Browser Research Automation').first().json}}\n\nProvide:\n1. Executive Summary\n2. Key Findings\n3. Implementation Roadmap\n4. Resource Links\n5. Next Steps\n6. Risk Assessment`
+                                content: 'Generate a comprehensive research report for: {{$(\'Research Request Webhook\').first().json.research_topic}}\n\nInitial Research: {{$(\'Initial Perplexity Research\').first().json.choices[0].message.content}}\n\nDeep Analysis: {{$(\'Deep Research Analysis\').first().json.choices[0].message.content}}\n\nBrowser Research: {{$(\'Browser Research Automation\').first().json}}\n\nProvide:\n1. Executive Summary\n2. Key Findings\n3. Implementation Roadmap\n4. Resource Links\n5. Next Steps\n6. Risk Assessment'
                             }],
                             max_tokens: 6000,
                             temperature: 0.1

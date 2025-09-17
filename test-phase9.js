@@ -187,7 +187,7 @@ class Phase9TestSuite {
       this.assert(response.data.metrics.system, 'Should include system metrics');
       this.assert(response.data.metrics.custom, 'Should include custom metrics');
       
-      console.log(`✅ APM Metrics: System and custom metrics available`);
+      console.log('✅ APM Metrics: System and custom metrics available');
     });
   }
   
@@ -295,7 +295,7 @@ class Phase9TestSuite {
       this.assert(response.data.metrics.performance, 'Should include performance metrics');
       this.assert(response.data.metrics.financials, 'Should include financial metrics');
       
-      console.log(`✅ BI Metrics: User, content, performance, and financial metrics available`);
+      console.log('✅ BI Metrics: User, content, performance, and financial metrics available');
     });
   }
   
@@ -402,7 +402,7 @@ class Phase9TestSuite {
       this.assert(response.data.metrics, 'Should include metrics data');
       this.assert(response.data.metrics.system, 'Should include system metrics');
       
-      console.log(`✅ Analytics Metrics: System metrics and performance data available`);
+      console.log('✅ Analytics Metrics: System metrics and performance data available');
     });
   }
   
@@ -483,7 +483,7 @@ class Phase9TestSuite {
       this.assert(suppressResponse.status === 200, 'Alert suppression should return 200');
       this.assert(suppressResponse.data.success === true, 'Alert suppression should indicate success');
       
-      console.log(`✅ Alerting Operations: Alert suppression works`);
+      console.log('✅ Alerting Operations: Alert suppression works');
     });
   }
   
@@ -507,9 +507,9 @@ class Phase9TestSuite {
           const csvExportResponse = await axios.get(`${this.baseUrl}/api/phase9/export/dashboard/${dashboardId}?format=csv`);
           this.assert(csvExportResponse.status === 200, 'CSV export should return 200');
           
-          console.log(`✅ Export: Dashboard export (JSON & CSV) works`);
+          console.log('✅ Export: Dashboard export (JSON & CSV) works');
         } else {
-          console.log(`✅ Export: No dashboards to export (expected for new installation)`);
+          console.log('✅ Export: No dashboards to export (expected for new installation)');
         }
       } catch (error) {
         console.log(`ℹ️  Export: Dashboard export test skipped (${error.message})`);
@@ -532,7 +532,7 @@ class Phase9TestSuite {
       this.assert(response.data.report.services, 'Should include services data');
       this.assert(response.data.report.metrics, 'Should include metrics data');
       
-      console.log(`✅ Reporting: Comprehensive Phase 9 report generated`);
+      console.log('✅ Reporting: Comprehensive Phase 9 report generated');
     });
   }
   

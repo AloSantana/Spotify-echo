@@ -174,7 +174,7 @@ const testFunctions = {
 
     console.log('✅ JWT Secret configured correctly');
     console.log(`   Length: ${secret.length} characters`);
-    console.log(`   Entropy: Good`);
+    console.log('   Entropy: Good');
     return true;
   }
 };
@@ -214,7 +214,7 @@ async function quickValidation() {
   }
 
   console.log('='.repeat(60));
-  console.log(`📊 Quick Validation Results:`);
+  console.log('📊 Quick Validation Results:');
   console.log(`   • Total: ${total}`);
   console.log(`   • Passed: ${passed}`);
   console.log(`   • Failed: ${total - passed}`);

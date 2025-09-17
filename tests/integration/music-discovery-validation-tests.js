@@ -461,7 +461,7 @@ describe('Music Discovery Algorithm Validation Suite', () => {
         timestamp: new Date().toISOString()
       });
       
-      console.log(`  ✅ OAuth token refresh validated`);
+      console.log('  ✅ OAuth token refresh validated');
     });
   });
 

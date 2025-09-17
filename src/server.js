@@ -69,6 +69,7 @@ const databaseRoutes = require('./api/routes/database');
 const playlistRoutes = require('./api/routes/playlists');
 const settingsRoutes = require('./api/routes/settings'); // Legacy settings routes (not directly mounted to avoid conflicts)
 const userSettingsRoutes = require('./api/routes/user-settings'); // New user settings API
+const simpleSettingsRoutes = require('./api/routes/simple-settings'); // Simple settings for frontend demo
 const systemRoutes = require('./api/routes/system');
 const analyticsRoutes = require('./api/routes/analytics');
 const insightsRoutes = require('./api/routes/insights'); // Enhanced Spotify insights with caching and pagination
@@ -478,7 +479,12 @@ app.use('/auth', authRoutes);
 app.use('/api/spotify', spotifyApiRoutes);
 app.use('/api', enhancedApiRoutes);
 app.use('/api/chat', chatRoutes_local);
-app.use('/', appRoutes);
+
+// Enhanced Medium Priority Routes
+const enhancedPerformanceRoutes = require('./api/routes/enhanced-performance');
+const enhancedTestingRoutes = require('./api/routes/enhanced-testing');
+app.use('/api/performance', enhancedPerformanceRoutes);
+app.use('/api/testing', enhancedTestingRoutes);
 
 // Phase 6: Enterprise health monitoring routes
 const enterpriseHealthRoutes = require('./routes/enterprise-health');
@@ -555,7 +561,7 @@ app.use(
 // Input sanitization
 app.use(sanitizeInput);
 
-// Configure static file serving (extracted to routes/static.js)
+// Configure static file serving BEFORE app routes (extracted to routes/static.js)
 configureStaticRoutes(app);
 
 // Database connection middleware
@@ -638,6 +644,7 @@ app.use('/api/database', databaseRoutes);
 app.use('/api/playlists', playlistRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/user-settings', userSettingsRoutes);
+app.use('/api/simple-settings', simpleSettingsRoutes); // Simple settings for frontend demo
 app.use('/api/system', systemRoutes);
 // Note: LLM providers and advanced settings moved to sub-paths to avoid conflicts
 app.use('/api/settings/llm', llmProvidersRoutes); // Enhanced LLM provider management
@@ -682,6 +689,9 @@ if (realtimeEnabled && io) {
 
 
 
+
+// App routes (SPA routing) - must be AFTER static file serving
+app.use('/', appRoutes);
 
 // Error handling middleware
 // eslint-disable-next-line no-unused-vars

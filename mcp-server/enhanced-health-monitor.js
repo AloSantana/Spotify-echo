@@ -576,7 +576,7 @@ class EnhancedMCPHealthMonitor extends EventEmitter {
             console.log(`🔍 Servers: http://localhost:${this.port}/servers`);
             console.log(`📈 History: http://localhost:${this.port}/history`);
             console.log(`🚨 Alerts: http://localhost:${this.port}/alerts`);
-            console.log(`🚀 Ready for enhanced MCP monitoring!\n`);
+            console.log('🚀 Ready for enhanced MCP monitoring!\n');
         });
 
         // Handle graceful shutdown

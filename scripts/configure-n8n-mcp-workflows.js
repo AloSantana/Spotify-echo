@@ -695,7 +695,7 @@ return {
             
             console.log('\n🎉 n8n workflow configuration completed!');
             console.log(`🔗 Access your n8n instance: ${this.apiUrl}`);
-            console.log(`📧 Login: willexmen8@gmail.com`);
+            console.log('📧 Login: willexmen8@gmail.com');
             console.log('🔑 Use your configured password');
             
             console.log('\n✨ Created workflows:');

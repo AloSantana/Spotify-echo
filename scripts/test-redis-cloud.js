@@ -112,7 +112,7 @@ async function testRedisCloud() {
         }
         const readTime = Date.now() - readStart;
 
-        console.log(`✅ Performance test completed`);
+        console.log('✅ Performance test completed');
         console.log(`   100 writes: ${writeTime}ms (${(writeTime/100).toFixed(1)}ms avg)`);
         console.log(`   100 reads: ${readTime}ms (${(readTime/100).toFixed(1)}ms avg)`);
 

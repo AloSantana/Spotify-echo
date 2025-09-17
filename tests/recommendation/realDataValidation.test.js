@@ -387,15 +387,15 @@ describe('Recommendation Engine Integration', () => {
 
     test('should validate explanation quality', () => {
       const explanation = {
-        primary: "Users with similar music taste often enjoy this track",
+        primary: 'Users with similar music taste often enjoy this track',
         detailed: [
           {
             strategy: 'collaborative',
             score: 0.8,
-            explanation: "Based on users with similar preferences"
+            explanation: 'Based on users with similar preferences'
           }
         ],
-        audioFeatures: "This track is high-energy, upbeat and positive",
+        audioFeatures: 'This track is high-energy, upbeat and positive',
         confidence: 'high',
         strategies: ['collaborative'],
         metadata: {

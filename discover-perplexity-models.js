@@ -138,7 +138,7 @@ class PerplexityModelDiscovery {
         const result = await this.testModel('invalid-model-name-123');
         
         console.log(`Status Code: ${result.statusCode}`);
-        console.log(`Response:`, JSON.stringify(result.response, null, 2));
+        console.log('Response:', JSON.stringify(result.response, null, 2));
 
         if (result.response && result.response.error) {
             const errorMsg = result.response.error.message;

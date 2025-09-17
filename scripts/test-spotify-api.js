@@ -210,7 +210,7 @@ class SpotifyAPITester {
       
       console.log('\n📊 API Test Results');
       console.log('===================');
-      console.log(`✅ Authentication: Working`);
+      console.log('✅ Authentication: Working');
       console.log(`${singleAudioFeatures ? '✅' : '❌'} Single Audio Features: ${singleAudioFeatures ? 'Working' : 'Failed'}`);
       console.log(`${batchAudioFeatures ? '✅' : '❌'} Batch Audio Features: ${batchAudioFeatures ? 'Working' : 'Failed'}`);
       console.log(`${searchEndpoint ? '✅' : '❌'} Track Search: ${searchEndpoint ? 'Working' : 'Failed'}`);

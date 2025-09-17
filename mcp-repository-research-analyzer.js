@@ -68,7 +68,7 @@ class MCPRepositoryResearchAnalyzer {
         console.log('🤖 Validating Perplexity Grok-4 Integration...');
         
         const validationTest = {
-            testPrompt: "Analyze the effectiveness of MCP servers for repository analysis. Provide a technical assessment.",
+            testPrompt: 'Analyze the effectiveness of MCP servers for repository analysis. Provide a technical assessment.',
             expectedCapabilities: ['deep_analysis', 'technical_assessment', 'repository_understanding'],
             modelSpecification: 'grok-4',
             validationTime: new Date().toISOString()
@@ -893,7 +893,7 @@ ${Object.entries(report.appendices.validationEvidence.qualityMetrics).map(([key,
             console.log('==========================================');
             console.log(`📋 Report: ${reportPath}`);
             console.log(`📊 JSON Data: ${jsonPath}`);
-            console.log(`🤖 Model Used: Grok-4 (Validated)`);
+            console.log('🤖 Model Used: Grok-4 (Validated)');
             console.log(`⚡ Effectiveness: ${this.researchResults.effectivenessMetrics?.overallEffectiveness.toFixed(1)}%`);
             console.log(`🎯 Top Recommendation: ${this.researchResults.effectivenessMetrics?.topRecommendations[0]?.name}`);
             console.log('==========================================\n');

@@ -1,0 +1,529 @@
+name: Full Validation Framework
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      enforce_perf_thresholds:
+        description: 'Enforce performance thresholds'
+        required: false
+        default: 'false'
+        type: boolean
+      skip_docker:
+        description: 'Skip Docker validation'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  NODE_VERSION: '20.x'
+  ENFORCE_PERF_THRESHOLDS: ${{ github.event.inputs.enforce_perf_thresholds || 'false' }}
+  SKIP_DOCKER: ${{ github.event.inputs.skip_docker || 'false' }}
+
+jobs:
+  # Stage 1: Environment Validation
+  environment-validation:
+    name: Environment Validation
+    runs-on: ubuntu-latest
+    outputs:
+      env-valid: ${{ steps.env-check.outputs.valid }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci --prefer-offline --no-audit
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: true
+
+      - name: Environment validation
+        id: env-check
+        run: |
+          node scripts/env-validate.js
+          echo "valid=true" >> $GITHUB_OUTPUT
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          SPOTIFY_TEST_ACCESS_TOKEN: ${{ secrets.SPOTIFY_TEST_ACCESS_TOKEN }}
+          SPOTIFY_TEST_REFRESH_TOKEN: ${{ secrets.SPOTIFY_TEST_REFRESH_TOKEN }}
+          SPOTIFY_TEST_USER_ID: ${{ secrets.SPOTIFY_TEST_USER_ID }}
+
+      - name: Upload environment report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: environment-report
+          path: reports/env-validation.json
+          retention-days: 30
+
+  # Stage 2: Provider Detection & Testing
+  provider-detection:
+    name: Provider Detection & Testing
+    runs-on: ubuntu-latest
+    needs: environment-validation
+    if: needs.environment-validation.outputs.env-valid == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci --prefer-offline --no-audit
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: true
+
+      - name: Detect and test providers
+        run: node scripts/providers/detect-providers.js
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+
+      - name: Upload provider reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: provider-reports
+          path: |
+            reports/provider-status.json
+            reports/provider-latencies.json
+          retention-days: 30
+
+  # Stage 3: Start Application Services
+  start-services:
+    name: Start Application Services
+    runs-on: ubuntu-latest
+    needs: [environment-validation, provider-detection]
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval \"db.adminCommand('ping')\""
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci --prefer-offline --no-audit
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: true
+
+      - name: Start application
+        run: |
+          npm start &
+          echo $! > app.pid
+          sleep 10
+        env:
+          NODE_ENV: development
+          PORT: 3000
+          MONGODB_URI: mongodb://localhost:27017/echotune_test
+          JWT_SECRET: test-jwt-secret-for-ci
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          
+      - name: Wait for application to be ready
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3000/health; do sleep 2; done'
+
+      - name: Test recommendation engine
+        run: node scripts/recommendation-probe.js http://localhost:3000
+
+      - name: Stop application
+        if: always()
+        run: |
+          if [ -f app.pid ]; then
+            kill $(cat app.pid) || true
+            rm app.pid
+          fi
+
+      - name: Upload recommendation report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recommendation-report
+          path: reports/recommendation-engine.json
+          retention-days: 30
+
+  # Stage 4: Playwright E2E Testing with Screenshots
+  playwright-e2e:
+    name: Playwright E2E Tests with Screenshots
+    runs-on: ubuntu-latest
+    needs: [environment-validation, provider-detection]
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval \"db.adminCommand('ping')\""
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci --prefer-offline --no-audit
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium firefox webkit
+
+      - name: Start application for E2E tests
+        run: |
+          npm start &
+          echo $! > app.pid
+          timeout 60 bash -c 'until curl -f http://localhost:3000/health; do sleep 2; done'
+        env:
+          NODE_ENV: test
+          PORT: 3000
+          MONGODB_URI: mongodb://localhost:27017/echotune_test
+          JWT_SECRET: test-jwt-secret-for-e2e
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Run comprehensive E2E flows
+        run: npx playwright test tests/e2e/comprehensive-flows.spec.js --workers=1
+        env:
+          BASE_URL: http://localhost:3000
+          SPOTIFY_TEST_USERNAME: ${{ secrets.SPOTIFY_TEST_USERNAME }}
+          SPOTIFY_TEST_PASSWORD: ${{ secrets.SPOTIFY_TEST_PASSWORD }}
+
+      - name: Stop application
+        if: always()
+        run: |
+          if [ -f app.pid ]; then
+            kill $(cat app.pid) || true
+            rm app.pid
+          fi
+
+      - name: Upload screenshot artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-screenshots
+          path: |
+            BROWSERSCREENSHOT-TESTING/
+            reports/screenshot-coverage.json
+          retention-days: 30
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 30
+
+  # Stage 5: Performance Smoke Testing
+  performance-testing:
+    name: Performance Smoke Testing
+    runs-on: ubuntu-latest
+    needs: start-services
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval \"db.adminCommand('ping')\""
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci --prefer-offline --no-audit
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: true
+
+      - name: Start application for performance tests
+        run: |
+          npm start &
+          echo $! > app.pid
+          timeout 60 bash -c 'until curl -f http://localhost:3000/health; do sleep 2; done'
+        env:
+          NODE_ENV: production
+          PORT: 3000
+          MONGODB_URI: mongodb://localhost:27017/echotune_perf
+          JWT_SECRET: test-jwt-secret-for-perf
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Run performance smoke tests
+        run: node scripts/perf-smoke-test.js http://localhost:3000
+        env:
+          ENFORCE_PERF_THRESHOLDS: ${{ env.ENFORCE_PERF_THRESHOLDS }}
+
+      - name: Stop application
+        if: always()
+        run: |
+          if [ -f app.pid ]; then
+            kill $(cat app.pid) || true
+            rm app.pid
+          fi
+
+      - name: Upload performance report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-report
+          path: reports/perf-chat.json
+          retention-days: 30
+
+  # Stage 6: Docker Validation (Optional)
+  docker-validation:
+    name: Docker Validation
+    runs-on: ubuntu-latest
+    needs: environment-validation
+    if: needs.environment-validation.outputs.env-valid == 'true' && env.SKIP_DOCKER != 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci --prefer-offline --no-audit
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: true
+
+      - name: Run Docker validation
+        run: node scripts/docker-validate.js
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Upload Docker report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: docker-report
+          path: |
+            reports/docker-validation.json
+            reports/docker-logs/
+          retention-days: 30
+
+  # Stage 7: Report Aggregation & Summary
+  report-aggregation:
+    name: Aggregate Test Reports
+    runs-on: ubuntu-latest
+    needs: [environment-validation, provider-detection, start-services, playwright-e2e, performance-testing]
+    if: always() && needs.environment-validation.outputs.env-valid == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci --prefer-offline --no-audit
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: true
+
+      - name: Download all reports
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Prepare reports directory
+        run: |
+          mkdir -p reports
+          # Copy all JSON reports to reports directory
+          find artifacts/ -name "*.json" -exec cp {} reports/ \;
+          
+          # Copy screenshot coverage if available
+          if [ -d "artifacts/e2e-screenshots/BROWSERSCREENSHOT-TESTING" ]; then
+            cp -r artifacts/e2e-screenshots/BROWSERSCREENSHOT-TESTING ./
+          fi
+
+      - name: Aggregate comprehensive test report
+        run: node scripts/collect-test-report.js
+
+      - name: Display test summary
+        run: |
+          echo "## 📊 Test Validation Summary" >> $GITHUB_STEP_SUMMARY
+          if [ -f "reports/test-run-report.md" ]; then
+            cat reports/test-run-report.md >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Test report generation failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload comprehensive reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: comprehensive-test-reports
+          path: |
+            reports/test-run-report.json
+            reports/test-run-report.md
+            reports/
+          retention-days: 90
+
+      - name: Comment PR with test results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'reports/test-run-report.md';
+            
+            if (fs.existsSync(path)) {
+              const report = fs.readFileSync(path, 'utf8');
+              const maxLength = 65000; // GitHub comment limit
+              const truncatedReport = report.length > maxLength 
+                ? report.substring(0, maxLength) + '\n\n... (report truncated)'
+                : report;
+              
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## 🧪 Comprehensive Test Validation Results\n\n${truncatedReport}`
+              });
+            }
+
+      - name: Check overall test status
+        run: |
+          if [ -f "reports/test-run-report.json" ]; then
+            SUCCESS=$(node -e "console.log(require('./reports/test-run-report.json').success)")
+            if [ "$SUCCESS" != "true" ]; then
+              echo "❌ Test validation failed"
+              exit 1
+            fi
+            echo "✅ Test validation passed"
+          else
+            echo "❌ Test report not found"
+            exit 1
+          fi
+
+  # Stage 8: Update .gitignore
+  update-gitignore:
+    name: Update .gitignore
+    runs-on: ubuntu-latest
+    needs: report-aggregation
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Update .gitignore with test artifacts
+        run: |
+          # Add test artifact patterns to .gitignore if not already present
+          cat >> .gitignore << 'EOF'
+          
+          # Test Artifacts & Reports
+          BROWSERSCREENSHOT-TESTING/
+          reports/docker-logs/
+          reports/*-validation.json
+          reports/provider-*.json
+          reports/recommendation-engine.json
+          reports/perf-chat.json
+          reports/screenshot-coverage.json
+          test-results/
+          artifacts/
+          *.log
+          
+          # Temporary test files
+          app.pid
+          
+          EOF
+          
+          # Remove duplicates while preserving order
+          awk '!seen[$0]++' .gitignore > .gitignore.tmp && mv .gitignore.tmp .gitignore
+
+      - name: Commit updated .gitignore
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .gitignore
+          if git diff --staged --quiet; then
+            echo "No changes to .gitignore"
+          else
+            git commit -m "chore: update .gitignore with test artifacts patterns [skip ci]"
+            git push
+          fi
+
+# Workflow-level failure policy
+# FAIL: env invalid, docker build/run failure (if not skipped), enabled provider test failure, 
+#       aggregator generation failure, hard perf threshold (if enforced)
+# WARN: no providers enabled, recommendation fallback, soft perf exceed, missing baseline images

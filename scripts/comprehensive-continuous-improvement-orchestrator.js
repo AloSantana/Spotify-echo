@@ -1099,7 +1099,7 @@ class ComprehensiveContinuousImprovementOrchestrator {
     // Performance metrics update
     updates.push({
       type: 'performance',
-      content: `## Performance Metrics\n\n` +
+      content: '## Performance Metrics\n\n' +
                `- Cycles Completed: ${this.orchestrationMetrics.cyclesCompleted}\n` +
                `- Average Cycle Time: ${this.orchestrationMetrics.averageCycleTime}ms\n` +
                `- Total Tasks Generated: ${this.totalTasksGenerated}\n` +

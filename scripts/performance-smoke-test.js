@@ -73,11 +73,11 @@ class PerformanceSmokeTest {
             const results = await baseline.runBaseline();
             this.analyzeResults(results);
             
-            console.log(`\n🏁 Smoke Test Results:`);
+            console.log('\n🏁 Smoke Test Results:');
             console.log(`Status: ${this.results.passed ? '✅ PASSED' : '❌ FAILED'}`);
             
             if (this.results.failures.length > 0) {
-                console.log(`\nFailures:`);
+                console.log('\nFailures:');
                 for (const failure of this.results.failures) {
                     console.log(`  ❌ ${failure}`);
                 }

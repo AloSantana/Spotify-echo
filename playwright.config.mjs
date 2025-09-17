@@ -11,7 +11,11 @@ export default defineConfig({
   /* Test directories for different test types */
   testMatch: [
     '**/tests/e2e/**/*.spec.ts',
-    '**/tests/visual/**/*.spec.ts'
+    '**/tests/e2e/**/*.spec.js',
+    '**/tests/visual/**/*.spec.ts',
+    '**/tests/visual/**/*.spec.js',
+    '**/tests/**/*.test.js',
+    '**/tests/**/*.test.ts'
   ],
   
   /* Run tests in files in parallel */
@@ -28,14 +32,14 @@ export default defineConfig({
   
   /* Reporter to use */
   reporter: [
-    ['html', { outputFolder: 'playwright-report' }],
-    ['json', { outputFile: 'reports/playwright-results.json' }],
-    ['junit', { outputFile: 'reports/playwright-results.xml' }]
+    ['html', { outputFolder: 'BROWSERSCREENSHOT-TESTING/playwright-report' }],
+    ['json', { outputFile: 'BROWSERSCREENSHOT-TESTING/reports/playwright-results.json' }],
+    ['junit', { outputFile: 'BROWSERSCREENSHOT-TESTING/reports/playwright-results.xml' }]
   ],
   
   /* Global setup and teardown */
-  globalSetup: './tests/setup/global-setup.js',
-  globalTeardown: './tests/setup/global-teardown.js',
+  // globalSetup: './tests/setup/global-setup.js',
+  // globalTeardown: './tests/setup/global-teardown.js',
   
   /* Shared settings for all projects */
   use: {
@@ -138,15 +142,15 @@ export default defineConfig({
   ],
 
   /* Run local dev server before starting tests */
-  webServer: {
-    command: 'npm run start',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-  },
+  // webServer: {
+  //   command: 'npm run start',
+  //   url: 'http://localhost:3000',
+  //   reuseExistingServer: !process.env.CI,
+  //   timeout: 120 * 1000,
+  // },
   
   /* Output directories for test artifacts */
-  outputDir: 'artifacts/test-results',
+  outputDir: 'BROWSERSCREENSHOT-TESTING/test-results',
   
   /* Timeout settings */
   timeout: 60 * 1000, // 60 seconds per test

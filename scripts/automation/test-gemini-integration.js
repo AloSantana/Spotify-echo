@@ -33,7 +33,7 @@ class UnifiedGeminiIntegrationTest {
       this.provider = new GeminiProvider({});
       await this.provider.initialize();
 
-      console.log(`✅ GeminiProvider initialized successfully.`);
+      console.log('✅ GeminiProvider initialized successfully.');
       console.log(`   Mode: ${this.provider.config.useVertex ? 'Vertex AI' : 'Google AI Studio'}`);
       this.results.initialization = true;
       return true;

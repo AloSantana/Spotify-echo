@@ -92,7 +92,7 @@ class AdvancedN8nValidationSuite {
                 }
             }
             
-            console.log(`\n📈 Workflow Validation Summary:`);
+            console.log('\n📈 Workflow Validation Summary:');
             console.log(`   Valid: ${this.testResults.workflows.validation_summary.valid}`);
             console.log(`   Invalid: ${this.testResults.workflows.validation_summary.invalid}`);
             console.log(`   Active: ${this.testResults.workflows.validation_summary.active}`);
@@ -206,7 +206,7 @@ class AdvancedN8nValidationSuite {
                 console.log(`   ✅ ${credential.name} (${credential.type})`);
             }
             
-            console.log(`\n📊 Credentials by Type:`);
+            console.log('\n📊 Credentials by Type:');
             Object.entries(this.testResults.credentials.by_type).forEach(([type, count]) => {
                 console.log(`   ${type}: ${count}`);
             });
@@ -534,7 +534,7 @@ class AdvancedN8nValidationSuite {
             markdownReport
         );
         
-        console.log(`✅ Validation results saved:`);
+        console.log('✅ Validation results saved:');
         console.log(`   📄 n8n-validation-report-${timestamp}.json`);
         console.log(`   📄 n8n-validation-report-${timestamp}.md`);
     }

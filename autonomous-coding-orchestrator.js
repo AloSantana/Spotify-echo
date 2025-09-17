@@ -1,5 +1,13 @@
 #!/usr/bin/env node
 
+/**
+ * Autonomous Coding Orchestrator
+ */
+class AutonomousCodingOrchestrator {
+    constructor() {
+        this.config = {};
+    }
+
     /**
      * Make actual Perplexity API call (REAL - NO MOCK)
      */
@@ -183,6 +191,10 @@
         console.log('\n🚀 AUTONOMOUS SYSTEM SUCCESS - ALL REAL IMPLEMENTATIONS');
 
         return finalReport;
+    }
+}
+
+module.exports = AutonomousCodingOrchestrator;
     }
 }
 

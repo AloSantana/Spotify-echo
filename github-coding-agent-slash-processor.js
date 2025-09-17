@@ -103,7 +103,7 @@ class GitHubCodingAgentSlashProcessor {
 
         } catch (error) {
             const executionTime = Date.now() - startTime;
-            console.error(`❌ Command failed:`, error.message);
+            console.error('❌ Command failed:', error.message);
             
             this.updateMetrics(false, executionTime);
             

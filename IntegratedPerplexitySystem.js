@@ -140,7 +140,7 @@ class IntegratedPerplexitySystem {
                     optimized: true
                 };
             } else {
-                console.log(`❌ Query failed`);
+                console.log('❌ Query failed');
                 return { ...result, queryId };
             }
             
@@ -255,7 +255,7 @@ class IntegratedPerplexitySystem {
      */
     getSystemStatus() {
         const costReport = this.costOptimizer.generateCostReport();
-        const apiStats = this.api.getUsageStats();
+        const _apiStats = this.api.getUsageStats();
         
         return {
             timestamp: new Date().toISOString(),
@@ -398,11 +398,11 @@ class IntegratedPerplexitySystem {
     }
 
     // Workflow implementations
-    async repositoryAnalysisWorkflow(params) {
+    async repositoryAnalysisWorkflow(_params) {
         return await this.researchWorkflow(`Repository analysis: ${params.repository}`);
     }
 
-    async costOptimizationWorkflow(params) {
+    async costOptimizationWorkflow(_params) {
         const report = this.generateOptimizationReport();
         return {
             workflowId: this.generateQueryId(),
@@ -411,8 +411,8 @@ class IntegratedPerplexitySystem {
         };
     }
 
-    async batchProcessingWorkflow(params) {
-        return await this.processBatch(params.queries, params.options);
+    async batchProcessingWorkflow(_params) {
+        return await this.processBatch(params.queries, params._options);
     }
 }
 

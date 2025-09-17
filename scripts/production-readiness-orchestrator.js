@@ -46,7 +46,7 @@ class ProductionReadinessOrchestrator {
         console.log('=' .repeat(60));
         console.log(`🚀 Version: ${this.orchestrationResults.orchestrator_version}`);
         console.log(`📅 Started: ${new Date().toLocaleString()}`);
-        console.log(`🏗️  Project: EchoTune AI - Production Readiness Validation`);
+        console.log('🏗️  Project: EchoTune AI - Production Readiness Validation');
         console.log('=' .repeat(60));
 
         try {

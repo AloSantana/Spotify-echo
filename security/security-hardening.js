@@ -88,28 +88,28 @@ class SecurityHardening {
       res.locals.nonce = nonce;
 
       const cspDirectives = {
-        defaultSrc: ["'self'"],
+        defaultSrc: ['\'self\''],
         scriptSrc: [
-          "'self'",
+          '\'self\'',
           `'nonce-${nonce}'`,
           'https://api.spotify.com',
           'https://sdk.scdn.co',
           'https://open.spotify.com'
         ],
         styleSrc: [
-          "'self'",
-          "'unsafe-inline'",
+          '\'self\'',
+          '\'unsafe-inline\'',
           'https://fonts.googleapis.com'
         ],
         imgSrc: [
-          "'self'",
+          '\'self\'',
           'data:',
           'https://i.scdn.co',
           'https://mosaic.scdn.co',
           'https://lineup-images.scdn.co'
         ],
         connectSrc: [
-          "'self'",
+          '\'self\'',
           'https://api.spotify.com',
           'https://accounts.spotify.com',
           'wss://dealer.spotify.com',
@@ -117,7 +117,7 @@ class SecurityHardening {
           'https://generativelanguage.googleapis.com'
         ],
         mediaSrc: [
-          "'self'",
+          '\'self\'',
           'https://p.scdn.co',
           'https://audio.scdn.co'
         ],
@@ -126,7 +126,7 @@ class SecurityHardening {
           'https://accounts.spotify.com'
         ],
         fontSrc: [
-          "'self'",
+          '\'self\'',
           'https://fonts.gstatic.com'
         ],
         upgradeInsecureRequests: []

@@ -127,19 +127,19 @@ class SystemValidator {
         const packagePath = path.join('mcp-servers', serverName, 'package.json');
         
         await fs.access(serverPath);
-        console.log(`    ✅ Server file exists`);
+        console.log('    ✅ Server file exists');
 
         await fs.access(packagePath);
-        console.log(`    ✅ Package.json exists`);
+        console.log('    ✅ Package.json exists');
 
         // Validate package.json structure
         const packageContent = await fs.readFile(packagePath, 'utf8');
         const packageData = JSON.parse(packageContent);
         
         if (packageData.name && packageData.version && packageData.dependencies) {
-          console.log(`    ✅ Package.json structure valid`);
+          console.log('    ✅ Package.json structure valid');
         } else {
-          console.log(`    ⚠️ Package.json missing required fields`);
+          console.log('    ⚠️ Package.json missing required fields');
         }
 
         // Try to load server (with mock SDK if needed)
@@ -150,7 +150,7 @@ class SystemValidator {
           }
 
           const ServerClass = require(path.resolve(serverPath));
-          console.log(`    ✅ Server class can be imported`);
+          console.log('    ✅ Server class can be imported');
           
           this.results.mcpServers[serverName] = {
             status: 'valid',

@@ -80,7 +80,7 @@ class MCPIntegrationTest {
         lastError = error;
         console.log(`  Attempt ${attempt} failed: ${error.message}`);
         if (attempt < maxRetries) {
-          console.log(`  Waiting 2 seconds before retry...`);
+          console.log('  Waiting 2 seconds before retry...');
           await new Promise(resolve => setTimeout(resolve, 2000));
         }
       }

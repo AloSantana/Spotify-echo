@@ -128,9 +128,9 @@ Include latest features from docs.perplexity.ai guides section`,
     );
     
     // Generate markdown summary
-    let markdown = `# Perplexity API Documentation Research Report\n\n`;
+    let markdown = '# Perplexity API Documentation Research Report\n\n';
     markdown += `**Generated**: ${timestamp}\n\n`;
-    markdown += `## Research Summary\n\n`;
+    markdown += '## Research Summary\n\n';
     markdown += `- **Queries Executed**: ${report.summary.successful_queries}/${report.total_queries}\n`;
     markdown += `- **Total Content Generated**: ${report.summary.total_content_generated.toLocaleString()} characters\n\n`;
     
@@ -139,15 +139,15 @@ Include latest features from docs.perplexity.ai guides section`,
             markdown += `## ${topic}\n\n`;
             markdown += `**Duration**: ${data.duration}ms | **Model**: ${data.result.model}\n\n`;
             markdown += `${data.result.content}\n\n`;
-            markdown += `---\n\n`;
+            markdown += '---\n\n';
         }
     }
     
     await fs.writeFile('perplexity-documentation-research.md', markdown);
     
     console.log('\n🎉 Research Complete!');
-    console.log(`📄 Detailed results: perplexity-documentation-research.json`);
-    console.log(`📋 Summary report: perplexity-documentation-research.md`);
+    console.log('📄 Detailed results: perplexity-documentation-research.json');
+    console.log('📋 Summary report: perplexity-documentation-research.md');
     console.log(`📊 Total content: ${report.summary.total_content_generated.toLocaleString()} characters`);
     
     return report;

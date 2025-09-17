@@ -322,7 +322,7 @@ class ComprehensivePerplexityTester {
         console.log(`\n✅ Passed Tests: ${passed}/${total}`);
         console.log(`📈 Success Rate: ${((passed/total) * 100).toFixed(1)}%`);
         
-        console.log(`\n🎯 Detailed Results:`);
+        console.log('\n🎯 Detailed Results:');
         console.log(`   ✅ Passed: ${this.testResults.passed.length}`);
         console.log(`   ⚠️  Warnings: ${this.testResults.warnings.length}`);
         console.log(`   ❌ Failed: ${this.testResults.failed.length}`);

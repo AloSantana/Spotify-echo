@@ -51,7 +51,7 @@ class ComprehensiveN8NValidator {
                 headers: { 'X-N8N-API-KEY': this.apiKey },
                 timeout: 10000
             });
-            console.log(`   ✅ API Authentication: Working`);
+            console.log('   ✅ API Authentication: Working');
             console.log(`   ✅ Total Workflows in System: ${api.data.data.length}`);
             
             this.results.server_connectivity = true;
@@ -187,7 +187,7 @@ class ComprehensiveN8NValidator {
                     
                     if (status === 404 && message.includes('not registered')) {
                         console.log(`   🟡 ${endpoint.name}: Endpoint exists but workflow inactive`);
-                        console.log(`      💡 Hint: Activate the workflow in N8N web interface`);
+                        console.log('      💡 Hint: Activate the workflow in N8N web interface');
                         this.results.webhook_endpoints_responding += 0.5; // Partial credit
                     } else {
                         console.log(`   ⚠️  ${endpoint.name}: Status ${status} - ${message}`);
@@ -232,10 +232,10 @@ class ComprehensiveN8NValidator {
             
             console.log('\n📊 IMPLEMENTATION METRICS:');
             console.log(`   • Server: ${this.apiUrl} ✅ Online`);
-            console.log(`   • Workflows: 4/4 ✅ Created`);
-            console.log(`   • Credentials: 2/2 ✅ Configured`);
-            console.log(`   • Automation: Daily + Real-time ✅ Ready`);
-            console.log(`   • AI Integration: OpenAI + MongoDB ✅ Connected`);
+            console.log('   • Workflows: 4/4 ✅ Created');
+            console.log('   • Credentials: 2/2 ✅ Configured');
+            console.log('   • Automation: Daily + Real-time ✅ Ready');
+            console.log('   • AI Integration: OpenAI + MongoDB ✅ Connected');
             
         } else {
             console.log('\n❌ IMPLEMENTATION INCOMPLETE');

@@ -32,7 +32,7 @@ describe('GitHubInfo Component Integration', () => {
     
     // Check if GitHubInfo is imported and used
     const appContent = fs.readFileSync(appPath, 'utf8');
-    expect(appContent).toContain("import GitHubInfo from '../components/GitHubInfo'");
+    expect(appContent).toContain('import GitHubInfo from \'../components/GitHubInfo\'');
     expect(appContent).toContain('<GitHubInfo />');
     expect(appContent).toContain('GitHub');
   });

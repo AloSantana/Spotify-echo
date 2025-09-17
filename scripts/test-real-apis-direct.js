@@ -57,7 +57,7 @@ async function testMongoDB() {
     const db = client.db('echotune');
     const collections = await db.listCollections().toArray();
     
-    console.log(`✅ MongoDB connected successfully!`);
+    console.log('✅ MongoDB connected successfully!');
     console.log(`📊 Found ${collections.length} collections:`);
     
     collections.forEach(col => {
@@ -82,7 +82,7 @@ async function testMongoDB() {
     
     // Clean up test user
     await usersCollection.deleteOne({ _id: insertResult.insertedId });
-    console.log(`🧹 Test user cleaned up`);
+    console.log('🧹 Test user cleaned up');
     
     await client.close();
     return true;
@@ -120,7 +120,7 @@ async function testServerEndpoints() {
         }
         successCount++;
       } else if (response.status === 401 || response.status === 405) {
-        console.log(`   ⚠️ Expected authentication/method error (this is normal)`);
+        console.log('   ⚠️ Expected authentication/method error (this is normal)');
         successCount++;
       } else {
         console.log(`   ❌ Unexpected status: ${response.status}`);
@@ -163,7 +163,7 @@ async function testSpotifyAPIIntegration() {
       return true;
       
     } else if (response.status === 401) {
-      console.log(`⚠️ Authentication required (expected for user endpoints)`);
+      console.log('⚠️ Authentication required (expected for user endpoints)');
       return true;
       
     } else {
@@ -205,7 +205,7 @@ async function testAIChatIntegration() {
       return true;
       
     } else if (response.status === 401 || response.status === 500 || response.status === 405) {
-      console.log(`⚠️ Expected error (chat may require authentication or proper setup)`);
+      console.log('⚠️ Expected error (chat may require authentication or proper setup)');
       return true;
       
     } else {

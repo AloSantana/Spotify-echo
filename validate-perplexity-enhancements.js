@@ -39,7 +39,7 @@ class PerplexityEnhancementValidator {
             
             console.log('✅ API initialized with cost optimization');
             console.log(`📊 Models available: ${this.api.getModels().length}`);
-            console.log(`💰 Daily budget: $5.00\n`);
+            console.log('💰 Daily budget: $5.00\n');
             
             return true;
         } catch (error) {
@@ -121,7 +121,7 @@ class PerplexityEnhancementValidator {
     async testCostOptimization() {
         return await this.runTest('Cost Optimization', async () => {
             // Test cost estimation
-            const prompt = "What is artificial intelligence?";
+            const prompt = 'What is artificial intelligence?';
             const model = this.api.models.sonar;
             const estimate = this.api.estimateCost(prompt, { maxTokens: 500 }, model);
             
@@ -257,9 +257,9 @@ class PerplexityEnhancementValidator {
     async testComplexityAssessment() {
         return await this.runTest('Complexity Assessment', async () => {
             const testCases = [
-                { prompt: "What is AI?", expected: "simple" },
-                { prompt: "Analyze the differences between machine learning and deep learning", expected: "moderate" },
-                { prompt: "Provide a comprehensive research analysis of the impact of artificial intelligence on music composition, including technical implementation details, current industry applications, and future trends", expected: "expert" }
+                { prompt: 'What is AI?', expected: 'simple' },
+                { prompt: 'Analyze the differences between machine learning and deep learning', expected: 'moderate' },
+                { prompt: 'Provide a comprehensive research analysis of the impact of artificial intelligence on music composition, including technical implementation details, current industry applications, and future trends', expected: 'expert' }
             ];
             
             const results = {};
@@ -269,7 +269,7 @@ class PerplexityEnhancementValidator {
                 results[testCase.expected] = complexity;
                 
                 // Allow some flexibility in complexity assessment
-                const validComplexities = ["simple", "moderate", "complex", "expert"];
+                const validComplexities = ['simple', 'moderate', 'complex', 'expert'];
                 if (!validComplexities.includes(complexity)) {
                     throw new Error(`Invalid complexity assessment: ${complexity}`);
                 }
@@ -327,22 +327,22 @@ class PerplexityEnhancementValidator {
         await fs.writeFile('perplexity-enhancement-validation.json', JSON.stringify(report, null, 2));
         
         // Create markdown summary
-        let markdown = `# Perplexity API Enhancement Validation Report\n\n`;
+        let markdown = '# Perplexity API Enhancement Validation Report\n\n';
         markdown += `**Generated**: ${this.results.timestamp}\n\n`;
-        markdown += `## Validation Summary\n\n`;
+        markdown += '## Validation Summary\n\n';
         markdown += `- **Tests Run**: ${this.results.summary.total}\n`;
         markdown += `- **Tests Passed**: ${this.results.summary.passed} (${report.validationSummary.successRate.toFixed(1)}%)\n`;
         markdown += `- **Tests Failed**: ${this.results.summary.failed}\n`;
         markdown += `- **Total Cost**: $${this.results.summary.cost.toFixed(4)}\n`;
         markdown += `- **Average Cost per Test**: $${report.validationSummary.costEfficiency.toFixed(4)}\n\n`;
         
-        markdown += `## Models Available\n\n`;
+        markdown += '## Models Available\n\n';
         for (const model of this.api.getModels()) {
             markdown += `- **${model.name}** (\`${model.id}\`): ${model.description}\n`;
         }
-        markdown += `\n`;
+        markdown += '\n';
         
-        markdown += `## Test Results\n\n`;
+        markdown += '## Test Results\n\n';
         for (const [testName, testResult] of Object.entries(this.results.tests)) {
             const status = testResult.status === 'PASSED' ? '✅' : '❌';
             markdown += `### ${status} ${testName}\n`;
@@ -365,7 +365,7 @@ class PerplexityEnhancementValidator {
                 markdown += `- **Error**: ${testResult.error}\n`;
             }
             
-            markdown += `\n`;
+            markdown += '\n';
         }
         
         await fs.writeFile('perplexity-enhancement-validation.md', markdown);
@@ -396,15 +396,15 @@ class PerplexityEnhancementValidator {
         const report = await this.generateReport();
         
         console.log('\n🎉 Validation Complete!\n');
-        console.log(`📊 Summary:`);
+        console.log('📊 Summary:');
         console.log(`   • Tests: ${report.summary.passed}/${report.summary.total} passed`);
         console.log(`   • Success Rate: ${report.validationSummary.successRate.toFixed(1)}%`);
         console.log(`   • Total Cost: $${report.summary.cost.toFixed(4)}`);
         console.log(`   • Models Validated: ${[...new Set(report.validationSummary.modelsValidated)].length}`);
         
-        console.log(`\n📄 Reports Generated:`);
-        console.log(`   • Detailed: perplexity-enhancement-validation.json`);
-        console.log(`   • Summary: perplexity-enhancement-validation.md`);
+        console.log('\n📄 Reports Generated:');
+        console.log('   • Detailed: perplexity-enhancement-validation.json');
+        console.log('   • Summary: perplexity-enhancement-validation.md');
         
         return report.summary.failed === 0;
     }

@@ -344,9 +344,9 @@ Be specific, actionable, and focused on immediate implementation.`;
             await this.saveWorkflowReport(workflowResults, summary);
             
             console.log('\n✅ AUTOMATION WORKFLOW COMPLETE');
-            console.log(`📊 Repository insights: Generated`);
+            console.log('📊 Repository insights: Generated');
             console.log(`📋 Roadmap updates: ${workflowResults.totalTasks} new tasks`);
-            console.log(`⚡ Ready for coding agent automation`);
+            console.log('⚡ Ready for coding agent automation');
             
             return workflowResults;
             

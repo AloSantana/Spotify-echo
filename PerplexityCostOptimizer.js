@@ -6,7 +6,7 @@
  */
 
 const fs = require('fs').promises;
-const path = require('path');
+const // const path = require('path'); // Unused
 
 class PerplexityCostOptimizer {
     constructor(options = {}) {

@@ -105,7 +105,7 @@ function generateOptimizedPackageJson() {
 function main() {
   const { mcpDeps, shouldMoveToDevDeps, alreadyInDevDeps } = analyzeDependencies();
   
-  console.log(`📊 Analysis Results:`);
+  console.log('📊 Analysis Results:');
   console.log(`   Total production dependencies: ${Object.keys(packageJson.dependencies || {}).length}`);
   console.log(`   Total dev dependencies: ${Object.keys(packageJson.devDependencies || {}).length}`);
   console.log('');

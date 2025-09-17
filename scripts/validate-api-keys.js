@@ -539,7 +539,7 @@ class APIKeyValidator {
                     status: 'configured_not_running',
                     message: 'MCP server files exist but server is not running',
                     port: port,
-                    suggestion: `Start with: npm run mcp-server`
+                    suggestion: 'Start with: npm run mcp-server'
                 };
             }
             
@@ -815,18 +815,18 @@ class APIKeyValidator {
     createMarkdownReport() {
         const reportPath = path.join(process.cwd(), 'API_KEYS_VALIDATION_REPORT.md');
         
-        let markdown = `# API Keys Validation Report\n\n`;
+        let markdown = '# API Keys Validation Report\n\n';
         markdown += `**Generated**: ${this.results.timestamp}\n`;
         markdown += `**Overall Status**: ${this.results.overall.toUpperCase()}\n`;
         markdown += `**Configuration Complete**: ${this.results.configurationComplete ? '✅ YES' : '❌ NO'}\n\n`;
         
-        markdown += `## Summary\n\n`;
+        markdown += '## Summary\n\n';
         markdown += `- **Total Services**: ${this.results.totalKeys}\n`;
         markdown += `- **Valid/Configured**: ${this.results.validKeys}\n`;
         markdown += `- **Failed**: ${this.results.failedKeys}\n`;
         markdown += `- **Not Configured**: ${this.results.totalKeys - this.results.validKeys - this.results.failedKeys}\n\n`;
         
-        markdown += `## Service Status\n\n`;
+        markdown += '## Service Status\n\n';
         Object.entries(this.results.services).forEach(([service, result]) => {
             const statusIcon = result.status === 'valid' || result.status === 'configured' || result.status === 'running' || result.status === 'secure' ? '✅' : 
                               result.status === 'not_configured' || result.status === 'disabled' ? '⚠️' : '❌';
@@ -837,11 +837,11 @@ class APIKeyValidator {
             if (result.message) {
                 markdown += ` - ${result.message}`;
             }
-            markdown += `\n`;
+            markdown += '\n';
         });
 
         if (this.results.recommendations.length > 0) {
-            markdown += `\n## Recommendations\n\n`;
+            markdown += '\n## Recommendations\n\n';
             this.results.recommendations.forEach(rec => {
                 markdown += `### ${rec.priority} Priority: ${rec.category}\n`;
                 markdown += `- **Issue**: ${rec.message}\n`;

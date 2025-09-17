@@ -43,7 +43,7 @@ class CollaborativeMatrixBuilder {
 
       // Calculate similarity scores
       const similarityMatrix = this.calculateSimilarityScores(cooccurrenceMatrix);
-      console.log(`📈 Calculated similarity scores`);
+      console.log('📈 Calculated similarity scores');
 
       // Save to file
       await this.saveMatrix(similarityMatrix, cooccurrenceMatrix);

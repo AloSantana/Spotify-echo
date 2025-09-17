@@ -332,7 +332,7 @@ class AudioFeaturesFetcher {
       }
 
       console.log('\n🎉 Audio features processing complete!');
-      console.log(`📊 Final Results:`);
+      console.log('📊 Final Results:');
       console.log(`   • Total tracks processed: ${processedCount}`);
       console.log(`   • Features fetched from API: ${this.fetchedCount}`);
       console.log(`   • Features from cache: ${this.cachedCount}`);
@@ -398,7 +398,7 @@ class AudioFeaturesFetcher {
       console.log(`   ✅ Tracks with audio features: ${tracksWithFeatures}`);
       console.log(`   ❌ Tracks without audio features: ${tracksWithoutFeatures}`);
       console.log(`   📈 Coverage: ${coverage}%`);
-      console.log(`   📄 Report saved to: AUDIO_FEATURES_FETCH_REPORT.json`);
+      console.log('   📄 Report saved to: AUDIO_FEATURES_FETCH_REPORT.json');
       
       return report;
       

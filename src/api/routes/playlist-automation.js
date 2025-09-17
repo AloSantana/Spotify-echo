@@ -67,7 +67,7 @@ router.post('/create', async (req, res) => {
         name,
         tracks,
         {
-          description: description || `AI-curated playlist created by EchoTune AI`,
+          description: description || 'AI-curated playlist created by EchoTune AI',
           public: config.public || false,
           collaborative: config.collaborative || false,
           ...config

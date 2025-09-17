@@ -149,7 +149,7 @@ class EnhancedPerplexityRepositoryAnalyzer {
       this.metrics.analysisTime = Date.now() - startTime;
       
       console.log('✅ Repository analysis complete!');
-      console.log(`📈 Analysis Summary:`);
+      console.log('📈 Analysis Summary:');
       console.log(`   Files analyzed: ${this.metrics.filesAnalyzed}`);
       console.log(`   Tasks generated: ${this.metrics.tasksGenerated}`);
       console.log(`   Analysis time: ${Math.round(this.metrics.analysisTime / 1000)}s`);

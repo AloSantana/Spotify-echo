@@ -26,7 +26,7 @@ class EvaluationCLI {
    * Run evaluation with specified parameters
    */
   async runEvaluation(model, suite, options = {}) {
-    console.log(`🚀 Starting AI Model Evaluation`);
+    console.log('🚀 Starting AI Model Evaluation');
     console.log(`   Model: ${model}`);
     console.log(`   Suite: ${suite}`);
     console.log(`   Options: ${JSON.stringify(options, null, 2)}`);
@@ -40,7 +40,7 @@ class EvaluationCLI {
       console.log(`\n✅ Evaluation completed successfully in ${duration}ms`);
       
       // Print summary
-      console.log(`\n📊 Results Summary:`);
+      console.log('\n📊 Results Summary:');
       console.log(`   Success Rate: ${(results.stats.successRate * 100).toFixed(1)}%`);
       console.log(`   Average Latency: ${results.latency.mean.toFixed(0)}ms`);
       console.log(`   Total Cost: $${results.cost.total.toFixed(6)}`);
@@ -48,7 +48,7 @@ class EvaluationCLI {
       console.log(`   Performance Grade: ${results.summary.performanceGrade}`);
       
       if (results.summary.recommendation.issues.length > 0) {
-        console.log(`\n⚠️  Issues Identified:`);
+        console.log('\n⚠️  Issues Identified:');
         results.summary.recommendation.issues.forEach(issue => {
           console.log(`   - ${issue}`);
         });

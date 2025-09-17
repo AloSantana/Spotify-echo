@@ -1,6 +1,6 @@
 import OptimizedMusicComponent from './components/OptimizedMusicComponent.jsx';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AppBar, Toolbar, Container, Tabs, Tab, Box, Typography, Paper } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { AppBar, Toolbar, Container, Tabs, Tab, Box, Typography, Paper, CircularProgress } from '@mui/material';
 import React, { useState, Suspense, lazy } from 'react';
 import ThemeProvider, { ThemeToggle } from './components/ThemeProvider';
 // Convert heavy components to lazy-loaded chunks for better initial bundle size
@@ -10,6 +10,13 @@ const ExplainableRecommendations = lazy(() => import('./components/ExplainableRe
 const EnhancedChatInterface = lazy(() => import('./components/EnhancedChatInterface'));
 const EnhancedMusicDiscovery = lazy(() => import('./components/EnhancedMusicDiscovery'));
 const EnhancedAnalyticsDashboard = lazy(() => import('./components/EnhancedAnalyticsDashboard'));
+
+// New enhanced UI components
+const AdvancedMusicControlCenter = lazy(() => import('./components/AdvancedMusicControlCenter'));
+const EnhancedMusicDiscoveryDashboard = lazy(() => import('./components/EnhancedMusicDiscoveryDashboard'));
+const AdvancedAnalyticsVisualizationDashboard = lazy(() => import('./components/AdvancedAnalyticsVisualizationDashboard'));
+const ModernChatInterface = lazy(() => import('./components/ModernChatInterface'));
+const AdvancedPlaylistManagement = lazy(() => import('./components/AdvancedPlaylistManagement'));
 const InsightsDashboard = lazy(() => import('./components/InsightsDashboard'));
 const SongsPage = lazy(() => import('./components/SongsPage'));
 const MobileResponsiveManager = lazy(() => import('./components/MobileResponsiveManager'));
@@ -19,7 +26,22 @@ const EnhancedStreamingChatInterface = lazy(() => import('./components/EnhancedS
 const EnhancedProviderPanel = lazy(() => import('./components/EnhancedProviderPanel'));
 const GitHubInfo = lazy(() => import('./components/GitHubInfo'));
 const AdminMCPPanel = lazy(() => import('./components/AdminMCPPanel'));
-// import { AuthProvider, useAuth } from './contexts/AuthContext';
+// Add new backend-connected components
+const ConnectedChatInterface = lazy(() => import('./components/ConnectedChatInterface'));
+const BackendConnectedSettings = lazy(() => import('./components/BackendConnectedSettings'));
+// Add comprehensive system components
+const ComprehensiveSystemSettings = lazy(() => import('./components/ComprehensiveSystemSettings'));
+const EnhancedSpotifyWebPlayer = lazy(() => import('./components/EnhancedSpotifyWebPlayer'));
+const RealTimeSystemMonitoring = lazy(() => import('./components/RealTimeSystemMonitoring'));
+// Add new enhanced components for Medium Priority features
+const EnhancedModernChatInterface = lazy(() => import('./components/EnhancedModernChatInterface'));
+const AdvancedPerformanceMonitoring = lazy(() => import('./components/AdvancedPerformanceMonitoring'));
+const ComprehensiveTestingExpansion = lazy(() => import('./components/ComprehensiveTestingExpansion'));
+// Add auth components as non-lazy since they're needed immediately
+import AuthStatus, { AuthGuard } from './components/AuthStatus';
+import SpotifyLoginButton from './components/SpotifyLoginButton';
+import { AuthProvider } from './contexts/AuthContext';
+import { useAuth } from './contexts/AuthContext';
 import { LLMProvider } from './contexts/LLMContext';
 // import { DatabaseProvider } from './contexts/DatabaseContext';
 import './styles/App.css';
@@ -57,29 +79,33 @@ const prefetchers = {
 function App() {
   return (
     <ThemeProvider>
-      <LLMProvider>
-        <Router>
-          <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading…</div>}>
-            <Routes>
-              <Route path="/" element={<MainApplication />} />
-              <Route path="/chat" element={<MainApplication initialTab="chat" />} />
-              <Route
-                path="/recommendations"
-                element={<MainApplication initialTab="recommendations" />}
-              />
-              <Route path="/playlist" element={<MainApplication initialTab="playlist" />} />
-              <Route path="/playlists" element={<MainApplication initialTab="playlists" />} />
-              <Route path="/songs" element={<MainApplication initialTab="songs" />} />
-              <Route path="/discovery" element={<MainApplication initialTab="discovery" />} />
-              <Route path="/analytics" element={<MainApplication initialTab="analytics" />} />
-              <Route path="/insights" element={<MainApplication initialTab="insights" />} />
-              <Route path="/autonomous" element={<MainApplication initialTab="autonomous" />} />
-              <Route path="/settings" element={<MainApplication initialTab="settings" />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
-        </Router>
-      </LLMProvider>
+      <AuthProvider>
+        <LLMProvider>
+          <Router>
+            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading…</div>}>
+              <Routes>
+                <Route path="/" element={<MainApplication />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/auth/callback" element={<AuthCallbackHandler />} />
+                <Route path="/chat" element={<MainApplication initialTab="chat" />} />
+                <Route
+                  path="/recommendations"
+                  element={<MainApplication initialTab="recommendations" />}
+                />
+                <Route path="/playlist" element={<MainApplication initialTab="playlist" />} />
+                <Route path="/playlists" element={<MainApplication initialTab="playlists" />} />
+                <Route path="/songs" element={<MainApplication initialTab="songs" />} />
+                <Route path="/discovery" element={<MainApplication initialTab="discovery" />} />
+                <Route path="/analytics" element={<MainApplication initialTab="analytics" />} />
+                <Route path="/insights" element={<MainApplication initialTab="insights" />} />
+                <Route path="/autonomous" element={<MainApplication initialTab="autonomous" />} />
+                <Route path="/settings" element={<MainApplication initialTab="settings" />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
+          </Router>
+        </LLMProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
@@ -154,7 +180,7 @@ function MainApplication({ initialTab = 'chat' }) {
         const data = await response.json();
         return {
           response: data.response,
-          recommendations: mockRecommendations.slice(0, 2), // Mock recommendations
+          recommendations: data.recommendations || [], // Use real recommendations from API
           explanation: {
             summary: 'I selected these tracks based on your mood and musical preferences.',
             reasoning: [
@@ -167,25 +193,43 @@ function MainApplication({ initialTab = 'chat' }) {
               { factor: 'activity', value: context.activity || 'general', influence: 'medium' },
             ],
           },
-          provider: data.provider || 'mock',
+          provider: data.provider || (process.env.NODE_ENV === 'production' ? 'unavailable' : 'mock'),
         };
       }
     } catch (error) {
       console.error('Chat API error:', error);
     }
 
-    // Fallback response
-    return {
-      response: 'I\'d love to help you discover great music! What kind of mood are you in today?',
+    // Production fallback - no mocks allowed
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.CI === 'true';
+    const fallbackResponse = isProduction ? {
+      response: 'Chat service temporarily unavailable. Please check your configuration.',
       recommendations: [],
-      provider: 'mock',
+      provider: 'unavailable',
+    } : {
+      response: 'I\'d love to help you discover great music! What kind of mood are you in today?',
+      recommendations: mockRecommendations.slice(0, 2),
+      provider: 'development-fallback',
     };
+
+    return fallbackResponse;
   };
 
   const handleGetExplanation = async (recommendationId, trackId) => {
     console.log('Getting explanation for:', recommendationId, trackId);
 
-    // Mock explanation based on track
+    // Mock explanation based on track (development only)
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.CI === 'true';
+    if (isProduction) {
+      return {
+        summary: 'Explanation service unavailable in production mode',
+        reasons: ['Real explanation service required'],
+        confidence: 0,
+        algorithm: 'production',
+        factors: []
+      };
+    }
+    
     const track = mockRecommendations.find((t) => t.id === trackId);
     if (track) {
       return {
@@ -280,6 +324,93 @@ function MainApplication({ initialTab = 'chat' }) {
     };
   };
 
+  // Mock playlists data
+  const mockPlaylists = [
+    {
+      id: 'playlist1',
+      name: 'My Favorites',
+      description: 'All my favorite tracks',
+      image: '/playlist1.jpg',
+      isPublic: true,
+      collaborative: false,
+      owner: 'You',
+      collaborators: [],
+      trackCount: 25,
+      duration: 6720,
+      lastModified: new Date('2024-01-07'),
+      tags: ['favorites', 'mixed']
+    }
+  ];
+
+  // Additional handler functions for enhanced components
+  const onPlayTrack = useCallback((track) => {
+    console.log('Playing track:', track);
+    // Handle track playback
+  }, []);
+
+  const onLikeTrack = useCallback((trackId, liked) => {
+    console.log('Toggling like for track:', trackId, liked);
+    // Handle track like/unlike
+  }, []);
+
+  const onShareTrack = useCallback((track) => {
+    console.log('Sharing track:', track);
+    // Handle track sharing
+  }, []);
+
+  const handleDiscoverMusic = useCallback(async (discoveryParams) => {
+    console.log('Discovering music with params:', discoveryParams);
+    // Mock discovery results
+    return mockRecommendations;
+  }, []);
+
+  const handleTimeRangeChange = useCallback((timeRange) => {
+    console.log('Time range changed:', timeRange);
+  }, []);
+
+  const handleExportData = useCallback(() => {
+    console.log('Exporting analytics data');
+  }, []);
+
+  const handleRefreshData = useCallback(() => {
+    console.log('Refreshing analytics data');
+  }, []);
+
+  const handleCreatePlaylist = useCallback(async (playlistData) => {
+    console.log('Creating playlist:', playlistData);
+    return { success: true, playlistId: `playlist_${Date.now()}` };
+  }, []);
+
+  const handleUpdatePlaylist = useCallback(async (playlistId, updates) => {
+    console.log('Updating playlist:', playlistId, updates);
+    return { success: true };
+  }, []);
+
+  const handleDeletePlaylist = useCallback(async (playlistId) => {
+    console.log('Deleting playlist:', playlistId);
+    return { success: true };
+  }, []);
+
+  const handleCollaboratePlaylist = useCallback(async (playlistId, collaborators) => {
+    console.log('Adding collaborators to playlist:', playlistId, collaborators);
+    return { success: true };
+  }, []);
+
+  const handleReorderTracks = useCallback(async (playlistId, reorderedTracks) => {
+    console.log('Reordering tracks in playlist:', playlistId, reorderedTracks);
+    return { success: true };
+  }, []);
+
+  const handleAddTrack = useCallback(async (playlistId, track) => {
+    console.log('Adding track to playlist:', playlistId, track);
+    return { success: true };
+  }, []);
+
+  const handleRemoveTrack = useCallback(async (playlistId, trackId) => {
+    console.log('Removing track from playlist:', playlistId, trackId);
+    return { success: true };
+  }, []);
+
   const handlePrefetch = (tab) => {
     const run = prefetchers[tab];
     if (run) {
@@ -303,7 +434,20 @@ function MainApplication({ initialTab = 'chat' }) {
               Enhanced Experience
             </Typography>
           </Typography>
-          <ThemeToggle showCustomization />
+          
+          {/* Authentication Status */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <AuthStatus 
+              variant="compact" 
+              onNavigate={(path) => {
+                if (path.startsWith('/')) {
+                  // Handle navigation
+                  window.location.href = path;
+                }
+              }} 
+            />
+            <ThemeToggle showCustomization />
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -316,6 +460,7 @@ function MainApplication({ initialTab = 'chat' }) {
             aria-label="EchoTune AI navigation"
           >
             <Tab label="🤖 AI Chat" value="chat" onMouseEnter={() => handlePrefetch('chat')} />
+            <Tab label="🔗 Enhanced Chat" value="enhanced-chat" onMouseEnter={() => handlePrefetch('chat')} />
             <Tab
               label="🎯 Recommendations"
               value="recommendations"
@@ -347,6 +492,9 @@ function MainApplication({ initialTab = 'chat' }) {
               value="insights"
               onMouseEnter={() => handlePrefetch('insights')}
             />
+            <Tab label="🎵 Spotify Player" value="spotify-player" />
+            <Tab label="⚡ Performance" value="performance-monitor" />
+            <Tab label="🧪 Testing" value="testing-dashboard" />
             <Tab
               label="🤖 Autonomous"
               value="autonomous"
@@ -368,12 +516,61 @@ function MainApplication({ initialTab = 'chat' }) {
         >
           {currentTab === 'chat' && (
             <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
-              <EnhancedChatInterface
-                sessionId={sessionId}
-                onSendMessage={handleSendChatMessage}
-                onProvideFeedback={handleProvideFeedback}
-                loading={false}
-              />
+              <AuthGuard 
+                fallback={
+                  <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <Typography variant="h5" gutterBottom>
+                      Connect Spotify to Start Chatting
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                      Sign in with your Spotify account to access AI-powered music conversations
+                    </Typography>
+                    <SpotifyLoginButton />
+                  </Box>
+                }
+              >
+                <ModernChatInterface
+                  sessionId={sessionId}
+                  onSendMessage={handleSendChatMessage}
+                  onPlayTrack={onPlayTrack}
+                  onLikeTrack={onLikeTrack}
+                  onShareTrack={onShareTrack}
+                  loading={false}
+                />
+              </AuthGuard>
+            </Container>
+          )}
+
+          {currentTab === 'enhanced-chat' && (
+            <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
+              <AuthGuard 
+                fallback={
+                  <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <Typography variant="h5" gutterBottom>
+                      Connect Spotify for Enhanced AI Chat
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                      Sign in with your Spotify account to access the enhanced AI chat with provider selection and configuration
+                    </Typography>
+                    <SpotifyLoginButton />
+                  </Box>
+                }
+              >
+                <EnhancedModernChatInterface
+                  sessionId={sessionId}
+                  onSendMessage={handleSendChatMessage}
+                  onPlayTrack={onPlayTrack}
+                  onLikeTrack={onLikeTrack}
+                  onShareTrack={onShareTrack}
+                  loading={false}
+                />
+              </AuthGuard>
+            </Container>
+          )}
+
+          {currentTab === 'connected-chat' && (
+            <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
+              <ConnectedChatInterface />
             </Container>
           )}
 
@@ -390,13 +587,20 @@ function MainApplication({ initialTab = 'chat' }) {
 
           {currentTab === 'playlist' && (
             <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
-              <PlaylistBuilder
-                initialTracks={[]}
-                recommendations={mockRecommendations}
-                onSave={handleSavePlaylist}
-                onShare={handleSharePlaylist}
-                onGetExplanation={handleGetExplanation}
-                onProvideFeedback={handleProvideFeedback}
+              <AdvancedPlaylistManagement
+                playlists={mockPlaylists}
+                tracks={mockRecommendations}
+                onCreatePlaylist={handleCreatePlaylist}
+                onUpdatePlaylist={handleUpdatePlaylist}
+                onDeletePlaylist={handleDeletePlaylist}
+                onPlayTrack={onPlayTrack}
+                onLikeTrack={onLikeTrack}
+                onSharePlaylist={handleSharePlaylist}
+                onCollaboratePlaylist={handleCollaboratePlaylist}
+                onReorderTracks={handleReorderTracks}
+                onAddTrack={handleAddTrack}
+                onRemoveTrack={handleRemoveTrack}
+                loading={false}
               />
             </Container>
           )}
@@ -415,19 +619,97 @@ function MainApplication({ initialTab = 'chat' }) {
 
           {currentTab === 'discovery' && (
             <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
-              <EnhancedMusicDiscovery />
+              <EnhancedMusicDiscoveryDashboard
+                onDiscoverMusic={handleDiscoverMusic}
+                onPlayTrack={onPlayTrack}
+                onLikeTrack={onLikeTrack}
+                onShareTrack={onShareTrack}
+                loading={false}
+              />
             </Container>
           )}
 
           {currentTab === 'analytics' && (
             <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
-              <EnhancedAnalyticsDashboard />
+              <AuthGuard 
+                fallback={
+                  <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <Typography variant="h5" gutterBottom>
+                      Connect Spotify for Analytics
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                      View detailed analytics about your music listening habits
+                    </Typography>
+                    <SpotifyLoginButton />
+                  </Box>
+                }
+              >
+                <AdvancedAnalyticsVisualizationDashboard
+                  timeRange="month"
+                  onTimeRangeChange={handleTimeRangeChange}
+                  onExportData={handleExportData}
+                  onRefreshData={handleRefreshData}
+                  loading={false}
+                />
+              </AuthGuard>
             </Container>
           )}
 
           {currentTab === 'insights' && (
             <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
-              <InsightsDashboard />
+              <AuthGuard 
+                fallback={
+                  <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <Typography variant="h5" gutterBottom>
+                      Connect Spotify for Insights
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                      Get personalized insights about your music preferences
+                    </Typography>
+                    <SpotifyLoginButton />
+                  </Box>
+                }
+              >
+                <InsightsDashboard />
+              </AuthGuard>
+            </Container>
+          )}
+
+          {currentTab === 'spotify-player' && (
+            <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
+              <AuthGuard 
+                fallback={
+                  <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <Typography variant="h5" gutterBottom>
+                      🔐 Spotify Authentication Required
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                      Please log in with Spotify to access the web player and control your music playback.
+                    </Typography>
+                    <SpotifyLoginButton />
+                  </Box>
+                }
+              >
+                <EnhancedSpotifyWebPlayer />
+              </AuthGuard>
+            </Container>
+          )}
+
+          {currentTab === 'performance-monitor' && (
+            <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
+              <AdvancedPerformanceMonitoring />
+            </Container>
+          )}
+
+          {currentTab === 'testing-dashboard' && (
+            <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
+              <ComprehensiveTestingExpansion />
+            </Container>
+          )}
+
+          {currentTab === 'system-monitor' && (
+            <Container maxWidth="xl" sx={{ height: '100%', py: 2 }}>
+              <RealTimeSystemMonitoring />
             </Container>
           )}
 
@@ -490,7 +772,7 @@ function MainApplication({ initialTab = 'chat' }) {
  * Manages sub-tabs for different configuration areas
  */
 function SettingsTabManager() {
-  const [settingsTab, setSettingsTab] = useState('general');
+  const [settingsTab, setSettingsTab] = useState('backend'); // Default to backend config
 
   // Check if admin panel is enabled
   const isAdminEnabled = process.env.REACT_APP_ENABLE_ADMIN_MCP_PANEL === 'true';
@@ -502,6 +784,8 @@ function SettingsTabManager() {
         onChange={(event, newValue) => setSettingsTab(newValue)}
         sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}
       >
+        <Tab label="🚀 Backend Config" value="backend" />
+        <Tab label="🏢 System Settings" value="comprehensive" />
         <Tab label="⚙️ General" value="general" />
         <Tab label="📱 Mobile & Responsive" value="mobile" />
         <Tab label="🐙 GitHub" value="github" />
@@ -509,11 +793,85 @@ function SettingsTabManager() {
       </Tabs>
 
       <Suspense fallback={<div style={{ padding: '1rem' }}>Loading settings…</div>}>
+        {settingsTab === 'backend' && <BackendConnectedSettings />}
+        {settingsTab === 'comprehensive' && <ComprehensiveSystemSettings />}
         {settingsTab === 'general' && <EnhancedConfigPanel />}
         {settingsTab === 'mobile' && <MobileResponsiveManager />}
         {settingsTab === 'github' && <GitHubInfo />}
         {settingsTab === 'admin' && isAdminEnabled && <AdminMCPPanel />}
       </Suspense>
+    </Box>
+  );
+}
+
+/**
+ * Login Page Component
+ * Dedicated login page with full Spotify authentication interface
+ */
+function LoginPage() {
+  const navigate = useNavigate();
+  
+  return (
+    <Box sx={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #1DB954 0%, #1ed760 100%)',
+      p: 2
+    }}>
+      <Container maxWidth="sm">
+        <SpotifyLoginButton 
+          onAuthComplete={() => navigate('/')}
+          onAuthError={(error) => {
+            console.error('Login error:', error);
+            // Could show error notification here
+          }}
+        />
+      </Container>
+    </Box>
+  );
+}
+
+/**
+ * Auth Callback Handler Component
+ * Handles OAuth callback and redirects appropriately
+ */
+function AuthCallbackHandler() {
+  const navigate = useNavigate();
+  const { checkAuthStatus } = useAuth();
+  
+  React.useEffect(() => {
+    const handleCallback = async () => {
+      try {
+        // Let AuthContext handle the callback
+        await checkAuthStatus();
+        navigate('/');
+      } catch (error) {
+        console.error('Auth callback error:', error);
+        navigate('/login');
+      }
+    };
+    
+    handleCallback();
+  }, [checkAuthStatus, navigate]);
+  
+  return (
+    <Box sx={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center' 
+    }}>
+      <Box sx={{ textAlign: 'center' }}>
+        <CircularProgress size={60} />
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          Completing authentication...
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Please wait while we connect your Spotify account
+        </Typography>
+      </Box>
     </Box>
   );
 }

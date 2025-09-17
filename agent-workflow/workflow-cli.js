@@ -73,7 +73,7 @@ program
             }
 
             console.log(`\n🚀 Creating workflow from template: ${options.template}`);
-            console.log(`Parameters:`, JSON.stringify(parameters, null, 2));
+            console.log('Parameters:', JSON.stringify(parameters, null, 2));
 
             const workflow = await workflowManager.handleAPIRequest({
                 template_category: options.template,
@@ -82,7 +82,7 @@ program
             });
 
             if (workflow) {
-                console.log(`\n✅ Workflow created successfully:`);
+                console.log('\n✅ Workflow created successfully:');
                 console.log(`   ID: ${workflow.id}`);
                 console.log(`   Name: ${workflow.template.name}`);
                 console.log(`   Status: ${workflow.status}`);
@@ -143,7 +143,7 @@ program
 
             const workflow = await workflowManager.executeWorkflow(workflowId);
             
-            console.log(`✅ Workflow execution started:`);
+            console.log('✅ Workflow execution started:');
             console.log(`   Name: ${workflow.template.name}`);
             console.log(`   Status: ${workflow.status}`);
             console.log(`   Started: ${workflow.started_at}`);
@@ -167,7 +167,7 @@ program
                 throw new Error(`Workflow not found: ${workflowId}`);
             }
 
-            console.log(`\n📄 Workflow Details:\n`);
+            console.log('\n📄 Workflow Details:\n');
             console.log(`   ID: ${workflow.id}`);
             console.log(`   Name: ${workflow.template.name}`);
             console.log(`   Category: ${workflow.template.category}`);
@@ -179,7 +179,7 @@ program
                 console.log(`   Started: ${workflow.started_at}`);
             }
 
-            console.log(`\n   Parameters:`);
+            console.log('\n   Parameters:');
             Object.entries(workflow.parameters).forEach(([key, value]) => {
                 console.log(`     ${key}: ${value}`);
             });
@@ -210,14 +210,14 @@ program
             const templates = workflowManager.getAvailableTemplates();
             const config = workflowManager.config;
 
-            console.log(`\n📊 Workflow System Status:\n`);
+            console.log('\n📊 Workflow System Status:\n');
             
             console.log(`   System Status: ${config.enabled ? '🟢 Enabled' : '🔴 Disabled'}`);
             console.log(`   Auto Assignment: ${config.auto_assign ? '🟢 Enabled' : '🔴 Disabled'}`);
             console.log(`   Max Concurrent: ${config.max_concurrent_workflows}`);
             console.log(`   Default Timeout: ${config.default_timeout}`);
             
-            console.log(`\n   Statistics:`);
+            console.log('\n   Statistics:');
             console.log(`     Active Workflows: ${activeWorkflows.length}`);
             console.log(`     Available Templates: ${templates.length}`);
             console.log(`     Notification Channels: ${config.notification_channels.join(', ')}`);
@@ -249,13 +249,13 @@ program
             const template = yaml.load(templateContent);
             
             if (workflowManager.validateTemplate(template)) {
-                console.log(`✅ Template is valid`);
+                console.log('✅ Template is valid');
                 console.log(`   Name: ${template.name}`);
                 console.log(`   Category: ${template.category}`);
                 console.log(`   Parameters: ${Object.keys(template.parameters).length}`);
                 console.log(`   Workflow Steps: ${template.workflow_steps.length}`);
             } else {
-                console.log(`❌ Template validation failed`);
+                console.log('❌ Template validation failed');
                 process.exit(1);
             }
             
@@ -281,45 +281,45 @@ program
             const template = {
                 name: templateName,
                 description: templateDesc,
-                version: "1.0.0",
+                version: '1.0.0',
                 category: category,
                 parameters: {
                     name: {
-                        type: "string",
+                        type: 'string',
                         required: true,
-                        description: "Task name"
+                        description: 'Task name'
                     },
                     priority: {
-                        type: "string",
+                        type: 'string',
                         required: false,
-                        default: "medium",
-                        options: ["low", "medium", "high", "critical"],
-                        description: "Task priority level"
+                        default: 'medium',
+                        options: ['low', 'medium', 'high', 'critical'],
+                        description: 'Task priority level'
                     }
                 },
                 triggers: [
                     {
-                        type: "manual",
-                        description: "Manually triggered"
+                        type: 'manual',
+                        description: 'Manually triggered'
                     }
                 ],
                 workflow_steps: [
                     {
-                        id: "main_step",
-                        name: "Main Task Step",
-                        type: "coding",
-                        timeout: "30m",
+                        id: 'main_step',
+                        name: 'Main Task Step',
+                        type: 'coding',
+                        timeout: '30m',
                         inputs: {
-                            name: "{{parameters.name}}"
+                            name: '{{parameters.name}}'
                         },
-                        outputs: ["result"]
+                        outputs: ['result']
                     }
                 ],
                 success_criteria: [
                     {
-                        name: "step_complete",
-                        check: "step_successful",
-                        step: "main_step"
+                        name: 'step_complete',
+                        check: 'step_successful',
+                        step: 'main_step'
                     }
                 ]
             };
@@ -332,7 +332,7 @@ program
             console.log(`✅ Generated template: ${outputFile}`);
             console.log(`   Name: ${templateName}`);
             console.log(`   Category: ${category}`);
-            console.log(`   Edit the file to customize the template`);
+            console.log('   Edit the file to customize the template');
             
         } catch (error) {
             console.error('❌ Error generating template:', error.message);

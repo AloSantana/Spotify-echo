@@ -255,7 +255,7 @@ class ContinuousAnalysisSystem {
     report += `**Phases:** ${Object.keys(results.phases).length}\n\n`;
     
     if (results.phases.task_generation?.tasks) {
-      report += `## Generated Tasks\n\n`;
+      report += '## Generated Tasks\n\n';
       results.phases.task_generation.tasks.slice(0, 5).forEach((task, i) => {
         report += `${i + 1}. **${task.title}** (${task.priority})\n`;
         report += `   ${task.description}\n\n`;

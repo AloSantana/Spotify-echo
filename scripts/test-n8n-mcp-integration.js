@@ -95,7 +95,7 @@ class N8nMcpIntegrationTest {
             });
 
             const workflowCount = apiResponse.data.data?.length || 0;
-            console.log(`   ✅ API authentication successful`);
+            console.log('   ✅ API authentication successful');
             console.log(`   📊 Found ${workflowCount} workflows`);
 
             this.testResults.n8nConnectivity = true;
@@ -271,8 +271,8 @@ class N8nMcpIntegrationTest {
         console.log('🔗 Integration Summary:');
         console.log(`   n8n Instance: ${process.env.N8N_API_URL}`);
         console.log(`   Workflows Available: ${this.workflowCount || 0}`);
-        console.log(`   MCP Tools: n8n workflow automation, documentation, API management`);
-        console.log(`   Authentication: JWT token configured`);
+        console.log('   MCP Tools: n8n workflow automation, documentation, API management');
+        console.log('   Authentication: JWT token configured');
 
         console.log('');
         console.log('🚀 Next Steps:');

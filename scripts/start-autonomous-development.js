@@ -96,12 +96,12 @@ class AutonomousDevelopmentSystem {
       
       // 2. Research latest patterns and improvements
       const researchInsights = await this.conductPerplexityResearch([
-        "Node.js performance optimization 2025",
-        "MongoDB query optimization techniques", 
-        "Express.js security best practices",
-        "AI API integration patterns",
-        "Spotify API rate limiting strategies",
-        "Real-time music recommendation algorithms"
+        'Node.js performance optimization 2025',
+        'MongoDB query optimization techniques', 
+        'Express.js security best practices',
+        'AI API integration patterns',
+        'Spotify API rate limiting strategies',
+        'Real-time music recommendation algorithms'
       ]);
       this.results.researchResults = researchInsights;
       
@@ -440,18 +440,18 @@ class AutonomousDevelopmentSystem {
     const researchTopics = [];
     
     if (bottlenecks.database?.needsOptimization) {
-      researchTopics.push("MongoDB aggregation pipeline optimization");
-      researchTopics.push("MongoDB indexing strategies music apps");
+      researchTopics.push('MongoDB aggregation pipeline optimization');
+      researchTopics.push('MongoDB indexing strategies music apps');
     }
     
     if (bottlenecks.api?.needsOptimization) {
-      researchTopics.push("Express.js middleware optimization");
-      researchTopics.push("Node.js API rate limiting best practices");
+      researchTopics.push('Express.js middleware optimization');
+      researchTopics.push('Node.js API rate limiting best practices');
     }
     
     if (bottlenecks.ai_providers?.needsOptimization) {
-      researchTopics.push("LLM API request optimization");
-      researchTopics.push("AI provider failover strategies");
+      researchTopics.push('LLM API request optimization');
+      researchTopics.push('AI provider failover strategies');
     }
     
     return await this.conductPerplexityResearch(researchTopics);
@@ -575,7 +575,7 @@ class AutonomousDevelopmentSystem {
     console.log(`⏱️  Duration: ${duration} seconds`);
     console.log(`🔬 Research Topics: ${this.results.researchResults?.length || 0}`);
     console.log(`🎯 Implementation Tasks: ${this.results.implementationTasks?.length || 0}`);
-    console.log(`📋 Roadmap Updates: Generated`);
+    console.log('📋 Roadmap Updates: Generated');
     console.log(`📈 Performance Analysis: ${this.results.performanceMetrics ? 'Completed' : 'Skipped'}`);
     
     // Save final report

@@ -27,149 +27,149 @@ class EnvironmentConfigUpdater {
         this.backupPath = path.join(process.cwd(), '.env.backup');
         
         this.missingKeys = [
-            "SSL_ENABLED", "SSL_CHAIN_PATH", "SSL_EMAIL",
-            "NGINX_WORKER_PROCESSES", "NGINX_WORKER_CONNECTIONS",
-            "BACKEND_HOST", "BACKEND_PORT",
-            "MONGODB_DB_NAME", "MONGODB_MAX_POOL_SIZE", "MONGODB_MIN_POOL_SIZE",
-            "MONGODB_MAX_IDLE_TIME", "MONGODB_CONNECT_TIMEOUT", "MONGODB_SOCKET_TIMEOUT",
-            "MONGODB_COLLECTIONS_PREFIX", "ENABLE_MONGODB_ANALYTICS", "MONGODB_ANALYTICS_RETENTION_DAYS",
-            "REDIS_DB_INDEX", "REDIS_KEY_PREFIX", "REDIS_DEFAULT_TTL",
-            "ENABLE_DATABASE_ANALYTICS", "ENABLE_QUERY_LOGGING",
-            "DATABASE_BACKUP_ENABLED", "DATABASE_BACKUP_INTERVAL",
-            "LLM_PROVIDER_FALLBACK", "OPENAI_RATE_LIMIT", "GEMINI_RATE_LIMIT",
-            "OPENROUTER_API_KEY", "OPENROUTER_MODEL", "OPENROUTER_SITE_URL", "OPENROUTER_APP_NAME",
-            "ANTHROPIC_API_KEY", "ANTHROPIC_MODEL", "ANTHROPIC_MAX_TOKENS",
-            "ENABLE_PROVIDER_SWITCHING", "ENABLE_MODEL_SELECTION", "LLM_RESPONSE_CACHE_TTL",
-            "LLM_RETRY_ATTEMPTS", "LLM_TIMEOUT",
-            "DOCKER_HUB_USERNAME", "DOCKER_HUB_TOKEN", "DOCKER_REGISTRY", "DOCKER_REPOSITORY",
-            "RATE_LIMIT_ENABLED", "CLUSTER_ENABLED", "WORKER_PROCESSES",
-            "PROMETHEUS_ENABLED", "PROMETHEUS_PORT",
-            "LOG_FORMAT", "ENABLE_REQUEST_LOGGING", "ENABLE_ERROR_TRACKING", "LOG_ROTATION_ENABLED",
-            "ENABLE_ANALYTICS_DASHBOARD", "ENABLE_REALTIME_UPDATES", "ENABLE_BACKGROUND_TASKS",
-            "ENABLE_FILE_UPLOADS", "MAX_FILE_SIZE",
-            "GITHUB_PAT", "GITHUB_API_URL", "DATABASE_URL", "SQLITE_DB_PATH",
-            "BRAVE_API_KEY", "YOUTUBE_API_KEY",
-            "BROWSERBASE_API_KEY", "BROWSERBASE_PROJECT_ID", "BROWSERBASE_SESSION_ID",
-            "INFLUXDB_URL", "INFLUXDB_TOKEN", "LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY",
-            "MCP_SERVER_PORT", "MCP_SERVER_HOST", "ENABLE_MCP_LOGGING", "MCP_TIMEOUT",
-            "ANALYTICS_RETENTION_DAYS", "TRACK_USER_BEHAVIOR", "ENABLE_LISTENING_INSIGHTS",
-            "ENABLE_MUSIC_ANALYTICS", "TRACK_PLAY_COUNTS", "ANALYZE_LISTENING_PATTERNS",
-            "GENERATE_RECOMMENDATIONS_INSIGHTS", "DASHBOARD_REFRESH_INTERVAL",
-            "ENABLE_REAL_TIME_CHARTS", "CHART_DATA_POINTS", "ENABLE_DATA_EXPORT"
+            'SSL_ENABLED', 'SSL_CHAIN_PATH', 'SSL_EMAIL',
+            'NGINX_WORKER_PROCESSES', 'NGINX_WORKER_CONNECTIONS',
+            'BACKEND_HOST', 'BACKEND_PORT',
+            'MONGODB_DB_NAME', 'MONGODB_MAX_POOL_SIZE', 'MONGODB_MIN_POOL_SIZE',
+            'MONGODB_MAX_IDLE_TIME', 'MONGODB_CONNECT_TIMEOUT', 'MONGODB_SOCKET_TIMEOUT',
+            'MONGODB_COLLECTIONS_PREFIX', 'ENABLE_MONGODB_ANALYTICS', 'MONGODB_ANALYTICS_RETENTION_DAYS',
+            'REDIS_DB_INDEX', 'REDIS_KEY_PREFIX', 'REDIS_DEFAULT_TTL',
+            'ENABLE_DATABASE_ANALYTICS', 'ENABLE_QUERY_LOGGING',
+            'DATABASE_BACKUP_ENABLED', 'DATABASE_BACKUP_INTERVAL',
+            'LLM_PROVIDER_FALLBACK', 'OPENAI_RATE_LIMIT', 'GEMINI_RATE_LIMIT',
+            'OPENROUTER_API_KEY', 'OPENROUTER_MODEL', 'OPENROUTER_SITE_URL', 'OPENROUTER_APP_NAME',
+            'ANTHROPIC_API_KEY', 'ANTHROPIC_MODEL', 'ANTHROPIC_MAX_TOKENS',
+            'ENABLE_PROVIDER_SWITCHING', 'ENABLE_MODEL_SELECTION', 'LLM_RESPONSE_CACHE_TTL',
+            'LLM_RETRY_ATTEMPTS', 'LLM_TIMEOUT',
+            'DOCKER_HUB_USERNAME', 'DOCKER_HUB_TOKEN', 'DOCKER_REGISTRY', 'DOCKER_REPOSITORY',
+            'RATE_LIMIT_ENABLED', 'CLUSTER_ENABLED', 'WORKER_PROCESSES',
+            'PROMETHEUS_ENABLED', 'PROMETHEUS_PORT',
+            'LOG_FORMAT', 'ENABLE_REQUEST_LOGGING', 'ENABLE_ERROR_TRACKING', 'LOG_ROTATION_ENABLED',
+            'ENABLE_ANALYTICS_DASHBOARD', 'ENABLE_REALTIME_UPDATES', 'ENABLE_BACKGROUND_TASKS',
+            'ENABLE_FILE_UPLOADS', 'MAX_FILE_SIZE',
+            'GITHUB_PAT', 'GITHUB_API_URL', 'DATABASE_URL', 'SQLITE_DB_PATH',
+            'BRAVE_API_KEY', 'YOUTUBE_API_KEY',
+            'BROWSERBASE_API_KEY', 'BROWSERBASE_PROJECT_ID', 'BROWSERBASE_SESSION_ID',
+            'INFLUXDB_URL', 'INFLUXDB_TOKEN', 'LANGFUSE_PUBLIC_KEY', 'LANGFUSE_SECRET_KEY',
+            'MCP_SERVER_PORT', 'MCP_SERVER_HOST', 'ENABLE_MCP_LOGGING', 'MCP_TIMEOUT',
+            'ANALYTICS_RETENTION_DAYS', 'TRACK_USER_BEHAVIOR', 'ENABLE_LISTENING_INSIGHTS',
+            'ENABLE_MUSIC_ANALYTICS', 'TRACK_PLAY_COUNTS', 'ANALYZE_LISTENING_PATTERNS',
+            'GENERATE_RECOMMENDATIONS_INSIGHTS', 'DASHBOARD_REFRESH_INTERVAL',
+            'ENABLE_REAL_TIME_CHARTS', 'CHART_DATA_POINTS', 'ENABLE_DATA_EXPORT'
         ];
 
         this.keyDefaults = {
             // SSL Configuration
-            "SSL_ENABLED": "true",
-            "SSL_CHAIN_PATH": "/etc/nginx/ssl/chain.pem", 
-            "SSL_EMAIL": "admin@your-domain.com",
+            'SSL_ENABLED': 'true',
+            'SSL_CHAIN_PATH': '/etc/nginx/ssl/chain.pem', 
+            'SSL_EMAIL': 'admin@your-domain.com',
 
             // NGINX Configuration
-            "NGINX_WORKER_PROCESSES": "auto",
-            "NGINX_WORKER_CONNECTIONS": "1024",
+            'NGINX_WORKER_PROCESSES': 'auto',
+            'NGINX_WORKER_CONNECTIONS': '1024',
 
             // Backend Configuration
-            "BACKEND_HOST": "app",
-            "BACKEND_PORT": "3000",
+            'BACKEND_HOST': 'app',
+            'BACKEND_PORT': '3000',
 
             // MongoDB Configuration
-            "MONGODB_DB_NAME": "echotune",
-            "MONGODB_MAX_POOL_SIZE": "10",
-            "MONGODB_MIN_POOL_SIZE": "5", 
-            "MONGODB_MAX_IDLE_TIME": "30000",
-            "MONGODB_CONNECT_TIMEOUT": "10000",
-            "MONGODB_SOCKET_TIMEOUT": "0",
-            "MONGODB_COLLECTIONS_PREFIX": "echotune_",
-            "ENABLE_MONGODB_ANALYTICS": "true",
-            "MONGODB_ANALYTICS_RETENTION_DAYS": "90",
+            'MONGODB_DB_NAME': 'echotune',
+            'MONGODB_MAX_POOL_SIZE': '10',
+            'MONGODB_MIN_POOL_SIZE': '5', 
+            'MONGODB_MAX_IDLE_TIME': '30000',
+            'MONGODB_CONNECT_TIMEOUT': '10000',
+            'MONGODB_SOCKET_TIMEOUT': '0',
+            'MONGODB_COLLECTIONS_PREFIX': 'echotune_',
+            'ENABLE_MONGODB_ANALYTICS': 'true',
+            'MONGODB_ANALYTICS_RETENTION_DAYS': '90',
 
             // Redis Configuration
-            "REDIS_DB_INDEX": "0",
-            "REDIS_KEY_PREFIX": "echotune:",
-            "REDIS_DEFAULT_TTL": "3600",
+            'REDIS_DB_INDEX': '0',
+            'REDIS_KEY_PREFIX': 'echotune:',
+            'REDIS_DEFAULT_TTL': '3600',
 
             // Database Features
-            "ENABLE_DATABASE_ANALYTICS": "true",
-            "ENABLE_QUERY_LOGGING": "false",
-            "DATABASE_BACKUP_ENABLED": "true", 
-            "DATABASE_BACKUP_INTERVAL": "24h",
+            'ENABLE_DATABASE_ANALYTICS': 'true',
+            'ENABLE_QUERY_LOGGING': 'false',
+            'DATABASE_BACKUP_ENABLED': 'true', 
+            'DATABASE_BACKUP_INTERVAL': '24h',
 
             // LLM Configuration
-            "LLM_PROVIDER_FALLBACK": "gemini,mock",
-            "OPENAI_RATE_LIMIT": "60",
-            "GEMINI_RATE_LIMIT": "60",
-            "OPENROUTER_API_KEY": "sk-or-your_openrouter_api_key_here",
-            "OPENROUTER_MODEL": "anthropic/claude-3.5-sonnet",
-            "OPENROUTER_SITE_URL": "https://your-domain.com",
-            "OPENROUTER_APP_NAME": "EchoTune AI",
-            "ANTHROPIC_API_KEY": "sk-ant-your_anthropic_api_key_here",
-            "ANTHROPIC_MODEL": "claude-3-sonnet-20240229",
-            "ANTHROPIC_MAX_TOKENS": "2000",
-            "ENABLE_PROVIDER_SWITCHING": "true",
-            "ENABLE_MODEL_SELECTION": "true",
-            "LLM_RESPONSE_CACHE_TTL": "300",
-            "LLM_RETRY_ATTEMPTS": "3",
-            "LLM_TIMEOUT": "30000",
+            'LLM_PROVIDER_FALLBACK': 'gemini,mock',
+            'OPENAI_RATE_LIMIT': '60',
+            'GEMINI_RATE_LIMIT': '60',
+            'OPENROUTER_API_KEY': 'sk-or-your_openrouter_api_key_here',
+            'OPENROUTER_MODEL': 'anthropic/claude-3.5-sonnet',
+            'OPENROUTER_SITE_URL': 'https://your-domain.com',
+            'OPENROUTER_APP_NAME': 'EchoTune AI',
+            'ANTHROPIC_API_KEY': 'sk-ant-your_anthropic_api_key_here',
+            'ANTHROPIC_MODEL': 'claude-3-sonnet-20240229',
+            'ANTHROPIC_MAX_TOKENS': '2000',
+            'ENABLE_PROVIDER_SWITCHING': 'true',
+            'ENABLE_MODEL_SELECTION': 'true',
+            'LLM_RESPONSE_CACHE_TTL': '300',
+            'LLM_RETRY_ATTEMPTS': '3',
+            'LLM_TIMEOUT': '30000',
 
             // Docker Configuration
-            "DOCKER_HUB_USERNAME": "your_dockerhub_username",
-            "DOCKER_HUB_TOKEN": "your_dockerhub_access_token",
-            "DOCKER_REGISTRY": "docker.io",
-            "DOCKER_REPOSITORY": "your_username/echotune-ai",
+            'DOCKER_HUB_USERNAME': 'your_dockerhub_username',
+            'DOCKER_HUB_TOKEN': 'your_dockerhub_access_token',
+            'DOCKER_REGISTRY': 'docker.io',
+            'DOCKER_REPOSITORY': 'your_username/echotune-ai',
 
             // Performance Configuration
-            "RATE_LIMIT_ENABLED": "true",
-            "CLUSTER_ENABLED": "false", 
-            "WORKER_PROCESSES": "auto",
-            "PROMETHEUS_ENABLED": "false",
-            "PROMETHEUS_PORT": "9090",
+            'RATE_LIMIT_ENABLED': 'true',
+            'CLUSTER_ENABLED': 'false', 
+            'WORKER_PROCESSES': 'auto',
+            'PROMETHEUS_ENABLED': 'false',
+            'PROMETHEUS_PORT': '9090',
 
             // Logging Configuration
-            "LOG_FORMAT": "combined",
-            "ENABLE_REQUEST_LOGGING": "true",
-            "ENABLE_ERROR_TRACKING": "true",
-            "LOG_ROTATION_ENABLED": "true",
+            'LOG_FORMAT': 'combined',
+            'ENABLE_REQUEST_LOGGING': 'true',
+            'ENABLE_ERROR_TRACKING': 'true',
+            'LOG_ROTATION_ENABLED': 'true',
 
             // Application Features
-            "ENABLE_ANALYTICS_DASHBOARD": "true",
-            "ENABLE_REALTIME_UPDATES": "true",
-            "ENABLE_BACKGROUND_TASKS": "true",
-            "ENABLE_FILE_UPLOADS": "true",
-            "MAX_FILE_SIZE": "50MB",
+            'ENABLE_ANALYTICS_DASHBOARD': 'true',
+            'ENABLE_REALTIME_UPDATES': 'true',
+            'ENABLE_BACKGROUND_TASKS': 'true',
+            'ENABLE_FILE_UPLOADS': 'true',
+            'MAX_FILE_SIZE': '50MB',
 
             // MCP Server Integrations
-            "GITHUB_PAT": "your_github_personal_access_token",
-            "GITHUB_API_URL": "https://api.github.com",
-            "DATABASE_URL": "postgresql://username:password@localhost:5432/echotune",
-            "SQLITE_DB_PATH": "data/echotune.db",
-            "BRAVE_API_KEY": "your_brave_search_api_key",
-            "YOUTUBE_API_KEY": "your_youtube_api_key",
-            "BROWSERBASE_API_KEY": "your_browserbase_api_key",
-            "BROWSERBASE_PROJECT_ID": "your_browserbase_project_id",
-            "BROWSERBASE_SESSION_ID": "your_browserbase_session_id",
-            "INFLUXDB_URL": "http://localhost:8086",
-            "INFLUXDB_TOKEN": "your_influxdb_token",
-            "LANGFUSE_PUBLIC_KEY": "pk_your_langfuse_public_key",
-            "LANGFUSE_SECRET_KEY": "sk_your_langfuse_secret_key",
+            'GITHUB_PAT': 'your_github_personal_access_token',
+            'GITHUB_API_URL': 'https://api.github.com',
+            'DATABASE_URL': 'postgresql://username:password@localhost:5432/echotune',
+            'SQLITE_DB_PATH': 'data/echotune.db',
+            'BRAVE_API_KEY': 'your_brave_search_api_key',
+            'YOUTUBE_API_KEY': 'your_youtube_api_key',
+            'BROWSERBASE_API_KEY': 'your_browserbase_api_key',
+            'BROWSERBASE_PROJECT_ID': 'your_browserbase_project_id',
+            'BROWSERBASE_SESSION_ID': 'your_browserbase_session_id',
+            'INFLUXDB_URL': 'http://localhost:8086',
+            'INFLUXDB_TOKEN': 'your_influxdb_token',
+            'LANGFUSE_PUBLIC_KEY': 'pk_your_langfuse_public_key',
+            'LANGFUSE_SECRET_KEY': 'sk_your_langfuse_secret_key',
 
             // MCP Server Configuration
-            "MCP_SERVER_PORT": "3001",
-            "MCP_SERVER_HOST": "localhost",
-            "ENABLE_MCP_LOGGING": "true",
-            "MCP_TIMEOUT": "30000",
+            'MCP_SERVER_PORT': '3001',
+            'MCP_SERVER_HOST': 'localhost',
+            'ENABLE_MCP_LOGGING': 'true',
+            'MCP_TIMEOUT': '30000',
 
             // Analytics Configuration
-            "ANALYTICS_RETENTION_DAYS": "365",
-            "TRACK_USER_BEHAVIOR": "true",
-            "ENABLE_LISTENING_INSIGHTS": "true",
-            "ENABLE_MUSIC_ANALYTICS": "true",
-            "TRACK_PLAY_COUNTS": "true",
-            "ANALYZE_LISTENING_PATTERNS": "true",
-            "GENERATE_RECOMMENDATIONS_INSIGHTS": "true",
-            "DASHBOARD_REFRESH_INTERVAL": "30000",
-            "ENABLE_REAL_TIME_CHARTS": "true",
-            "CHART_DATA_POINTS": "100",
-            "ENABLE_DATA_EXPORT": "true"
+            'ANALYTICS_RETENTION_DAYS': '365',
+            'TRACK_USER_BEHAVIOR': 'true',
+            'ENABLE_LISTENING_INSIGHTS': 'true',
+            'ENABLE_MUSIC_ANALYTICS': 'true',
+            'TRACK_PLAY_COUNTS': 'true',
+            'ANALYZE_LISTENING_PATTERNS': 'true',
+            'GENERATE_RECOMMENDATIONS_INSIGHTS': 'true',
+            'DASHBOARD_REFRESH_INTERVAL': '30000',
+            'ENABLE_REAL_TIME_CHARTS': 'true',
+            'CHART_DATA_POINTS': '100',
+            'ENABLE_DATA_EXPORT': 'true'
         };
     }
 
@@ -248,9 +248,9 @@ class EnvironmentConfigUpdater {
         
         // Add keys by category
         Object.entries(keysByCategory).forEach(([category, keys]) => {
-            newContent += `\n# =============================================================================\n`;
+            newContent += '\n# =============================================================================\n';
             newContent += `# ${category.toUpperCase()}\n`;
-            newContent += `# =============================================================================\n\n`;
+            newContent += '# =============================================================================\n\n';
             
             keys.forEach(key => {
                 const defaultValue = this.keyDefaults[key] || 'your_value_here';
@@ -313,7 +313,7 @@ class EnvironmentConfigUpdater {
 
         const { missing } = this.findMissingKeys();
         
-        console.log(`\n🔧 Interactive Configuration Mode`);
+        console.log('\n🔧 Interactive Configuration Mode');
         console.log(`Found ${missing.length} missing configuration keys.\n`);
 
         const keysByCategory = this.groupKeysByCategory(missing);
@@ -321,13 +321,13 @@ class EnvironmentConfigUpdater {
 
         for (const [category, keys] of Object.entries(keysByCategory)) {
             console.log(`\n📁 ${category} (${keys.length} keys)`);
-            const addCategory = await question(`Add all keys from this category? [y/N]: `);
+            const addCategory = await question('Add all keys from this category? [y/N]: ');
             
             if (addCategory.toLowerCase() === 'y') {
                 selectedKeys.push(...keys);
                 console.log(`✅ Added ${keys.length} keys from ${category}`);
             } else {
-                console.log(`Keys in this category:`);
+                console.log('Keys in this category:');
                 keys.forEach(key => console.log(`  - ${key}`));
                 
                 for (const key of keys) {
@@ -342,16 +342,16 @@ class EnvironmentConfigUpdater {
 
         if (selectedKeys.length > 0) {
             console.log(`\n📝 Summary: Adding ${selectedKeys.length} keys to .env file`);
-            const confirm = await question(`Proceed? [y/N]: `);
+            const confirm = await question('Proceed? [y/N]: ');
             
             if (confirm.toLowerCase() === 'y') {
                 this.createBackup();
                 this.addMissingKeys(selectedKeys);
-                console.log(`\n✅ Configuration updated successfully!`);
-                console.log(`💡 Remember to update the placeholder values with your actual API keys and settings.`);
+                console.log('\n✅ Configuration updated successfully!');
+                console.log('💡 Remember to update the placeholder values with your actual API keys and settings.');
             }
         } else {
-            console.log(`\n⚠️ No keys selected for addition.`);
+            console.log('\n⚠️ No keys selected for addition.');
         }
 
         rl.close();

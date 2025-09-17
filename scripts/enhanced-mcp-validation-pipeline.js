@@ -989,7 +989,7 @@ class EnhancedMCPValidationPipeline {
         // Generate summary report
         await this.generateSummaryReport(report);
         
-        this.log(`📄 Detailed report saved to enhanced-mcp-validation-report.json`, 'success');
+        this.log('📄 Detailed report saved to enhanced-mcp-validation-report.json', 'success');
         
         return report;
     }

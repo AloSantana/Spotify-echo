@@ -10,7 +10,7 @@ const AgentRouter = require('../src/ai/agent/router');
 class AIProviderTester {
   constructor() {
     this.router = new AgentRouter();
-    this.testPrompt = "Recommend 3 upbeat rock songs for a workout playlist. Keep the response brief.";
+    this.testPrompt = 'Recommend 3 upbeat rock songs for a workout playlist. Keep the response brief.';
   }
 
   async initialize() {

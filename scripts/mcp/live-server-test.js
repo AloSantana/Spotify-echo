@@ -195,7 +195,7 @@ class LiveMCPServerTester {
             try {
                 const { MongoClient } = require('mongodb');
                 funcResult.features.mongoDriverAvailable = true;
-                console.log(`   ✅ MongoDB driver available`);
+                console.log('   ✅ MongoDB driver available');
                 
                 // Test connection with mock URI (will fail but tests structure)
                 funcResult.mockTest = true;
@@ -289,7 +289,7 @@ class LiveMCPServerTester {
     }
 
     async testOtherMCPServers() {
-        console.log(`\n--- Testing additional MCP servers ---`);
+        console.log('\n--- Testing additional MCP servers ---');
         
         const otherServers = ['brave-search', 'puppeteer-mcp'];
         
@@ -438,7 +438,7 @@ ${Object.entries(this.results.functionality).map(([server, result]) =>
         
         await fs.writeFile(visualReportPath, visualReport);
         
-        console.log(`   ✅ Live testing reports generated:`);
+        console.log('   ✅ Live testing reports generated:');
         console.log(`      - JSON: ${jsonReportPath}`);  
         console.log(`      - Markdown: ${mdReportPath}`);
         console.log(`      - Visual: ${visualReportPath}`);

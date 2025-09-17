@@ -361,12 +361,12 @@ class WorkflowIntegrationTest {
   }
 
   generateMarkdownSummary(report) {
-    let markdown = `# Enhanced Perplexity MCP Server - Integration Test Report\n\n`;
+    let markdown = '# Enhanced Perplexity MCP Server - Integration Test Report\n\n';
     markdown += `**Generated:** ${report.timestamp}\n`;
     markdown += `**Overall Status:** ${report.summary.overallStatus}\n\n`;
     
     // Workflow Tests Summary
-    markdown += `## 🔧 Workflow Generation Tests\n\n`;
+    markdown += '## 🔧 Workflow Generation Tests\n\n';
     markdown += `**Results:** ${report.summary.workflows.passed}/${report.summary.workflows.total} passed\n\n`;
     
     report.detailedResults.workflows.forEach((test, index) => {
@@ -388,7 +388,7 @@ class WorkflowIntegrationTest {
     });
     
     // Integration Tests Summary
-    markdown += `## 🔗 Integration Pattern Tests\n\n`;
+    markdown += '## 🔗 Integration Pattern Tests\n\n';
     markdown += `**Results:** ${report.summary.integrations.passed}/${report.summary.integrations.total} passed\n\n`;
     
     report.detailedResults.integrations.forEach(test => {
@@ -403,12 +403,12 @@ class WorkflowIntegrationTest {
     });
     
     // Recommendations
-    markdown += `\n## 🎯 Recommendations\n\n`;
+    markdown += '\n## 🎯 Recommendations\n\n';
     
     if (report.summary.overallStatus === 'PASS') {
-      markdown += `- 🎉 All integration tests passed! The Enhanced Perplexity MCP Server is fully integrated.\n`;
-      markdown += `- 🚀 Ready for production use with coding agents and IDE integrations.\n`;
-      markdown += `- 📚 Review the CODING_AGENT_EXAMPLES.md for usage patterns.\n`;
+      markdown += '- 🎉 All integration tests passed! The Enhanced Perplexity MCP Server is fully integrated.\n';
+      markdown += '- 🚀 Ready for production use with coding agents and IDE integrations.\n';
+      markdown += '- 📚 Review the CODING_AGENT_EXAMPLES.md for usage patterns.\n';
     } else {
       if (report.summary.workflows.failed > 0) {
         markdown += `- 🔧 Address ${report.summary.workflows.failed} failing workflow generation test(s).\n`;

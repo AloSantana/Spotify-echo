@@ -203,7 +203,7 @@ async function configureVercelEnvironment() {
     
     fs.writeFileSync(envFile, `# EchoTune AI - Production Environment Variables for Vercel\n# Generated on ${new Date().toISOString()}\n\n${envContent}`);
     
-    log.success(`Generated .env.production.vercel`);
+    log.success('Generated .env.production.vercel');
 
     // Generate Vercel environment setup commands
     const vercelCommands = Object.entries(envVars)
@@ -225,7 +225,7 @@ echo "You can now deploy with: vercel --prod"
     fs.writeFileSync(commandsFile, commandsContent);
     fs.chmodSync(commandsFile, '755');
     
-    log.success(`Generated vercel-env-commands.sh`);
+    log.success('Generated vercel-env-commands.sh');
 
     // Generate README section
     const readmeSection = `## 🚀 Quick Deploy to Vercel
@@ -252,7 +252,7 @@ ${Object.entries(envVars)
 For detailed instructions, see [DEPLOY_TO_VERCEL.md](./DEPLOY_TO_VERCEL.md)
 `;
 
-    log.success(`Generated README section for Vercel deployment`);
+    log.success('Generated README section for Vercel deployment');
 
     // Final instructions
     log.header('🎉 Configuration Complete!');
@@ -263,13 +263,13 @@ For detailed instructions, see [DEPLOY_TO_VERCEL.md](./DEPLOY_TO_VERCEL.md)
     log.info('4. Or manually: vercel --prod');
     log.info('\n📁 Generated files:');
     log.info(`   - .env.production.vercel (${Object.keys(envVars).length} variables)`);
-    log.info(`   - vercel-env-commands.sh (automated setup)`);
-    log.info(`   - README section (copy to your README.md)`);
+    log.info('   - vercel-env-commands.sh (automated setup)');
+    log.info('   - README section (copy to your README.md)');
 
     // Save README section for user to copy
     const readmeFile = path.join(process.cwd(), 'VERCEL_README_SECTION.md');
     fs.writeFileSync(readmeFile, readmeSection);
-    log.info(`   - VERCEL_README_SECTION.md (copy to your README.md)`);
+    log.info('   - VERCEL_README_SECTION.md (copy to your README.md)');
 
   } catch (error) {
     log.error(`Configuration failed: ${error.message}`);

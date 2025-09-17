@@ -131,7 +131,7 @@ class PerplexityCommandsDemo {
             console.log(`   📝 Usage: ${cmd.usage}`);
             console.log(`   💡 Example: ${cmd.example}`);
             console.log(`   📤 Response: ${cmd.expectedResponse}`);
-            console.log(`   ✨ Features:`);
+            console.log('   ✨ Features:');
             cmd.features.forEach(feature => {
                 console.log(`      ${feature}`);
             });

@@ -315,7 +315,7 @@ class EnhancedBrowserResearchStandalone {
 
       analysis.recommendations = this.generateRecommendations(analysis);
       
-      console.log(`✅ Repository analysis complete`);
+      console.log('✅ Repository analysis complete');
       return analysis;
 
     } catch (error) {
@@ -622,7 +622,7 @@ class EnhancedBrowserResearchStandalone {
       }
     }
 
-    console.log(`\n📊 Validation Results:`);
+    console.log('\n📊 Validation Results:');
     console.log(`✅ Passed: ${results.passed}`);
     console.log(`❌ Failed: ${results.failed}`);
     console.log(`Success Rate: ${Math.round((results.passed / (results.passed + results.failed)) * 100)}%`);

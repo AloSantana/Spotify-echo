@@ -25,7 +25,7 @@ function cleanKey(k) {
 
 function cleanValue(v) {
   let s = v.replace(/\r?\n/g, '').trim();
-  if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
+  if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith('\'') && s.endsWith('\''))) {
     s = s.slice(1, -1);
   }
   s = s.replace(/=/g, '');

@@ -198,7 +198,7 @@ class DocumentationReviewer {
             }
         }
         
-        console.log(`✅ Critical documentation check complete`);
+        console.log('✅ Critical documentation check complete');
     }
 
     async generateRecommendations() {

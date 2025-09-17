@@ -382,15 +382,15 @@ class EnhancedDigitalOceanManager {
             // Update Spotify redirect URI for production
             envContent = envContent.replace(
                 /SPOTIFY_REDIRECT_URI=.*/,
-                `SPOTIFY_REDIRECT_URI=https://primosphere.studio/auth/callback`
+                'SPOTIFY_REDIRECT_URI=https://primosphere.studio/auth/callback'
             );
             
             // Add DigitalOcean configuration section if not present
             if (!envContent.includes('DIGITALOCEAN_API_TOKEN')) {
-                envContent += `\n# =============================================================================\n`;
-                envContent += `# 🌊 DIGITALOCEAN CONFIGURATION\n`;
-                envContent += `# =============================================================================\n\n`;
-                envContent += `# DigitalOcean API Token (get from https://cloud.digitalocean.com/account/api/tokens)\n`;
+                envContent += '\n# =============================================================================\n';
+                envContent += '# 🌊 DIGITALOCEAN CONFIGURATION\n';
+                envContent += '# =============================================================================\n\n';
+                envContent += '# DigitalOcean API Token (get from https://cloud.digitalocean.com/account/api/tokens)\n';
                 envContent += `DIGITALOCEAN_API_TOKEN=${this.apiToken}\n`;
                 envContent += `DIGITALOCEAN_REGISTRY_EMAIL=${this.dockerCredentials.email}\n`;
                 envContent += `DIGITALOCEAN_REGISTRY_TOKEN=${this.dockerCredentials.token}\n`;
@@ -537,7 +537,7 @@ class EnhancedDigitalOceanManager {
         fs.writeFileSync(reportPath, JSON.stringify(results, null, 2));
 
         // Generate markdown report
-        let markdown = `# 🌊 Enhanced DigitalOcean Testing Report\n\n`;
+        let markdown = '# 🌊 Enhanced DigitalOcean Testing Report\n\n';
         markdown += `**Generated:** ${results.timestamp}\n`;
         markdown += `**Localhost Callback:** ${results.callbackUrl}\n`;
         markdown += `**Production Callback:** ${results.productionCallbackUrl}\n`;

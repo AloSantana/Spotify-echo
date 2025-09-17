@@ -14,12 +14,12 @@
  * - Integration with MCP ecosystem
  */
 
-const Sentry = require("@sentry/node");
+const Sentry = require('@sentry/node');
 const express = require('express');
 
 // Initialize Sentry with provided configuration
 Sentry.init({
-  dsn: "https://81f42a0da8d0d7467f0c231d29f34051@o4509810176294912.ingest.us.sentry.io/4509810186387456",
+  dsn: 'https://81f42a0da8d0d7467f0c231d29f34051@o4509810176294912.ingest.us.sentry.io/4509810186387456',
   // Tracing must be enabled for MCP monitoring to work
   tracesSampleRate: 1.0,
   sendDefaultPii: true,

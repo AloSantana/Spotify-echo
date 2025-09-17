@@ -294,13 +294,13 @@ async function report() {
   log(`\n⏱️ Report generated in ${duration}ms`);
   
   // Summary
-  log(`\n📊 Summary:`);
+  log('\n📊 Summary:');
   log(`  • Total servers configured: ${reportData.summary.totalServers}`);
   log(`  • Ready to start: ${reportData.summary.availableServers}`);
   log(`  • Skipped (missing env): ${reportData.summary.skippedServers}`);
   
   if (reportData.summary.environmentIssues.length > 0) {
-    log(`\n⚠️ Environment issues:`);
+    log('\n⚠️ Environment issues:');
     for (const issue of reportData.summary.environmentIssues) {
       log(`  • ${issue.server}: missing ${issue.missingEnvVars.join(', ')}`);
     }

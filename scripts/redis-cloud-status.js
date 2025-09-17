@@ -122,24 +122,24 @@ class StatusReporter {
     
     // Generate recommendations
     if (!readiness.redis) {
-      this.results.systemReadiness.recommendations.push("Fix Redis Cloud connection");
+      this.results.systemReadiness.recommendations.push('Fix Redis Cloud connection');
     }
     
     if (!readiness.mongodb) {
-      this.results.systemReadiness.recommendations.push("Fix MongoDB connection");
+      this.results.systemReadiness.recommendations.push('Fix MongoDB connection');
     }
     
     if (!readiness.audioFeatures) {
-      this.results.systemReadiness.recommendations.push("Fetch missing audio features via Spotify API");
+      this.results.systemReadiness.recommendations.push('Fetch missing audio features via Spotify API');
     }
     
     if (!readiness.featureVectors) {
-      this.results.systemReadiness.recommendations.push("Generate feature vectors for ML algorithms");
+      this.results.systemReadiness.recommendations.push('Generate feature vectors for ML algorithms');
     }
     
     if (readiness.mlReady) {
-      this.results.systemReadiness.recommendations.push("Deploy recommendation engine");
-      this.results.systemReadiness.recommendations.push("Implement collaborative filtering");
+      this.results.systemReadiness.recommendations.push('Deploy recommendation engine');
+      this.results.systemReadiness.recommendations.push('Implement collaborative filtering');
     }
     
     console.log(`📊 System readiness score: ${this.results.systemReadiness.score}%`);

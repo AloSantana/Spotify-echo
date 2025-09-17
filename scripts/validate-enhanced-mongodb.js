@@ -150,10 +150,10 @@ class EnhancedMongoDBValidator {
                         _id: {
                             $switch: {
                                 branches: [
-                                    { case: { $gte: ["$data_quality_score", 80] }, then: "high" },
-                                    { case: { $gte: ["$data_quality_score", 50] }, then: "medium" },
+                                    { case: { $gte: ['$data_quality_score', 80] }, then: 'high' },
+                                    { case: { $gte: ['$data_quality_score', 50] }, then: 'medium' },
                                 ],
-                                default: "low"
+                                default: 'low'
                             }
                         },
                         count: { $sum: 1 }
@@ -163,7 +163,7 @@ class EnhancedMongoDBValidator {
             
             // Top artists by track count
             const topArtists = await this.collection.aggregate([
-                { $group: { _id: "$artist_name", track_count: { $sum: 1 } } },
+                { $group: { _id: '$artist_name', track_count: { $sum: 1 } } },
                 { $sort: { track_count: -1 } },
                 { $limit: 10 }
             ]).toArray();
@@ -182,10 +182,10 @@ class EnhancedMongoDBValidator {
                 {
                     $group: {
                         _id: null,
-                        avg_danceability: { $avg: "$audio_features.danceability" },
-                        avg_energy: { $avg: "$audio_features.energy" },
-                        avg_valence: { $avg: "$audio_features.valence" },
-                        avg_tempo: { $avg: "$audio_features.tempo" }
+                        avg_danceability: { $avg: '$audio_features.danceability' },
+                        avg_energy: { $avg: '$audio_features.energy' },
+                        avg_valence: { $avg: '$audio_features.valence' },
+                        avg_tempo: { $avg: '$audio_features.tempo' }
                     }
                 }
             ]).toArray();
@@ -342,8 +342,8 @@ class EnhancedMongoDBValidator {
             // Genre analysis
             const genreStats = await this.collection.aggregate([
                 { $match: { genres: { $exists: true, $ne: [] } } },
-                { $unwind: "$genres" },
-                { $group: { _id: "$genres", count: { $sum: 1 } } },
+                { $unwind: '$genres' },
+                { $group: { _id: '$genres', count: { $sum: 1 } } },
                 { $sort: { count: -1 } },
                 { $limit: 20 }
             ]).toArray();
@@ -355,8 +355,8 @@ class EnhancedMongoDBValidator {
                     $group: {
                         _id: {
                             $dateToString: {
-                                format: "%Y-%m",
-                                date: "$listening_stats.first_played"
+                                format: '%Y-%m',
+                                date: '$listening_stats.first_played'
                             }
                         },
                         count: { $sum: 1 }
@@ -371,11 +371,11 @@ class EnhancedMongoDBValidator {
                 {
                     $group: {
                         _id: null,
-                        high_energy: { $sum: { $cond: [{ $gte: ["$audio_features.energy", 0.8] }, 1, 0] } },
-                        medium_energy: { $sum: { $cond: [{ $and: [{ $gte: ["$audio_features.energy", 0.4] }, { $lt: ["$audio_features.energy", 0.8] }] }, 1, 0] } },
-                        low_energy: { $sum: { $cond: [{ $lt: ["$audio_features.energy", 0.4] }, 1, 0] } },
-                        high_danceability: { $sum: { $cond: [{ $gte: ["$audio_features.danceability", 0.7] }, 1, 0] } },
-                        high_valence: { $sum: { $cond: [{ $gte: ["$audio_features.valence", 0.7] }, 1, 0] } }
+                        high_energy: { $sum: { $cond: [{ $gte: ['$audio_features.energy', 0.8] }, 1, 0] } },
+                        medium_energy: { $sum: { $cond: [{ $and: [{ $gte: ['$audio_features.energy', 0.4] }, { $lt: ['$audio_features.energy', 0.8] }] }, 1, 0] } },
+                        low_energy: { $sum: { $cond: [{ $lt: ['$audio_features.energy', 0.4] }, 1, 0] } },
+                        high_danceability: { $sum: { $cond: [{ $gte: ['$audio_features.danceability', 0.7] }, 1, 0] } },
+                        high_valence: { $sum: { $cond: [{ $gte: ['$audio_features.valence', 0.7] }, 1, 0] } }
                     }
                 }
             ]).toArray();
@@ -487,7 +487,7 @@ class EnhancedMongoDBValidator {
         const mdReportPath = '/home/runner/work/Spotify-echo/Spotify-echo/ENHANCED_MONGODB_VALIDATION_REPORT.md';
         fs.writeFileSync(mdReportPath, markdownReport);
         
-        this.log(`Validation reports saved:`, 'info');
+        this.log('Validation reports saved:', 'info');
         this.log(`  JSON: ${jsonReportPath}`, 'info');
         this.log(`  Markdown: ${mdReportPath}`, 'info');
         

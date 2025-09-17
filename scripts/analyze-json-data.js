@@ -169,7 +169,7 @@ class SpotifyDataAnalyzer {
             }
         }
         
-        console.log(`\n📊 JSON Analysis Complete:`);
+        console.log('\n📊 JSON Analysis Complete:');
         console.log(`  - Files processed: ${processedFiles}/${this.jsonFiles.length}`);
         console.log(`  - Total records: ${this.jsonData.totalRecords}`);
         console.log(`  - Unique tracks: ${this.jsonData.uniqueTracks.size}`);
@@ -214,7 +214,7 @@ class SpotifyDataAnalyzer {
             const db = client.db('echotune');
             const collections = await db.listCollections().toArray();
             
-            console.log(`  📊 MongoDB Collections:`);
+            console.log('  📊 MongoDB Collections:');
             for (const collection of collections) {
                 const count = await db.collection(collection.name).countDocuments();
                 console.log(`    - ${collection.name}: ${count} documents`);
@@ -228,7 +228,7 @@ class SpotifyDataAnalyzer {
                 const commonTracks = Array.from(this.jsonData.uniqueTracks)
                     .filter(track => mongoTracks.includes(track));
                 
-                console.log(`\n  🔄 Track Overlap Analysis:`);
+                console.log('\n  🔄 Track Overlap Analysis:');
                 console.log(`    - JSON tracks: ${this.jsonData.uniqueTracks.size}`);
                 console.log(`    - MongoDB tracks: ${mongoTracks.length}`);
                 console.log(`    - Common tracks: ${commonTracks.length}`);

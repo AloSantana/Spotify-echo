@@ -280,7 +280,7 @@ class E2EChatRecValidator {
     
     try {
       // Simulate user chat message
-      const userMessage = "I want some upbeat music for working out";
+      const userMessage = 'I want some upbeat music for working out';
       const context = {
         userId: this.options.testUserId,
         userMessage,

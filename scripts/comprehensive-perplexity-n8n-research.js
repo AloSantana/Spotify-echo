@@ -446,8 +446,8 @@ Provide specific, actionable tasks with implementation guidance and priority ran
             markdownSummary
         );
         
-        console.log(`✅ Saved comprehensive results to reports/ directory`);
-        console.log(`📁 Files generated:`);
+        console.log('✅ Saved comprehensive results to reports/ directory');
+        console.log('📁 Files generated:');
         console.log(`   - perplexity-n8n-research-${timestamp}.json`);
         console.log(`   - n8n-implementation-analysis-${timestamp}.json`);
         console.log(`   - n8n-validation-results-${timestamp}.json`);

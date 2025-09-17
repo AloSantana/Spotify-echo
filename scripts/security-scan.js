@@ -104,7 +104,7 @@ class SecurityScanner {
 
   async createDefaultAllowlist() {
     const defaultAllowlist = {
-      version: "1.0.0",
+      version: '1.0.0',
       lastUpdated: new Date().toISOString(),
       entries: []
     };

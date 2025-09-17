@@ -1,484 +1,718 @@
 #!/usr/bin/env node
+
 /**
- * Consolidated Test Report Collector
- * Aggregates all test results into unified JSON and Markdown reports
+ * Test Report Aggregator - Schema v2
+ * Collects all test artifacts and generates comprehensive JSON + Markdown reports
+ * Outputs: test-run-report.json, test-run-report.md
  */
 
 const fs = require('fs');
 const path = require('path');
-const glob = require('glob');
 
-class TestReportCollector {
+class TestReportAggregator {
   constructor() {
-    this.reportData = {
+    this.reportsDir = path.join(process.cwd(), 'reports');
+    this.screenshotDir = path.join(process.cwd(), 'BROWSERSCREENSHOT-TESTING');
+    this.baselineDir = path.join(process.cwd(), 'visual-baseline');
+    
+    this.aggregatedReport = {
+      schemaVersion: '2.0',
       timestamp: new Date().toISOString(),
-      testRun: {
-        id: 'test-run-' + Date.now(),
-        environment: process.env.NODE_ENV || 'development',
-        branch: process.env.GITHUB_REF_NAME || 'local',
-        commit: process.env.GITHUB_SHA || 'unknown'
+      runId: this.generateRunId(),
+      success: false,
+      summary: {
+        totalTests: 0,
+        passedTests: 0,
+        failedTests: 0,
+        warningsCount: 0,
+        errorsCount: 0
       },
-      summary: {},
-      results: {},
-      metrics: {},
-      artifacts: []
+      env: {},
+      providers: {},
+      recommendation: {},
+      docker: {},
+      screenshots: {},
+      performance: {},
+      routeCoverage: {},
+      visualCoverage: {},
+      mcp: {},
+      warnings: [],
+      failures: [],
+      metadata: {
+        nodeVersion: process.version,
+        platform: process.platform,
+        arch: process.arch,
+        cwd: process.cwd(),
+        environment: process.env.NODE_ENV || 'development'
+      }
     };
   }
 
-  async collect() {
-    console.log('📊 Collecting Test Reports...\n');
-    
-    // 1. Collect Jest/Unit test results
-    await this.collectJestResults();
-    
-    // 2. Collect Playwright test results
-    await this.collectPlaywrightResults();
-    
-    // 3. Collect route manifest
-    await this.collectRouteManifest();
-    
-    // 4. Collect test matrix
-    await this.collectTestMatrix();
-    
-    // 5. Collect performance results
-    await this.collectPerformanceResults();
-    
-    // 6. Collect MCP health data
-    await this.collectMCPHealth();
-    
-    // 7. Collect environment validation
-    await this.collectEnvironmentValidation();
-    
-    // 8. Calculate aggregate metrics
-    this.calculateMetrics();
-    
-    // 9. Write reports
-    await this.writeReports();
-    
-    // 10. Display summary
-    this.displaySummary();
+  generateRunId() {
+    return `run-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
   }
 
-  async collectJestResults() {
-    console.log('🧪 Collecting Jest results...');
-    
-    const jestFiles = glob.sync('coverage/coverage-final.json');
-    if (jestFiles.length > 0) {
-      try {
-        const coverageData = JSON.parse(fs.readFileSync(jestFiles[0], 'utf8'));
-        
-        // Extract coverage summary
-        let totalLines = 0;
-        let coveredLines = 0;
-        
-        for (const file in coverageData) {
-          const fileCoverage = coverageData[file];
-          if (fileCoverage.s) {
-            totalLines += Object.keys(fileCoverage.s).length;
-            coveredLines += Object.values(fileCoverage.s).filter(hits => hits > 0).length;
-          }
-        }
-        
-        this.reportData.results.jest = {
-          coverage: {
-            totalLines,
-            coveredLines,
-            percentage: totalLines > 0 ? Math.round((coveredLines / totalLines) * 100) : 0
-          },
-          files: Object.keys(coverageData).length
-        };
-        
-        console.log(`   ✅ Coverage: ${this.reportData.results.jest.coverage.percentage}%`);
-      } catch (error) {
-        console.log(`   ⚠️  Error reading Jest results: ${error.message}`);
-      }
-    } else {
-      console.log('   ℹ️  No Jest coverage data found');
-    }
-  }
+  async aggregateReports() {
+    console.log('📊 Aggregating test reports...\n');
 
-  async collectPlaywrightResults() {
-    console.log('🎭 Collecting Playwright results...');
-    
-    const playwrightFiles = glob.sync('reports/playwright-results.json');
-    if (playwrightFiles.length > 0) {
-      try {
-        const playwrightData = JSON.parse(fs.readFileSync(playwrightFiles[0], 'utf8'));
-        
-        this.reportData.results.playwright = {
-          suites: playwrightData.suites?.length || 0,
-          tests: playwrightData.tests?.length || 0,
-          passed: playwrightData.tests?.filter(t => t.status === 'passed').length || 0,
-          failed: playwrightData.tests?.filter(t => t.status === 'failed').length || 0,
-          duration: playwrightData.stats?.duration || 0
-        };
-        
-        console.log(`   ✅ Tests: ${this.reportData.results.playwright.passed}/${this.reportData.results.playwright.tests} passed`);
-      } catch (error) {
-        console.log(`   ⚠️  Error reading Playwright results: ${error.message}`);
-      }
-    } else {
-      console.log('   ℹ️  No Playwright results found');
-    }
-  }
-
-  async collectRouteManifest() {
-    console.log('🛣️  Collecting route manifest...');
-    
-    const manifestFile = 'reports/route-manifest.json';
-    if (fs.existsSync(manifestFile)) {
-      try {
-        const manifestData = JSON.parse(fs.readFileSync(manifestFile, 'utf8'));
-        
-        this.reportData.results.routes = {
-          total: manifestData.summary.totalRoutes,
-          tested: manifestData.summary.testedRoutes,
-          coverage: manifestData.summary.coveragePercent,
-          categories: manifestData.categories
-        };
-        
-        console.log(`   ✅ Route coverage: ${this.reportData.results.routes.coverage}%`);
-      } catch (error) {
-        console.log(`   ⚠️  Error reading route manifest: ${error.message}`);
-      }
-    } else {
-      console.log('   ℹ️  No route manifest found');
-    }
-  }
-
-  async collectTestMatrix() {
-    console.log('🔨 Collecting test matrix...');
-    
-    const matrixFile = 'reports/test-matrix.json';
-    if (fs.existsSync(matrixFile)) {
-      try {
-        const matrixData = JSON.parse(fs.readFileSync(matrixFile, 'utf8'));
-        
-        this.reportData.results.testMatrix = {
-          selectedTests: matrixData.summary.selectedTests,
-          totalTestTypes: matrixData.summary.totalTests,
-          changedFiles: matrixData.changedFiles.length,
-          recommendations: matrixData.recommendations
-        };
-        
-        console.log(`   ✅ Selected tests: ${matrixData.summary.selectedTests.join(', ')}`);
-      } catch (error) {
-        console.log(`   ⚠️  Error reading test matrix: ${error.message}`);
-      }
-    } else {
-      console.log('   ℹ️  No test matrix found');
-    }
-  }
-
-  async collectPerformanceResults() {
-    console.log('⚡ Collecting performance results...');
-    
-    // Look for performance data in session storage or files
-    const perfFiles = glob.sync('reports/perf-*.json');
-    if (perfFiles.length > 0) {
-      try {
-        const perfData = JSON.parse(fs.readFileSync(perfFiles[0], 'utf8'));
-        
-        this.reportData.results.performance = {
-          chatLatencyP95: perfData.statistics?.p95 || 'N/A',
-          endpoint: perfData.endpoint || '/api/chat',
-          passed: perfData.passed || false
-        };
-        
-        console.log(`   ✅ Chat P95 latency: ${this.reportData.results.performance.chatLatencyP95}ms`);
-      } catch (error) {
-        console.log(`   ⚠️  Error reading performance results: ${error.message}`);
-      }
-    } else {
-      console.log('   ℹ️  No performance results found');
-      this.reportData.results.performance = {
-        chatLatencyP95: 'Not measured',
-        endpoint: '/api/chat',
-        passed: null
-      };
-    }
-  }
-
-  async collectMCPHealth() {
-    console.log('🤖 Collecting MCP health data...');
-    
-    const mcpFiles = glob.sync('reports/mcp-health.md');
-    if (mcpFiles.length > 0) {
-      try {
-        const mcpContent = fs.readFileSync(mcpFiles[0], 'utf8');
-        
-        // Parse MCP health info (basic parsing)
-        const lines = mcpContent.split('\n');
-        let healthyServers = 0;
-        let totalServers = 0;
-        
-        for (const line of lines) {
-          if (line.includes('✅') || line.includes('Healthy')) {
-            healthyServers++;
-            totalServers++;
-          } else if (line.includes('❌') || line.includes('Failed')) {
-            totalServers++;
-          }
-        }
-        
-        this.reportData.results.mcp = {
-          healthyServers,
-          totalServers,
-          healthPercentage: totalServers > 0 ? Math.round((healthyServers / totalServers) * 100) : 0
-        };
-        
-        console.log(`   ✅ MCP health: ${healthyServers}/${totalServers} servers healthy`);
-      } catch (error) {
-        console.log(`   ⚠️  Error reading MCP health: ${error.message}`);
-      }
-    } else {
-      console.log('   ℹ️  No MCP health data found');
-      this.reportData.results.mcp = {
-        healthyServers: 0,
-        totalServers: 0,
-        healthPercentage: 0
-      };
-    }
-  }
-
-  async collectEnvironmentValidation() {
-    console.log('🔍 Collecting environment validation...');
-    
-    // Try to run environment validation
     try {
-      const { execSync } = require('child_process');
-      execSync('node scripts/env-validate.js', { stdio: 'pipe' });
-      
-      this.reportData.results.environment = {
-        valid: true,
-        missingSecrets: 0,
-        errors: []
-      };
-      
-      console.log('   ✅ Environment validation passed');
+      // 1. Load individual reports
+      await this.loadEnvironmentReport();
+      await this.loadProviderReports();
+      await this.loadRecommendationReport();
+      await this.loadDockerReport();
+      await this.loadPerformanceReport();
+      await this.loadScreenshotCoverage();
+      await this.loadRouteCoverage();
+      await this.loadVisualCoverage();
+      await this.loadMCPReport();
+
+      // 2. Calculate overall success
+      this.calculateOverallSuccess();
+
+      // 3. Generate comprehensive reports
+      await this.writeJsonReport();
+      await this.writeMarkdownReport();
+
+      console.log('✅ Report aggregation completed successfully');
+
     } catch (error) {
-      this.reportData.results.environment = {
-        valid: false,
-        missingSecrets: 1, // Estimate
-        errors: [error.message.substring(0, 200)]
-      };
-      
-      console.log('   ❌ Environment validation failed');
+      console.error('💥 Report aggregation failed:', error.message);
+      this.aggregatedReport.failures.push({
+        component: 'aggregator',
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
+      throw error;
+    }
+
+    return this.aggregatedReport;
+  }
+
+  async loadEnvironmentReport() {
+    try {
+      const envPath = path.join(this.reportsDir, 'env-validation.json');
+      if (fs.existsSync(envPath)) {
+        const envData = JSON.parse(fs.readFileSync(envPath, 'utf8'));
+        this.aggregatedReport.env = {
+          success: envData.success,
+          requiredValid: envData.summary?.requiredValid || 0,
+          totalRequired: envData.summary?.totalRequired || 0,
+          optionalValid: envData.summary?.optionalValid || 0,
+          testBypassAvailable: envData.summary?.testBypassAvailable || 0,
+          hasPlaceholders: envData.summary?.hasPlaceholders || false,
+          errors: envData.errors || [],
+          warnings: envData.warnings || []
+        };
+
+        this.aggregatedReport.warnings.push(...(envData.warnings || []));
+        if (!envData.success) {
+          this.aggregatedReport.failures.push({
+            component: 'environment',
+            errors: envData.errors
+          });
+        }
+
+        console.log(`✅ Environment report loaded: ${this.aggregatedReport.env.requiredValid}/${this.aggregatedReport.env.totalRequired} required vars`);
+      } else {
+        console.log('⚠️ Environment report not found');
+        this.aggregatedReport.env.success = false;
+        this.aggregatedReport.warnings.push('Environment validation report missing');
+      }
+    } catch (error) {
+      console.error('❌ Failed to load environment report:', error.message);
+      this.aggregatedReport.env.success = false;
+      this.aggregatedReport.failures.push({
+        component: 'environment',
+        error: error.message
+      });
     }
   }
 
-  calculateMetrics() {
-    console.log('📊 Calculating aggregate metrics...');
-    
-    const results = this.reportData.results;
-    
-    this.reportData.metrics = {
-      // Coverage metrics
-      apiRouteCoveragePercent: results.routes?.coverage || 0,
-      testCodeCoveragePercent: results.jest?.coverage?.percentage || 0,
+  async loadProviderReports() {
+    try {
+      const statusPath = path.join(this.reportsDir, 'provider-status.json');
+      const latencyPath = path.join(this.reportsDir, 'provider-latencies.json');
       
-      // Test metrics
-      totalTestsRun: (results.playwright?.tests || 0) + (results.jest?.files || 0),
-      testsPassedPercent: this.calculatePassRate(),
-      
-      // Performance metrics
-      latencyP95Chat: results.performance?.chatLatencyP95 || 'N/A',
-      
-      // System health
-      mcpFailedServers: (results.mcp?.totalServers || 0) - (results.mcp?.healthyServers || 0),
-      envSecretsMissingCount: results.environment?.missingSecrets || 0,
-      
-      // Change impact
-      changedCriticalModules: this.identifyCriticalChanges(),
-      
-      // Visual coverage
-      visualCoveragePercent: this.calculateVisualCoverage()
+      if (fs.existsSync(statusPath)) {
+        const statusData = JSON.parse(fs.readFileSync(statusPath, 'utf8'));
+        
+        this.aggregatedReport.providers = {
+          total: statusData.providersTotal || 0,
+          available: statusData.providersAvailable || 0,
+          working: statusData.providersWorking || 0,
+          tested: statusData.providersTested || 0,
+          providers: statusData.providers || {},
+          success: (statusData.providersWorking || 0) > 0
+        };
+
+        // Load latency data if available
+        if (fs.existsSync(latencyPath)) {
+          const latencyData = JSON.parse(fs.readFileSync(latencyPath, 'utf8'));
+          this.aggregatedReport.providers.latencies = latencyData.latencies || {};
+          this.aggregatedReport.providers.stats = latencyData.stats || {};
+        }
+
+        console.log(`✅ Provider reports loaded: ${this.aggregatedReport.providers.working}/${this.aggregatedReport.providers.available} working`);
+      } else {
+        console.log('⚠️ Provider reports not found');
+        this.aggregatedReport.providers.success = false;
+        this.aggregatedReport.warnings.push('Provider detection reports missing');
+      }
+    } catch (error) {
+      console.error('❌ Failed to load provider reports:', error.message);
+      this.aggregatedReport.providers.success = false;
+      this.aggregatedReport.failures.push({
+        component: 'providers',
+        error: error.message
+      });
+    }
+  }
+
+  async loadRecommendationReport() {
+    try {
+      const recoPath = path.join(this.reportsDir, 'recommendation-engine.json');
+      if (fs.existsSync(recoPath)) {
+        const recoData = JSON.parse(fs.readFileSync(recoPath, 'utf8'));
+        
+        this.aggregatedReport.recommendation = {
+          success: recoData.success,
+          hybridAvailable: recoData.hybridEndpoint?.available || false,
+          recommendationCount: recoData.hybridEndpoint?.recommendationCount || 0,
+          fallbackUsed: recoData.fallbackUsed || false,
+          hybridFlagState: recoData.hybridFlagState,
+          totalLatency: recoData.totalLatency || 0,
+          endpointsTested: (recoData.endpointsTested || []).length,
+          errors: recoData.errors || [],
+          warnings: recoData.warnings || []
+        };
+
+        this.aggregatedReport.warnings.push(...(recoData.warnings || []));
+        if (!recoData.success) {
+          this.aggregatedReport.failures.push({
+            component: 'recommendations',
+            errors: recoData.errors
+          });
+        }
+
+        console.log(`✅ Recommendation report loaded: ${this.aggregatedReport.recommendation.success ? 'working' : 'failed'}`);
+      } else {
+        console.log('⚠️ Recommendation report not found');
+        this.aggregatedReport.recommendation.success = false;
+        this.aggregatedReport.warnings.push('Recommendation engine report missing');
+      }
+    } catch (error) {
+      console.error('❌ Failed to load recommendation report:', error.message);
+      this.aggregatedReport.recommendation.success = false;
+      this.aggregatedReport.failures.push({
+        component: 'recommendations',
+        error: error.message
+      });
+    }
+  }
+
+  async loadDockerReport() {
+    try {
+      const dockerPath = path.join(this.reportsDir, 'docker-validation.json');
+      if (fs.existsSync(dockerPath)) {
+        const dockerData = JSON.parse(fs.readFileSync(dockerPath, 'utf8'));
+        
+        this.aggregatedReport.docker = {
+          success: dockerData.success,
+          buildSuccess: dockerData.build?.success || false,
+          buildDuration: dockerData.build?.duration || 0,
+          imageSize: dockerData.build?.imageSize,
+          runSuccess: dockerData.run?.success || false,
+          healthCheckSuccess: dockerData.healthCheck?.success || false,
+          healthCheckDuration: dockerData.healthCheck?.duration || 0,
+          endpointsTested: (dockerData.endpoints?.tested || []).length,
+          endpointsWorking: dockerData.endpoints?.working || 0,
+          errors: [],
+          warnings: []
+        };
+
+        // Collect errors from all phases
+        if (dockerData.build?.error) this.aggregatedReport.docker.errors.push(`Build: ${dockerData.build.error}`);
+        if (dockerData.run?.error) this.aggregatedReport.docker.errors.push(`Run: ${dockerData.run.error}`);
+        if (dockerData.healthCheck?.error) this.aggregatedReport.docker.errors.push(`Health: ${dockerData.healthCheck.error}`);
+
+        if (!dockerData.success) {
+          this.aggregatedReport.failures.push({
+            component: 'docker',
+            errors: this.aggregatedReport.docker.errors
+          });
+        }
+
+        console.log(`✅ Docker report loaded: ${dockerData.success ? 'passed' : 'failed'}`);
+      } else {
+        console.log('ℹ️ Docker report not found (optional)');
+        this.aggregatedReport.docker.success = null; // null means not tested
+      }
+    } catch (error) {
+      console.error('❌ Failed to load Docker report:', error.message);
+      this.aggregatedReport.docker.success = false;
+      this.aggregatedReport.failures.push({
+        component: 'docker',
+        error: error.message
+      });
+    }
+  }
+
+  async loadPerformanceReport() {
+    try {
+      const perfPath = path.join(this.reportsDir, 'perf-chat.json');
+      if (fs.existsSync(perfPath)) {
+        const perfData = JSON.parse(fs.readFileSync(perfPath, 'utf8'));
+        
+        this.aggregatedReport.performance = {
+          success: perfData.success,
+          testCount: perfData.testCount || 0,
+          successRate: perfData.metrics?.successRate || 0,
+          p50: perfData.metrics?.p50 || 0,
+          p95: perfData.metrics?.p95 || 0,
+          average: perfData.metrics?.average || 0,
+          softThresholdExceeded: perfData.thresholds?.softExceeded || false,
+          hardThresholdExceeded: perfData.thresholds?.hardExceeded || false,
+          fastestProvider: perfData.providers?.fastest,
+          slowestProvider: perfData.providers?.slowest,
+          errors: perfData.errors || [],
+          warnings: perfData.warnings || []
+        };
+
+        this.aggregatedReport.warnings.push(...(perfData.warnings || []));
+        if (!perfData.success) {
+          this.aggregatedReport.failures.push({
+            component: 'performance',
+            errors: perfData.errors
+          });
+        }
+
+        console.log(`✅ Performance report loaded: p50=${this.aggregatedReport.performance.p50}ms, p95=${this.aggregatedReport.performance.p95}ms`);
+      } else {
+        console.log('ℹ️ Performance report not found (optional)');
+        this.aggregatedReport.performance.success = null;
+      }
+    } catch (error) {
+      console.error('❌ Failed to load performance report:', error.message);
+      this.aggregatedReport.performance.success = false;
+      this.aggregatedReport.failures.push({
+        component: 'performance',
+        error: error.message
+      });
+    }
+  }
+
+  async loadScreenshotCoverage() {
+    try {
+      const screenshotReportPath = path.join(this.reportsDir, 'screenshot-coverage.json');
+      if (fs.existsSync(screenshotReportPath)) {
+        const screenshotData = JSON.parse(fs.readFileSync(screenshotReportPath, 'utf8'));
+        
+        this.aggregatedReport.screenshots = {
+          runId: screenshotData.runId,
+          totalSteps: screenshotData.totalSteps || 0,
+          totalErrors: screenshotData.errors?.length || 0,
+          flows: {
+            auth: screenshotData.summary?.authSteps || 0,
+            settings: screenshotData.summary?.settingsSteps || 0,
+            chat: screenshotData.summary?.chatSteps || 0,
+            recommendations: screenshotData.summary?.recommendationsSteps || 0,
+            errorflow: screenshotData.summary?.errorflowSteps || 0
+          },
+          success: (screenshotData.totalSteps || 0) > 0
+        };
+
+        console.log(`✅ Screenshot coverage loaded: ${this.aggregatedReport.screenshots.totalSteps} steps captured`);
+      } else {
+        console.log('ℹ️ Screenshot coverage report not found (optional)');
+        this.aggregatedReport.screenshots.success = null;
+      }
+    } catch (error) {
+      console.error('❌ Failed to load screenshot coverage:', error.message);
+      this.aggregatedReport.screenshots.success = false;
+      this.aggregatedReport.failures.push({
+        component: 'screenshots',
+        error: error.message
+      });
+    }
+  }
+
+  async loadRouteCoverage() {
+    try {
+      const routePath = path.join(this.reportsDir, 'route-manifest.json');
+      if (fs.existsSync(routePath)) {
+        const routeData = JSON.parse(fs.readFileSync(routePath, 'utf8'));
+        
+        this.aggregatedReport.routeCoverage = {
+          totalRoutes: (routeData.routes || []).length,
+          testedRoutes: (routeData.routes || []).filter(r => r.tested).length,
+          coverage: routeData.coverage || 0,
+          success: true
+        };
+
+        console.log(`✅ Route coverage loaded: ${this.aggregatedReport.routeCoverage.testedRoutes}/${this.aggregatedReport.routeCoverage.totalRoutes} routes`);
+      } else {
+        console.log('ℹ️ Route manifest not found (optional)');
+        this.aggregatedReport.routeCoverage.success = null;
+      }
+    } catch (error) {
+      console.error('❌ Failed to load route coverage:', error.message);
+      this.aggregatedReport.routeCoverage.success = false;
+    }
+  }
+
+  async loadVisualCoverage() {
+    try {
+      // Check if visual baseline directory exists
+      if (fs.existsSync(this.baselineDir)) {
+        const baselineFiles = fs.readdirSync(this.baselineDir).filter(f => f.endsWith('.png'));
+        
+        // Check for latest screenshot run
+        let runtimeFiles = 0;
+        if (fs.existsSync(this.screenshotDir)) {
+          const runs = fs.readdirSync(this.screenshotDir);
+          if (runs.length > 0) {
+            const latestRun = runs.sort().pop();
+            const runDir = path.join(this.screenshotDir, latestRun);
+            
+            // Count all PNG files in the run directory recursively
+            const countFiles = (dir) => {
+              let count = 0;
+              const items = fs.readdirSync(dir);
+              for (const item of items) {
+                const fullPath = path.join(dir, item);
+                if (fs.statSync(fullPath).isDirectory()) {
+                  count += countFiles(fullPath);
+                } else if (item.endsWith('.png')) {
+                  count++;
+                }
+              }
+              return count;
+            };
+            
+            runtimeFiles = countFiles(runDir);
+          }
+        }
+
+        this.aggregatedReport.visualCoverage = {
+          baselineStates: baselineFiles.length,
+          runtimeStates: runtimeFiles,
+          coverage: baselineFiles.length > 0 ? Math.round((runtimeFiles / baselineFiles.length) * 100) : 0,
+          success: true
+        };
+
+        console.log(`✅ Visual coverage loaded: ${runtimeFiles} runtime vs ${baselineFiles.length} baseline images`);
+      } else {
+        console.log('ℹ️ Visual baseline directory not found');
+        this.aggregatedReport.visualCoverage.success = null;
+      }
+    } catch (error) {
+      console.error('❌ Failed to load visual coverage:', error.message);
+      this.aggregatedReport.visualCoverage.success = false;
+    }
+  }
+
+  async loadMCPReport() {
+    try {
+      // Look for various MCP report files
+      const mcpFiles = [
+        'mcp-validation-report.json',
+        'mcp-status-report.json',
+        'mcp-health-report.json'
+      ];
+
+      let mcpData = null;
+      for (const filename of mcpFiles) {
+        const mcpPath = path.join(this.reportsDir, filename);
+        if (fs.existsSync(mcpPath)) {
+          mcpData = JSON.parse(fs.readFileSync(mcpPath, 'utf8'));
+          break;
+        }
+      }
+
+      if (mcpData) {
+        this.aggregatedReport.mcp = {
+          serversChecked: mcpData.serversChecked || mcpData.totalServers || 0,
+          serversWorking: mcpData.serversWorking || mcpData.healthyServers || 0,
+          failed: mcpData.failed || mcpData.failedServers || [],
+          usedGitDiff: mcpData.usedGitDiff || false,
+          success: (mcpData.serversWorking || mcpData.healthyServers || 0) > 0
+        };
+
+        console.log(`✅ MCP report loaded: ${this.aggregatedReport.mcp.serversWorking}/${this.aggregatedReport.mcp.serversChecked} servers working`);
+      } else {
+        console.log('ℹ️ MCP report not found (optional)');
+        this.aggregatedReport.mcp.success = null;
+      }
+    } catch (error) {
+      console.error('❌ Failed to load MCP report:', error.message);
+      this.aggregatedReport.mcp.success = false;
+    }
+  }
+
+  calculateOverallSuccess() {
+    const requiredComponents = ['env', 'providers', 'recommendation'];
+    const optionalComponents = ['docker', 'performance', 'screenshots', 'routeCoverage', 'visualCoverage', 'mcp'];
+
+    // Count tests
+    let totalTests = 0;
+    let passedTests = 0;
+    let failedTests = 0;
+
+    // Required components must pass
+    for (const component of requiredComponents) {
+      totalTests++;
+      if (this.aggregatedReport[component].success === true) {
+        passedTests++;
+      } else if (this.aggregatedReport[component].success === false) {
+        failedTests++;
+      }
+    }
+
+    // Optional components count towards totals but don't fail the build
+    for (const component of optionalComponents) {
+      if (this.aggregatedReport[component].success !== null) {
+        totalTests++;
+        if (this.aggregatedReport[component].success === true) {
+          passedTests++;
+        } else {
+          failedTests++;
+        }
+      }
+    }
+
+    this.aggregatedReport.summary = {
+      totalTests,
+      passedTests,
+      failedTests,
+      warningsCount: this.aggregatedReport.warnings.length,
+      errorsCount: this.aggregatedReport.failures.length
     };
+
+    // Overall success: all required components must pass
+    const requiredPassed = requiredComponents.every(comp => 
+      this.aggregatedReport[comp].success === true
+    );
+
+    this.aggregatedReport.success = requiredPassed;
+
+    console.log('\n📊 Overall Results:');
+    console.log(`  Tests: ${passedTests}/${totalTests} passed`);
+    console.log(`  Warnings: ${this.aggregatedReport.summary.warningsCount}`);
+    console.log(`  Failures: ${this.aggregatedReport.summary.errorsCount}`);
+    console.log(`  Overall: ${this.aggregatedReport.success ? '✅ PASSED' : '❌ FAILED'}`);
   }
 
-  calculatePassRate() {
-    const playwright = this.reportData.results.playwright || {};
-    const totalTests = playwright.tests || 0;
-    const passedTests = playwright.passed || 0;
-    
-    if (totalTests === 0) return 0;
-    return Math.round((passedTests / totalTests) * 100);
+  async writeJsonReport() {
+    const reportPath = path.join(this.reportsDir, 'test-run-report.json');
+    fs.writeFileSync(reportPath, JSON.stringify(this.aggregatedReport, null, 2));
+    console.log(`\n📄 JSON report written to: ${reportPath}`);
   }
 
-  identifyCriticalChanges() {
-    const matrix = this.reportData.results.testMatrix;
-    if (!matrix || !matrix.selectedTests) return [];
-    
-    // Identify critical modules based on selected tests
-    const criticalTests = ['performance', 'e2e'];
-    return matrix.selectedTests.filter(test => criticalTests.includes(test));
+  async writeMarkdownReport() {
+    const reportPath = path.join(this.reportsDir, 'test-run-report.md');
+    const markdown = this.generateMarkdown();
+    fs.writeFileSync(reportPath, markdown);
+    console.log(`📄 Markdown report written to: ${reportPath}`);
   }
 
-  calculateVisualCoverage() {
-    // Count visual test files
-    const visualTests = glob.sync('tests/visual/**/*.spec.ts');
-    const baselineImages = glob.sync('visual-baseline/*.png');
+  generateMarkdown() {
+    const report = this.aggregatedReport;
     
-    if (visualTests.length === 0) return 0;
-    return Math.round((baselineImages.length / (visualTests.length * 5)) * 100); // Estimate 5 screenshots per test
-  }
+    let md = '# Test Run Report\n\n';
+    md += `**Run ID:** ${report.runId}  \n`;
+    md += `**Timestamp:** ${report.timestamp}  \n`;
+    md += `**Schema Version:** ${report.schemaVersion}  \n`;
+    md += `**Overall Status:** ${report.success ? '✅ PASSED' : '❌ FAILED'}  \n\n`;
 
-  async writeReports() {
-    console.log('📝 Writing reports...');
+    // Summary
+    md += '## Summary\n\n';
+    md += '| Metric | Value |\n';
+    md += '|--------|-------|\n';
+    md += `| Total Tests | ${report.summary.totalTests} |\n`;
+    md += `| Passed | ${report.summary.passedTests} |\n`;
+    md += `| Failed | ${report.summary.failedTests} |\n`;
+    md += `| Warnings | ${report.summary.warningsCount} |\n`;
+    md += `| Errors | ${report.summary.errorsCount} |\n\n`;
+
+    // Environment
+    md += '## Environment Validation\n\n';
+    md += `**Status:** ${this.statusIcon(report.env.success)}  \n`;
+    md += `**Required Variables:** ${report.env.requiredValid}/${report.env.totalRequired} valid  \n`;
+    md += `**Optional Providers:** ${report.env.optionalValid} available  \n`;
+    md += `**Test Bypass Tokens:** ${report.env.testBypassAvailable}  \n\n`;
+
+    // Providers
+    md += '## Provider Detection\n\n';
+    md += `**Status:** ${this.statusIcon(report.providers.success)}  \n`;
+    md += `**Providers:** ${report.providers.working}/${report.providers.available} working  \n`;
     
-    // Ensure reports directory exists
-    if (!fs.existsSync('reports')) {
-      fs.mkdirSync('reports', { recursive: true });
+    if (report.providers.stats?.fastest) {
+      md += `**Fastest Response:** ${report.providers.stats.fastest}ms  \n`;
     }
     
-    // Write JSON report
-    const jsonPath = 'reports/test-run-report.json';
-    fs.writeFileSync(jsonPath, JSON.stringify(this.reportData, null, 2));
-    console.log(`   ✅ JSON report: ${jsonPath}`);
+    md += '\n### Provider Details\n\n';
+    md += '| Provider | Status | Latency |\n';
+    md += '|----------|--------|----------|\n';
     
-    // Write Markdown report
-    const markdownPath = 'reports/test-run-report.md';
-    const markdownContent = this.generateMarkdownReport();
-    fs.writeFileSync(markdownPath, markdownContent);
-    console.log(`   ✅ Markdown report: ${markdownPath}`);
-  }
+    Object.entries(report.providers.providers || {}).forEach(([key, provider]) => {
+      const status = provider.working ? '✅' : provider.available ? '❌' : '➖';
+      const latency = provider.latency ? `${provider.latency}ms` : 'N/A';
+      md += `| ${provider.name || key} | ${status} | ${latency} |\n`;
+    });
+    md += '\n';
 
-  generateMarkdownReport() {
-    const data = this.reportData;
-    const metrics = data.metrics;
-    const results = data.results;
-    
-    return `# EchoTune AI - Test Run Report
+    // Recommendations
+    md += '## Recommendation Engine\n\n';
+    md += `**Status:** ${this.statusIcon(report.recommendation.success)}  \n`;
+    md += `**Hybrid Available:** ${report.recommendation.hybridAvailable ? '✅' : '❌'}  \n`;
+    md += `**Recommendation Count:** ${report.recommendation.recommendationCount}  \n`;
+    md += `**Fallback Used:** ${report.recommendation.fallbackUsed ? '⚠️' : '➖'}  \n`;
+    md += `**Total Latency:** ${report.recommendation.totalLatency}ms  \n\n`;
 
-**Generated:** ${data.timestamp}  
-**Environment:** ${data.testRun.environment}  
-**Branch:** ${data.testRun.branch}  
-**Commit:** ${data.testRun.commit}
-
-## 📊 Executive Summary
-
-| Metric | Value | Status |
-|--------|-------|--------|
-| API Route Coverage | ${metrics.apiRouteCoveragePercent}% | ${metrics.apiRouteCoveragePercent >= 80 ? '✅' : '⚠️'} |
-| Test Code Coverage | ${metrics.testCodeCoveragePercent}% | ${metrics.testCodeCoveragePercent >= 75 ? '✅' : '⚠️'} |
-| Tests Passed | ${metrics.testsPassedPercent}% | ${metrics.testsPassedPercent >= 90 ? '✅' : '❌'} |
-| Chat P95 Latency | ${metrics.latencyP95Chat}ms | ${typeof metrics.latencyP95Chat === 'number' && metrics.latencyP95Chat < 2000 ? '✅' : '⚠️'} |
-| MCP Failed Servers | ${metrics.mcpFailedServers} | ${metrics.mcpFailedServers === 0 ? '✅' : '❌'} |
-| Missing Secrets | ${metrics.envSecretsMissingCount} | ${metrics.envSecretsMissingCount === 0 ? '✅' : '❌'} |
-
-## 🧪 Test Results
-
-### Unit & Integration Tests (Jest)
-- **Coverage:** ${results.jest?.coverage?.percentage || 0}%
-- **Files Tested:** ${results.jest?.files || 0}
-- **Lines Covered:** ${results.jest?.coverage?.coveredLines || 0}/${results.jest?.coverage?.totalLines || 0}
-
-### End-to-End Tests (Playwright)
-- **Total Tests:** ${results.playwright?.tests || 0}
-- **Passed:** ${results.playwright?.passed || 0}
-- **Failed:** ${results.playwright?.failed || 0}
-- **Duration:** ${results.playwright?.duration || 0}ms
-
-## 🛣️ API Coverage
-
-- **Total Routes:** ${results.routes?.total || 0}
-- **Tested Routes:** ${results.routes?.tested || 0}
-- **Coverage:** ${results.routes?.coverage || 0}%
-
-${results.routes?.categories ? this.formatCategoryTable(results.routes.categories) : ''}
-
-## ⚡ Performance Metrics
-
-- **Chat API P95 Latency:** ${metrics.latencyP95Chat}ms
-- **Performance Tests:** ${results.performance?.passed ? '✅ Passed' : '❌ Failed or Not Run'}
-
-## 🤖 MCP Server Health
-
-- **Healthy Servers:** ${results.mcp?.healthyServers || 0}/${results.mcp?.totalServers || 0}
-- **Health Percentage:** ${results.mcp?.healthPercentage || 0}%
-
-## 🔧 Test Selection
-
-**Selected Test Types:** ${results.testMatrix?.selectedTests?.join(', ') || 'None'}  
-**Changed Files:** ${results.testMatrix?.changedFiles || 0}
-
-${results.testMatrix?.recommendations?.length > 0 ? `
-**Recommendations:**
-${results.testMatrix.recommendations.map(rec => `- ${rec}`).join('\n')}
-` : ''}
-
-## 🎯 Quality Gates
-
-${this.generateQualityGates()}
-
-## 📁 Artifacts
-
-- JSON Report: \`reports/test-run-report.json\`
-- Route Manifest: \`reports/route-manifest.json\`
-- Test Matrix: \`reports/test-matrix.json\`
-- Visual Baselines: \`visual-baseline/\`
-
----
-*Report generated by EchoTune AI Testing Framework v1.0.0*
-`;
-  }
-
-  formatCategoryTable(categories) {
-    let table = '\n### By Category\n\n| Category | Tested | Total | Coverage |\n|----------|--------|-------|----------|\n';
-    
-    for (const [category, stats] of Object.entries(categories)) {
-      table += `| ${category} | ${stats.tested} | ${stats.total} | ${stats.coverage}% |\n`;
+    // Docker (if tested)
+    if (report.docker.success !== null) {
+      md += '## Docker Validation\n\n';
+      md += `**Status:** ${this.statusIcon(report.docker.success)}  \n`;
+      md += `**Build:** ${report.docker.buildSuccess ? '✅' : '❌'} (${report.docker.buildDuration}ms)  \n`;
+      md += `**Health Check:** ${report.docker.healthCheckSuccess ? '✅' : '❌'} (${report.docker.healthCheckDuration}ms)  \n`;
+      md += `**Endpoints:** ${report.docker.endpointsWorking}/${report.docker.endpointsTested} working  \n`;
+      if (report.docker.imageSize) {
+        md += `**Image Size:** ${report.docker.imageSize}  \n`;
+      }
+      md += '\n';
     }
-    
-    return table;
-  }
 
-  generateQualityGates() {
-    const metrics = this.reportData.metrics;
-    const gates = [
-      { name: 'API Route Coverage', value: metrics.apiRouteCoveragePercent, threshold: 80, unit: '%' },
-      { name: 'Test Coverage', value: metrics.testCodeCoveragePercent, threshold: 75, unit: '%' },
-      { name: 'Test Pass Rate', value: metrics.testsPassedPercent, threshold: 90, unit: '%' },
-      { name: 'MCP Server Health', value: 100 - (metrics.mcpFailedServers * 10), threshold: 90, unit: '%' },
-      { name: 'Environment Secrets', value: metrics.envSecretsMissingCount, threshold: 0, unit: '', invert: true }
-    ];
-    
-    let gateResults = '';
-    
-    for (const gate of gates) {
-      const passed = gate.invert ? gate.value <= gate.threshold : gate.value >= gate.threshold;
-      const status = passed ? '✅ PASS' : '❌ FAIL';
-      gateResults += `- **${gate.name}:** ${gate.value}${gate.unit} (threshold: ${gate.threshold}${gate.unit}) - ${status}\n`;
+    // Performance (if tested)
+    if (report.performance.success !== null) {
+      md += '## Performance Testing\n\n';
+      md += `**Status:** ${this.statusIcon(report.performance.success)}  \n`;
+      md += `**Tests:** ${report.performance.testCount} requests  \n`;
+      md += `**Success Rate:** ${report.performance.successRate}%  \n`;
+      md += `**Latency p50:** ${report.performance.p50}ms  \n`;
+      md += `**Latency p95:** ${report.performance.p95}ms  \n`;
+      
+      if (report.performance.softThresholdExceeded) {
+        md += '**Soft Threshold:** ⚠️ Exceeded  \n';
+      }
+      if (report.performance.hardThresholdExceeded) {
+        md += '**Hard Threshold:** ❌ Exceeded  \n';
+      }
+      
+      if (report.performance.fastestProvider) {
+        md += `**Fastest Provider:** ${report.performance.fastestProvider}  \n`;
+      }
+      md += '\n';
     }
-    
-    return gateResults;
+
+    // Screenshots (if tested)
+    if (report.screenshots.success !== null && report.screenshots.totalSteps > 0) {
+      md += '## Screenshot Coverage\n\n';
+      md += `**Total Steps:** ${report.screenshots.totalSteps}  \n`;
+      md += `**Errors Captured:** ${report.screenshots.totalErrors}  \n`;
+      
+      md += '\n### Flow Coverage\n\n';
+      md += '| Flow | Steps |\n';
+      md += '|------|-------|\n';
+      Object.entries(report.screenshots.flows).forEach(([flow, steps]) => {
+        md += `| ${flow} | ${steps} |\n`;
+      });
+      md += '\n';
+    }
+
+    // Warnings
+    if (report.warnings.length > 0) {
+      md += '## Warnings\n\n';
+      report.warnings.forEach(warning => {
+        md += `- ⚠️ ${warning}\n`;
+      });
+      md += '\n';
+    }
+
+    // Failures
+    if (report.failures.length > 0) {
+      md += '## Failures\n\n';
+      report.failures.forEach(failure => {
+        md += `### ${failure.component}\n\n`;
+        if (failure.errors && Array.isArray(failure.errors)) {
+          failure.errors.forEach(error => {
+            md += `- ❌ ${error}\n`;
+          });
+        } else if (failure.error) {
+          md += `- ❌ ${failure.error}\n`;
+        }
+        md += '\n';
+      });
+    }
+
+    // TODO Section
+    md += '## TODO (Deferred)\n\n';
+    md += '- [ ] Contract tests for API endpoints\n';
+    md += '- [ ] Visual diff gating with baseline images\n';
+    md += '- [ ] Performance trends and regression detection\n';
+    md += '- [ ] Semantic similarity testing for AI responses\n';
+    md += '- [ ] Load testing with concurrent users\n';
+    md += '- [ ] Security testing and vulnerability scanning\n\n';
+
+    // Metadata
+    md += '## Metadata\n\n';
+    md += `**Node Version:** ${report.metadata.nodeVersion}  \n`;
+    md += `**Platform:** ${report.metadata.platform} (${report.metadata.arch})  \n`;
+    md += `**Environment:** ${report.metadata.environment}  \n`;
+    md += `**Working Directory:** ${report.metadata.cwd}  \n`;
+
+    return md;
   }
 
-  displaySummary() {
-    console.log('\n📊 Test Report Summary');
-    console.log('='.repeat(50));
-    
-    const metrics = this.reportData.metrics;
-    
-    console.log(`📈 Key Metrics:`);
-    console.log(`   API Route Coverage: ${metrics.apiRouteCoveragePercent}%`);
-    console.log(`   Test Code Coverage: ${metrics.testCodeCoveragePercent}%`);
-    console.log(`   Tests Passed: ${metrics.testsPassedPercent}%`);
-    console.log(`   Chat P95 Latency: ${metrics.latencyP95Chat}ms`);
-    console.log(`   MCP Failed Servers: ${metrics.mcpFailedServers}`);
-    
-    console.log(`\n📁 Reports Generated:`);
-    console.log(`   • reports/test-run-report.json`);
-    console.log(`   • reports/test-run-report.md`);
-    
-    console.log('\n✅ Test report collection completed!');
+  statusIcon(success) {
+    if (success === true) return '✅';
+    if (success === false) return '❌';
+    return '➖'; // null/not tested
+  }
+
+  async run() {
+    try {
+      // Ensure reports directory exists
+      if (!fs.existsSync(this.reportsDir)) {
+        fs.mkdirSync(this.reportsDir, { recursive: true });
+      }
+
+      const report = await this.aggregateReports();
+
+      if (report.success) {
+        console.log('\n✅ Test report aggregation completed successfully');
+        process.exit(0);
+      } else {
+        console.log('\n❌ Test report aggregation completed with failures');
+        process.exit(1);
+      }
+
+    } catch (error) {
+      console.error('💥 Test report aggregation failed:', error.message);
+      
+      // Write error report
+      const errorReport = {
+        schemaVersion: '2.0',
+        timestamp: new Date().toISOString(),
+        success: false,
+        error: error.message,
+        partialData: this.aggregatedReport
+      };
+
+      fs.writeFileSync(
+        path.join(this.reportsDir, 'test-run-report.json'), 
+        JSON.stringify(errorReport, null, 2)
+      );
+
+      process.exit(1);
+    }
   }
 }
 
-// Run collection if called directly
+// Run aggregation if called directly
 if (require.main === module) {
-  const collector = new TestReportCollector();
-  collector.collect().catch(console.error);
+  const aggregator = new TestReportAggregator();
+  aggregator.run();
 }
 
-module.exports = TestReportCollector;
+module.exports = TestReportAggregator;

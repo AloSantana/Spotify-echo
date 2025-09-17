@@ -481,7 +481,7 @@ The EchoTune AI platform is production-ready with advanced administrative capabi
         // Save detailed report
         const reportPath = path.join(__dirname, '..', 'ENHANCED_DEPLOYMENT_REPORT.md');
         fs.writeFileSync(reportPath, report);
-        console.log(`\n📄 Detailed report saved: ENHANCED_DEPLOYMENT_REPORT.md`);
+        console.log('\n📄 Detailed report saved: ENHANCED_DEPLOYMENT_REPORT.md');
     }
 
     /**

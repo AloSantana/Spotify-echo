@@ -152,7 +152,7 @@ describe('Perplexity API and Grok-4 Integration Test Suite', () => {
         const result = await perplexityClient.search(TEST_CONFIG.testData.complexQuery, {
           model: 'llama-3.1-sonar-huge-128k-online',
           return_citations: true,
-          search_domain_filter: ["developer.mozilla.org", "github.com", "stackoverflow.com"]
+          search_domain_filter: ['developer.mozilla.org', 'github.com', 'stackoverflow.com']
         });
 
         const responseTime = Date.now() - startTime;

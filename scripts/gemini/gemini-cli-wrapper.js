@@ -145,7 +145,7 @@ async function runPrompt(options) {
     safetyMode: options.safety
   };
 
-  console.log(`\n📋 Configuration:`);
+  console.log('\n📋 Configuration:');
   console.log(`   Model: ${options.model}`);
   console.log(`   Temperature: ${options.temperature}`);
   console.log(`   Max tokens: ${options.maxTokens}`);
@@ -326,7 +326,7 @@ async function runBenchmark(options) {
   // Save results
   await fs.writeFile(options.output, JSON.stringify(results, null, 2));
   
-  console.log(`\n📊 Benchmark Results:`);
+  console.log('\n📊 Benchmark Results:');
   console.log(`   Overall success rate: ${(results.summary.overallSuccessRate * 100).toFixed(1)}%`);
   console.log(`   Average latency: ${results.summary.averageLatency.toFixed(0)}ms`);
   console.log(`   Total cost: $${results.summary.totalCost.toFixed(6)}`);

@@ -360,13 +360,13 @@ async function main() {
         const verification = await fixer.verifyFixes();
         const report = await fixer.generateReport();
         
-        console.log(`\n✅ Phase 1 Completed Successfully!`);
+        console.log('\n✅ Phase 1 Completed Successfully!');
         console.log(`📁 Fixed ${fixedFiles.length} files`);
         console.log(`🔧 Reduced ESLint errors from ${verification.lintErrorsBefore} to ${verification.lintErrorsAfter}`);
-        console.log(`📋 Report generated: eslint-fix-report.json`);
+        console.log('📋 Report generated: eslint-fix-report.json');
         
         if (verification.lintErrorsAfter < 20) {
-            console.log(`\n🎯 Ready to proceed to Phase 2: MCP Server Integration & Automation`);
+            console.log('\n🎯 Ready to proceed to Phase 2: MCP Server Integration & Automation');
         } else {
             console.log(`\n⚠️ ${verification.lintErrorsAfter} errors remaining - manual review recommended`);
         }

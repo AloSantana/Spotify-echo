@@ -59,41 +59,41 @@ class CursorMCPGenerator {
     console.log('🌐 Generating Global Cursor MCP Configuration...');
     
     const globalConfig = {
-      "$schema": "https://modelcontextprotocol.io/schema/cursor-mcp.json",
-      "mcpServers": {
-        "perplexity": {
-          "command": "node",
-          "args": [path.join(this.projectRoot, "mcp-servers", "perplexity-mcp", "perplexity-mcp-server.js")],
-          "env": {
-            "PERPLEXITY_API_KEY": process.env.PERPLEXITY_API_KEY || "${PERPLEXITY_API_KEY}",
-            "PERPLEXITY_MODEL": process.env.PERPLEXITY_MODEL || "llama-3.1-sonar-small-128k-online",
-            "PERPLEXITY_MAX_LATENCY_MS": process.env.PERPLEXITY_MAX_LATENCY_MS || "1500",
-            "PERPLEXITY_MAX_MEMORY_MB": process.env.PERPLEXITY_MAX_MEMORY_MB || "256",
-            "PERPLEXITY_COST_BUDGET_USD": process.env.PERPLEXITY_COST_BUDGET_USD || "0.50"
+      '$schema': 'https://modelcontextprotocol.io/schema/cursor-mcp.json',
+      'mcpServers': {
+        'perplexity': {
+          'command': 'node',
+          'args': [path.join(this.projectRoot, 'mcp-servers', 'perplexity-mcp', 'perplexity-mcp-server.js')],
+          'env': {
+            'PERPLEXITY_API_KEY': process.env.PERPLEXITY_API_KEY || '${PERPLEXITY_API_KEY}',
+            'PERPLEXITY_MODEL': process.env.PERPLEXITY_MODEL || 'llama-3.1-sonar-small-128k-online',
+            'PERPLEXITY_MAX_LATENCY_MS': process.env.PERPLEXITY_MAX_LATENCY_MS || '1500',
+            'PERPLEXITY_MAX_MEMORY_MB': process.env.PERPLEXITY_MAX_MEMORY_MB || '256',
+            'PERPLEXITY_COST_BUDGET_USD': process.env.PERPLEXITY_COST_BUDGET_USD || '0.50'
           }
         },
-        "filesystem": {
-          "command": "npx",
-          "args": ["@modelcontextprotocol/server-filesystem", this.projectRoot],
-          "env": {}
+        'filesystem': {
+          'command': 'npx',
+          'args': ['@modelcontextprotocol/server-filesystem', this.projectRoot],
+          'env': {}
         },
-        "memory": {
-          "command": "npx", 
-          "args": ["@modelcontextprotocol/server-memory"],
-          "env": {}
+        'memory': {
+          'command': 'npx', 
+          'args': ['@modelcontextprotocol/server-memory'],
+          'env': {}
         },
-        "brave-search": {
-          "command": "npx",
-          "args": ["@modelcontextprotocol/server-brave-search"],
-          "env": {
-            "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+        'brave-search': {
+          'command': 'npx',
+          'args': ['@modelcontextprotocol/server-brave-search'],
+          'env': {
+            'BRAVE_API_KEY': '${BRAVE_API_KEY}'
           }
         },
-        "github": {
-          "command": "npx",
-          "args": ["@modelcontextprotocol/server-github"],
-          "env": {
-            "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+        'github': {
+          'command': 'npx',
+          'args': ['@modelcontextprotocol/server-github'],
+          'env': {
+            'GITHUB_PERSONAL_ACCESS_TOKEN': '${GITHUB_TOKEN}'
           }
         }
       }
@@ -119,39 +119,39 @@ class CursorMCPGenerator {
     console.log('📁 Generating Project-specific MCP Configuration...');
     
     const projectConfig = {
-      "$schema": "https://modelcontextprotocol.io/schema/cursor-mcp.json",
-      "mcpServers": {
-        "echotune-perplexity": {
-          "command": "node",
-          "args": ["./mcp-servers/perplexity-mcp/perplexity-mcp-server.js"],
-          "env": {
-            "PERPLEXITY_API_KEY": "${PERPLEXITY_API_KEY}",
-            "PERPLEXITY_MODEL": "llama-3.1-sonar-small-128k-online",
-            "PERPLEXITY_MAX_LATENCY_MS": "1500",
-            "PERPLEXITY_MAX_MEMORY_MB": "256",
-            "PERPLEXITY_COST_BUDGET_USD": "0.50",
-            "DEBUG": "true"
+      '$schema': 'https://modelcontextprotocol.io/schema/cursor-mcp.json',
+      'mcpServers': {
+        'echotune-perplexity': {
+          'command': 'node',
+          'args': ['./mcp-servers/perplexity-mcp/perplexity-mcp-server.js'],
+          'env': {
+            'PERPLEXITY_API_KEY': '${PERPLEXITY_API_KEY}',
+            'PERPLEXITY_MODEL': 'llama-3.1-sonar-small-128k-online',
+            'PERPLEXITY_MAX_LATENCY_MS': '1500',
+            'PERPLEXITY_MAX_MEMORY_MB': '256',
+            'PERPLEXITY_COST_BUDGET_USD': '0.50',
+            'DEBUG': 'true'
           }
         },
-        "echotune-filesystem": {
-          "command": "npx",
-          "args": ["@modelcontextprotocol/server-filesystem", "./src", "./scripts", "./mcp-server"],
-          "env": {}
+        'echotune-filesystem': {
+          'command': 'npx',
+          'args': ['@modelcontextprotocol/server-filesystem', './src', './scripts', './mcp-server'],
+          'env': {}
         },
-        "package-manager": {
-          "command": "node",
-          "args": ["./mcp-servers/package-management/package-version-mcp.js"],
-          "env": {}
+        'package-manager': {
+          'command': 'node',
+          'args': ['./mcp-servers/package-management/package-version-mcp.js'],
+          'env': {}
         },
-        "analytics": {
-          "command": "node", 
-          "args": ["./mcp-servers/analytics-server/analytics-mcp.js"],
-          "env": {}
+        'analytics': {
+          'command': 'node', 
+          'args': ['./mcp-servers/analytics-server/analytics-mcp.js'],
+          'env': {}
         },
-        "testing": {
-          "command": "node",
-          "args": ["./mcp-servers/testing-automation/testing-automation-mcp.js"],
-          "env": {}
+        'testing': {
+          'command': 'node',
+          'args': ['./mcp-servers/testing-automation/testing-automation-mcp.js'],
+          'env': {}
         }
       }
     };
@@ -284,45 +284,45 @@ class CursorMCPGenerator {
 
     // Research-to-Code workflow
     const researchWorkflow = {
-      "name": "Research-to-Code Workflow",
-      "description": "Complete workflow from research to implementation",
-      "steps": [
+      'name': 'Research-to-Code Workflow',
+      'description': 'Complete workflow from research to implementation',
+      'steps': [
         {
-          "action": "research",
-          "tool": "perplexity",
-          "prompt": "Research latest developments in {topic} with focus on production implementation",
-          "timeout": "30s"
+          'action': 'research',
+          'tool': 'perplexity',
+          'prompt': 'Research latest developments in {topic} with focus on production implementation',
+          'timeout': '30s'
         },
         {
-          "action": "analyze",
-          "tool": "memory",
-          "prompt": "Analyze research findings and create implementation plan",
-          "timeout": "15s"
+          'action': 'analyze',
+          'tool': 'memory',
+          'prompt': 'Analyze research findings and create implementation plan',
+          'timeout': '15s'
         },
         {
-          "action": "implement", 
-          "tool": "filesystem",
-          "prompt": "Implement solution following architecture rules and performance budgets",
-          "timeout": "300s"
+          'action': 'implement', 
+          'tool': 'filesystem',
+          'prompt': 'Implement solution following architecture rules and performance budgets',
+          'timeout': '300s'
         },
         {
-          "action": "test",
-          "tool": "testing",
-          "prompt": "Generate and run comprehensive tests for implementation",
-          "timeout": "60s"
+          'action': 'test',
+          'tool': 'testing',
+          'prompt': 'Generate and run comprehensive tests for implementation',
+          'timeout': '60s'
         },
         {
-          "action": "validate",
-          "tool": "analytics",
-          "prompt": "Validate performance against budgets and generate metrics report",
-          "timeout": "30s"
+          'action': 'validate',
+          'tool': 'analytics',
+          'prompt': 'Validate performance against budgets and generate metrics report',
+          'timeout': '30s'
         }
       ],
-      "acceptanceCriteria": [
-        "Research citations included in documentation",
-        "Performance budgets maintained",
-        "Tests achieve >80% coverage",
-        "No new security vulnerabilities"
+      'acceptanceCriteria': [
+        'Research citations included in documentation',
+        'Performance budgets maintained',
+        'Tests achieve >80% coverage',
+        'No new security vulnerabilities'
       ]
     };
 
@@ -333,39 +333,39 @@ class CursorMCPGenerator {
 
     // Bug fix workflow
     const bugfixWorkflow = {
-      "name": "Bug Fix Research Workflow",
-      "description": "Research-driven bug fixing with root cause analysis",
-      "steps": [
+      'name': 'Bug Fix Research Workflow',
+      'description': 'Research-driven bug fixing with root cause analysis',
+      'steps': [
         {
-          "action": "research",
-          "tool": "perplexity", 
-          "prompt": "Research common causes and solutions for error: {error_message}",
-          "timeout": "20s"
+          'action': 'research',
+          'tool': 'perplexity', 
+          'prompt': 'Research common causes and solutions for error: {error_message}',
+          'timeout': '20s'
         },
         {
-          "action": "analyze",
-          "tool": "filesystem",
-          "prompt": "Analyze codebase for patterns matching research findings",
-          "timeout": "30s"
+          'action': 'analyze',
+          'tool': 'filesystem',
+          'prompt': 'Analyze codebase for patterns matching research findings',
+          'timeout': '30s'
         },
         {
-          "action": "fix",
-          "tool": "filesystem",
-          "prompt": "Implement minimal fix based on research best practices",
-          "timeout": "120s"
+          'action': 'fix',
+          'tool': 'filesystem',
+          'prompt': 'Implement minimal fix based on research best practices',
+          'timeout': '120s'
         },
         {
-          "action": "test",
-          "tool": "testing",
-          "prompt": "Test fix and add regression tests",
-          "timeout": "60s"
+          'action': 'test',
+          'tool': 'testing',
+          'prompt': 'Test fix and add regression tests',
+          'timeout': '60s'
         }
       ],
-      "acceptanceCriteria": [
-        "Root cause identified and documented",
-        "Minimal change set (<20 LOC)",
-        "Regression tests added",
-        "Performance impact validated"
+      'acceptanceCriteria': [
+        'Root cause identified and documented',
+        'Minimal change set (<20 LOC)',
+        'Regression tests added',
+        'Performance impact validated'
       ]
     };
 

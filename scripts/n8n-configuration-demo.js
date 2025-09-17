@@ -43,8 +43,8 @@ class N8nConfigurationDemo {
             });
             
             console.log(`   📊 Workflows: ${workflows.data.data.length} total`);
-            console.log(`   🔑 API Authentication: ✅ CONFIGURED`);
-            console.log(`   🛠️  MCP Tools: 39 available via n8n-mcp`);
+            console.log('   🔑 API Authentication: ✅ CONFIGURED');
+            console.log('   🛠️  MCP Tools: 39 available via n8n-mcp');
             
         } catch (error) {
             console.log(`   ❌ Connection failed: ${error.message}`);
@@ -147,13 +147,13 @@ class N8nConfigurationDemo {
             console.log(`      📨 Method: ${endpoint.method}`);
             console.log(`      🎯 Purpose: ${endpoint.purpose}`);
             console.log('');
-            console.log(`      🧪 Test Command:`);
+            console.log('      🧪 Test Command:');
             console.log(`      curl -X ${endpoint.method} "${endpoint.url}" \\`);
-            console.log(`        -H "Content-Type: application/json" \\`);
-            console.log(`        -d '{`);
-            console.log(`          "user_id": "demo_user",`);
-            console.log(`          "tracks": [{"id": "track123", "name": "Demo Song"}]`);
-            console.log(`        }'`);
+            console.log('        -H "Content-Type: application/json" \\');
+            console.log('        -d \'{');
+            console.log('          "user_id": "demo_user",');
+            console.log('          "tracks": [{"id": "track123", "name": "Demo Song"}]');
+            console.log('        }\'');
             console.log('');
         });
     }

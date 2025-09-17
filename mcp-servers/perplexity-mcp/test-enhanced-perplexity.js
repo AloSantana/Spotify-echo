@@ -368,7 +368,7 @@ class EnhancedPerplexityTester {
       const avgLatency = results.reduce((sum, r) => sum + r.latency, 0) / results.length;
       const avgResponseLength = results.reduce((sum, r) => sum + r.responseLength, 0) / results.length;
       
-      console.log(`✅ Performance benchmark completed:`);
+      console.log('✅ Performance benchmark completed:');
       console.log(`   Average latency: ${Math.round(avgLatency)}ms`);
       console.log(`   Average response length: ${Math.round(avgResponseLength)} characters`);
       
@@ -491,12 +491,12 @@ class EnhancedPerplexityTester {
   }
 
   generateMarkdownSummary(report) {
-    let markdown = `# Enhanced Perplexity MCP Server Test Report\n\n`;
+    let markdown = '# Enhanced Perplexity MCP Server Test Report\n\n';
     markdown += `**Generated:** ${report.timestamp}\n`;
     markdown += `**Total Tests:** ${report.summary.totalTests} | **Passed:** ${report.summary.passed} | **Failed:** ${report.summary.failed} | **Errors:** ${report.summary.errors}\n\n`;
     
     // Model Results
-    markdown += `## 🤖 Model Test Results\n\n`;
+    markdown += '## 🤖 Model Test Results\n\n';
     Object.entries(report.results.models).forEach(([model, result]) => {
       const status = result.testStatus === 'PASS' ? '✅' : result.testStatus === 'FAIL' ? '❌' : '⚠️';
       markdown += `### ${status} ${model}\n`;
@@ -524,7 +524,7 @@ class EnhancedPerplexityTester {
     
     // Workflow Results
     if (Object.keys(report.results.workflows).length > 0) {
-      markdown += `## 🔧 Workflow Test Results\n\n`;
+      markdown += '## 🔧 Workflow Test Results\n\n';
       Object.entries(report.results.workflows).forEach(([workflow, result]) => {
         const status = result.status === 'PASS' ? '✅' : result.status === 'FAIL' ? '❌' : '⚠️';
         markdown += `### ${status} ${workflow}\n`;
@@ -546,7 +546,7 @@ class EnhancedPerplexityTester {
     
     // Performance Results
     if (report.results.performance && report.results.performance.status) {
-      markdown += `## 📊 Performance Benchmark Results\n\n`;
+      markdown += '## 📊 Performance Benchmark Results\n\n';
       const perf = report.results.performance;
       const status = perf.status === 'PASS' ? '✅' : perf.status === 'SLOW' ? '⚠️' : '❌';
       
@@ -567,7 +567,7 @@ class EnhancedPerplexityTester {
     
     // Errors
     if (report.results.errors.length > 0) {
-      markdown += `## ❌ Errors\n\n`;
+      markdown += '## ❌ Errors\n\n';
       report.results.errors.forEach((error, index) => {
         markdown += `${index + 1}. **${error.test}:** ${error.error} (${error.timestamp})\n`;
       });
@@ -575,10 +575,10 @@ class EnhancedPerplexityTester {
     }
     
     // Recommendations
-    markdown += `## 🎯 Recommendations\n\n`;
+    markdown += '## 🎯 Recommendations\n\n';
     
     if (report.summary.passed === report.summary.totalTests) {
-      markdown += `- 🎉 All tests passed! The enhanced Perplexity MCP server is working optimally.\n`;
+      markdown += '- 🎉 All tests passed! The enhanced Perplexity MCP server is working optimally.\n';
     }
     
     // Model-specific recommendations

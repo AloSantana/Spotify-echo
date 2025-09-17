@@ -67,64 +67,64 @@ class CursorMCPConfigGenerator {
     generateInputs() {
         return [
             {
-                id: "perplexity-key",
-                type: "promptString",
-                description: "Perplexity API Key",
+                id: 'perplexity-key',
+                type: 'promptString',
+                description: 'Perplexity API Key',
                 password: true,
-                placeholder: "pplx-..."
+                placeholder: 'pplx-...'
             },
             {
-                id: "openai-key", 
-                type: "promptString",
-                description: "OpenAI API Key",
+                id: 'openai-key', 
+                type: 'promptString',
+                description: 'OpenAI API Key',
                 password: true,
-                placeholder: "sk-..."
+                placeholder: 'sk-...'
             },
             {
-                id: "anthropic-key",
-                type: "promptString", 
-                description: "Anthropic Claude API Key",
+                id: 'anthropic-key',
+                type: 'promptString', 
+                description: 'Anthropic Claude API Key',
                 password: true,
-                placeholder: "sk-ant-..."
+                placeholder: 'sk-ant-...'
             },
             {
-                id: "google-gemini-key",
-                type: "promptString",
-                description: "Google Gemini API Key", 
+                id: 'google-gemini-key',
+                type: 'promptString',
+                description: 'Google Gemini API Key', 
                 password: true,
-                placeholder: "AI..."
+                placeholder: 'AI...'
             },
             {
-                id: "spotify-client-id",
-                type: "promptString",
-                description: "Spotify Client ID",
+                id: 'spotify-client-id',
+                type: 'promptString',
+                description: 'Spotify Client ID',
                 password: false
             },
             {
-                id: "spotify-client-secret",
-                type: "promptString",
-                description: "Spotify Client Secret",
+                id: 'spotify-client-secret',
+                type: 'promptString',
+                description: 'Spotify Client Secret',
                 password: true
             },
             {
-                id: "browserbase-key",
-                type: "promptString",
-                description: "Browserbase API Key (optional)",
+                id: 'browserbase-key',
+                type: 'promptString',
+                description: 'Browserbase API Key (optional)',
                 password: true,
-                placeholder: "bb_..."
+                placeholder: 'bb_...'
             },
             {
-                id: "browserbase-project-id",
-                type: "promptString",
-                description: "Browserbase Project ID (optional)",
+                id: 'browserbase-project-id',
+                type: 'promptString',
+                description: 'Browserbase Project ID (optional)',
                 password: false
             },
             {
-                id: "max-cost-per-session",
-                type: "promptString",
-                description: "Maximum cost per research session (USD)",
+                id: 'max-cost-per-session',
+                type: 'promptString',
+                description: 'Maximum cost per research session (USD)',
                 password: false,
-                placeholder: "0.50"
+                placeholder: '0.50'
             }
         ];
     }
@@ -134,27 +134,27 @@ class CursorMCPConfigGenerator {
         
         // Add Perplexity MCP with comprehensive configuration
         servers.perplexity = {
-            command: "node",
-            args: ["mcp-servers/perplexity-mcp/perplexity-mcp-server.js"],
+            command: 'node',
+            args: ['mcp-servers/perplexity-mcp/perplexity-mcp-server.js'],
             env: {
-                "PERPLEXITY_API_KEY": "${input:perplexity-key}",
-                "PERPLEXITY_BASE_URL": "https://api.perplexity.ai",
-                "PERPLEXITY_MODEL": "llama-3.1-sonar-large-128k-online",
-                "PERPLEXITY_MAX_LATENCY_MS": "1500",
-                "PERPLEXITY_MAX_MEMORY_MB": "256", 
-                "PERPLEXITY_MAX_CPU_CORES": "0.5",
-                "PERPLEXITY_COST_BUDGET_USD": "${input:max-cost-per-session}",
-                "PERPLEXITY_CACHE_SIZE": "100",
-                "PERPLEXITY_CACHE_EXPIRY_MS": "300000",
-                "REDIS_URL": "${REDIS_URL}"
+                'PERPLEXITY_API_KEY': '${input:perplexity-key}',
+                'PERPLEXITY_BASE_URL': 'https://api.perplexity.ai',
+                'PERPLEXITY_MODEL': 'llama-3.1-sonar-large-128k-online',
+                'PERPLEXITY_MAX_LATENCY_MS': '1500',
+                'PERPLEXITY_MAX_MEMORY_MB': '256', 
+                'PERPLEXITY_MAX_CPU_CORES': '0.5',
+                'PERPLEXITY_COST_BUDGET_USD': '${input:max-cost-per-session}',
+                'PERPLEXITY_CACHE_SIZE': '100',
+                'PERPLEXITY_CACHE_EXPIRY_MS': '300000',
+                'REDIS_URL': '${REDIS_URL}'
             },
-            description: "AI-powered research with web search, citations, and performance budgets",
+            description: 'AI-powered research with web search, citations, and performance budgets',
             capabilities: [
-                "research",
-                "web_search", 
-                "citations",
-                "real_time_data",
-                "cost_controlled"
+                'research',
+                'web_search', 
+                'citations',
+                'real_time_data',
+                'cost_controlled'
             ],
             settings: {
                 enableCache: true,
@@ -177,13 +177,13 @@ class CursorMCPConfigGenerator {
         
         // Add GitHub MCP for repository operations
         servers.github = {
-            command: "npx",
-            args: ["-y", "@modelcontextprotocol/server-github"],
+            command: 'npx',
+            args: ['-y', '@modelcontextprotocol/server-github'],
             env: {
-                "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+                'GITHUB_PERSONAL_ACCESS_TOKEN': '${GITHUB_TOKEN}'
             },
-            description: "GitHub repository operations, issues, and pull requests",
-            capabilities: ["repository_analysis", "issue_management", "pr_operations"],
+            description: 'GitHub repository operations, issues, and pull requests',
+            capabilities: ['repository_analysis', 'issue_management', 'pr_operations'],
             settings: {
                 enableCache: true,
                 timeout: 15000
@@ -192,13 +192,13 @@ class CursorMCPConfigGenerator {
         
         // Add filesystem operations
         servers.filesystem = {
-            command: "node",
-            args: ["node_modules/FileScopeMCP/dist/mcp-server.js"],
+            command: 'node',
+            args: ['node_modules/FileScopeMCP/dist/mcp-server.js'],
             env: {
-                "ALLOWED_DIRECTORIES": `${process.cwd()},${process.cwd()}/src,${process.cwd()}/scripts,${process.cwd()}/mcp-server`
+                'ALLOWED_DIRECTORIES': `${process.cwd()},${process.cwd()}/src,${process.cwd()}/scripts,${process.cwd()}/mcp-server`
             },
-            description: "Secure filesystem operations with directory restrictions",
-            capabilities: ["file_operations", "code_analysis", "repository_scanning"],
+            description: 'Secure filesystem operations with directory restrictions',
+            capabilities: ['file_operations', 'code_analysis', 'repository_scanning'],
             settings: {
                 enableCache: false,
                 timeout: 10000
@@ -207,13 +207,13 @@ class CursorMCPConfigGenerator {
         
         // Add SQLite operations
         servers.sqlite = {
-            command: "npx", 
-            args: ["-y", "@modelcontextprotocol/server-sqlite"],
+            command: 'npx', 
+            args: ['-y', '@modelcontextprotocol/server-sqlite'],
             env: {
-                "SQLITE_DB_PATH": "${PWD}/data/echotune.db"
+                'SQLITE_DB_PATH': '${PWD}/data/echotune.db'
             },
-            description: "SQLite database operations and queries",
-            capabilities: ["database_queries", "data_analysis", "schema_inspection"],
+            description: 'SQLite database operations and queries',
+            capabilities: ['database_queries', 'data_analysis', 'schema_inspection'],
             settings: {
                 enableCache: true,
                 timeout: 15000
@@ -222,14 +222,14 @@ class CursorMCPConfigGenerator {
         
         // Add browser automation
         servers.browser = {
-            command: "npx",
-            args: ["@modelcontextprotocol/server-puppeteer"],
+            command: 'npx',
+            args: ['@modelcontextprotocol/server-puppeteer'],
             env: {
-                "PUPPETEER_HEADLESS": "true",
-                "PUPPETEER_TIMEOUT": "30000"
+                'PUPPETEER_HEADLESS': 'true',
+                'PUPPETEER_TIMEOUT': '30000'
             },
-            description: "Browser automation and web scraping capabilities",
-            capabilities: ["web_automation", "screenshots", "form_filling", "page_interaction"],
+            description: 'Browser automation and web scraping capabilities',
+            capabilities: ['web_automation', 'screenshots', 'form_filling', 'page_interaction'],
             settings: {
                 enableCache: false,
                 timeout: 35000
@@ -243,14 +243,14 @@ class CursorMCPConfigGenerator {
         // Add Browserbase (if configured)
         if (process.env.BROWSERBASE_API_KEY || this.shouldIncludeBrowserbase()) {
             servers.browserbase = {
-                command: "npx",
-                args: ["@browserbasehq/mcp-server-browserbase"],
+                command: 'npx',
+                args: ['@browserbasehq/mcp-server-browserbase'],
                 env: {
-                    "BROWSERBASE_API_KEY": "${input:browserbase-key}",
-                    "BROWSERBASE_PROJECT_ID": "${input:browserbase-project-id}"
+                    'BROWSERBASE_API_KEY': '${input:browserbase-key}',
+                    'BROWSERBASE_PROJECT_ID': '${input:browserbase-project-id}'
                 },
-                description: "Cloud browser automation with enhanced reliability",
-                capabilities: ["cloud_browser", "screenshots", "session_recording", "debugging"],
+                description: 'Cloud browser automation with enhanced reliability',
+                capabilities: ['cloud_browser', 'screenshots', 'session_recording', 'debugging'],
                 settings: {
                     enableCache: false,
                     timeout: 45000
@@ -263,11 +263,11 @@ class CursorMCPConfigGenerator {
         }
         
         // Add Sequential Thinking for complex reasoning
-        servers["sequential-thinking"] = {
-            command: "node",
-            args: ["mcp-servers/sequential-thinking/dist/index.js"],
-            description: "Structured thinking and reasoning capabilities for complex tasks",
-            capabilities: ["structured_reasoning", "problem_solving", "step_by_step_analysis"],
+        servers['sequential-thinking'] = {
+            command: 'node',
+            args: ['mcp-servers/sequential-thinking/dist/index.js'],
+            description: 'Structured thinking and reasoning capabilities for complex tasks',
+            capabilities: ['structured_reasoning', 'problem_solving', 'step_by_step_analysis'],
             settings: {
                 enableCache: true,
                 timeout: 20000
@@ -276,14 +276,14 @@ class CursorMCPConfigGenerator {
         
         // Add Spotify integration
         servers.spotify = {
-            command: "python",
-            args: ["mcp-server/spotify_server.py"],
+            command: 'python',
+            args: ['mcp-server/spotify_server.py'],
             env: {
-                "SPOTIFY_CLIENT_ID": "${input:spotify-client-id}",
-                "SPOTIFY_CLIENT_SECRET": "${input:spotify-client-secret}"
+                'SPOTIFY_CLIENT_ID': '${input:spotify-client-id}',
+                'SPOTIFY_CLIENT_SECRET': '${input:spotify-client-secret}'
             },
-            description: "Spotify API integration for music data and operations",
-            capabilities: ["music_data", "playlist_management", "audio_analysis", "user_profiles"],
+            description: 'Spotify API integration for music data and operations',
+            capabilities: ['music_data', 'playlist_management', 'audio_analysis', 'user_profiles'],
             settings: {
                 enableCache: true,
                 timeout: 15000
@@ -303,26 +303,26 @@ class CursorMCPConfigGenerator {
         }
         
         // Add local orchestrator and monitoring
-        servers["mcp-orchestrator"] = {
-            command: "node",
-            args: ["mcp-server/enhanced-mcp-orchestrator.js"],
-            description: "Local MCP server orchestration, health monitoring, and load balancing",
-            capabilities: ["orchestration", "health_monitoring", "server_management", "load_balancing"],
+        servers['mcp-orchestrator'] = {
+            command: 'node',
+            args: ['mcp-server/enhanced-mcp-orchestrator.js'],
+            description: 'Local MCP server orchestration, health monitoring, and load balancing',
+            capabilities: ['orchestration', 'health_monitoring', 'server_management', 'load_balancing'],
             settings: {
                 enableCache: false,
-                httpEndpoint: "http://localhost:3002",
+                httpEndpoint: 'http://localhost:3002',
                 refreshInterval: 30000
             }
         };
         
-        servers["health-monitor"] = {
-            command: "node", 
-            args: ["mcp-server/enhanced-health-monitor.js"],
-            description: "System health monitoring, diagnostics, and performance tracking",
-            capabilities: ["health_checks", "metrics", "diagnostics", "performance_tracking"],
+        servers['health-monitor'] = {
+            command: 'node', 
+            args: ['mcp-server/enhanced-health-monitor.js'],
+            description: 'System health monitoring, diagnostics, and performance tracking',
+            capabilities: ['health_checks', 'metrics', 'diagnostics', 'performance_tracking'],
             settings: {
                 enableCache: false,
-                httpEndpoint: "http://localhost:3010",
+                httpEndpoint: 'http://localhost:3010',
                 refreshInterval: 15000
             }
         };
@@ -344,7 +344,7 @@ class CursorMCPConfigGenerator {
                 backoffMs: 1000
             },
             logging: {
-                level: "info",
+                level: 'info',
                 enableRequestLogging: false,
                 enableErrorLogging: true
             }
@@ -357,7 +357,7 @@ class CursorMCPConfigGenerator {
                 maxCostPerHour: 2.00,
                 maxCostPerDay: 10.00,
                 alertThresholds: [0.50, 1.00, 5.00],
-                currency: "USD"
+                currency: 'USD'
             },
             perProvider: {
                 perplexity: {
@@ -405,7 +405,7 @@ class CursorMCPConfigGenerator {
     
     convertToCursorFormat(name, config) {
         const cursorServer = {
-            command: config.command || "node",
+            command: config.command || 'node',
             args: config.args || [],
             description: config.description || `${name} MCP server`,
             capabilities: config.capabilities || [],
@@ -423,11 +423,11 @@ class CursorMCPConfigGenerator {
         // Add special settings for different server types
         if (name.includes('browser') || name.includes('puppeteer')) {
             cursorServer.settings.timeout = 35000;
-            cursorServer.capabilities = [...(cursorServer.capabilities || []), "browser_automation", "screenshots", "web_scraping"];
+            cursorServer.capabilities = [...(cursorServer.capabilities || []), 'browser_automation', 'screenshots', 'web_scraping'];
         }
         
         if (name.includes('spotify')) {
-            cursorServer.capabilities = [...(cursorServer.capabilities || []), "music_data", "api_integration", "playlist_management"];
+            cursorServer.capabilities = [...(cursorServer.capabilities || []), 'music_data', 'api_integration', 'playlist_management'];
             cursorServer.costLimits = {
                 maxRequestsPerHour: 1000,
                 alertThreshold: 800
@@ -435,7 +435,7 @@ class CursorMCPConfigGenerator {
         }
         
         if (name.includes('filesystem') || name.includes('file')) {
-            cursorServer.capabilities = [...(cursorServer.capabilities || []), "file_operations", "repository_analysis", "code_scanning"];
+            cursorServer.capabilities = [...(cursorServer.capabilities || []), 'file_operations', 'repository_analysis', 'code_scanning'];
             cursorServer.settings.enableCache = false;
         }
         
@@ -451,55 +451,55 @@ class CursorMCPConfigGenerator {
         const aiWorkflows = {
             workflows: [
                 {
-                    name: "research-to-pr",
-                    description: "Research a topic and create a comprehensive PR with implementation",
+                    name: 'research-to-pr',
+                    description: 'Research a topic and create a comprehensive PR with implementation',
                     steps: [
-                        "Use @perplexity to research the topic comprehensively",
-                        "Use @github to analyze current repository structure",
-                        "Use @filesystem to implement changes",
-                        "Use @sequential-thinking to plan the implementation strategy",
-                        "Create tests and documentation"
+                        'Use @perplexity to research the topic comprehensively',
+                        'Use @github to analyze current repository structure',
+                        'Use @filesystem to implement changes',
+                        'Use @sequential-thinking to plan the implementation strategy',
+                        'Create tests and documentation'
                     ],
                     estimatedCost: 0.25,
-                    estimatedTime: "15-30 minutes"
+                    estimatedTime: '15-30 minutes'
                 },
                 {
-                    name: "code-review-analysis",
-                    description: "Perform comprehensive code review with research-backed suggestions",
+                    name: 'code-review-analysis',
+                    description: 'Perform comprehensive code review with research-backed suggestions',
                     steps: [
-                        "Use @filesystem to analyze code changes",
-                        "Use @perplexity to research best practices for identified patterns",
-                        "Use @sequential-thinking to structure review feedback",
-                        "Generate actionable improvement suggestions"
+                        'Use @filesystem to analyze code changes',
+                        'Use @perplexity to research best practices for identified patterns',
+                        'Use @sequential-thinking to structure review feedback',
+                        'Generate actionable improvement suggestions'
                     ],
                     estimatedCost: 0.15,
-                    estimatedTime: "10-20 minutes"
+                    estimatedTime: '10-20 minutes'
                 },
                 {
-                    name: "performance-optimization",
-                    description: "Analyze and optimize system performance",
+                    name: 'performance-optimization',
+                    description: 'Analyze and optimize system performance',
                     steps: [
-                        "Use @health-monitor to get current performance metrics",
-                        "Use @perplexity to research optimization strategies",
-                        "Use @filesystem to implement optimizations", 
-                        "Use @sqlite to analyze data performance",
-                        "Validate improvements with benchmarks"
+                        'Use @health-monitor to get current performance metrics',
+                        'Use @perplexity to research optimization strategies',
+                        'Use @filesystem to implement optimizations', 
+                        'Use @sqlite to analyze data performance',
+                        'Validate improvements with benchmarks'
                     ],
                     estimatedCost: 0.30,
-                    estimatedTime: "20-45 minutes"
+                    estimatedTime: '20-45 minutes'
                 },
                 {
-                    name: "music-data-analysis",
-                    description: "Analyze music data and generate insights",
+                    name: 'music-data-analysis',
+                    description: 'Analyze music data and generate insights',
                     steps: [
-                        "Use @spotify to fetch user music data",
-                        "Use @sqlite to query historical patterns",
-                        "Use @perplexity to research music trend analysis",
-                        "Use @sequential-thinking to structure insights",
-                        "Generate comprehensive analysis report"
+                        'Use @spotify to fetch user music data',
+                        'Use @sqlite to query historical patterns',
+                        'Use @perplexity to research music trend analysis',
+                        'Use @sequential-thinking to structure insights',
+                        'Generate comprehensive analysis report'
                     ],
                     estimatedCost: 0.20,
-                    estimatedTime: "15-30 minutes"
+                    estimatedTime: '15-30 minutes'
                 }
             ]
         };

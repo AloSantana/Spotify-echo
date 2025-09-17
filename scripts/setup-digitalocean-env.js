@@ -201,7 +201,7 @@ ${Object.entries(envVars)
     
     fs.writeFileSync(envFile, envContent);
     
-    log.success(`Generated .env.production.digitalocean`);
+    log.success('Generated .env.production.digitalocean');
 
     // Generate DigitalOcean App Platform commands
     const appPlatformCommands = Object.entries(envVars)
@@ -226,13 +226,13 @@ echo "You can now deploy your app on DigitalOcean App Platform"
     fs.writeFileSync(appPlatformFile, appPlatformContent);
     fs.chmodSync(appPlatformFile, '755');
     
-    log.success(`Generated digitalocean-app-commands.sh`);
+    log.success('Generated digitalocean-app-commands.sh');
 
     // Generate Docker Compose environment file
     const dockerEnvFile = path.join(process.cwd(), '.env.docker.digitalocean');
     fs.writeFileSync(dockerEnvFile, envContent);
     
-    log.success(`Generated .env.docker.digitalocean`);
+    log.success('Generated .env.docker.digitalocean');
 
     // Generate Kubernetes secrets template
     const k8sSecretsFile = path.join(process.cwd(), 'k8s-digitalocean-secrets.yaml');
@@ -261,7 +261,7 @@ ${Object.entries(envVars)
 
     fs.writeFileSync(k8sSecretsFile, k8sSecretsContent);
     
-    log.success(`Generated k8s-digitalocean-secrets.yaml`);
+    log.success('Generated k8s-digitalocean-secrets.yaml');
 
     // Generate README section
     const readmeSection = `## 🚀 Quick Deploy to DigitalOcean
@@ -297,7 +297,7 @@ ${Object.entries(envVars)
 For detailed instructions, see [DEPLOY_TO_DIGITALOCEAN.md](./DEPLOY_TO_DIGITALOCEAN.md)
 `;
 
-    log.success(`Generated README section for DigitalOcean deployment`);
+    log.success('Generated README section for DigitalOcean deployment');
 
     // Final instructions
     log.header('🎉 Configuration Complete!');
@@ -311,15 +311,15 @@ For detailed instructions, see [DEPLOY_TO_DIGITALOCEAN.md](./DEPLOY_TO_DIGITALOC
     log.info('4. Or manually follow the deployment guide');
     log.info('\n📁 Generated files:');
     log.info(`   - .env.production.digitalocean (${Object.keys(envVars).length} variables)`);
-    log.info(`   - digitalocean-app-commands.sh (App Platform setup)`);
-    log.info(`   - .env.docker.digitalocean (Docker deployment)`);
-    log.info(`   - k8s-digitalocean-secrets.yaml (Kubernetes secrets)`);
-    log.info(`   - README section (copy to your README.md)`);
+    log.info('   - digitalocean-app-commands.sh (App Platform setup)');
+    log.info('   - .env.docker.digitalocean (Docker deployment)');
+    log.info('   - k8s-digitalocean-secrets.yaml (Kubernetes secrets)');
+    log.info('   - README section (copy to your README.md)');
 
     // Save README section for user to copy
     const readmeFile = path.join(process.cwd(), 'DIGITALOCEAN_README_SECTION.md');
     fs.writeFileSync(readmeFile, readmeSection);
-    log.info(`   - DIGITALOCEAN_README_SECTION.md (copy to your README.md)`);
+    log.info('   - DIGITALOCEAN_README_SECTION.md (copy to your README.md)');
 
   } catch (error) {
     log.error(`Configuration failed: ${error.message}`);

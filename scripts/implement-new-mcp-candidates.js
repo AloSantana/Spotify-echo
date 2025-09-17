@@ -588,8 +588,8 @@ ${this.implementationResults.filter(r => r.status === 'success').map(candidate =
             });
         }
         
-        console.log(`\n📄 Implementation report: MCP_CANDIDATES_IMPLEMENTATION.md`);
-        console.log(`📄 Validation results: mcp-candidates-validation.json`);
+        console.log('\n📄 Implementation report: MCP_CANDIDATES_IMPLEMENTATION.md');
+        console.log('📄 Validation results: mcp-candidates-validation.json');
     }
 
     // Helper methods

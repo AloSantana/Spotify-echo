@@ -218,10 +218,10 @@ async function main() {
     const hasUnhealthyServers = healthReport.unhealthyCount > 0;
     
     if (hasUnhealthyServers) {
-      console.log(`\n⚠️  Some MCP servers are not responding. Check the logs above.`);
+      console.log('\n⚠️  Some MCP servers are not responding. Check the logs above.');
       console.log(`Health score: ${healthReport.healthPercentage}%`);
     } else {
-      console.log(`\n🎉 All MCP servers are healthy!`);
+      console.log('\n🎉 All MCP servers are healthy!');
       console.log(`Health score: ${healthReport.healthPercentage}%`);
     }
     

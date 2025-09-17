@@ -26,22 +26,22 @@ class MusicPerplexityResearch {
                 description: 'Latest Spotify Web API changes, best practices, and optimization strategies',
                 queries: [
                     {
-                        query: "Latest Spotify Web API changes for recommendations and audio-features, PKCE best practices 2024",
+                        query: 'Latest Spotify Web API changes for recommendations and audio-features, PKCE best practices 2024',
                         focus: 'API updates and security',
                         expectedInsights: ['PKCE implementation', 'API rate limits', 'OAuth 2.0 changes']
                     },
                     {
-                        query: "Optimizing 429 handling and batching for Spotify track endpoints with exponential backoff",
+                        query: 'Optimizing 429 handling and batching for Spotify track endpoints with exponential backoff',
                         focus: 'Performance and reliability',
                         expectedInsights: ['Rate limiting strategies', 'Batch processing', 'Error handling']
                     },
                     {
-                        query: "Spotify recommendations parameters and feature targeting (danceability, energy, valence, tempo) best practices",
+                        query: 'Spotify recommendations parameters and feature targeting (danceability, energy, valence, tempo) best practices',
                         focus: 'Recommendation algorithms',
                         expectedInsights: ['Audio feature usage', 'Parameter optimization', 'User experience']
                     },
                     {
-                        query: "Spotify playlist management and collaborative features implementation patterns 2024",
+                        query: 'Spotify playlist management and collaborative features implementation patterns 2024',
                         focus: 'Playlist functionality',
                         expectedInsights: ['Collaborative playlists', 'Playlist sharing', 'User permissions']
                     }
@@ -52,22 +52,22 @@ class MusicPerplexityResearch {
                 description: 'Advanced recommendation algorithms, hybrid approaches, and context-aware systems',
                 queries: [
                     {
-                        query: "Hybrid music recommendation: combining content-based audio features and collaborative filters in production 2024",
+                        query: 'Hybrid music recommendation: combining content-based audio features and collaborative filters in production 2024',
                         focus: 'Algorithm architecture',
                         expectedInsights: ['Hybrid approaches', 'Content-based filtering', 'Collaborative filtering']
                     },
                     {
-                        query: "Context-aware music recommendations (time-of-day, mood, session signals) implementation patterns",
+                        query: 'Context-aware music recommendations (time-of-day, mood, session signals) implementation patterns',
                         focus: 'Contextual recommendations',
                         expectedInsights: ['Temporal patterns', 'Mood detection', 'Session analysis']
                     },
                     {
-                        query: "Bandit strategies for music recommendation exploration and user engagement optimization",
+                        query: 'Bandit strategies for music recommendation exploration and user engagement optimization',
                         focus: 'Exploration strategies',
                         expectedInsights: ['Multi-armed bandits', 'Exploration vs exploitation', 'User engagement']
                     },
                     {
-                        query: "Music recommendation evaluation metrics: accuracy, diversity, novelty, and user satisfaction",
+                        query: 'Music recommendation evaluation metrics: accuracy, diversity, novelty, and user satisfaction',
                         focus: 'Evaluation and metrics',
                         expectedInsights: ['Evaluation frameworks', 'Diversity metrics', 'User satisfaction']
                     }
@@ -78,22 +78,22 @@ class MusicPerplexityResearch {
                 description: 'React 19 patterns, media UI optimization, and accessibility for music applications',
                 queries: [
                     {
-                        query: "React 19 patterns for low-latency media UIs with MUI accessibility and concurrent features",
+                        query: 'React 19 patterns for low-latency media UIs with MUI accessibility and concurrent features',
                         focus: 'React performance',
                         expectedInsights: ['Concurrent features', 'Media optimization', 'Accessibility patterns']
                     },
                     {
-                        query: "Vite chunking and preloading strategies for media-heavy music applications",
+                        query: 'Vite chunking and preloading strategies for media-heavy music applications',
                         focus: 'Build optimization',
                         expectedInsights: ['Code splitting', 'Preloading strategies', 'Bundle optimization']
                     },
                     {
-                        query: "PWA playbook for offline caches of metadata and small previews in music apps",
+                        query: 'PWA playbook for offline caches of metadata and small previews in music apps',
                         focus: 'Offline functionality',
                         expectedInsights: ['Service workers', 'Cache strategies', 'Offline UX']
                     },
                     {
-                        query: "Audio player UI/UX best practices: controls, visualizations, and accessibility",
+                        query: 'Audio player UI/UX best practices: controls, visualizations, and accessibility',
                         focus: 'Audio player design',
                         expectedInsights: ['Control design', 'Visual feedback', 'Accessibility standards']
                     }
@@ -104,22 +104,22 @@ class MusicPerplexityResearch {
                 description: 'Node.js optimization, real-time performance, and caching strategies for music platforms',
                 queries: [
                     {
-                        query: "Express + Socket.IO performance tuning at scale for real-time music applications",
+                        query: 'Express + Socket.IO performance tuning at scale for real-time music applications',
                         focus: 'Real-time performance',
                         expectedInsights: ['Socket.IO optimization', 'Express tuning', 'Scalability patterns']
                     },
                     {
-                        query: "Node.js 20 performance optimization for music streaming and recommendation APIs",
+                        query: 'Node.js 20 performance optimization for music streaming and recommendation APIs',
                         focus: 'Node.js optimization',
                         expectedInsights: ['Performance tuning', 'Memory management', 'API optimization']
                     },
                     {
-                        query: "Redis caching strategies for audio features and track metadata in music platforms",
+                        query: 'Redis caching strategies for audio features and track metadata in music platforms',
                         focus: 'Caching strategies',
                         expectedInsights: ['Cache patterns', 'TTL strategies', 'Memory optimization']
                     },
                     {
-                        query: "Microservices architecture for music recommendation systems: patterns and best practices",
+                        query: 'Microservices architecture for music recommendation systems: patterns and best practices',
                         focus: 'Architecture patterns',
                         expectedInsights: ['Service boundaries', 'Communication patterns', 'Deployment strategies']
                     }
@@ -130,22 +130,22 @@ class MusicPerplexityResearch {
                 description: 'Database optimization, ETL patterns, and analytics for music platforms',
                 queries: [
                     {
-                        query: "MongoDB indexing and aggregations for time-series listening data and audio feature queries",
+                        query: 'MongoDB indexing and aggregations for time-series listening data and audio feature queries',
                         focus: 'Database optimization',
                         expectedInsights: ['Indexing strategies', 'Aggregation pipelines', 'Performance optimization']
                     },
                     {
-                        query: "Event-driven ETL patterns for music recommendation systems and user preference aggregation",
+                        query: 'Event-driven ETL patterns for music recommendation systems and user preference aggregation',
                         focus: 'Data processing',
                         expectedInsights: ['ETL patterns', 'Event streaming', 'Data aggregation']
                     },
                     {
-                        query: "Database schema optimization for music discovery platforms with real-time updates",
+                        query: 'Database schema optimization for music discovery platforms with real-time updates',
                         focus: 'Schema design',
                         expectedInsights: ['Schema patterns', 'Real-time updates', 'Data modeling']
                     },
                     {
-                        query: "Music analytics and insights: user behavior patterns, genre analysis, and trend detection",
+                        query: 'Music analytics and insights: user behavior patterns, genre analysis, and trend detection',
                         focus: 'Analytics and insights',
                         expectedInsights: ['Behavior analysis', 'Trend detection', 'Insight generation']
                     }
@@ -156,22 +156,22 @@ class MusicPerplexityResearch {
                 description: 'AI integration, ML models, and intelligent features for music applications',
                 queries: [
                     {
-                        query: "AI-powered music analysis: genre classification, mood detection, and style recognition",
+                        query: 'AI-powered music analysis: genre classification, mood detection, and style recognition',
                         focus: 'AI analysis',
                         expectedInsights: ['Genre classification', 'Mood detection', 'Style recognition']
                     },
                     {
-                        query: "Natural language processing for music search and conversational music assistants",
+                        query: 'Natural language processing for music search and conversational music assistants',
                         focus: 'NLP integration',
                         expectedInsights: ['Search optimization', 'Conversational AI', 'User intent']
                     },
                     {
-                        query: "Machine learning model deployment for music recommendation systems in production",
+                        query: 'Machine learning model deployment for music recommendation systems in production',
                         focus: 'ML deployment',
                         expectedInsights: ['Model serving', 'Production deployment', 'Performance monitoring']
                     },
                     {
-                        query: "Federated learning approaches for music recommendation privacy and personalization",
+                        query: 'Federated learning approaches for music recommendation privacy and personalization',
                         focus: 'Privacy and personalization',
                         expectedInsights: ['Federated learning', 'Privacy preservation', 'Personalization strategies']
                     }
