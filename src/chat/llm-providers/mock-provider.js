@@ -3,12 +3,22 @@ const BaseLLMProvider = require('./base-provider');
 /**
  * Mock LLM Provider for Demo/Testing
  * Provides realistic music assistant responses without requiring API keys
+ * PRODUCTION GATED: Disabled in production unless explicitly enabled
  */
 class MockLLMProvider extends BaseLLMProvider {
   constructor(config = {}) {
+    // Enforce No-Mock policy in production
+    if (process.env.NODE_ENV === 'production' && !process.env.ENABLE_MOCK_PROVIDER) {
+      throw new Error('Mock provider disabled in production. Set ENABLE_MOCK_PROVIDER=true to override.');
+    }
+    
     super(config);
     this.name = 'mock';
     this.defaultModel = 'mock-music-assistant';
+    this.isProductionGated = process.env.NODE_ENV === 'production';
+    
+    console.log(`🎭 Mock provider initialized (Production: ${this.isProductionGated ? 'GATED' : 'ALLOWED'})`);
+    
     this.responses = [
       'I\'d love to help you discover new music! What kind of mood are you in today? Are you looking for something upbeat and energetic, or perhaps something more mellow and relaxing?',
       'Great choice! Based on your preferences, I can recommend some fantastic tracks. What genre or activity would you like music for?',
@@ -42,9 +52,14 @@ class MockLLMProvider extends BaseLLMProvider {
   }
 
   async initialize() {
+    // Production gating check
+    if (this.isProductionGated && !process.env.ENABLE_MOCK_PROVIDER) {
+      throw new Error('Mock provider cannot be initialized in production without explicit override');
+    }
+    
     // Mock provider is always ready
     this.isInitialized = true;
-    console.log('✅ Mock LLM provider initialized - Demo mode active');
+    console.log(`✅ Mock LLM provider initialized - Demo mode active (Production gated: ${this.isProductionGated})`);
   }
 
   validateConfig() {
