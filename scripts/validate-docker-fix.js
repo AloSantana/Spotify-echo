@@ -14,7 +14,7 @@ async function validateDockerFix() {
     
     const timestamp = Date.now();
     const runId = `docker-fix-${timestamp}`;
-    const screenshotDir = path.join(__dirname, '..', 'BROWSERTESTIMAGES', runId);
+    const screenshotDir = path.join(__dirname, '..', 'BROWSERSCREENSHOT-TESTING', runId);
     const reportDir = path.join(__dirname, '..', 'reports');
     
     // Create directories

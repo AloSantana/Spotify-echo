@@ -8,13 +8,13 @@ const path = require('path');
  * Complete EchoTune AI Validation Runner
  * 
  * This script runs all validation tests and generates comprehensive reports
- * with screenshots stored in BROWSERTESTIMAGES folder
+ * with screenshots stored in BROWSERSCREENSHOT-TESTING folder
  */
 
 class CompleteValidationRunner {
   constructor() {
     this.runId = `complete-${Date.now()}`;
-    this.baseDir = path.join(process.cwd(), 'BROWSERTESTIMAGES', this.runId);
+    this.baseDir = path.join(process.cwd(), 'BROWSERSCREENSHOT-TESTING', this.runId);
     this.results = {
       environment: {},
       npm: {},
@@ -317,7 +317,7 @@ ${report.docker?.summary ? `
 
 ### E2E Testing
 - **Test Status**: ${this.getStatusEmoji(report.e2e.status === 'completed')} ${report.e2e.status || 'not run'}
-- **Screenshots Captured**: Available in BROWSERTESTIMAGES folder
+- **Screenshots Captured**: Available in BROWSERSCREENSHOT-TESTING folder
 
 ## Spotify Integration Status
 
@@ -340,7 +340,7 @@ ${Object.entries(report.environment.optionalVars || {}).filter(([key]) => key.in
 
 All test screenshots and logs are stored in:
 \`\`\`
-BROWSERTESTIMAGES/${summary.runId}/
+BROWSERSCREENSHOT-TESTING/${summary.runId}/
 ├── auth/                    # Authentication flow screenshots
 ├── chat/                    # Chat functionality screenshots  
 ├── recommendations/         # Music recommendation screenshots
@@ -443,7 +443,7 @@ ${Object.entries(summary.featureStatus).filter(([, status]) => status === 'faile
       this.log('📊 Validation complete!');
       this.log(`📄 Report: ${this.baseDir}/complete-validation-report.json`);
       this.log('📋 Summary: validation-summary.md');
-      this.log(`📸 Screenshots: BROWSERTESTIMAGES/${this.runId}/`);
+      this.log(`📸 Screenshots: BROWSERSCREENSHOT-TESTING/${this.runId}/`);
       
       return report;
       

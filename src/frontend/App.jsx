@@ -180,7 +180,7 @@ function MainApplication({ initialTab = 'chat' }) {
         const data = await response.json();
         return {
           response: data.response,
-          recommendations: mockRecommendations.slice(0, 2), // Mock recommendations
+          recommendations: data.recommendations || [], // Use real recommendations from API
           explanation: {
             summary: 'I selected these tracks based on your mood and musical preferences.',
             reasoning: [
@@ -193,25 +193,43 @@ function MainApplication({ initialTab = 'chat' }) {
               { factor: 'activity', value: context.activity || 'general', influence: 'medium' },
             ],
           },
-          provider: data.provider || 'mock',
+          provider: data.provider || (process.env.NODE_ENV === 'production' ? 'unavailable' : 'mock'),
         };
       }
     } catch (error) {
       console.error('Chat API error:', error);
     }
 
-    // Fallback response
-    return {
-      response: 'I\'d love to help you discover great music! What kind of mood are you in today?',
+    // Production fallback - no mocks allowed
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.CI === 'true';
+    const fallbackResponse = isProduction ? {
+      response: 'Chat service temporarily unavailable. Please check your configuration.',
       recommendations: [],
-      provider: 'mock',
+      provider: 'unavailable',
+    } : {
+      response: 'I\'d love to help you discover great music! What kind of mood are you in today?',
+      recommendations: mockRecommendations.slice(0, 2),
+      provider: 'development-fallback',
     };
+
+    return fallbackResponse;
   };
 
   const handleGetExplanation = async (recommendationId, trackId) => {
     console.log('Getting explanation for:', recommendationId, trackId);
 
-    // Mock explanation based on track
+    // Mock explanation based on track (development only)
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.CI === 'true';
+    if (isProduction) {
+      return {
+        summary: 'Explanation service unavailable in production mode',
+        reasons: ['Real explanation service required'],
+        confidence: 0,
+        algorithm: 'production',
+        factors: []
+      };
+    }
+    
     const track = mockRecommendations.find((t) => t.id === trackId);
     if (track) {
       return {

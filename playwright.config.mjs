@@ -12,7 +12,10 @@ export default defineConfig({
   testMatch: [
     '**/tests/e2e/**/*.spec.ts',
     '**/tests/e2e/**/*.spec.js',
-    '**/tests/visual/**/*.spec.ts'
+    '**/tests/visual/**/*.spec.ts',
+    '**/tests/visual/**/*.spec.js',
+    '**/tests/**/*.test.js',
+    '**/tests/**/*.test.ts'
   ],
   
   /* Run tests in files in parallel */
@@ -29,9 +32,9 @@ export default defineConfig({
   
   /* Reporter to use */
   reporter: [
-    ['html', { outputFolder: 'playwright-report' }],
-    ['json', { outputFile: 'reports/playwright-results.json' }],
-    ['junit', { outputFile: 'reports/playwright-results.xml' }]
+    ['html', { outputFolder: 'BROWSERSCREENSHOT-TESTING/playwright-report' }],
+    ['json', { outputFile: 'BROWSERSCREENSHOT-TESTING/reports/playwright-results.json' }],
+    ['junit', { outputFile: 'BROWSERSCREENSHOT-TESTING/reports/playwright-results.xml' }]
   ],
   
   /* Global setup and teardown */
@@ -147,7 +150,7 @@ export default defineConfig({
   // },
   
   /* Output directories for test artifacts */
-  outputDir: 'artifacts/test-results',
+  outputDir: 'BROWSERSCREENSHOT-TESTING/test-results',
   
   /* Timeout settings */
   timeout: 60 * 1000, // 60 seconds per test

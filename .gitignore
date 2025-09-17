@@ -569,3 +569,45 @@ perplexity-budget-status.txt
 
 # Google Cloud credentials
 gcp-credentials.json
+# Screenshot testing directories
+BROWSERSCREENSHOT-TESTING/
+BROWSERTESTIMAGES/
+artifacts/screenshots/
+playwright-report/
+reports/playwright-results.*
+visual-baseline/
+test-results/
+
+# Docker and deployment artifacts
+docker-logs/
+*.log
+.docker/
+
+# Temporary and build artifacts
+/tmp/
+temp/
+node_modules/
+dist/
+build/
+.cache/
+
+# Environment and secrets
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# IDE and editor files  
+.vscode/
+.cursor/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Testing artifacts
+coverage/
+.nyc_output/
+junit.xml
+test-results/

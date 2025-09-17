@@ -9,7 +9,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 const path = require('path');
 
-const SCREENSHOT_DIR = path.join(__dirname, 'BROWSERTESTIMAGES', `enhanced-ui-${Date.now()}`);
+const SCREENSHOT_DIR = path.join(__dirname, 'BROWSERSCREENSHOT-TESTING', `enhanced-ui-${Date.now()}`);
 const VIEWPORT_DESKTOP = { width: 1280, height: 800 };
 const VIEWPORT_MOBILE = { width: 390, height: 844 };
 
