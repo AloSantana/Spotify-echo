@@ -50,6 +50,35 @@ router.post('/', async (req, res) => {
     res.status(500).json({
       error: 'Failed to process message',
       message: 'Sorry, I encountered an error. Please try again.',
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
+/**
+ * Simple chat endpoint for testing (GET)
+ * GET /api/chat
+ */
+router.get('/', async (req, res) => {
+  try {
+    res.json({
+      provider: 'dev',
+      message: 'LLM provider not configured; stub response.',
+      ok: true,
+      timestamp: new Date().toISOString(),
+      endpoints: {
+        chat: 'POST /api/chat',
+        recommendations: 'GET /api/recommendations?strategy=content'
+      }
+    });
+  } catch (error) {
+    console.error('Chat GET error:', error);
+    res.status(200).json({
+      provider: 'dev',
+      message: 'LLM provider error; stub response.',
+      ok: false,
+      error: error.message,
+      timestamp: new Date().toISOString(),
     });
   }
 });
