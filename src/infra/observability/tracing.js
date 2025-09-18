@@ -5,11 +5,17 @@
  * Configures tracing for the application with automatic instrumentation
  */
 
-const { NodeSDK } = require('@opentelemetry/sdk-node');
-const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
-const { Resource } = require('@opentelemetry/resources');
-const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
-const opentelemetry = require('@opentelemetry/api');
+let NodeSDK, getNodeAutoInstrumentations, Resource, SemanticResourceAttributes, opentelemetry;
+
+try {
+  NodeSDK = require('@opentelemetry/sdk-node').NodeSDK;
+  getNodeAutoInstrumentations = require('@opentelemetry/auto-instrumentations-node').getNodeAutoInstrumentations;
+  Resource = require('@opentelemetry/resources').Resource;
+  SemanticResourceAttributes = require('@opentelemetry/semantic-conventions').SemanticResourceAttributes;
+  opentelemetry = require('@opentelemetry/api');
+} catch (error) {
+  console.warn('OpenTelemetry modules not available, tracing disabled:', error.message);
+}
 
 let sdk = null;
 let isInitialized = false;
@@ -24,6 +30,11 @@ function initializeTracing() {
     return;
   }
 
+  if (!NodeSDK || !getNodeAutoInstrumentations || !Resource || !SemanticResourceAttributes) {
+    logger.warn('OpenTelemetry modules not available, skipping tracing initialization');
+    return;
+  }
+
   try {
     const serviceName = process.env.OTEL_SERVICE_NAME || 'echotune-api';
     const otlpEndpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
@@ -35,9 +46,6 @@ function initializeTracing() {
     });
 
     // Configure resource
-    const { Resource } = require('@opentelemetry/resources');
-    const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
-    
     const resource = new Resource({
       [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
       [SemanticResourceAttributes.SERVICE_VERSION]: process.env.npm_package_version || '1.0.0',

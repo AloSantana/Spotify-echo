@@ -10,7 +10,7 @@ All recommendations are grounded in the current repo’s status, MCP ecosystem, 
 
 - A robust MCP ecosystem with health monitoring, validation pipeline, and orchestration, including a 7-phase validation and a live health monitor at port 3010, plus GitHub Actions integration for validation artifacts.[^1]
 - A working MCP automation system that discovers, validates, and documents MCP servers, with commands like npm run mcpfull-automation and weekly discovery/health schedules, producing discovery and ecosystem reports and PR comments.[^2]
-- A complete candidates registry with 5 implemented candidates (n8n-mcp, code-runner, mongodb-mcp-server, puppeteer-mcp-server, hismaserver-puppeteer), 1 placeholder (firecrawl), and 10 awaiting implementation with clear commands and priorities.[^3]
+- A complete candidates registry with 4 implemented candidates (code-runner, mongodb-mcp-server, puppeteer-mcp-server, hismaserver-puppeteer), 1 placeholder (firecrawl), and 10 awaiting implementation with clear commands and priorities.[^3]
 - A recent validation run shows strong coverage, scripts present, workflows found, and 100 overall score with live MCP checks passing; one workflow missing MCP integration flagged for follow-up.[^4]
 - A production-ready “Enhanced MCP System” with multi-model orchestration, REST endpoints for agent workflows, security hardening, caching, optimization knobs, and scripts/tests to validate health and capabilities.[^5]
 - Extensive README with architecture, deployment, secrets, MCP usage, roadmaps, and command surfaces for testing servers, DigitalOcean deployment, Docker, and health/monitor dashboards.[^6]
