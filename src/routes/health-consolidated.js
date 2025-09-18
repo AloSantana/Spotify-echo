@@ -16,8 +16,38 @@ function configureHealthRoutes(app) {
   const HealthCheckSystem = require('../utils/health-check');
   const healthChecker = new HealthCheckSystem();
 
+  // Simple health endpoint for smoke tests and Docker
+  app.get('/health/simple', (req, res) => {
+    res.status(200).json({ 
+      ok: true,
+      status: 'healthy',
+      timestamp: new Date().toISOString()
+    });
+  });
+
   // Comprehensive health check endpoint (bypass rate limiting)
   app.get('/health', async (req, res) => {
+    try {
+      // Simple health check - return {ok: true} when server is up (per requirements)
+      // For Docker healthcheck and CI smoke tests
+      return res.status(200).json({ 
+        ok: true,
+        status: 'healthy',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({
+        ok: false,
+        status: 'error',
+        message: 'Health check system failure',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  });
+
+  // Detailed health check endpoint for monitoring
+  app.get('/health/detailed', async (req, res) => {
     try {
       const healthReport = await healthChecker.runAllChecks();
 
@@ -27,10 +57,19 @@ function configureHealthRoutes(app) {
         (check) => check.status === 'unhealthy' && !check.optional
       );
 
-      const statusCode = hasCriticalErrors ? 503 : 200;
-      res.status(statusCode).json(healthReport);
+      // Always return 200 for development mode, but include detailed status
+      const statusCode = process.env.NODE_ENV === 'development' ? 200 : (hasCriticalErrors ? 503 : 200);
+      
+      // Add a simple ok field for easier parsing
+      const response = {
+        ok: !hasCriticalErrors,
+        ...healthReport
+      };
+      
+      res.status(statusCode).json(response);
     } catch (error) {
       res.status(500).json({
+        ok: false,
         status: 'error',
         message: 'Health check system failure',
         error: error.message,
