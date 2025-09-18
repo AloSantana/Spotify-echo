@@ -37,6 +37,38 @@ const spotifyRateLimit = createRateLimit({
   message: 'Too many Spotify API requests, please slow down',
 });
 
+// Helper function to make Spotify API calls
+async function makeSpotifyRequest(endpoint, accessToken, options = {}) {
+  const url = endpoint.startsWith('http') ? endpoint : `https://api.spotify.com/v1${endpoint}`;
+
+  try {
+    const response = await axios({
+      url,
+      method: options.method || 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      data: options.data,
+      params: options.params,
+    });
+
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 429) {
+      const retryAfter = error.response.headers['retry-after'];
+      throw new Error(`Rate limited. Retry after ${retryAfter} seconds`);
+    }
+
+    if (error.response?.status === 401) {
+      throw new Error('Spotify authentication expired');
+    }
+
+    throw new Error(`Spotify API error: ${error.response?.status || 'Unknown'} ${error.message}`);
+  }
+}
+
 /**
  * Initiate Spotify OAuth 2.0 PKCE flow
  * GET /api/spotify/auth/login
@@ -1020,6 +1052,306 @@ router.get('/health', async (req, res) => {
       status: 'unhealthy',
       error: error.message,
       timestamp: new Date().toISOString(),
+    });
+  }
+});
+
+/**
+ * GET /api/spotify/devices
+ * Get user's available devices
+ */
+router.get('/devices', requireAuth, spotifyRateLimit, async (req, res) => {
+  try {
+    const devices = await makeSpotifyRequest(
+      '/me/player/devices',
+      req.user.spotifyTokens.access_token
+    );
+
+    res.json({
+      success: true,
+      devices: devices.devices,
+      message: 'Devices retrieved successfully',
+    });
+  } catch (error) {
+    console.error('Get devices error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get devices',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * PUT /api/spotify/playback/play
+ * Start/resume playback
+ */
+router.put('/playback/play', requireAuth, spotifyRateLimit, async (req, res) => {
+  try {
+    const { device_id, context_uri, uris, offset, position_ms } = req.body;
+
+    const data = {};
+    if (context_uri) data.context_uri = context_uri;
+    if (uris) data.uris = uris;
+    if (offset) data.offset = offset;
+    if (position_ms) data.position_ms = position_ms;
+
+    const endpoint = device_id ? `/me/player/play?device_id=${device_id}` : '/me/player/play';
+
+    await makeSpotifyRequest(endpoint, req.user.spotifyTokens.access_token, {
+      method: 'PUT',
+      data,
+    });
+
+    res.json({
+      success: true,
+      message: 'Playback started',
+    });
+  } catch (error) {
+    console.error('Start playback error:', error);
+    
+    // Handle specific Spotify API errors
+    if (error.message.includes('404')) {
+      return res.status(404).json({
+        success: false,
+        error: 'no_active_device',
+        code: 'no_active_device',
+        message: 'Open Spotify on one device and press play once, then retry.',
+      });
+    }
+    
+    if (error.message.includes('403')) {
+      return res.status(403).json({
+        success: false,
+        error: 'no_active_device', 
+        code: 'no_active_device',
+        message: 'Open Spotify on one device and press play once, then retry.',
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: 'Failed to start playback',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * PUT /api/spotify/playback/pause
+ * Pause playback
+ */
+router.put('/playback/pause', requireAuth, spotifyRateLimit, async (req, res) => {
+  try {
+    const { device_id } = req.body;
+
+    const endpoint = device_id ? `/me/player/pause?device_id=${device_id}` : '/me/player/pause';
+
+    await makeSpotifyRequest(endpoint, req.user.spotifyTokens.access_token, {
+      method: 'PUT',
+    });
+
+    res.json({
+      success: true,
+      message: 'Playback paused',
+    });
+  } catch (error) {
+    console.error('Pause playback error:', error);
+    
+    // Handle specific Spotify API errors
+    if (error.message.includes('404')) {
+      return res.status(404).json({
+        success: false,
+        error: 'no_active_device',
+        code: 'no_active_device',
+        message: 'Open Spotify on one device and press play once, then retry.',
+      });
+    }
+    
+    if (error.message.includes('403')) {
+      return res.status(403).json({
+        success: false,
+        error: 'no_active_device',
+        code: 'no_active_device', 
+        message: 'Open Spotify on one device and press play once, then retry.',
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: 'Failed to pause playback',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * POST /api/spotify/next
+ * Skip to next track
+ */
+router.post('/next', requireAuth, spotifyRateLimit, async (req, res) => {
+  try {
+    const { device_id } = req.body;
+
+    const endpoint = device_id ? `/me/player/next?device_id=${device_id}` : '/me/player/next';
+
+    await makeSpotifyRequest(endpoint, req.user.spotifyTokens.access_token, {
+      method: 'POST',
+    });
+
+    res.json({
+      success: true,
+      message: 'Skipped to next track',
+    });
+  } catch (error) {
+    console.error('Next track error:', error);
+    
+    // Handle specific Spotify API errors
+    if (error.message.includes('404')) {
+      return res.status(404).json({
+        success: false,
+        error: 'no_active_device',
+        code: 'no_active_device',
+        message: 'Open Spotify on one device and press play once, then retry.',
+      });
+    }
+    
+    if (error.message.includes('403')) {
+      return res.status(403).json({
+        success: false,
+        error: 'no_active_device',
+        code: 'no_active_device',
+        message: 'Open Spotify on one device and press play once, then retry.',
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: 'Failed to skip to next track',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * POST /api/spotify/previous
+ * Skip to previous track
+ */
+router.post('/previous', requireAuth, spotifyRateLimit, async (req, res) => {
+  try {
+    const { device_id } = req.body;
+
+    const endpoint = device_id ? `/me/player/previous?device_id=${device_id}` : '/me/player/previous';
+
+    await makeSpotifyRequest(endpoint, req.user.spotifyTokens.access_token, {
+      method: 'POST',
+    });
+
+    res.json({
+      success: true,
+      message: 'Skipped to previous track',
+    });
+  } catch (error) {
+    console.error('Previous track error:', error);
+    
+    // Handle specific Spotify API errors
+    if (error.message.includes('404')) {
+      return res.status(404).json({
+        success: false,
+        error: 'no_active_device',
+        code: 'no_active_device',
+        message: 'Open Spotify on one device and press play once, then retry.',
+      });
+    }
+    
+    if (error.message.includes('403')) {
+      return res.status(403).json({
+        success: false,
+        error: 'no_active_device',
+        code: 'no_active_device',
+        message: 'Open Spotify on one device and press play once, then retry.',
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: 'Failed to skip to previous track',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * POST /api/spotify/transfer
+ * Transfer playback to another device
+ */
+router.post('/transfer', requireAuth, spotifyRateLimit, async (req, res) => {
+  try {
+    const { deviceId, device_ids } = req.body;
+    
+    // Support both deviceId (singular) and device_ids (array) for compatibility
+    const deviceIds = device_ids || (deviceId ? [deviceId] : []);
+    
+    if (!deviceIds.length) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing device ID',
+        message: 'deviceId or device_ids is required',
+      });
+    }
+
+    await makeSpotifyRequest('/me/player', req.user.spotifyTokens.access_token, {
+      method: 'PUT',
+      data: {
+        device_ids: deviceIds,
+        play: false, // Don't start playback automatically
+      },
+    });
+
+    res.json({
+      success: true,
+      message: 'Playback transferred successfully',
+    });
+  } catch (error) {
+    console.error('Transfer playback error:', error);
+    
+    // Handle specific Spotify API errors
+    if (error.message.includes('404')) {
+      return res.status(404).json({
+        success: false,
+        error: 'device_not_found',
+        code: 'device_not_found',
+        message: 'Device not found. Please ensure the device is online and active.',
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: 'Failed to transfer playback',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * GET /api/spotify/playback
+ * Get current playback state
+ */
+router.get('/playback', requireAuth, spotifyRateLimit, async (req, res) => {
+  try {
+    const playback = await makeSpotifyRequest('/me/player', req.user.spotifyTokens.access_token);
+
+    res.json({
+      success: true,
+      playback: playback || null,
+      message: playback ? 'Playback state retrieved' : 'No active playback',
+    });
+  } catch (error) {
+    console.error('Get playback error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get playback state',
+      message: error.message,
     });
   }
 });

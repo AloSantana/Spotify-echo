@@ -592,7 +592,28 @@ router.put('/playback/play', requireSpotifyAuth, async (req, res) => {
     });
   } catch (error) {
     console.error('Start playback error:', error);
+    
+    // Handle specific Spotify API errors
+    if (error.message.includes('404')) {
+      return res.status(404).json({
+        success: false,
+        error: 'no_active_device',
+        code: 'no_active_device',
+        message: 'Open Spotify on one device and press play once, then retry.',
+      });
+    }
+    
+    if (error.message.includes('403')) {
+      return res.status(403).json({
+        success: false,
+        error: 'no_active_device', 
+        code: 'no_active_device',
+        message: 'Open Spotify on one device and press play once, then retry.',
+      });
+    }
+
     res.status(500).json({
+      success: false,
       error: 'Failed to start playback',
       message: error.message,
     });
@@ -619,8 +640,177 @@ router.put('/playback/pause', requireSpotifyAuth, async (req, res) => {
     });
   } catch (error) {
     console.error('Pause playback error:', error);
+    
+    // Handle specific Spotify API errors
+    if (error.message.includes('404')) {
+      return res.status(404).json({
+        success: false,
+        error: 'no_active_device',
+        code: 'no_active_device',
+        message: 'Open Spotify on one device and press play once, then retry.',
+      });
+    }
+    
+    if (error.message.includes('403')) {
+      return res.status(403).json({
+        success: false,
+        error: 'no_active_device',
+        code: 'no_active_device', 
+        message: 'Open Spotify on one device and press play once, then retry.',
+      });
+    }
+
     res.status(500).json({
+      success: false,
       error: 'Failed to pause playback',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * POST /api/spotify/next
+ * Skip to next track
+ */
+router.post('/next', requireSpotifyAuth, async (req, res) => {
+  try {
+    const { device_id } = req.body;
+
+    const endpoint = device_id ? `/me/player/next?device_id=${device_id}` : '/me/player/next';
+
+    await makeSpotifyRequest(endpoint, req.auth.spotifyTokens.access_token, {
+      method: 'POST',
+    });
+
+    res.json({
+      success: true,
+      message: 'Skipped to next track',
+    });
+  } catch (error) {
+    console.error('Next track error:', error);
+    
+    // Handle specific Spotify API errors
+    if (error.message.includes('404')) {
+      return res.status(404).json({
+        success: false,
+        error: 'no_active_device',
+        code: 'no_active_device',
+        message: 'Open Spotify on one device and press play once, then retry.',
+      });
+    }
+    
+    if (error.message.includes('403')) {
+      return res.status(403).json({
+        success: false,
+        error: 'no_active_device',
+        code: 'no_active_device',
+        message: 'Open Spotify on one device and press play once, then retry.',
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: 'Failed to skip to next track',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * POST /api/spotify/previous
+ * Skip to previous track
+ */
+router.post('/previous', requireSpotifyAuth, async (req, res) => {
+  try {
+    const { device_id } = req.body;
+
+    const endpoint = device_id ? `/me/player/previous?device_id=${device_id}` : '/me/player/previous';
+
+    await makeSpotifyRequest(endpoint, req.auth.spotifyTokens.access_token, {
+      method: 'POST',
+    });
+
+    res.json({
+      success: true,
+      message: 'Skipped to previous track',
+    });
+  } catch (error) {
+    console.error('Previous track error:', error);
+    
+    // Handle specific Spotify API errors
+    if (error.message.includes('404')) {
+      return res.status(404).json({
+        success: false,
+        error: 'no_active_device',
+        code: 'no_active_device',
+        message: 'Open Spotify on one device and press play once, then retry.',
+      });
+    }
+    
+    if (error.message.includes('403')) {
+      return res.status(403).json({
+        success: false,
+        error: 'no_active_device',
+        code: 'no_active_device',
+        message: 'Open Spotify on one device and press play once, then retry.',
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: 'Failed to skip to previous track',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * POST /api/spotify/transfer
+ * Transfer playback to another device
+ */
+router.post('/transfer', requireSpotifyAuth, async (req, res) => {
+  try {
+    const { deviceId, device_ids } = req.body;
+    
+    // Support both deviceId (singular) and device_ids (array) for compatibility
+    const deviceIds = device_ids || (deviceId ? [deviceId] : []);
+    
+    if (!deviceIds.length) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing device ID',
+        message: 'deviceId or device_ids is required',
+      });
+    }
+
+    await makeSpotifyRequest('/me/player', req.auth.spotifyTokens.access_token, {
+      method: 'PUT',
+      data: {
+        device_ids: deviceIds,
+        play: false, // Don't start playback automatically
+      },
+    });
+
+    res.json({
+      success: true,
+      message: 'Playback transferred successfully',
+    });
+  } catch (error) {
+    console.error('Transfer playback error:', error);
+    
+    // Handle specific Spotify API errors
+    if (error.message.includes('404')) {
+      return res.status(404).json({
+        success: false,
+        error: 'device_not_found',
+        code: 'device_not_found',
+        message: 'Device not found. Please ensure the device is online and active.',
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: 'Failed to transfer playback',
       message: error.message,
     });
   }

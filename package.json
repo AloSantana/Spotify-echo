@@ -172,6 +172,7 @@
     "validate:comprehensive": "node scripts/comprehensive-validation.js",
     "validate:api-comprehensive": "node scripts/comprehensive-api-testing.js",
     "validate:spotify": "node scripts/validate-api-keys.js --spotify",
+    "spotify:devices": "node scripts/spotify-devices.js",
     "validate:openai": "node scripts/validate-api-keys.js --openai",
     "validate:gemini": "node scripts/validate-api-keys.js --gemini",
     "validate:mongodb": "node scripts/validate-api-keys.js --mongodb",
