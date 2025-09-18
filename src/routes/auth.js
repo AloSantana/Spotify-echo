@@ -84,4 +84,58 @@ router.get('/callback', (req, res, next) => {
   next('router');
 });
 
+/**
+ * GET /auth/health
+ * Auth health endpoint - validates configuration without leaking secrets
+ */
+router.get('/health', (req, res) => {
+  try {
+    const status = {
+      ok: true,
+      clientConfigured: !!SPOTIFY_CLIENT_ID && !!SPOTIFY_CLIENT_SECRET,
+      redirectUri: SPOTIFY_REDIRECT_URI || 'not configured',
+      scopes: [
+        'user-read-private',
+        'user-read-email', 
+        'playlist-modify-public',
+        'playlist-modify-private',
+        'user-read-recently-played',
+        'user-top-read'
+      ],
+      checks: {
+        spotifyClientId: !!SPOTIFY_CLIENT_ID,
+        spotifyClientSecret: !!SPOTIFY_CLIENT_SECRET,
+        redirectUri: !!SPOTIFY_REDIRECT_URI
+      },
+      warnings: [],
+      errors: []
+    };
+
+    // Check for configuration issues
+    if (!status.checks.spotifyClientId) {
+      status.errors.push('SPOTIFY_CLIENT_ID not configured');
+    }
+    if (!status.checks.spotifyClientSecret) {
+      status.errors.push('SPOTIFY_CLIENT_SECRET not configured'); 
+    }
+    if (!status.checks.redirectUri) {
+      status.warnings.push('SPOTIFY_REDIRECT_URI not configured - using default');
+    }
+
+    // Overall health
+    status.ok = status.errors.length === 0;
+    const statusCode = status.ok ? 200 : 503;
+    
+    res.status(statusCode).json(status);
+  } catch (error) {
+    console.error('Auth health check error:', error);
+    res.status(500).json({
+      ok: false,
+      clientConfigured: false,
+      redirectUri: 'error',
+      error: 'Health check failed'
+    });
+  }
+});
+
 module.exports = router;

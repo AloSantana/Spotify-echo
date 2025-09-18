@@ -400,7 +400,15 @@ class AuthService {
       },
     });
 
-    return response.data;
+    const tokenData = response.data;
+
+    // Handle refresh token rotation
+    // Spotify may return a new refresh token, use it if provided
+    if (!tokenData.refresh_token) {
+      tokenData.refresh_token = spotifyRefreshToken; // Keep existing if not rotated
+    }
+
+    return tokenData;
   }
 
   /**
@@ -542,6 +550,53 @@ class AuthService {
     }
 
     return attempts.count >= this.config.security.maxFailedAttempts;
+  }
+
+  /**
+   * Auth health check - validates configuration without leaking secrets
+   */
+  getHealthStatus() {
+    const status = {
+      ok: true,
+      clientConfigured: !!this.config.spotify.clientId && !!this.config.spotify.clientSecret,
+      redirectUri: this.config.spotify.redirectUri || 'not configured',
+      scopes: this.config.spotify.scopes,
+      checks: {
+        spotifyClientId: !!this.config.spotify.clientId,
+        spotifyClientSecret: !!this.config.spotify.clientSecret,
+        redirectUri: !!this.config.spotify.redirectUri,
+        jwtSecret: !!this.config.jwt.secret && this.config.jwt.secret !== 'fallback-dev-secret-change-in-production',
+        sessionSecret: !!this.config.session.secret && this.config.session.secret !== 'fallback-dev-secret-change-in-production',
+        redisConnection: this.redisManager && this.redisManager.isConnected,
+      },
+      warnings: [],
+      errors: []
+    };
+
+    // Check for configuration issues
+    if (!status.checks.spotifyClientId) {
+      status.errors.push('SPOTIFY_CLIENT_ID not configured');
+    }
+    if (!status.checks.spotifyClientSecret) {
+      status.errors.push('SPOTIFY_CLIENT_SECRET not configured');
+    }
+    if (!status.checks.redirectUri) {
+      status.errors.push('SPOTIFY_REDIRECT_URI not configured');
+    }
+    if (!status.checks.jwtSecret) {
+      status.warnings.push('Using development JWT_SECRET - change in production');
+    }
+    if (!status.checks.sessionSecret) {
+      status.warnings.push('Using development SESSION_SECRET - change in production');
+    }
+    if (!status.checks.redisConnection) {
+      status.warnings.push('Redis not connected - using in-memory storage');
+    }
+
+    // Overall health
+    status.ok = status.errors.length === 0;
+
+    return status;
   }
 
   /**
