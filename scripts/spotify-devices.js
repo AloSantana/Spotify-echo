@@ -5,10 +5,29 @@
  * Lists available Spotify devices for development and testing
  */
 
-const fetch = require('node-fetch');
+// Simple environment loading without external dependencies
+const fs = require('fs');
+const path = require('path');
 
-// Load environment variables
-require('dotenv').config();
+// Load .env file if it exists
+function loadEnv() {
+  try {
+    const envPath = path.join(__dirname, '..', '.env');
+    if (fs.existsSync(envPath)) {
+      const envContent = fs.readFileSync(envPath, 'utf8');
+      envContent.split('\n').forEach(line => {
+        const [key, ...valueParts] = line.split('=');
+        if (key && !key.startsWith('#')) {
+          process.env[key.trim()] = valueParts.join('=').trim();
+        }
+      });
+    }
+  } catch (error) {
+    // Ignore errors if .env doesn't exist
+  }
+}
+
+loadEnv();
 
 async function listDevices() {
   try {
