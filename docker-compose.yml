@@ -31,10 +31,11 @@ services:
       # Uncomment to run local MongoDB
       # - mongo
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:${PORT:-3000}/health"]
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
       interval: 30s
-      timeout: 5s
-      retries: 5
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     networks:
       - echonet
 

@@ -1,0 +1,87 @@
+name: Runtime Smoke Tests
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  smoke-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build application
+      run: npm run build
+      
+    - name: Install Playwright browsers
+      run: npx playwright install chromium
+      
+    - name: Run smoke tests
+      run: npx playwright test tests/e2e/smoke.spec.js --project=desktop-chromium --workers=1
+      env:
+        NODE_ENV: development
+        ENABLE_MOCK_PROVIDER: true
+        
+    - name: Upload Playwright artifacts on failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-test-results
+        path: BROWSERSCREENSHOT-TESTING/
+        retention-days: 7
+        
+  docker-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Build Docker image
+      run: |
+        docker build \
+          --build-arg BUILD_SHA=${{ github.sha }} \
+          --build-arg BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+          -t echotune-ai:${{ github.sha }} \
+          .
+        echo "✅ Docker image built successfully"
+        
+    - name: Test Docker container startup (quick check)
+      run: |
+        # Start container in background
+        docker run -d --name echotune-test \
+          -p 3000:3000 \
+          -e NODE_ENV=development \
+          -e ENABLE_MOCK_PROVIDER=true \
+          echotune-ai:${{ github.sha }}
+        
+        # Wait for startup
+        sleep 10
+        
+        # Quick health check
+        docker exec echotune-test curl -f http://localhost:3000/health || {
+          echo "Health check failed, showing logs:"
+          docker logs echotune-test
+          exit 1
+        }
+        
+        echo "✅ Docker container started and health check passed"
+        
+        # Cleanup
+        docker stop echotune-test
+        docker rm echotune-test
