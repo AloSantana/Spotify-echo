@@ -24,7 +24,8 @@ import {
   MenuItem,
   Switch,
   FormControlLabel,
-  Fab
+  Fab,
+  Collapse
 } from '@mui/material';
 import {
   PlayArrow as PlayIcon,
@@ -48,6 +49,8 @@ import {
   GraphicEq as GraphicEqIcon,
   Settings as SettingsIcon,
   CloudSync as SyncIcon,
+  Info as InfoIcon,
+  Warning as WarningIcon,
   Lyrics as LyricsIcon
 } from '@mui/icons-material';
 
@@ -250,32 +253,79 @@ export default function EnhancedSpotifyWebPlayer() {
   };
 
   const togglePlayback = async () => {
-    if (!playerRef.current) return;
-
     try {
-      await playerRef.current.togglePlay();
+      const response = await fetch(
+        isPlaying ? '/api/spotify/pause' : '/api/spotify/play',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ device_id: activeDevice?.id })
+        }
+      );
+
+      if (response.ok) {
+        setIsPlaying(!isPlaying);
+      } else {
+        const errorData = await response.json();
+        if (errorData.code === 'no_active_device') {
+          setError('No active device found. Please open Spotify on your phone, computer, or web player and start playing a song, then try again.');
+        } else {
+          console.error('Failed to toggle playback:', errorData.message);
+        }
+      }
     } catch (error) {
       console.error('Failed to toggle playback:', error);
+      setError('Network error while controlling playback');
     }
   };
 
   const nextTrack = async () => {
-    if (!playerRef.current) return;
-
     try {
-      await playerRef.current.nextTrack();
+      const response = await fetch('/api/spotify/next', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device_id: activeDevice?.id })
+      });
+
+      if (response.ok) {
+        // Success - track will change, playback state will update via polling
+        console.log('Skipped to next track');
+      } else {
+        const errorData = await response.json();
+        if (errorData.code === 'no_active_device') {
+          setError('No active device found. Please open Spotify on your phone, computer, or web player and start playing a song, then try again.');
+        } else {
+          console.error('Failed to skip to next track:', errorData.message);
+        }
+      }
     } catch (error) {
       console.error('Failed to skip to next track:', error);
+      setError('Network error while skipping track');
     }
   };
 
   const previousTrack = async () => {
-    if (!playerRef.current) return;
-
     try {
-      await playerRef.current.previousTrack();
+      const response = await fetch('/api/spotify/previous', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device_id: activeDevice?.id })
+      });
+
+      if (response.ok) {
+        // Success - track will change, playback state will update via polling
+        console.log('Skipped to previous track');
+      } else {
+        const errorData = await response.json();
+        if (errorData.code === 'no_active_device') {
+          setError('No active device found. Please open Spotify on your phone, computer, or web player and start playing a song, then try again.');
+        } else {
+          console.error('Failed to skip to previous track:', errorData.message);
+        }
+      }
     } catch (error) {
       console.error('Failed to skip to previous track:', error);
+      setError('Network error while skipping track');
     }
   };
 
@@ -338,18 +388,29 @@ export default function EnhancedSpotifyWebPlayer() {
   const transferPlayback = async (deviceId) => {
     try {
       const response = await fetch('/api/spotify/transfer', {
-        method: 'PUT',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ device_ids: [deviceId] })
+        body: JSON.stringify({ deviceId })
       });
 
       if (response.ok) {
         const device = devices.find(d => d.id === deviceId);
         setActiveDevice(device);
         setDeviceMenuAnchor(null);
+        setError(null); // Clear any previous errors
+        console.log('Playback transferred to:', device?.name);
+      } else {
+        const errorData = await response.json();
+        if (errorData.code === 'device_not_found') {
+          setError('Device not found. Please ensure the device is online and active.');
+        } else {
+          console.error('Failed to transfer playback:', errorData.message);
+          setError('Failed to transfer playback to device');
+        }
       }
     } catch (error) {
       console.error('Failed to transfer playback:', error);
+      setError('Network error while transferring playback');
     }
   };
 
@@ -563,12 +624,26 @@ export default function EnhancedSpotifyWebPlayer() {
                 </IconButton>
               </Box>
               
-              {activeDevice && (
+              {activeDevice ? (
                 <Chip 
                   label={`${activeDevice.name} (${activeDevice.type})`}
                   color="primary"
                   size="small"
                 />
+              ) : (
+                <Alert severity="info" icon={<InfoIcon />} sx={{ mt: 2 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                    No active device detected
+                  </Typography>
+                  <Typography variant="body2" sx={{ mb: 1 }}>
+                    To control playback:
+                  </Typography>
+                  <Typography variant="body2" component="div">
+                    1. Open Spotify on your phone, computer, or tablet<br/>
+                    2. Start playing any song<br/>
+                    3. Return here and try the controls again
+                  </Typography>
+                </Alert>
               )}
               
               <Menu
@@ -576,15 +651,22 @@ export default function EnhancedSpotifyWebPlayer() {
                 open={Boolean(deviceMenuAnchor)}
                 onClose={() => setDeviceMenuAnchor(null)}
               >
-                {devices.map((device) => (
-                  <MenuItem 
-                    key={device.id}
-                    onClick={() => transferPlayback(device.id)}
-                    selected={device.id === activeDevice?.id}
-                  >
-                    {device.name} ({device.type})
+                {devices.length > 0 ? (
+                  devices.map((device) => (
+                    <MenuItem 
+                      key={device.id}
+                      onClick={() => transferPlayback(device.id)}
+                      selected={device.id === activeDevice?.id}
+                    >
+                      {device.name} ({device.type})
+                      {device.is_active && ' - Active'}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>
+                    No devices available
                   </MenuItem>
-                ))}
+                )}
               </Menu>
             </CardContent>
           </Card>
