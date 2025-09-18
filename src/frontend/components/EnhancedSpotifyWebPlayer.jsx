@@ -255,9 +255,9 @@ export default function EnhancedSpotifyWebPlayer() {
   const togglePlayback = async () => {
     try {
       const response = await fetch(
-        isPlaying ? '/api/spotify/playback/pause' : '/api/spotify/playback/play',
+        isPlaying ? '/api/spotify/pause' : '/api/spotify/play',
         {
-          method: 'PUT',
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ device_id: activeDevice?.id })
         }

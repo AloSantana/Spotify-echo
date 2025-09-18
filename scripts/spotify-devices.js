@@ -5,6 +5,8 @@
  * Lists available Spotify devices for development and testing
  */
 
+const fetch = require('node-fetch');
+
 // Load environment variables
 require('dotenv').config();
 
@@ -20,42 +22,76 @@ async function listDevices() {
       process.exit(1);
     }
 
-    console.log('📋 Instructions:');
-    console.log('1. Start the server: npm start');
-    console.log('2. Log in via Spotify OAuth at: http://localhost:3000/auth/spotify');
-    console.log('3. Once logged in, call: GET /api/spotify/devices');
-    console.log('4. Or use the frontend UI to see available devices');
+    console.log('🔍 Attempting to list devices via API...\n');
+    
+    try {
+      // Try to call the devices API
+      const response = await fetch('http://localhost:3000/api/spotify/devices', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.status === 401) {
+        console.log('🔐 Authentication required.');
+        console.log('Please log in with Spotify first:\n');
+        console.log('1. Start the server: npm start');
+        console.log('2. Open: http://localhost:3000/auth/spotify');
+        console.log('3. Complete OAuth flow');
+        console.log('4. Run this script again\n');
+        process.exit(0);
+      }
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.devices) {
+          console.log('✅ Found devices:\n');
+          data.devices.forEach((device, index) => {
+            console.log(`${index + 1}. ${device.name} (${device.type})`);
+            console.log(`   ID: ${device.id}`);
+            console.log(`   Active: ${device.is_active ? '✓' : '✗'}`);
+            console.log(`   Volume: ${device.volume_percent}%\n`);
+          });
+
+          if (data.devices.length === 0) {
+            console.log('⚠️  No devices found.');
+            console.log('💡 To add devices:');
+            console.log('   - Open Spotify on your phone, computer, or web player');
+            console.log('   - Start playing a song');
+            console.log('   - Run this script again\n');
+          }
+        } else {
+          console.log('⚠️  API returned unexpected format:', data);
+        }
+      } else {
+        const errorData = await response.text();
+        console.log(`❌ API error (${response.status}): ${errorData}\n`);
+      }
+
+    } catch (networkError) {
+      console.log('❌ Network error - is the server running?');
+      console.log('💡 Start the server with: npm start\n');
+      console.log('📋 Manual setup instructions:');
+      console.log('1. Start the server: npm start');
+      console.log('2. Log in via Spotify OAuth at: http://localhost:3000/auth/spotify');
+      console.log('3. Once logged in, call: GET /api/spotify/devices');
+      console.log('4. Or use the frontend UI to see available devices');
+    }
+    
     console.log('\n💡 Required Spotify scopes:');
     console.log('   - user-read-playback-state');
     console.log('   - user-modify-playback-state');
     console.log('   - streaming (if using Web Playback SDK)');
     
-    console.log('\n🎯 Expected device response format:');
-    console.log('```json');
-    console.log('{');
-    console.log('  "success": true,');
-    console.log('  "devices": [');
-    console.log('    {');
-    console.log('      "id": "device-id-here",');
-    console.log('      "name": "Device Name",');
-    console.log('      "type": "Computer|Smartphone|Speaker",');
-    console.log('      "is_active": true,');
-    console.log('      "is_private_session": false,');
-    console.log('      "is_restricted": false,');
-    console.log('      "volume_percent": 50');
-    console.log('    }');
-    console.log('  ]');
-    console.log('}');
-    console.log('```');
-    
     console.log('\n🔧 API Testing Examples:');
     console.log('# List devices');
-    console.log('curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" http://localhost:3000/api/spotify/devices');
+    console.log('curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:3000/api/spotify/devices');
     
     console.log('\n# Control playback');
-    console.log('curl -X PUT -H "Content-Type: application/json" \\');
+    console.log('curl -X POST -H "Content-Type: application/json" \\');
     console.log('     -d \'{"device_id":"YOUR_DEVICE_ID"}\' \\');
-    console.log('     http://localhost:3000/api/spotify/playback/play');
+    console.log('     http://localhost:3000/api/spotify/play');
     
     console.log('\n# Skip to next track');
     console.log('curl -X POST -H "Content-Type: application/json" \\');

@@ -1083,10 +1083,10 @@ router.get('/devices', requireAuth, spotifyRateLimit, async (req, res) => {
 });
 
 /**
- * PUT /api/spotify/playback/play
+ * POST /api/spotify/play
  * Start/resume playback
  */
-router.put('/playback/play', requireAuth, spotifyRateLimit, async (req, res) => {
+router.post('/play', requireAuth, spotifyRateLimit, async (req, res) => {
   try {
     const { device_id, context_uri, uris, offset, position_ms } = req.body;
 
@@ -1117,6 +1117,7 @@ router.put('/playback/play', requireAuth, spotifyRateLimit, async (req, res) => 
         error: 'no_active_device',
         code: 'no_active_device',
         message: 'Open Spotify on one device and press play once, then retry.',
+        developerMessage: 'No active Spotify device found'
       });
     }
     
@@ -1126,6 +1127,7 @@ router.put('/playback/play', requireAuth, spotifyRateLimit, async (req, res) => 
         error: 'no_active_device', 
         code: 'no_active_device',
         message: 'Open Spotify on one device and press play once, then retry.',
+        developerMessage: 'Insufficient permissions or no active device'
       });
     }
 
@@ -1133,15 +1135,16 @@ router.put('/playback/play', requireAuth, spotifyRateLimit, async (req, res) => 
       success: false,
       error: 'Failed to start playback',
       message: error.message,
+      developerMessage: `Spotify API error: ${error.message}`
     });
   }
 });
 
 /**
- * PUT /api/spotify/playback/pause
+ * POST /api/spotify/pause
  * Pause playback
  */
-router.put('/playback/pause', requireAuth, spotifyRateLimit, async (req, res) => {
+router.post('/pause', requireAuth, spotifyRateLimit, async (req, res) => {
   try {
     const { device_id } = req.body;
 
@@ -1165,6 +1168,7 @@ router.put('/playback/pause', requireAuth, spotifyRateLimit, async (req, res) =>
         error: 'no_active_device',
         code: 'no_active_device',
         message: 'Open Spotify on one device and press play once, then retry.',
+        developerMessage: 'No active Spotify device found'
       });
     }
     
@@ -1174,6 +1178,7 @@ router.put('/playback/pause', requireAuth, spotifyRateLimit, async (req, res) =>
         error: 'no_active_device',
         code: 'no_active_device', 
         message: 'Open Spotify on one device and press play once, then retry.',
+        developerMessage: 'Insufficient permissions or no active device'
       });
     }
 
@@ -1181,6 +1186,7 @@ router.put('/playback/pause', requireAuth, spotifyRateLimit, async (req, res) =>
       success: false,
       error: 'Failed to pause playback',
       message: error.message,
+      developerMessage: `Spotify API error: ${error.message}`
     });
   }
 });
@@ -1213,6 +1219,7 @@ router.post('/next', requireAuth, spotifyRateLimit, async (req, res) => {
         error: 'no_active_device',
         code: 'no_active_device',
         message: 'Open Spotify on one device and press play once, then retry.',
+        developerMessage: 'No active Spotify device found'
       });
     }
     
@@ -1222,6 +1229,7 @@ router.post('/next', requireAuth, spotifyRateLimit, async (req, res) => {
         error: 'no_active_device',
         code: 'no_active_device',
         message: 'Open Spotify on one device and press play once, then retry.',
+        developerMessage: 'Insufficient permissions or no active device'
       });
     }
 
@@ -1229,6 +1237,7 @@ router.post('/next', requireAuth, spotifyRateLimit, async (req, res) => {
       success: false,
       error: 'Failed to skip to next track',
       message: error.message,
+      developerMessage: `Spotify API error: ${error.message}`
     });
   }
 });
@@ -1261,6 +1270,7 @@ router.post('/previous', requireAuth, spotifyRateLimit, async (req, res) => {
         error: 'no_active_device',
         code: 'no_active_device',
         message: 'Open Spotify on one device and press play once, then retry.',
+        developerMessage: 'No active Spotify device found'
       });
     }
     
@@ -1270,6 +1280,7 @@ router.post('/previous', requireAuth, spotifyRateLimit, async (req, res) => {
         error: 'no_active_device',
         code: 'no_active_device',
         message: 'Open Spotify on one device and press play once, then retry.',
+        developerMessage: 'Insufficient permissions or no active device'
       });
     }
 
@@ -1277,6 +1288,7 @@ router.post('/previous', requireAuth, spotifyRateLimit, async (req, res) => {
       success: false,
       error: 'Failed to skip to previous track',
       message: error.message,
+      developerMessage: `Spotify API error: ${error.message}`
     });
   }
 });
@@ -1329,6 +1341,7 @@ router.post('/transfer', requireAuth, spotifyRateLimit, async (req, res) => {
       success: false,
       error: 'Failed to transfer playback',
       message: error.message,
+      developerMessage: `Spotify API error: ${error.message}`
     });
   }
 });
