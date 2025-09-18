@@ -270,6 +270,9 @@ sequenceDiagram
    - `user-top-read` - Access top tracks and artists
    - `user-library-read` - Read saved tracks
    - `user-library-modify` - Save/remove tracks
+   - `user-read-playback-state` - Read current playback state
+   - `user-modify-playback-state` - Control playback (play/pause/skip/device transfer)
+   - `streaming` - Play tracks in Web Playbook SDK (if using web player)
 
 ### Environment Setup
 
@@ -352,6 +355,62 @@ npm run auth:exchange -- --code=<your-code>
 3. **Configure Settings**: Visit `/settings.html` to set music preferences  
 4. **Start Chatting**: Use `/chat` to begin AI-powered music discovery
 5. **Explore Data**: Admin panel at `/admin.html` shows analytics
+
+### 🎵 Spotify Playback Setup
+
+EchoTune AI provides full playback control when connected to Spotify. Follow these steps to enable music playback:
+
+#### Activating an "Active Device"
+
+Spotify requires an **active device** to control playback. An active device is any Spotify-enabled device currently playing music.
+
+**Quick Setup:**
+1. Open Spotify on **any device** (phone, computer, tablet, smart speaker)
+2. **Start playing any song** (this makes the device "active")
+3. Return to EchoTune AI and use the playback controls
+
+**Supported Devices:**
+- 📱 **Mobile**: Spotify mobile app (iOS/Android)
+- 💻 **Desktop**: Spotify desktop app (Windows/Mac/Linux)
+- 🌐 **Web Player**: [open.spotify.com](https://open.spotify.com)
+- 🔊 **Smart Speakers**: Alexa, Google Home, etc.
+- 🎧 **Hardware**: Spotify Connect-enabled devices
+
+#### Available Playback Controls
+
+Once you have an active device, you can use:
+
+- ▶️ **Play/Pause** - Start or stop playback
+- ⏭️ **Next Track** - Skip to next song
+- ⏮️ **Previous Track** - Go to previous song  
+- 📱 **Device Transfer** - Switch playback between devices
+- 📋 **Device List** - View all available Spotify devices
+
+#### Testing Playback Controls
+
+```bash
+# Check available devices (requires login)
+npm run spotify:devices
+
+# Example API calls (after authentication)
+curl -X GET "http://localhost:3000/api/spotify/devices"
+curl -X POST "http://localhost:3000/api/spotify/next"
+```
+
+#### "No Active Device" Troubleshooting
+
+If you see **"No active device found"**:
+
+1. ✅ **Start music on any device**: Open Spotify and press play
+2. ✅ **Wait a moment**: Can take 10-30 seconds for device to register
+3. ✅ **Refresh the page**: Device list updates when UI loads
+4. ✅ **Check device is online**: Ensure device has internet connection
+
+**Quick Test Workflow:**
+1. Open [open.spotify.com](https://open.spotify.com) in another tab
+2. Play any song
+3. Return to EchoTune AI
+4. Try the playback controls - they should work immediately!
 
 ### 🔧 Troubleshooting
 
