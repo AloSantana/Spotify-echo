@@ -468,7 +468,8 @@ const FRONTEND_URL = process.env.FRONTEND_URL || getDefaultFrontendUrl();
 let sessionManager = null;
 
 // Mount modular routes (Phase 6: Route management moved to API Gateway)
-app.use('/health', systemHealthRoutes);
+// Note: Commented out system health routes that conflict with simple health check
+// app.use('/health', systemHealthRoutes);
 app.use('/metrics', systemMetricsRoutes);
 app.use('/api/performance', systemPerformanceRoutes);
 app.use('/api', systemMonitoringRoutes);
@@ -487,8 +488,9 @@ app.use('/api/performance', enhancedPerformanceRoutes);
 app.use('/api/testing', enhancedTestingRoutes);
 
 // Phase 6: Enterprise health monitoring routes
-const enterpriseHealthRoutes = require('./routes/enterprise-health');
-app.use('/health', enterpriseHealthRoutes);
+// Note: Commented out enterprise health routes that conflict with simple health check
+// const enterpriseHealthRoutes = require('./routes/enterprise-health');
+// app.use('/health', enterpriseHealthRoutes);
 
 // Phase 7: Event-Driven Architecture & Service Mesh routes
 const eventDrivenRoutes = require('./routes/event-driven');

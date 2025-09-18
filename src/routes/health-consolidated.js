@@ -28,15 +28,27 @@ function configureHealthRoutes(app) {
   // Comprehensive health check endpoint (bypass rate limiting)
   app.get('/health', async (req, res) => {
     try {
-      // Simple health check for smoke tests and Docker healthcheck
-      if (req.query.simple === 'true' || req.headers['user-agent']?.includes('wget')) {
-        return res.status(200).json({ 
-          ok: true,
-          status: 'healthy',
-          timestamp: new Date().toISOString()
-        });
-      }
+      // Simple health check - return {ok: true} when server is up (per requirements)
+      // For Docker healthcheck and CI smoke tests
+      return res.status(200).json({ 
+        ok: true,
+        status: 'healthy',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({
+        ok: false,
+        status: 'error',
+        message: 'Health check system failure',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  });
 
+  // Detailed health check endpoint for monitoring
+  app.get('/health/detailed', async (req, res) => {
+    try {
       const healthReport = await healthChecker.runAllChecks();
 
       // For production deployment health checks, only fail on critical errors
