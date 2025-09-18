@@ -67,6 +67,15 @@ jobs:
           SPOTIFY_TEST_REFRESH_TOKEN: ${{ secrets.SPOTIFY_TEST_REFRESH_TOKEN }}
           SPOTIFY_TEST_USER_ID: ${{ secrets.SPOTIFY_TEST_USER_ID }}
 
+      - name: Validate OAuth credentials
+        run: |
+          echo "🔧 Testing Spotify OAuth configuration..."
+          node scripts/ci-auth-validation.js
+        env:
+          CI: true
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+
       - name: Upload environment report
         uses: actions/upload-artifact@v4
         if: always()

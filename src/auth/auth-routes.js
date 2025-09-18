@@ -165,6 +165,15 @@ router.post('/refresh', async (req, res) => {
       maxAge: 60 * 60 * 1000, // 1 hour
     });
 
+    // Check if we need to update refresh token cookie (rotation)
+    // This would happen if the auth service returned a new refresh token
+    if (result.refresh_token && result.refresh_token !== refreshToken) {
+      res.cookie('refresh_token', result.refresh_token, {
+        ...cookieOptions,
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days for refresh token
+      });
+    }
+
     res.json({
       success: true,
       access_token: result.access_token,
@@ -343,6 +352,36 @@ if (process.env.NODE_ENV !== 'production' || process.env.AUTH_DEVELOPMENT_MODE =
     });
   });
 }
+
+/**
+ * GET /auth/health
+ * Auth health endpoint - validates configuration without leaking secrets
+ */
+router.get('/health', (req, res) => {
+  try {
+    if (!authService) {
+      return res.status(503).json({
+        ok: false,
+        clientConfigured: false,
+        redirectUri: 'not configured',
+        error: 'Auth service not initialized'
+      });
+    }
+
+    const healthStatus = authService.getHealthStatus();
+    const statusCode = healthStatus.ok ? 200 : 503;
+    
+    res.status(statusCode).json(healthStatus);
+  } catch (error) {
+    console.error('Auth health check error:', error);
+    res.status(500).json({
+      ok: false,
+      clientConfigured: false,
+      redirectUri: 'error',
+      error: 'Health check failed'
+    });
+  }
+});
 
 module.exports = {
   router,

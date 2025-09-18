@@ -69,10 +69,40 @@ function createAuthMiddleware(options = {}) {
           req.auth.spotifyTokens = verification.spotifyTokens;
           req.auth.sessionId = verification.session.sessionId;
 
+          // Check if Spotify tokens need refresh (if expiring within 5 minutes)
+          if (verification.spotifyTokens && verification.spotifyTokens.expires_at) {
+            const fiveMinutesFromNow = Date.now() + (5 * 60 * 1000);
+            if (verification.spotifyTokens.expires_at < fiveMinutesFromNow) {
+              try {
+                console.log('🔄 Refreshing Spotify tokens (expiring soon)');
+                const refreshedTokens = await authService.refreshSpotifyToken(verification.spotifyTokens.refresh_token);
+                
+                // Update session with new tokens
+                const updatedSession = {
+                  ...verification.session,
+                  spotifyTokens: {
+                    ...verification.spotifyTokens,
+                    ...refreshedTokens,
+                    expires_at: Date.now() + refreshedTokens.expires_in * 1000
+                  }
+                };
+                
+                await authService.updateSession(verification.session.sessionId, updatedSession);
+                req.auth.spotifyTokens = updatedSession.spotifyTokens;
+                req.spotifyTokens = updatedSession.spotifyTokens;
+                
+                console.log('✅ Spotify tokens refreshed automatically');
+              } catch (refreshError) {
+                console.warn('⚠️ Failed to refresh Spotify tokens:', refreshError.message);
+                // Continue with existing tokens - they might still work
+              }
+            }
+          }
+
           // Legacy compatibility
           req.user = verification.user;
           req.userId = verification.user.id;
-          req.spotifyTokens = verification.spotifyTokens;
+          req.spotifyTokens = req.auth.spotifyTokens;
         } else {
           console.warn(`Token verification failed: ${verification.error}`);
         }

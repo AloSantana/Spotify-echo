@@ -127,42 +127,100 @@ router.get('/auth/callback', authRateLimit, async (req, res) => {
 
     // Verify state and get stored PKCE data
     const redisManager = getRedisManager();
-    const authData = await redisManager.get(`oauth:${state}`);
+    let authData = null;
+    
+    try {
+      authData = await redisManager.get(`oauth:${state}`);
+    } catch (redisError) {
+      console.warn('Redis not available for state verification, checking memory fallback');
+    }
+    
+    // Check memory fallback if Redis data not found
+    if (!authData && global.authStates) {
+      authData = global.authStates.get(state);
+      if (authData) {
+        // Check if state hasn't expired (10 minutes)
+        if (Date.now() - authData.timestamp > 10 * 60 * 1000) {
+          global.authStates.delete(state);
+          authData = null;
+        }
+      }
+    }
 
     if (!authData) {
+      console.error('OAuth callback failed: Invalid or expired state parameter');
       return res.status(400).json({
         error: 'Invalid state',
-        message: 'State parameter is invalid or expired',
+        message: 'State parameter is invalid or expired. Please try logging in again.',
+        code: 'INVALID_OAUTH_STATE'
       });
     }
 
-    // Clean up used state
-    await redisManager.del(`oauth:${state}`);
+    // Clean up used state from both stores
+    try {
+      await redisManager.del(`oauth:${state}`);
+    } catch (redisError) {
+      // Ignore Redis errors during cleanup
+    }
+    if (global.authStates) {
+      global.authStates.delete(state);
+    }
 
     // Exchange code for tokens
-    const tokenResponse = await axios.post(
-      'https://accounts.spotify.com/api/token',
-      new URLSearchParams({
-        grant_type: 'authorization_code',
-        code,
-        redirect_uri: getRedirectUri(),
-        client_id: SPOTIFY_CLIENT_ID,
-        code_verifier: authData.code_verifier,
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString('base64')}`,
-        },
-      }
-    );
+    let tokenResponse;
+    try {
+      tokenResponse = await axios.post(
+        'https://accounts.spotify.com/api/token',
+        new URLSearchParams({
+          grant_type: 'authorization_code',
+          code,
+          redirect_uri: getRedirectUri(),
+          client_id: SPOTIFY_CLIENT_ID,
+          code_verifier: authData.code_verifier,
+        }),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Basic ${Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString('base64')}`,
+          },
+        }
+      );
+    } catch (tokenError) {
+      console.error('Spotify token exchange failed:', tokenError.response?.data || tokenError.message);
+      return res.status(400).json({
+        error: 'Token exchange failed',
+        message: 'Failed to exchange authorization code for access token',
+        details: tokenError.response?.data?.error_description || 'Invalid authorization code or client credentials',
+        code: 'SPOTIFY_TOKEN_EXCHANGE_FAILED'
+      });
+    }
 
     const { access_token, refresh_token, expires_in } = tokenResponse.data;
+    
+    if (!access_token || !refresh_token) {
+      console.error('Spotify token response missing required tokens:', tokenResponse.data);
+      return res.status(500).json({
+        error: 'Invalid token response',
+        message: 'Spotify did not return required tokens',
+        code: 'INCOMPLETE_TOKEN_RESPONSE'
+      });
+    }
 
     // Get user profile
-    const userResponse = await axios.get('https://api.spotify.com/v1/me', {
-      headers: { Authorization: `Bearer ${access_token}` },
-    });
+    let userResponse;
+    try {
+      userResponse = await axios.get('https://api.spotify.com/v1/me', {
+        headers: { Authorization: `Bearer ${access_token}` },
+      });
+    } catch (profileError) {
+      console.error('Failed to fetch user profile:', profileError.response?.data || profileError.message);
+      return res.status(500).json({
+        error: 'Profile fetch failed',
+        message: 'Failed to retrieve user profile from Spotify',
+        details: profileError.response?.data?.error?.message || 'Invalid access token',
+        code: 'SPOTIFY_PROFILE_FETCH_FAILED'
+      });
+    }
 
     const spotifyUser = userResponse.data;
     const userData = sanitizeUserData(spotifyUser);
@@ -170,7 +228,12 @@ router.get('/auth/callback', authRateLimit, async (req, res) => {
     // Create JWT tokens
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
-      throw new Error('JWT_SECRET not configured');
+      console.error('JWT_SECRET not configured');
+      return res.status(500).json({
+        error: 'Server configuration error',
+        message: 'Authentication service not properly configured',
+        code: 'JWT_SECRET_MISSING'
+      });
     }
 
     const accessTokenJWT = createJWT(userData, jwtSecret, { expiresIn: '1h' });
@@ -185,10 +248,13 @@ router.get('/auth/callback', authRateLimit, async (req, res) => {
       created_at: new Date().toISOString(),
     };
 
-    await redisManager.setSession(userData.id, sessionData, 7 * 24 * 60 * 60); // 7 days
-
-    // Cache user data for quick access
-    await redisManager.cacheSpotifyUser(userData.id, userData, 3600); // 1 hour
+    try {
+      await redisManager.setSession(userData.id, sessionData, 7 * 24 * 60 * 60); // 7 days
+      // Cache user data for quick access
+      await redisManager.cacheSpotifyUser(userData.id, userData, 3600); // 1 hour
+    } catch (sessionError) {
+      console.warn('Failed to store session in Redis, authentication will still work but session may not persist:', sessionError.message);
+    }
 
     // Set secure cookies
     const isProduction = process.env.NODE_ENV === 'production';
@@ -209,10 +275,27 @@ router.get('/auth/callback', authRateLimit, async (req, res) => {
     });
   } catch (error) {
     console.error('OAuth callback error:', error.response?.data || error.message);
+    
+    // Provide specific error message based on error type
+    let errorMessage = 'Failed to complete Spotify authentication';
+    let errorCode = 'OAUTH_CALLBACK_ERROR';
+    
+    if (error.response?.status === 400) {
+      errorMessage = 'Invalid request to Spotify. Please check your app configuration.';
+      errorCode = 'SPOTIFY_BAD_REQUEST';
+    } else if (error.response?.status === 401) {
+      errorMessage = 'Invalid Spotify credentials. Please check your Client ID and Secret.';
+      errorCode = 'SPOTIFY_UNAUTHORIZED';
+    } else if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+      errorMessage = 'Unable to connect to Spotify. Please check your internet connection.';
+      errorCode = 'SPOTIFY_CONNECTION_ERROR';
+    }
+    
     res.status(500).json({
       error: 'Authentication failed',
-      message: 'Failed to complete Spotify authentication',
+      message: errorMessage,
       details: error.response?.data?.error_description || error.message,
+      code: errorCode
     });
   }
 });
