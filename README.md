@@ -240,20 +240,55 @@ sequenceDiagram
 - **MongoDB** (Atlas recommended)
 - **Spotify Developer Account**
 
+### 🎵 Spotify API Setup
+
+#### Step 1: Create Spotify App
+
+1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. Click **"Create an App"**
+3. Fill in app details:
+   - **App Name**: `EchoTune AI Local` (or your preference)
+   - **App Description**: `Local development for music discovery app`
+   - **Redirect URI**: `http://localhost:3000/auth/callback`
+   - **Website**: (optional)
+4. Accept terms and click **"Create"**
+
+#### Step 2: Configure App Settings
+
+1. In your new app dashboard, click **"Settings"**
+2. Note your **Client ID** and **Client Secret**
+3. Under **"Redirect URIs"**, ensure you have:
+   ```
+   http://localhost:3000/auth/callback
+   ```
+4. **Required Scopes** (automatically requested by app):
+   - `user-read-private` - Basic profile access
+   - `user-read-email` - Email access for account linking
+   - `playlist-modify-public` - Create/modify public playlists
+   - `playlist-modify-private` - Create/modify private playlists  
+   - `user-read-recently-played` - Access listening history
+   - `user-top-read` - Access top tracks and artists
+   - `user-library-read` - Read saved tracks
+   - `user-library-modify` - Save/remove tracks
+
 ### Environment Setup
 
-Create `.env` file with essential variables:
+Create `.env` file with your Spotify credentials:
 
 ```env
+# Required: Spotify API Credentials
+SPOTIFY_CLIENT_ID=your_spotify_client_id_here
+SPOTIFY_CLIENT_SECRET=your_spotify_client_secret_here
+SPOTIFY_REDIRECT_URI=http://localhost:3000/auth/callback
+
 # Required: MongoDB Connection
 MONGODB_URI=mongodb+srv://your-cluster/echotune
 
-# Required: Spotify API Credentials
-SPOTIFY_CLIENT_ID=your_spotify_client_id
-SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
-SPOTIFY_REDIRECT_URI=http://localhost:3000/callback
+# Required: JWT Security (generate secure secrets for production)
+JWT_SECRET=your-secure-jwt-secret-here
+SESSION_SECRET=your-secure-session-secret-here
 
-# Required: At least one AI provider
+# Optional: AI Provider (at least one recommended)
 GEMINI_API_KEY=your_gemini_api_key
 # OR
 OPENAI_API_KEY=your_openai_api_key
@@ -262,6 +297,8 @@ OPENROUTER_API_KEY=your_openrouter_api_key
 
 # Optional: Advanced features
 REDIS_URL=redis://localhost:6379
+NODE_ENV=development
+PORT=3000
 ```
 
 ### Installation & Launch
@@ -274,6 +311,10 @@ cd Spotify-echo
 # Install dependencies
 npm install
 
+# Validate your setup
+npm run auth:url  # Generate authorization URL
+npm run auth:test-credentials  # Test client credentials
+
 # Start the application
 npm start
 
@@ -281,12 +322,81 @@ npm start
 open http://localhost:3000
 ```
 
+### 🔐 Authentication Testing
+
+Test your Spotify setup before full launch:
+
+#### Validate Configuration
+```bash
+# Check auth health (should show clientConfigured: true)
+curl http://localhost:3000/auth/health
+
+# Test client credentials (should connect to Spotify API)
+npm run auth:test-credentials
+```
+
+#### Manual OAuth Flow
+```bash
+# Generate authorization URL
+npm run auth:url
+# Copy URL, visit in browser, authorize app, copy code from callback
+
+# Exchange code for tokens (replace <your-code>)
+npm run auth:exchange -- --code=<your-code>
+```
+
 ### First Run Experience
 
-1. **Connect Spotify**: Click "Login with Spotify" to authorize
-2. **Configure Settings**: Visit `/settings.html` to set preferences  
-3. **Start Chatting**: Use `/chat` to begin music discovery
-4. **Explore Data**: Admin panel at `/admin.html` shows analytics
+1. **Validate Setup**: Run `npm run auth:test-credentials` to ensure Spotify connection
+2. **Connect Spotify**: Click "Login with Spotify" to complete OAuth flow
+3. **Configure Settings**: Visit `/settings.html` to set music preferences  
+4. **Start Chatting**: Use `/chat` to begin AI-powered music discovery
+5. **Explore Data**: Admin panel at `/admin.html` shows analytics
+
+### 🔧 Troubleshooting
+
+#### Common Issues
+
+**"SPOTIFY_CLIENT_ID not configured"**
+- Ensure `.env` file exists with valid credentials
+- Check Spotify Developer Dashboard for correct Client ID
+
+**"Invalid redirect URI"**  
+- Verify redirect URI in Spotify app settings exactly matches: `http://localhost:3000/auth/callback`
+- Check for trailing slashes or protocol mismatches
+
+**"Invalid client" during OAuth**
+- Double-check Client ID and Client Secret are correct
+- Ensure Client Secret is kept private and not exposed
+
+**"Access denied" during authorization**
+- App may be in development mode (limited to 25 users)
+- Submit quota extension request in Spotify Dashboard
+
+**Token refresh errors**
+- Tokens automatically refresh when expiring
+- Check server logs for refresh errors
+- May need to re-authorize if refresh token expires
+
+#### Health Checks
+
+```bash
+# Check overall auth health  
+curl http://localhost:3000/auth/health
+
+# Check server status
+curl http://localhost:3000/health
+
+# Validate environment variables
+npm run validate:env
+```
+
+#### Getting Help
+
+1. Check the [Spotify Web API Documentation](https://developer.spotify.com/documentation/web-api/)
+2. Review server logs for detailed error messages
+3. Use development tools in your browser to inspect network requests
+4. For issues with this app, check existing GitHub issues
 
 ## 🔧 Environment Variables
 
