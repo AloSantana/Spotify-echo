@@ -1,8 +1,13 @@
-# AWS Bedrock Comprehensive Test Harness & Copilot Integration
+# AWS Bedrock Comprehensive Test Harness & Model Manager
+
+> **IMPORTANT DISCLAIMER:**  
+> The "Model Manager" tool is for AWS Bedrock model testing and configuration only.
+> It does **NOT** control which models GitHub Copilot uses. GitHub Copilot's model
+> selection is managed by GitHub's infrastructure, not by this tool.
 
 ## Overview
 
-A robust, production-ready test framework and Copilot integration for AWS Bedrock model testing with comprehensive error handling, inference profile ARN support, actionable recommendations, and interactive model switching.
+A robust, production-ready test framework and model management tool for AWS Bedrock model testing with comprehensive error handling, inference profile ARN support, actionable recommendations, and interactive model switching.
 
 ## Features
 
@@ -15,14 +20,16 @@ A robust, production-ready test framework and Copilot integration for AWS Bedroc
 ✅ **Region Support** - Test models in any AWS region  
 ✅ **Deprecated Model Filtering** - Exclude old models automatically  
 ✅ **CI/CD Ready** - Proper exit codes and report generation  
+✅ **Retry Logic** - Automatic retry with exponential backoff for transient errors  
+✅ **Auto-Create Directories** - Test results directory created automatically  
 
-### Copilot Integration ✨ NEW
-✅ **Visible Model Tracking** - Always know which model is handling requests  
+### Model Manager (formerly "Copilot Integration")
+✅ **Visible Model Tracking** - Always know which model is being tested  
 ✅ **Slash Commands** - Dynamic model switching with `/use` and `/model` commands  
-✅ **Session Management** - Track token usage, latency, and interactions  
+✅ **Testing Session Management** - Track token usage, latency, and interactions  
 ✅ **Default Models** - Claude Sonnet 4.5 (coding) and Opus 4.1 (analysis)  
 ✅ **Model Confirmations** - Visual feedback for all model changes  
-✅ **Session Reports** - Export detailed session statistics  
+✅ **Session Reports** - Export detailed testing session statistics  
 
 ## Quick Start
 
@@ -40,11 +47,11 @@ export AWS_SECRET_ACCESS_KEY="your_secret"
 npm run test:bedrock
 ```
 
-### Copilot Integration ✨ NEW
+### Model Manager
 
 ```bash
-# Start interactive session with model visibility
-npm run bedrock:session
+# Start interactive model manager
+npm run bedrock:manager
 
 # Check current model
 npm run bedrock:status
@@ -53,7 +60,7 @@ npm run bedrock:status
 npm run bedrock:list
 
 # Switch models dynamically
-node scripts/aws-bedrock-copilot-integration.js /use claude-opus-4-1
+node scripts/aws-bedrock-model-manager.js /use claude-opus-4-1
 
 # Get help
 npm run bedrock:help
@@ -70,7 +77,7 @@ npm run bedrock:help
 ✅ **Deprecated Model Filtering** - Exclude old models automatically  
 ✅ **CI/CD Ready** - Proper exit codes and report generation  
 
-### Copilot Integration Slash Commands ✨ NEW
+### Model Manager Slash Commands
 
 ```bash
 # Model switching
@@ -87,25 +94,25 @@ npm run bedrock:help
 /model help                   # Show all commands
 
 # NPM shortcuts
-npm run bedrock:session       # Start interactive session
+npm run bedrock:manager       # Start interactive model manager
 npm run bedrock:status        # Quick status check
 npm run bedrock:list          # List models
 npm run bedrock:help          # Show help
 ```
 
-### Visible Model Tracking ✨ NEW
+### Visible Model Tracking
 
-Every session displays current model information:
+Every testing session displays current model information:
 
 ```
 ╔════════════════════════════════════════════════════════════╗
-║  GitHub Copilot Session - AWS Bedrock Integration         ║
+║  AWS Bedrock Model Manager – Testing & Configuration Tool ║
 ╠════════════════════════════════════════════════════════════╣
 ║  Model: Claude Sonnet 4.5                                 ║
 ║  ID: anthropic.claude-sonnet-4-5-20250929-v1:0            ║
 ║  Region: us-east-1                                          ║
 ║  Purpose: Code generation & analysis                        ║
-║  Session Started: 2025-01-15 13:00:00                     ║
+║  Testing Session Started: 2025-01-15 13:00:00             ║
 ╚════════════════════════════════════════════════════════════╝
 ```
 
@@ -129,17 +136,21 @@ When switching models:
 | `npm run test:bedrock:quick` | Skip streaming & variations (faster) |
 | `npm run test:bedrock:deprecated` | Include deprecated models |
 | `npm run test:bedrock:legacy` | Run original test script |
+| `npm run test:bedrock:integration` | Run production integration tests |
 
-### Copilot Integration Scripts ✨ NEW
+### Model Manager Scripts
 
 | Script | Description |
 |--------|-------------|
-| `npm run bedrock:session` | Start interactive Copilot session |
-| `npm run bedrock:status` | Show current model and session stats |
+| `npm run bedrock:manager` | Start interactive model manager |
+| `npm run bedrock:status` | Show current model and testing session stats |
 | `npm run bedrock:list` | List all available Bedrock models |
 | `npm run bedrock:help` | Show all slash commands |
+| `npm run bedrock:health` | Quick health check for Bedrock access |
 
 ## CLI Options
+
+### Test Harness Options
 
 ```bash
 node scripts/test-aws-bedrock-comprehensive.js [options]
@@ -152,7 +163,27 @@ Options:
   --skip-variations         Skip parameter variation tests
   --config <path>           Custom config file
   --verbose                 Verbose logging
+  --max-retries <number>    Maximum retry attempts (default: 3)
   --help                    Show help
+```
+
+### Shell Wrapper Options
+
+```bash
+./scripts/test-aws-bedrock.sh [options] [credentials]
+
+Options:
+  -h, --help              Show help message
+  -v, --verbose           Enable verbose output
+  -q, --quick             Run quick tests
+  --max-retries NUM       Set retry attempts
+  --region REGION         Set AWS region
+  --models MODEL1,MODEL2  Test specific models
+
+Positional Arguments:
+  AWS_ACCESS_KEY_ID       AWS access key
+  AWS_SECRET_ACCESS_KEY   AWS secret key
+  AWS_REGION              AWS region (optional)
 ```
 
 ## Configuration
@@ -177,10 +208,15 @@ Latest results also saved as:
 
 ## Documentation
 
-- **[Comprehensive Test Guide](./docs/AWS_BEDROCK_COMPREHENSIVE_TEST_GUIDE.md)** - Full usage documentation
-- **[Test Examples](./docs/AWS_BEDROCK_TEST_EXAMPLES.md)** - Example outputs and scenarios
-- **[Testing README](./docs/AWS_BEDROCK_TESTING_README.md)** - Overview and setup
-- **[Copilot Integration Guide](./docs/AWS_BEDROCK_COPILOT_INTEGRATION.md)** ✨ NEW - Interactive session management
+### Core Guides
+- **[AWS Bedrock Coding Guide](./docs/AWS_BEDROCK_CODING_GUIDE.md)** - Comprehensive guide for using AWS Bedrock Claude models
+- **[Quickstart Guide](./docs/AWS_BEDROCK_QUICKSTART.md)** - Get started in 5 minutes
+- **[Test Harness README](./AWS_BEDROCK_TEST_HARNESS_README.md)** - This document
+
+### Additional Resources
+- **[Architecture Documentation](./docs/AWS_BEDROCK_ARCHITECTURE.md)** - System architecture and design (coming soon)
+- **[Integration Tests](./scripts/aws-bedrock-integration-tests.js)** - Production integration test examples
+- **[Health Check Script](./scripts/aws-bedrock-health-check.js)** - Quick availability verification
 
 ## Example Usage
 
@@ -203,14 +239,19 @@ AWS_REGION=us-west-2 npm run test:bedrock
 
 #### Quick Health Check
 ```bash
-npm run test:bedrock:quick
+npm run bedrock:health
 ```
 
-### Copilot Integration Examples ✨ NEW
-
-#### Start Interactive Session
+#### With Retry Configuration
 ```bash
-npm run bedrock:session
+npm run test:bedrock -- --max-retries 5
+```
+
+### Model Manager Examples
+
+#### Start Interactive Manager
+```bash
+npm run bedrock:manager
 ```
 
 #### Check Current Model

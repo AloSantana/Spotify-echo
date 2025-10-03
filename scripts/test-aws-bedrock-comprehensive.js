@@ -41,7 +41,8 @@ class ComprehensiveBedrockTestHarness {
       skipStreaming: options.skipStreaming || false,
       skipVariations: options.skipVariations || false,
       configPath: options.configPath || path.join(__dirname, '../config/aws-bedrock-models.json'),
-      verbose: options.verbose || false
+      verbose: options.verbose || false,
+      maxRetries: options.maxRetries || 3
     };
 
     this.credentials = {
@@ -74,10 +75,115 @@ class ComprehensiveBedrockTestHarness {
   }
 
   /**
+   * Invoke model with retry logic and exponential backoff
+   * @param {Object} client - AWS Bedrock client
+   * @param {Object} params - Command parameters
+   * @param {number} maxRetries - Maximum number of retries
+   * @returns {Promise<Object>} Response from the model
+   */
+  async invokeModelWithRetry(client, params, maxRetries = null) {
+    const retries = maxRetries !== null ? maxRetries : this.options.maxRetries;
+    let lastError = null;
+    
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const command = new InvokeModelCommand(params);
+        const response = await client.send(command);
+        
+        if (attempt > 0) {
+          this.log(`✓ Succeeded on retry attempt ${attempt}`, 'success');
+        }
+        
+        return response;
+      } catch (error) {
+        lastError = error;
+        
+        // Don't retry on certain errors
+        const errorMessage = error.message || '';
+        const errorCode = error.$metadata?.httpStatusCode;
+        
+        // Don't retry on 4xx errors except 429 (throttling)
+        if (errorCode >= 400 && errorCode < 500 && errorCode !== 429) {
+          throw error;
+        }
+        
+        // If this was the last attempt, throw the error
+        if (attempt >= retries) {
+          throw error;
+        }
+        
+        // Calculate backoff delay: 1s, 2s, 4s, 8s...
+        const delayMs = Math.min(1000 * Math.pow(2, attempt), 10000);
+        
+        this.log(`⚠️  Attempt ${attempt + 1} failed (${errorMessage}), retrying in ${delayMs}ms...`, 'warning');
+        
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+    
+    // Should never reach here, but just in case
+    throw lastError || new Error('Max retries exceeded');
+  }
+
+  /**
+   * Invoke streaming model with retry logic
+   * @param {Object} client - AWS Bedrock client
+   * @param {Object} params - Command parameters
+   * @param {number} maxRetries - Maximum number of retries
+   * @returns {Promise<Object>} Streaming response
+   */
+  async invokeStreamingModelWithRetry(client, params, maxRetries = null) {
+    const retries = maxRetries !== null ? maxRetries : this.options.maxRetries;
+    let lastError = null;
+    
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const command = new InvokeModelWithResponseStreamCommand(params);
+        const response = await client.send(command);
+        
+        if (attempt > 0) {
+          this.log(`✓ Streaming succeeded on retry attempt ${attempt}`, 'success');
+        }
+        
+        return response;
+      } catch (error) {
+        lastError = error;
+        
+        const errorCode = error.$metadata?.httpStatusCode;
+        
+        // Don't retry on 4xx errors except 429
+        if (errorCode >= 400 && errorCode < 500 && errorCode !== 429) {
+          throw error;
+        }
+        
+        if (attempt >= retries) {
+          throw error;
+        }
+        
+        const delayMs = Math.min(1000 * Math.pow(2, attempt), 10000);
+        this.log(`⚠️  Streaming attempt ${attempt + 1} failed, retrying in ${delayMs}ms...`, 'warning');
+        
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+    
+    throw lastError || new Error('Max retries exceeded');
+  }
+
+  /**
    * Initialize the test harness
    */
   async initialize() {
     this.log('Initializing Comprehensive AWS Bedrock Test Harness...', 'test');
+    
+    // Auto-create test-results directory
+    const resultsDir = path.join(__dirname, '../test-results');
+    try {
+      await fs.mkdir(resultsDir, { recursive: true });
+      this.log('✅ Test results directory ready', 'success');
+    } catch (error) {
+      this.log(`⚠️  Could not create test-results directory: ${error.message}`, 'warning');
+    }
     
     // Load configuration
     await this.loadConfiguration();
@@ -201,10 +307,8 @@ class ComprehensiveBedrockTestHarness {
         this.log(`Using inference profile ARN: ${model.inferenceProfileArn}`, 'info');
       }
 
-      const command = new InvokeModelCommand(commandParams);
-
       const startTime = Date.now();
-      const response = await this.client.send(command);
+      const response = await this.invokeModelWithRetry(this.client, commandParams);
       const latency = Date.now() - startTime;
 
       // Parse response
@@ -281,10 +385,8 @@ class ComprehensiveBedrockTestHarness {
         commandParams.modelId = model.inferenceProfileArn;
       }
 
-      const command = new InvokeModelWithResponseStreamCommand(commandParams);
-
       const startTime = Date.now();
-      const response = await this.client.send(command);
+      const response = await this.invokeStreamingModelWithRetry(this.client, commandParams);
 
       let fullText = '';
       let chunkCount = 0;
@@ -374,8 +476,7 @@ class ComprehensiveBedrockTestHarness {
           commandParams.modelId = model.inferenceProfileArn;
         }
 
-        const command = new InvokeModelCommand(commandParams);
-        const response = await this.client.send(command);
+        const response = await this.invokeModelWithRetry(this.client, commandParams);
         const responseBody = JSON.parse(new TextDecoder().decode(response.body));
 
         results.push({
@@ -857,7 +958,8 @@ function parseArgs() {
     skipStreaming: false,
     skipVariations: false,
     configPath: null,
-    verbose: false
+    verbose: false,
+    maxRetries: 3
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -877,6 +979,12 @@ function parseArgs() {
       options.configPath = args[++i];
     } else if (arg === '--verbose') {
       options.verbose = true;
+    } else if (arg === '--max-retries' && args[i + 1]) {
+      options.maxRetries = parseInt(args[++i], 10);
+      if (isNaN(options.maxRetries) || options.maxRetries < 0) {
+        console.error('Error: --max-retries must be a non-negative integer');
+        process.exit(1);
+      }
     } else if (arg === '--help') {
       console.log(`
 AWS Bedrock Comprehensive Test Harness
@@ -891,6 +999,7 @@ Options:
   --skip-variations         Skip parameter variation tests
   --config <path>           Custom model configuration file
   --verbose                 Enable verbose logging
+  --max-retries <number>    Maximum retry attempts for failed requests (default: 3)
   --help                    Show this help message
 
 Environment Variables:
@@ -913,6 +1022,9 @@ Examples:
 
   # Verbose output
   node scripts/test-aws-bedrock-comprehensive.js --verbose
+  
+  # Set custom retry count
+  node scripts/test-aws-bedrock-comprehensive.js --max-retries 5
       `);
       process.exit(0);
     }

@@ -1,26 +1,31 @@
 #!/usr/bin/env node
 
 /**
- * AWS Bedrock Model Integration for GitHub Copilot Sessions
+ * IMPORTANT DISCLAIMER:
+ * This tool manages AWS Bedrock model testing and configuration.
+ * It does NOT control which models GitHub Copilot uses.
+ * GitHub Copilot's model selection is managed by GitHub's infrastructure.
+ * 
+ * AWS Bedrock Model Manager - Testing & Configuration Tool
  * 
  * Features:
- * - Visible model usage tracking in sessions
- * - Slash commands for dynamic model switching
- * - Session state management with model metadata
+ * - Visible model usage tracking in testing sessions
+ * - Slash commands for dynamic model switching during tests
+ * - Testing session state management with model metadata
  * - Token usage and latency tracking
  * - Model priority and defaults configuration
  * 
  * Usage:
- *   const integration = new BedrockCopilotIntegration();
- *   await integration.initialize();
- *   integration.displaySessionHeader();
- *   await integration.handleSlashCommand('/use claude-sonnet-4-5');
+ *   const manager = new BedrockModelManager();
+ *   await manager.initialize();
+ *   manager.displaySessionHeader();
+ *   await manager.handleSlashCommand('/use claude-sonnet-4-5');
  */
 
 const fs = require('fs').promises;
 const path = require('path');
 
-class BedrockCopilotIntegration {
+class BedrockModelManager {
   constructor(options = {}) {
     this.configPath = options.configPath || path.join(__dirname, '../config/aws-bedrock-models.json');
     this.config = null;
@@ -50,10 +55,10 @@ class BedrockCopilotIntegration {
   }
 
   /**
-   * Initialize the integration
+   * Initialize the model manager
    */
   async initialize() {
-    console.log('🔧 Initializing AWS Bedrock Copilot Integration...');
+    console.log('🔧 Initializing AWS Bedrock Model Manager...');
     
     // Load configuration
     await this.loadConfiguration();
@@ -61,7 +66,7 @@ class BedrockCopilotIntegration {
     // Set default model
     await this.setDefaultModel();
     
-    console.log('✅ AWS Bedrock integration initialized');
+    console.log('✅ AWS Bedrock Model Manager initialized');
   }
 
   /**
@@ -78,7 +83,7 @@ class BedrockCopilotIntegration {
   }
 
   /**
-   * Set default model for the session
+   * Set default model for the testing session
    */
   async setDefaultModel() {
     const defaultKey = this.defaultModels.coding;
@@ -90,11 +95,11 @@ class BedrockCopilotIntegration {
     
     this.currentModel = { key: defaultKey, ...model };
     this.sessionState.currentModel = this.currentModel;
-    this.logModelChange(null, this.currentModel, 'Session initialization');
+    this.logModelChange(null, this.currentModel, 'Testing session initialization');
   }
 
   /**
-   * Display session header with current model info
+   * Display testing session header with current model info
    */
   displaySessionHeader() {
     const model = this.currentModel;
@@ -102,7 +107,7 @@ class BedrockCopilotIntegration {
     
     console.log('');
     console.log('╔════════════════════════════════════════════════════════════╗');
-    console.log('║  GitHub Copilot Session - AWS Bedrock Integration         ║');
+    console.log('║  AWS Bedrock Model Manager – Testing & Configuration Tool ║');
     console.log('╠════════════════════════════════════════════════════════════╣');
     console.log(`║  Model: ${model.displayName.padEnd(49)} ║`);
     console.log(`║  ID: ${model.modelId.padEnd(52)} ║`);
@@ -112,7 +117,7 @@ class BedrockCopilotIntegration {
     console.log(`║  Purpose: ${purpose.padEnd(49)} ║`);
     
     const sessionTime = new Date().toISOString().replace('T', ' ').substring(0, 19);
-    console.log(`║  Session Started: ${sessionTime.padEnd(41)} ║`);
+    console.log(`║  Testing Session Started: ${sessionTime.padEnd(34)} ║`);
     console.log('╚════════════════════════════════════════════════════════════╝');
     console.log('');
   }
@@ -252,7 +257,7 @@ class BedrockCopilotIntegration {
       interactions: 0
     };
 
-    console.log('📊 Session Statistics');
+    console.log('📊 Testing Session Statistics');
     console.log(`• Interactions: ${this.sessionState.interactions}`);
     console.log(`• Total Tokens: ${this.sessionState.tokenUsage.total}`);
     console.log(`• Current Model Tokens: ${tokenStats.total}`);
@@ -341,7 +346,7 @@ class BedrockCopilotIntegration {
    */
   showHelp() {
     console.log('');
-    console.log('🔍 AWS Bedrock Copilot Commands');
+    console.log('🔍 AWS Bedrock Model Manager Commands');
     console.log('═'.repeat(60));
     console.log('');
     console.log('Model Selection:');
@@ -430,7 +435,7 @@ class BedrockCopilotIntegration {
   }
 
   /**
-   * Get session summary
+   * Get testing session summary
    */
   getSessionSummary() {
     const duration = Date.now() - this.sessionState.startTime.getTime();
@@ -448,7 +453,7 @@ class BedrockCopilotIntegration {
   }
 
   /**
-   * Export session state
+   * Export testing session state
    */
   async exportSessionState(outputPath) {
     const state = {
@@ -458,17 +463,17 @@ class BedrockCopilotIntegration {
     };
 
     await fs.writeFile(outputPath, JSON.stringify(state, null, 2));
-    console.log(`✓ Session state exported to: ${outputPath}`);
+    console.log(`✓ Testing session state exported to: ${outputPath}`);
   }
 }
 
 // CLI execution
 async function main() {
-  const integration = new BedrockCopilotIntegration();
+  const manager = new BedrockModelManager();
   
   try {
-    await integration.initialize();
-    integration.displaySessionHeader();
+    await manager.initialize();
+    manager.displaySessionHeader();
     
     // Example: Process command line arguments
     const args = process.argv.slice(2);
@@ -478,7 +483,7 @@ async function main() {
       const commandArgs = args.slice(1);
       
       if (command.startsWith('/')) {
-        const result = await integration.handleSlashCommand(command, commandArgs);
+        const result = await manager.handleSlashCommand(command, commandArgs);
         
         if (!result.success) {
           console.error(`❌ ${result.message}`);
@@ -493,7 +498,7 @@ async function main() {
       }
     } else {
       // Interactive mode
-      integration.showHelp();
+      manager.showHelp();
     }
     
   } catch (error) {
@@ -503,7 +508,7 @@ async function main() {
 }
 
 // Export for use as module
-module.exports = BedrockCopilotIntegration;
+module.exports = BedrockModelManager;
 
 // Run if called directly
 if (require.main === module) {
