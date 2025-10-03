@@ -1,12 +1,39 @@
 #!/usr/bin/env node
 /**
- * Comprehensive Claude Opus 4.1 Integration Test
- * Tests all aspects of the Claude Opus 4.1 Vertex AI integration
+ * ⚠️  DEPRECATED - This file is deprecated
+ * 
+ * This test suite was designed for Vertex AI integration which has been replaced.
+ * 
+ * 🚀 USE INSTEAD: scripts/test-claude-opus-4.1-bedrock.js
+ * 
+ * The new Bedrock-only test suite provides:
+ * - AWS Bedrock inference profile ARN support
+ * - Complete provider=bedrock validation
+ * - No Vertex AI dependencies
+ * - Comprehensive token tracking and cost calculation
+ * - Enhanced logging with timestamps and HTTP status
+ * 
+ * Migration: 
+ *   node scripts/test-claude-opus-4.1-bedrock.js
+ * 
+ * See docs/BEDROCK_VALIDATION_QUICKSTART.md for complete guide.
  */
 
-const VertexAnthropicProvider = require('../src/chat/llm-providers/vertex-anthropic-provider');
-const modelRegistry = require('../src/chat/model-registry');
-const MultiProviderDeployment = require('./deploy-ai-providers');
+console.error('\n⚠️  DEPRECATION WARNING\n');
+console.error('This test file (test-claude-opus-4.1.js) is deprecated.');
+console.error('It uses Vertex AI which has been replaced with AWS Bedrock.\n');
+console.error('✅ USE INSTEAD: scripts/test-claude-opus-4.1-bedrock.js\n');
+console.error('Run: node scripts/test-claude-opus-4.1-bedrock.js\n');
+console.error('For more information, see docs/BEDROCK_VALIDATION_QUICKSTART.md\n');
+
+process.exit(1);
+
+// Original Vertex AI code below - no longer functional
+// This file is kept for reference only
+
+const VertexAnthropicProvider = null; // Disabled
+const modelRegistry = null; // Disabled
+const MultiProviderDeployment = null; // Disabled
 
 class ClaudeOpus41Test {
   constructor() {
