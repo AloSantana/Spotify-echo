@@ -192,6 +192,29 @@ jobs:
           echo "🏥 Running AWS Bedrock health check..."
           npm run bedrock:health || echo "⚠️ Health check skipped (no credentials)"
 
+      - name: Run live validation with both models
+        if: env.AWS_ACCESS_KEY_ID != ''
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
+        run: |
+          echo "🧪 Running live Bedrock validation..."
+          echo "Testing both Claude Sonnet 4.5 and Claude Opus 4.1"
+          echo "Using inference profile ARNs where required"
+          echo ""
+          npm run bedrock:validate:live || {
+            echo "❌ Live validation failed"
+            exit 1
+          }
+          
+      - name: Generate evidence report
+        if: env.AWS_ACCESS_KEY_ID != '' && always()
+        run: |
+          echo "📊 Generating comprehensive evidence..."
+          npm run bedrock:evidence > reports/bedrock-evidence-full.md || echo "⚠️ Evidence generation failed"
+          echo "✅ Evidence report generated"
+
       - name: Run integration tests
         if: env.AWS_ACCESS_KEY_ID != ''
         env:
@@ -220,6 +243,7 @@ jobs:
           name: bedrock-test-results
           path: |
             test-results/
+            reports/
             *.json
             *.md
           retention-days: 30
