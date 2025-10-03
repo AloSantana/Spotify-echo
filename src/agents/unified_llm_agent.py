@@ -2,9 +2,8 @@
 """
 Unified LLM Agent (Minimal Spec)
 
-Multi-model interaction agent supporting Gemini/Vertex and Claude Opus 4.1
-with slash commands, natural language interface, model routing, and 
-comprehensive reporting with verification.
+Multi-model interaction agent with slash commands, natural language interface,
+model routing, and comprehensive reporting with verification.
 
 Features:
 - Slash commands and natural language input parsing
@@ -14,6 +13,8 @@ Features:
 - Consensus comparison between models
 - Cost tracking and usage verification
 - Extensible adapter architecture
+
+Note: Vertex AI support has been removed. This agent now works with direct API integrations.
 """
 
 import asyncio
@@ -27,8 +28,9 @@ from dataclasses import dataclass, asdict
 from enum import Enum
 import logging
 
-from ..services.vertex_ai_service import VertexAIService, ModelRequest, ModelResponse
-from ..config.vertex_config import config
+# Vertex AI imports removed - migrated to direct API integrations
+# from ..services.vertex_ai_service import VertexAIService, ModelRequest, ModelResponse
+# from ..config.vertex_config import config
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -232,11 +234,15 @@ class IntentParser:
 
 
 class ModelAdapter:
-    """Abstract adapter interface for different model providers."""
+    """Abstract adapter interface for different model providers.
     
-    def __init__(self, model_config: ModelConfig, vertex_service: VertexAIService):
+    Note: Vertex AI support has been removed. This adapter is kept for compatibility
+    but should be updated to use direct API integrations.
+    """
+    
+    def __init__(self, model_config: ModelConfig, ai_service=None):
         self.config = model_config
-        self.vertex_service = vertex_service
+        self.ai_service = ai_service  # Generic AI service instead of vertex_service
     
     async def invoke(self, prompt: str, params: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -244,48 +250,65 @@ class ModelAdapter:
         
         Returns:
             Dict with keys: text, usage, raw_model, request_id, error
+        
+        Note: Vertex AI implementation removed. This is a stub for compatibility.
         """
-        try:
-            # Create request for vertex service
-            request = ModelRequest(
-                model_id=self.config.id,
-                prompt=prompt,
-                max_tokens=params.get('max_tokens', self.config.max_tokens),
-                temperature=params.get('temperature', self.config.temperature),
-                streaming=params.get('streaming', False)
-            )
-            
-            start_time = time.time()
-            response = await self.vertex_service.generate(request)
-            latency_ms = (time.time() - start_time) * 1000
-            
-            # Generate verification hash
-            verification_data = f"{prompt}:{response.content}:{response.model}:{time.time()}"
-            verification_hash = hashlib.sha256(verification_data.encode()).hexdigest()[:16]
-            
-            return {
-                "text": response.content,
-                "usage": {
-                    "input_tokens": response.usage.get('input_tokens', 0),
-                    "output_tokens": response.usage.get('output_tokens', 0)
-                },
-                "raw_model": response.model,
-                "request_id": str(uuid.uuid4()),
-                "latency_ms": latency_ms,
-                "verification_hash": verification_hash,
-                "error": None
-            }
-            
-        except Exception as e:
-            logger.error(f"Model adapter error for {self.config.id}: {e}")
-            return {
-                "text": "",
-                "usage": {"input_tokens": 0, "output_tokens": 0},
-                "raw_model": self.config.id,
-                "request_id": str(uuid.uuid4()),
-                "latency_ms": 0,
-                "verification_hash": "",
-                "error": str(e)
+        # Vertex AI code removed - return stub response
+        return {
+            "text": "Vertex AI support has been removed. Please use direct API integrations.",
+            "usage": {
+                "input_tokens": 0,
+                "output_tokens": 0
+            },
+            "raw_model": self.config.id,
+            "request_id": str(uuid.uuid4()),
+            "verification_hash": hashlib.sha256(prompt.encode()).hexdigest()[:16],
+            "error": "Vertex AI integration removed - use direct API integrations"
+        }
+        
+        # Original Vertex AI code commented out:
+        # try:
+        #     # Create request for vertex service
+        #     request = ModelRequest(
+        #         model_id=self.config.id,
+        #         prompt=prompt,
+        #         max_tokens=params.get('max_tokens', self.config.max_tokens),
+        #         temperature=params.get('temperature', self.config.temperature),
+        #         streaming=params.get('streaming', False)
+        #     )
+        #     
+        #     start_time = time.time()
+        #     response = await self.vertex_service.generate(request)
+        #     latency_ms = (time.time() - start_time) * 1000
+        #     
+        #     # Generate verification hash
+        #     verification_data = f"{prompt}:{response.content}:{response.model}:{time.time()}"
+        #     verification_hash = hashlib.sha256(verification_data.encode()).hexdigest()[:16]
+        #     
+        #     return {
+        #         "text": response.content,
+        #         "usage": {
+        #             "input_tokens": response.usage.get('input_tokens', 0),
+        #             "output_tokens": response.usage.get('output_tokens', 0)
+        #         },
+        #         "raw_model": response.model,
+        #         "request_id": str(uuid.uuid4()),
+        #         "latency_ms": latency_ms,
+        #         "verification_hash": verification_hash,
+        #         "error": None
+        #     }
+        #     
+        # except Exception as e:
+        #     logger.error(f"Model adapter error for {self.config.id}: {e}")
+        #     return {
+        #         "text": "",
+        #         "usage": {"input_tokens": 0, "output_tokens": 0},
+        #         "raw_model": self.config.id,
+        #         "request_id": str(uuid.uuid4()),
+        #         "latency_ms": 0,
+        #         "verification_hash": "",
+        #         "error": str(e)
+        #     }
             }
 
 
@@ -476,42 +499,49 @@ class UnifiedLLMAgent:
     
     Supports slash commands, natural language, model routing, deep reasoning,
     and consensus analysis with comprehensive reporting.
+    
+    Note: Vertex AI support has been removed. This class is kept for compatibility
+    but should be updated to use direct API integrations.
     """
     
     def __init__(self):
-        """Initialize the unified agent."""
-        self.vertex_service = VertexAIService()
+        """Initialize the unified agent.
+        
+        Note: Vertex AI service removed - stubbed for compatibility.
+        """
+        # Vertex AI service removed
+        # self.vertex_service = VertexAIService()
         self.initialized = False
         
-        # Model configurations
+        # Model configurations - Vertex AI references commented out
         self.models = {
             "gemini-pro": ModelConfig(
-                id=config.gemini_pro_model,
-                provider="vertex",
+                id="gemini-2.5-pro",  # Using direct API model ID
+                provider="google-ai",  # Changed from "vertex"
                 role=ModelRole.FAST,
                 cost_tier="low",
                 max_tokens=4000
             ),
             "claude-opus-4.1": ModelConfig(
-                id=config.claude_opus_model,
+                id="claude-opus-4-20250514",
                 provider="anthropic",
                 role=ModelRole.DEEP_REASONING,
                 cost_tier="high",
                 max_tokens=4000
             ),
             "gemini-flash": ModelConfig(
-                id=config.gemini_flash_model,
-                provider="vertex",
+                id="gemini-2.5-flash",  # Using direct API model ID
+                provider="google-ai",  # Changed from "vertex"
                 role=ModelRole.FAST,
                 cost_tier="low",
                 max_tokens=2000
             )
         }
         
-        # Create adapters
+        # Create adapters - without vertex_service
         self.adapters = {}
         for name, model_config in self.models.items():
-            self.adapters[name] = ModelAdapter(model_config, self.vertex_service)
+            self.adapters[name] = ModelAdapter(model_config, ai_service=None)
         
         # Routing configuration
         self.routing = {
@@ -529,11 +559,15 @@ class UnifiedLLMAgent:
         logger.info("UnifiedLLMAgent initialized")
     
     async def initialize(self) -> bool:
-        """Initialize the agent and underlying services."""
+        """Initialize the agent and underlying services.
+        
+        Note: Vertex AI initialization removed.
+        """
         try:
-            await self.vertex_service.initialize()
+            # Vertex AI initialization removed
+            # await self.vertex_service.initialize()
             self.initialized = True
-            logger.info("✅ UnifiedLLMAgent initialization complete")
+            logger.info("✅ UnifiedLLMAgent initialization complete (Vertex AI support removed)")
             return True
         except Exception as e:
             logger.error(f"❌ UnifiedLLMAgent initialization failed: {e}")

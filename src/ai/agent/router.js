@@ -1,9 +1,12 @@
 /**
  * Agent Router for Multi-LLM Orchestration
  * Intelligently routes requests to appropriate models based on task type and policies
+ * 
+ * Note: Vertex AI support has been removed. This router now works with direct API integrations.
  */
 
-const { VertexInvoker, AIRequest } = require('../providers/vertexInvoker');
+// Vertex AI imports removed - migrated to direct API integrations
+// const { VertexInvoker, AIRequest } = require('../providers/vertexInvoker');
 const BaseLLMProvider = require('../../chat/llm-providers/base-provider');
 const { ValidationError, ModelUnavailableError } = require('../errors');
 const aiMetrics = require('../../metrics/aiMetrics');
@@ -11,7 +14,7 @@ const aiMetrics = require('../../metrics/aiMetrics');
 class AgentRouter {
   constructor(options = {}) {
     this.config = {
-      defaultProvider: 'vertex',
+      defaultProvider: 'openai',  // Changed from 'vertex'
       enableFallback: true,
       costThreshold: 0.01, // USD per request
       latencyThreshold: 5000, // ms
@@ -31,15 +34,15 @@ class AgentRouter {
    * Initialize available providers
    */
   async initializeProviders() {
-    // Vertex AI Provider
-    try {
-      const vertexProvider = new VertexInvoker();
-      await vertexProvider.initialize();
-      this.providers.set('vertex', vertexProvider);
-      console.log('✅ Vertex AI provider initialized');
-    } catch (error) {
-      console.warn('⚠️  Vertex AI provider initialization failed:', error.message);
-    }
+    // Vertex AI Provider - REMOVED
+    // try {
+    //   const vertexProvider = new VertexInvoker();
+    //   await vertexProvider.initialize();
+    //   this.providers.set('vertex', vertexProvider);
+    //   console.log('✅ Vertex AI provider initialized');
+    // } catch (error) {
+    //   console.warn('⚠️  Vertex AI provider initialization failed:', error.message);
+    // }
 
     // Add existing providers from chat system
     try {
@@ -82,21 +85,21 @@ class AgentRouter {
       console.warn('⚠️  Anthropic provider initialization failed:', error.message);
     }
 
-    // Vertex AI Anthropic Provider (Claude Opus 4.1)
-    try {
-      const VertexAnthropicProvider = require('../../chat/llm-providers/vertex-anthropic-provider');
-      const vertexAnthropicProvider = new VertexAnthropicProvider({
-        projectId: process.env.GCP_PROJECT_ID,
-        location: process.env.GCP_VERTEX_LOCATION || 'us-central1'
-      });
-      await vertexAnthropicProvider.initialize();
-      if (vertexAnthropicProvider.isAvailable()) {
-        this.providers.set('vertex-anthropic', vertexAnthropicProvider);
-        console.log('✅ Vertex AI Anthropic provider initialized');
-      }
-    } catch (error) {
-      console.warn('⚠️  Vertex AI Anthropic provider initialization failed:', error.message);
-    }
+    // Vertex AI Anthropic Provider - REMOVED
+    // try {
+    //   const VertexAnthropicProvider = require('../../chat/llm-providers/vertex-anthropic-provider');
+    //   const vertexAnthropicProvider = new VertexAnthropicProvider({
+    //     projectId: process.env.GCP_PROJECT_ID,
+    //     location: process.env.GCP_VERTEX_LOCATION || 'us-central1'
+    //   });
+    //   await vertexAnthropicProvider.initialize();
+    //   if (vertexAnthropicProvider.isAvailable()) {
+    //     this.providers.set('vertex-anthropic', vertexAnthropicProvider);
+    //     console.log('✅ Vertex AI Anthropic provider initialized');
+    //   }
+    // } catch (error) {
+    //   console.warn('⚠️  Vertex AI Anthropic provider initialization failed:', error.message);
+    // }
 
     // Mock provider for testing
     try {
@@ -115,21 +118,21 @@ class AgentRouter {
    * Initialize routing policies
    */
   initializePolicies() {
-    // Task-based routing policies
+    // Task-based routing policies - Vertex references changed to OpenAI
     this.policies.set('text-generation', {
-      primary: { provider: 'vertex', model: 'text-bison@latest', costTier: 'standard' },
+      primary: { provider: 'openai', model: 'gpt-4o', costTier: 'standard' },
       fallback: { provider: 'openai', model: 'gpt-4o-mini', costTier: 'economy' },
       backup: { provider: 'mock', model: 'mock-model', costTier: 'free' }
     });
 
     this.policies.set('embeddings', {
-      primary: { provider: 'vertex', model: 'textembedding-gecko@latest', costTier: 'economy' },
+      primary: { provider: 'openai', model: 'text-embedding-3-large', costTier: 'economy' },
       fallback: { provider: 'openai', model: 'text-embedding-3-small', costTier: 'economy' },
       backup: { provider: 'mock', model: 'mock-embedding', costTier: 'free' }
     });
 
     this.policies.set('rerank', {
-      primary: { provider: 'vertex', model: 'text-bison@latest', costTier: 'standard' },
+      primary: { provider: 'openai', model: 'gpt-4o-mini', costTier: 'standard' },
       fallback: { provider: 'openai', model: 'gpt-4o-mini', costTier: 'economy' },
       backup: { provider: 'mock', model: 'mock-model', costTier: 'free' }
     });
