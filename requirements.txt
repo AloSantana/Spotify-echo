@@ -64,8 +64,5 @@ click==8.1.7
 selenium==4.16.0
 beautifulsoup4==4.12.2
 
-# Vertex AI Integration for Claude Opus 4.1 and Gemini 2.5
-google-cloud-aiplatform==1.65.0
-anthropic[vertex]
+# Pydantic for configuration management
 pydantic==2.10.4
-google-auth==2.36.0

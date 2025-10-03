@@ -1,18 +1,21 @@
 /**
  * Enhanced Gemini Client
- * Supports both Google AI Studio and Vertex AI with dynamic base switching
+ * Supports Google AI Studio (Vertex AI support removed)
  */
 
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const { VertexAI } = require('@google-cloud/vertexai');
+// Vertex AI import removed
+// const { VertexAI } = require('@google-cloud/vertexai');
 
 class GeminiClient {
   constructor(config) {
     this.config = {
-      useVertex: config.useVertex || process.env.GEMINI_USE_VERTEX === 'true',
+      // useVertex removed - always use Google AI Studio
+      // useVertex: config.useVertex || process.env.GEMINI_USE_VERTEX === 'true',
       apiKey: config.apiKey || process.env.GEMINI_API_KEY,
-      projectId: config.projectId || process.env.GCP_PROJECT_ID,
-      location: config.location || process.env.GCP_VERTEX_LOCATION || 'us-central1',
+      // projectId and location removed - not needed for Google AI Studio
+      // projectId: config.projectId || process.env.GCP_PROJECT_ID,
+      // location: config.location || process.env.GCP_VERTEX_LOCATION || 'us-central1',
       model: config.model || process.env.GEMINI_MODEL || 'gemini-2.5-pro',
       ...config
     };
@@ -23,27 +26,28 @@ class GeminiClient {
 
   async initialize() {
     try {
-      if (this.config.useVertex) {
-        // Vertex AI initialization
-        if (!this.config.projectId) {
-          throw new Error('GCP Project ID required for Vertex AI');
-        }
-        
-        this.client = new VertexAI({
-          project: this.config.projectId,
-          location: this.config.location,
-        });
-        
-        console.log(`✅ Gemini Vertex AI client initialized (${this.config.projectId})`);
-      } else {
-        // Google AI Studio initialization
-        if (!this.config.apiKey) {
-          throw new Error('Gemini API key required for Google AI Studio');
-        }
-        
-        this.client = new GoogleGenerativeAI(this.config.apiKey);
-        console.log('✅ Gemini AI Studio client initialized');
+      // Vertex AI initialization removed - only Google AI Studio now
+      // if (this.config.useVertex) {
+      //   // Vertex AI initialization
+      //   if (!this.config.projectId) {
+      //     throw new Error('GCP Project ID required for Vertex AI');
+      //   }
+      //   
+      //   this.client = new VertexAI({
+      //     project: this.config.projectId,
+      //     location: this.config.location,
+      //   });
+      //   
+      //   console.log(`✅ Gemini Vertex AI client initialized (${this.config.projectId})`);
+      // }
+      
+      // Google AI Studio initialization (now the only option)
+      if (!this.config.apiKey) {
+        throw new Error('Gemini API key required for Google AI Studio');
       }
+      
+      this.client = new GoogleGenerativeAI(this.config.apiKey);
+      console.log('✅ Gemini AI Studio client initialized');
       
       this.isInitialized = true;
       return true;
@@ -116,11 +120,10 @@ class GeminiClient {
 
   getClientInfo() {
     return {
-      type: this.config.useVertex ? 'vertex' : 'studio',
+      type: 'studio',  // Always studio now, vertex removed
       model: this.config.model,
-      initialized: this.isInitialized,
-      projectId: this.config.projectId,
-      location: this.config.location
+      initialized: this.isInitialized
+      // projectId and location removed - not needed for Google AI Studio
     };
   }
 }

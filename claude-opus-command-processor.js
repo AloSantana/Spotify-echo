@@ -11,46 +11,38 @@ require('dotenv').config();
 
 const fs = require('fs').promises;
 const path = require('path');
-const { VertexAI } = require('@google-cloud/vertexai');
+const Anthropic = require('@anthropic-ai/sdk');
 
 class ClaudeOpusCommandProcessor {
     constructor() {
         this.config = {
-            projectId: process.env.GCP_PROJECT_ID || 'mock-project-id',
-            location: process.env.GCP_VERTEX_LOCATION || 'us-central1',
-            // The primary model for this processor should be the Claude Opus 4.1 model.
-            model: 'publishers/anthropic/models/claude-opus-4-1',
-            claudeModel: 'publishers/anthropic/models/claude-opus-4-1',
-            version: 'claude-opus-4-1@20250805',
+            model: 'claude-opus-4-20250514',
             maxOutputTokens: 32000,
             contextWindow: 200000,
             defaultThinkingBudget: 5000,
-            mockMode: !process.env.GCP_PROJECT_ID || process.env.AI_MOCK_MODE === 'true'
+            mockMode: !process.env.ANTHROPIC_API_KEY || process.env.AI_MOCK_MODE === 'true'
         };
 
-        // Only initialize Vertex AI if we have proper configuration
+        // Only initialize Anthropic API if we have proper configuration
         if (!this.config.mockMode) {
             try {
-                this.vertexAI = new VertexAI({
-                    project: this.config.projectId,
-                    location: this.config.location,
+                this.client = new Anthropic({
+                    apiKey: process.env.ANTHROPIC_API_KEY,
                 });
-                console.log(`✅ Vertex AI configured: ${this.config.projectId}`);
+                console.log(`✅ Anthropic API configured`);
             } catch (error) {
-                console.log('⚠️ Vertex AI initialization failed, falling back to mock mode');
-                this.vertexAI = null;
+                console.log('⚠️ Anthropic API initialization failed, falling back to mock mode');
+                this.client = null;
                 this.config.mockMode = true;
             }
         } else {
-            this.vertexAI = null;
-            console.log('🔧 Running in mock mode - Configure GCP_PROJECT_ID to use real Vertex AI');
-            console.log('📖 Quick setup guide: QUICK_GCP_SETUP.md');
-            console.log('🛠️ Run: node scripts/configure-gcp-credentials.js setup');
+            this.client = null;
+            console.log('🔧 Running in mock mode - Configure ANTHROPIC_API_KEY to use real Claude Opus 4.1');
         }
 
         this.commandTypes = {
             'test': {
-                description: 'Test Vertex AI connection and configuration',
+                description: 'Test Anthropic API connection and configuration',
                 systemPrompt: 'You are a helpful AI assistant. Respond concisely to test prompts.',
                 extendedThinking: false,
                 thinkingBudget: 1000,
@@ -174,10 +166,10 @@ class ClaudeOpusCommandProcessor {
     }
 
     /**
-     * Execute Claude Opus 4.1 analysis with Vertex AI
+     * Execute Claude Opus 4.1 analysis with Anthropic API
      */
     async executeClaudeOpusAnalysis(config) {
-        console.log('🔄 Connecting to Claude Opus 4.1 via Vertex AI...');
+        console.log('🔄 Connecting to Claude Opus 4.1 via Anthropic API...');
 
         // Handle mock mode
         if (this.config.mockMode) {
@@ -190,43 +182,39 @@ class ClaudeOpusCommandProcessor {
             const systemPrompt = this.buildSystemPrompt(config);
             const userPrompt = await this.buildUserPrompt(config);
 
-            // Configure model with extended thinking
-            const modelConfig = {
+            // Prepare request parameters
+            const requestParams = {
                 model: this.config.model,
-                generationConfig: {
-                    maxOutputTokens: this.config.maxOutputTokens,
-                    temperature: config.temperature,
-                    topP: 0.9,
-                }
+                max_tokens: this.config.maxOutputTokens,
+                temperature: config.temperature,
+                system: systemPrompt,
+                messages: [
+                    {
+                        role: 'user',
+                        content: userPrompt
+                    }
+                ]
             };
 
             if (config.extendedThinking) {
-                modelConfig.generationConfig.thinking = {
+                requestParams.thinking = {
                     type: 'enabled',
                     budget_tokens: config.thinkingBudget
                 };
             }
 
-            const model = this.vertexAI.getGenerativeModel(modelConfig);
-
-            // Prepare request
-            const request = {
-                contents: [
-                    {
-                        role: 'user',
-                        parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
-                    }
-                ]
-            };
-
             console.log('🧠 Sending request to Claude Opus 4.1...');
-            const response = await model.generateContent(request);
+            const response = await this.client.messages.create(requestParams);
 
-            if (!response.response || !response.response.candidates) {
+            if (!response || !response.content || response.content.length === 0) {
                 throw new Error('No valid response from Claude Opus 4.1');
             }
 
-            const analysis = response.response.candidates[0].content.parts[0].text;
+            const analysis = response.content.map(block => {
+                if (block.type === 'text') return block.text;
+                if (block.type === 'thinking') return `[Thinking: ${block.thinking}]`;
+                return '';
+            }).join('\n');
 
             return {
                 success: true,
@@ -235,18 +223,20 @@ class ClaudeOpusCommandProcessor {
                 target: config.target,
                 extendedThinking: config.extendedThinking,
                 thinkingBudget: config.thinkingBudget,
-                modelVersion: this.config.version,
+                modelVersion: this.config.model,
                 analysis,
                 metadata: {
                     promptLength: userPrompt.length,
                     responseLength: analysis.length,
                     temperature: config.temperature,
+                    inputTokens: response.usage?.input_tokens || 0,
+                    outputTokens: response.usage?.output_tokens || 0,
                     processingTime: Date.now()
                 }
             };
 
         } catch (error) {
-            console.error('❌ Vertex AI request failed:', error.message);
+            console.error('❌ Anthropic API request failed:', error.message);
             throw new Error(`Claude Opus 4.1 analysis failed: ${error.message}`);
         }
     }
@@ -263,7 +253,7 @@ class ClaudeOpusCommandProcessor {
 
 ## Mock Analysis Results
 
-This is a simulated response from Claude Opus 4.1 for testing purposes. In a real deployment with proper Vertex AI configuration, this would contain:
+This is a simulated response from Claude Opus 4.1 for testing purposes. In a real deployment with proper Anthropic API configuration, this would contain:
 
 ### Advanced Analysis Capabilities
 - Deep reasoning with extended thinking mode
@@ -272,17 +262,15 @@ This is a simulated response from Claude Opus 4.1 for testing purposes. In a rea
 - Comprehensive architectural insights
 
 ### Configuration Status
-- **Mock Mode**: Active (GCP_PROJECT_ID not configured)
+- **Mock Mode**: Active (ANTHROPIC_API_KEY not configured)
 - **Model**: ${this.config.model}
-- **Version**: ${this.config.version}
 - **Thinking Budget**: ${config.thinkingBudget} tokens
 
 ### Setup Requirements
 To enable real Claude Opus 4.1 analysis:
-1. Configure GCP_PROJECT_ID environment variable
-2. Enable Vertex AI API in your Google Cloud project
-3. Deploy Claude Opus 4.1 through Vertex AI Model Garden
-4. Ensure proper authentication and permissions
+1. Configure ANTHROPIC_API_KEY environment variable
+2. Ensure proper API access permissions
+3. Test connection with simple query
 
 ### Test Command Examples
 - \`/claude-opus deep-reasoning\`
@@ -455,15 +443,15 @@ ${isError ? `## ❌ Error Information
 **Error**: ${result.error}
 
 ### 🔧 Troubleshooting Steps
-1. Verify Vertex AI access and project configuration
-2. Check Claude Opus 4.1 model availability in your region
-3. Ensure proper authentication and permissions
+1. Verify Anthropic API key configuration
+2. Check Claude Opus 4.1 model availability
+3. Ensure proper API access permissions
 4. Review the command parameters and try again
 
 ### 🆘 Alternative Options
-- Use direct Anthropic API integration as fallback
+- Check API key validity
 - Try with reduced thinking budget
-- Contact support for Vertex AI configuration assistance` : `## 🧠 Analysis Results
+- Contact support for API configuration assistance` : `## 🧠 Analysis Results
 
 ${result.analysis}
 
@@ -584,17 +572,14 @@ async function main() {
             console.log('🧪 Testing Claude Opus 4.1 Configuration...\n');
             
             console.log('📊 Configuration Status:');
-            console.log(`Project ID: ${processor.config.projectId}`);
-            console.log(`Location: ${processor.config.location}`);
             console.log(`Mock Mode: ${processor.config.mockMode ? '🔧 Active' : '✅ Disabled'}`);
-            console.log(`Vertex AI: ${processor.vertexAI ? '✅ Initialized' : '❌ Not available'}`);
+            console.log(`Anthropic API: ${processor.client ? '✅ Initialized' : '❌ Not available'}`);
             
             if (processor.config.mockMode) {
                 console.log('\n⚠️ Running in mock mode');
-                console.log('🛠️ To enable real Vertex AI:');
-                console.log('   1. Set GCP_PROJECT_ID in .env file');
-                console.log('   2. Run: node scripts/configure-gcp-credentials.js setup');
-                console.log('   3. See: QUICK_GCP_SETUP.md');
+                console.log('🛠️ To enable real Claude Opus 4.1:');
+                console.log('   1. Set ANTHROPIC_API_KEY in .env file');
+                console.log('   2. Ensure API access is configured');
                 
                 const testResult = await processor.processCommand('test', { 
                     prompt: 'This is a test message. Please respond with "Test successful!"'
@@ -606,20 +591,20 @@ async function main() {
                 
                 return;
             } else {
-                console.log('\n🧪 Testing real Vertex AI connection...');
+                console.log('\n🧪 Testing real Anthropic API connection...');
                 
                 const testResult = await processor.processCommand('test', { 
-                    prompt: 'This is a test message. Please respond with "Vertex AI test successful!" and nothing else.'
+                    prompt: 'This is a test message. Please respond with "Anthropic API test successful!" and nothing else.'
                 });
                 
-                console.log('\n✅ Real Vertex AI Test Result:');
+                console.log('\n✅ Real Anthropic API Test Result:');
                 console.log(`Success: ${testResult.success}`);
                 console.log(`Mock Mode: ${testResult.mockMode}`);
                 console.log(`Response: ${testResult.response?.substring(0, 200)}...`);
                 
                 if (testResult.success && !testResult.mockMode) {
-                    console.log('\n🎉 GCP credentials are working correctly!');
-                    console.log('✅ Models are now using real Vertex AI instead of mock responses');
+                    console.log('\n🎉 Anthropic API credentials are working correctly!');
+                    console.log('✅ Models are now using real Claude Opus 4.1 instead of mock responses');
                 } else {
                     console.log('\n⚠️ Test completed but may still be in mock mode');
                 }

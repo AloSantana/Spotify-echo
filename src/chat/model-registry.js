@@ -253,35 +253,35 @@ class ModelRegistry {
         },
       },
 
-      // Vertex AI Anthropic Models (accessed through Vertex AI)
-      'vertex-anthropic': {
-        'claude-opus-4.1': {
-          name: 'Claude Opus 4.1',
-          description: 'Anthropic\'s most advanced model and industry leader for coding and agent capabilities via Vertex AI',
-          capabilities: ['text', 'coding', 'reasoning', 'agents', 'extended-thinking', 'long-horizon-tasks', 'multimodal'],
-          maxTokens: 32000,
-          contextWindow: 200000,
-          costPer1kTokens: { input: 0.015, output: 0.075 }, // Premium pricing
-          latencyTier: 'medium',
-          qualityTier: 'highest',
-          extendedThinking: true,
-          agentCapable: true,
-          codingOptimized: true,
-          vertexModelId: 'publishers/anthropic/models/claude-opus-4-1',
-          versionId: 'claude-opus-4-1@20250805',
-        },
-        'claude-3-5-sonnet-vertex': {
-          name: 'Claude 3.5 Sonnet (Vertex AI)',
-          description: 'High-performance reasoning model via Vertex AI',
-          capabilities: ['text', 'reasoning', 'analysis', 'coding'],
-          maxTokens: 8192,
-          contextWindow: 200000,
-          costPer1kTokens: { input: 0.003, output: 0.015 },
-          latencyTier: 'fast',
-          qualityTier: 'highest',
-          vertexModelId: 'publishers/anthropic/models/claude-3-5-sonnet',
-        },
-      },
+      // Vertex AI Anthropic Models - REMOVED (migrated to direct Anthropic API)
+      // 'vertex-anthropic': {
+      //   'claude-opus-4.1': {
+      //     name: 'Claude Opus 4.1',
+      //     description: 'Anthropic\'s most advanced model and industry leader for coding and agent capabilities via Vertex AI',
+      //     capabilities: ['text', 'coding', 'reasoning', 'agents', 'extended-thinking', 'long-horizon-tasks', 'multimodal'],
+      //     maxTokens: 32000,
+      //     contextWindow: 200000,
+      //     costPer1kTokens: { input: 0.015, output: 0.075 }, // Premium pricing
+      //     latencyTier: 'medium',
+      //     qualityTier: 'highest',
+      //     extendedThinking: true,
+      //     agentCapable: true,
+      //     codingOptimized: true,
+      //     vertexModelId: 'publishers/anthropic/models/claude-opus-4-1',
+      //     versionId: 'claude-opus-4-1@20250805',
+      //   },
+      //   'claude-3-5-sonnet-vertex': {
+      //     name: 'Claude 3.5 Sonnet (Vertex AI)',
+      //     description: 'High-performance reasoning model via Vertex AI',
+      //     capabilities: ['text', 'reasoning', 'analysis', 'coding'],
+      //     maxTokens: 8192,
+      //     contextWindow: 200000,
+      //     costPer1kTokens: { input: 0.003, output: 0.015 },
+      //     latencyTier: 'fast',
+      //     qualityTier: 'highest',
+      //     vertexModelId: 'publishers/anthropic/models/claude-3-5-sonnet',
+      //   },
+      // },
     };
 
     // Store models in registry
@@ -355,9 +355,10 @@ class ModelRegistry {
       availableProviders.push('grok4');
     }
 
-    if (process.env.GCP_PROJECT_ID && process.env.GCP_VERTEX_LOCATION) {
-      availableProviders.push('vertex-anthropic');
-    }
+    // Vertex AI removed - no longer checking GCP configuration
+    // if (process.env.GCP_PROJECT_ID && process.env.GCP_VERTEX_LOCATION) {
+    //   availableProviders.push('vertex-anthropic');
+    // }
 
     return availableProviders;
   }
@@ -404,8 +405,9 @@ class ModelRegistry {
         return !!process.env.OPENROUTER_API_KEY;
       case 'azure':
         return !!(process.env.AZURE_OPENAI_API_KEY && process.env.AZURE_OPENAI_ENDPOINT);
-      case 'vertex-anthropic':
-        return !!(process.env.GCP_PROJECT_ID && process.env.GCP_VERTEX_LOCATION);
+      // vertex-anthropic removed
+      // case 'vertex-anthropic':
+      //   return !!(process.env.GCP_PROJECT_ID && process.env.GCP_VERTEX_LOCATION);
       default:
         return false;
     }
