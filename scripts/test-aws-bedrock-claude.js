@@ -31,13 +31,16 @@ class AWSBedrockClaudeTester {
     this.awsSecretAccessKey = process.env.AWS_SECRET_ACCESS_KEY || '1jJwa03J6LLrcpH9bc166kqrz4EwRyi0TUNSvTbC';
     this.awsRegion = process.env.AWS_REGION || 'us-east-1';
 
-    // Claude 4.5 Sonnet model ID
-    // Note: Claude 4.5 might not be available yet, testing with Claude 3.5 Sonnet as fallback
+    // Comprehensive model list including Claude 4.x, 3.5, and other models
     this.modelIds = [
-      'anthropic.claude-3-5-sonnet-20241022-v2:0', // Claude 3.5 Sonnet v2 (latest)
-      'anthropic.claude-3-5-sonnet-20240620-v1:0', // Claude 3.5 Sonnet v1
-      'anthropic.claude-3-sonnet-20240229-v1:0',   // Claude 3 Sonnet
-      'anthropic.claude-v2:1',                     // Claude 2.1 (fallback)
+      'anthropic.claude-opus-4-1-20250805-v1:0',        // Claude Opus 4.1
+      'anthropic.claude-sonnet-4-5-20250929-v1:0',      // Claude Sonnet 4.5
+      'anthropic.claude-3-5-sonnet-v2-20240620-v1:0',   // Claude 3.5 Sonnet v2
+      'anthropic.claude-3-5-sonnet-20240620-v1:0',      // Claude 3.5 Sonnet v1
+      'anthropic.claude-3-5-haiku-20240515-v1:0',       // Claude 3.5 Haiku
+      'anthropic.claude-3-sonnet-20240229-v1:0',        // Claude 3 Sonnet
+      'anthropic.claude-v2:1',                          // Claude 2.1
+      'deepseek.r1-v1:0',                               // DeepSeek-R1
     ];
 
     this.client = null;
