@@ -25,9 +25,61 @@
 
 ## 🤖 Enhanced GitHub Copilot Integration & MCP Automation
 
-**EchoTune AI** features advanced GitHub Copilot integration with comprehensive MCP (Model Context Protocol) automation and validation gating system.
+**EchoTune AI** features advanced GitHub Copilot integration with comprehensive MCP (Model Context Protocol) automation, AWS Bedrock model integration, and validation gating system.
 
-### 🚀 Enhanced GPT-5 Multi-Model Integration
+### 🚀 AWS Bedrock Model Integration
+
+**EchoTune AI** integrates with AWS Bedrock for state-of-the-art AI model access with visible model tracking and dynamic switching capabilities.
+
+#### Default Models for Coding Sessions
+- **Claude Sonnet 4.5** (`anthropic.claude-sonnet-4-5-20250929-v1:0`) - Primary model for code generation and analysis
+- **Claude Opus 4.1** (`anthropic.claude-opus-4-1-20250805-v1:0`) - Complex analysis and architectural review
+- **DeepSeek R1** (`deepseek.r1-v1:0`) - Advanced reasoning and problem-solving
+
+#### Session Model Visibility
+Every coding session displays current AWS Bedrock model information:
+```
+╔════════════════════════════════════════════════════════════╗
+║  GitHub Copilot Session - AWS Bedrock Integration         ║
+╠════════════════════════════════════════════════════════════╣
+║  Model: Claude Sonnet 4.5                                  ║
+║  ID: anthropic.claude-sonnet-4-5-20250929-v1:0            ║
+║  Region: us-east-1                                         ║
+║  Purpose: Code generation & analysis                       ║
+║  Session Started: 2025-01-15 13:00:00                     ║
+╚════════════════════════════════════════════════════════════╝
+```
+
+#### AWS Bedrock Slash Commands
+```bash
+# Model Switching
+/use claude-opus-4-1          # Switch to Claude Opus 4.1 for complex analysis
+/use claude-sonnet-4-5        # Switch to Claude Sonnet 4.5 for coding (default)
+/use claude-3-5-sonnet-v2     # Switch to Claude 3.5 Sonnet v2 with vision
+/use deepseek-r1              # Switch to DeepSeek R1 for reasoning tasks
+/use titan                    # Switch to Amazon Titan Text Express
+
+# Model Information
+/model status                 # Show current model and session stats
+/model list                   # List all available AWS Bedrock models
+/model reset                  # Reset to default model (Claude Sonnet 4.5)
+/model help                   # Show all model commands
+
+# Quick Reference
+node scripts/aws-bedrock-copilot-integration.js /model list
+```
+
+#### Model Change Confirmations
+When switching models, you'll see:
+```
+📝 Model Changed
+• Previous: Claude Sonnet 4.5
+• Current: Claude Opus 4.1 (anthropic.claude-opus-4-1-20250805-v1:0)
+• Region: us-east-1
+• Reason: User requested via /use command
+```
+
+#### Enhanced GPT-5 Multi-Model Integration (Legacy)
 
 #### Available Models & Commands
 - **GPT-5**: `gpt-5` - Latest GPT model with enhanced capabilities  
