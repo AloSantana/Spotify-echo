@@ -1,14 +1,24 @@
-# AWS Bedrock Claude Integration - Testing Results
+# AWS Bedrock Testing - Comprehensive Guide
 
-This directory contains comprehensive testing results for AWS Bedrock with Claude 4.5 Sonnet integration.
+This directory contains comprehensive testing infrastructure and results for AWS Bedrock model integration.
+
+## 🚀 New: Comprehensive Test Harness
+
+**Version 1.0.0** - A robust, configurable test harness for AWS Bedrock models with:
+- ✅ Inference profile ARN support
+- ✅ Detailed error reporting with actionable insights
+- ✅ Configurable model registry
+- ✅ Streaming and parameter variation tests
+- ✅ JSON and Markdown reports
+
+**See**: [AWS Bedrock Comprehensive Test Guide](./AWS_BEDROCK_COMPREHENSIVE_TEST_GUIDE.md)
 
 ## 📋 Executive Summary
 
-**Test Date**: October 3, 2025  
-**Status**: ❌ **Access Denied - IAM Permissions Required**  
-**Credentials**: Valid but insufficient permissions  
-**Models Tested**: 4 Claude variants  
-**Models Accessible**: 0 / 4
+**Test Infrastructure**: ✅ **Comprehensive Test Harness Available**  
+**Configuration**: Model registry with inference profile support  
+**Documentation**: Complete usage guide and troubleshooting  
+**Integration**: CI/CD ready with multiple test modes
 
 ## 🔑 Credentials Tested
 
@@ -35,21 +45,67 @@ This directory contains comprehensive testing results for AWS Bedrock with Claud
 
 ## 🧪 Test Scripts
 
-### 1. Comprehensive Bedrock Test
+### 1. Comprehensive Bedrock Test Harness (NEW)
+
+The new comprehensive test harness provides robust testing for all AWS Bedrock models:
+
+```bash
+# Run all tests with default settings
+npm run test:bedrock
+
+# Or use the shell script
+./scripts/test-aws-bedrock-comprehensive.sh
+
+# Quick test (skip streaming and variations)
+npm run test:bedrock:quick
+
+# Verbose output for debugging
+npm run test:bedrock:verbose
+
+# Include deprecated models
+npm run test:bedrock:deprecated
+
+# Test specific models
+npm run test:bedrock -- --models claude-3-5-sonnet-v2,claude-sonnet-4-5
+
+# Test in different region
+AWS_REGION=us-west-2 npm run test:bedrock
+
+# View all options
+node scripts/test-aws-bedrock-comprehensive.js --help
+```
+
+**Features**:
+- Configurable model registry (`config/aws-bedrock-models.json`)
+- Inference profile ARN support
+- Detailed error categorization and actionable recommendations
+- Streaming and parameter variation tests
+- JSON and Markdown reports in `test-results/`
+- Model availability by region
+- Automatic deprecated model filtering
+
+**Documentation**: See [AWS Bedrock Comprehensive Test Guide](./AWS_BEDROCK_COMPREHENSIVE_TEST_GUIDE.md)
+
+### 2. Legacy Bedrock Test (Original)
+
+The original test script focusing on Claude models:
+
 ```bash
 node scripts/test-aws-bedrock-claude.js
+# or
+npm run test:bedrock:legacy
 ```
 
 Tests:
 - Client initialization
 - Credentials validation
-- Model availability (4 Claude variants)
+- Model availability (Claude variants)
 - Basic text generation
 - Streaming responses
 - Parameter variations
 - Error handling
 
-### 2. IAM User Inspection
+### 3. IAM User Inspection
 ```bash
 node scripts/check-aws-iam-user.js
 ```
@@ -60,7 +116,7 @@ Retrieves:
 - Group memberships
 - Permission summary
 
-### 3. Automated Test Runner
+### 4. Automated Test Runner (Legacy)
 ```bash
 ./scripts/test-aws-bedrock.sh
 ```
@@ -69,6 +125,41 @@ Or with custom credentials:
 ```bash
 ./scripts/test-aws-bedrock.sh AWS_KEY AWS_SECRET us-east-1
 ```
+
+## 📊 Model Configuration
+
+The comprehensive test harness uses a configurable model registry at `config/aws-bedrock-models.json`.
+
+### Supported Models
+
+The configuration includes:
+- **Claude 4.x**: Opus 4.1, Sonnet 4.5
+- **Claude 3.5**: Sonnet v2, Sonnet v1, Haiku
+- **Claude 3**: Opus, Sonnet, Haiku
+- **Claude 2**: Claude 2.1 (deprecated)
+- **DeepSeek**: R1
+- **Amazon Titan**: Text Express v1
+
+### Adding New Models
+
+1. Edit `config/aws-bedrock-models.json`
+2. Add model entry with all required fields
+3. Run test: `npm run test:bedrock -- --models your-model-key`
+
+### Inference Profile ARN Support
+
+For models requiring cross-region inference profiles:
+
+```json
+{
+  "model-key": {
+    "requiresInferenceProfile": true,
+    "inferenceProfileArn": "arn:aws:bedrock:us-east-1::inference-profile/..."
+  }
+}
+```
+
+The test harness automatically uses the ARN when configured.
 
 ## 📊 Detailed Test Results
 
