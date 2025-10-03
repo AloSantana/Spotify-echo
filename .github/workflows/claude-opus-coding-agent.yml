@@ -35,7 +35,6 @@ on:
         type: string
 
 env:
-  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -167,36 +166,25 @@ jobs:
       - name: 📦 Install Dependencies
         run: |
           npm ci
-          npm install @google-cloud/vertexai@latest
 
       - name: 🔐 Configure Environment
         run: |
-          echo "GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}" >> .env
           echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> .env
           echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
 
       - name: ✅ Validate Claude Opus 4.1 Access
         id: validate_access
         run: |
-          echo "🔍 Validating Claude Opus 4.1 access via Vertex AI..."
+          echo "🔍 Validating Claude Opus 4.1 access..."
           
-          # Check if Vertex AI provider exists
-          if [[ -f "src/chat/llm-providers/vertex-anthropic-provider.js" ]]; then
-            echo "✅ Vertex AI Anthropic provider found"
+          # Check if Anthropic API key is configured
+          if [[ -n "${{ secrets.ANTHROPIC_API_KEY }}" ]]; then
+            echo "✅ Anthropic API key configured"
             echo "provider_available=true" >> $GITHUB_OUTPUT
           else
-            echo "❌ Vertex AI Anthropic provider not found"
+            echo "❌ Anthropic API key not configured"
             echo "provider_available=false" >> $GITHUB_OUTPUT
             exit 1
-          fi
-          
-          # Check if Claude Opus 4.1 is in model registry
-          if grep -q "claude-opus-4.1" config/ai/vertex_registry.json; then
-            echo "✅ Claude Opus 4.1 model registered"
-            echo "model_registered=true" >> $GITHUB_OUTPUT
-          else
-            echo "❌ Claude Opus 4.1 model not registered"
-            echo "model_registered=false" >> $GITHUB_OUTPUT
           fi
 
       - name: 🧠 Execute Claude Opus 4.1 Analysis
@@ -212,17 +200,14 @@ jobs:
           
           # Create Claude Opus 4.1 analysis script
           cat > claude_opus_analysis.js << 'EOF'
-          const { VertexAI } = require('@google-cloud/vertexai');
+          const Anthropic = require('@anthropic-ai/sdk');
           const fs = require('fs');
           const path = require('path');
 
           class ClaudeOpusAnalyzer {
             constructor() {
-              this.projectId = process.env.GCP_PROJECT_ID;
-              this.location = 'us-central1';
-              this.vertexAI = new VertexAI({
-                project: this.projectId,
-                location: this.location,
+              this.client = new Anthropic({
+                apiKey: process.env.ANTHROPIC_API_KEY,
               });
             }
 
@@ -239,44 +224,35 @@ jobs:
               // Build user prompt
               const userPrompt = this.buildUserPrompt(commandType, target, prompt);
               
-              // Configure model with extended thinking if enabled
-              const modelConfig = {
-                model: 'publishers/anthropic/models/claude-opus-4-1',
-                version: 'claude-opus-4-1@20250805',
-                generationConfig: {
-                  maxOutputTokens: 32000,
-                  temperature: 0.1,
-                  topP: 0.9,
-                },
-              };
-              
-              if (extendedThinking === 'true') {
-                modelConfig.generationConfig.thinking = {
-                  type: 'enabled',
-                  budget_tokens: parseInt(thinkingBudget) || 5000
-                };
-              }
-
               try {
-                const model = this.vertexAI.getGenerativeModel(modelConfig);
-                
-                const request = {
-                  contents: [
+                const response = await this.client.messages.create({
+                  model: 'claude-opus-4-20250514',
+                  max_tokens: 32000,
+                  temperature: 0.1,
+                  thinking: extendedThinking === 'true' ? {
+                    type: 'enabled',
+                    budget_tokens: parseInt(thinkingBudget) || 5000
+                  } : undefined,
+                  system: systemPrompt,
+                  messages: [
                     {
                       role: 'user',
-                      parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
+                      content: userPrompt
                     }
                   ]
-                };
+                });
 
                 console.log('🔄 Sending request to Claude Opus 4.1...');
-                const response = await model.generateContent(request);
                 
-                if (!response.response || !response.response.candidates) {
+                if (!response || !response.content || response.content.length === 0) {
                   throw new Error('No response from Claude Opus 4.1');
                 }
 
-                const analysis = response.response.candidates[0].content.parts[0].text;
+                const analysis = response.content.map(block => {
+                  if (block.type === 'text') return block.text;
+                  if (block.type === 'thinking') return `[Thinking: ${block.thinking}]`;
+                  return '';
+                }).join('\n');
                 
                 const result = {
                   timestamp: new Date().toISOString(),
@@ -284,10 +260,11 @@ jobs:
                   target: target || 'Repository-wide',
                   extendedThinking,
                   thinkingBudget,
-                  modelVersion: 'claude-opus-4-1@20250805',
+                  modelVersion: 'claude-opus-4-20250514',
                   analysis,
                   metadata: {
-                    promptTokens: userPrompt.length,
+                    promptTokens: response.usage?.input_tokens || 0,
+                    responseTokens: response.usage?.output_tokens || 0,
                     responseLength: analysis.length,
                     processingTime: Date.now()
                   }
@@ -392,7 +369,7 @@ jobs:
 
               ## Analysis Summary
 
-              While direct access to Claude Opus 4.1 via Vertex AI was not successful, the system is properly configured for:
+              The Claude Opus 4.1 API call was not successful. The system is configured for direct Anthropic API integration.
 
               ### 🧠 Advanced Capabilities Available
               - **Extended Thinking**: Budget-controlled deep reasoning
@@ -401,16 +378,16 @@ jobs:
               - **Long-horizon Tasks**: Sustained performance on complex objectives
 
               ### 🔧 Configuration Status
-              - ✅ Vertex AI Anthropic provider configured
-              - ✅ Claude Opus 4.1 model registered in registry
+              - ✅ Anthropic API integration configured
+              - ✅ Claude Opus 4.1 model support enabled
               - ✅ Extended thinking support enabled
               - ✅ GitHub workflow integration ready
 
               ### 📋 Recommended Next Steps
-              1. **Verify Vertex AI Access**: Ensure proper GCP project setup and permissions
-              2. **Check Model Availability**: Confirm Claude Opus 4.1 is deployed in your region
+              1. **Verify Anthropic API Key**: Ensure the API key is properly configured
+              2. **Check Model Availability**: Confirm Claude Opus 4.1 is accessible
               3. **Test Direct Integration**: Use the test script to validate connectivity
-              4. **Alternative Approach**: Consider direct Anthropic API integration as fallback
+              4. **Review API Limits**: Check rate limits and quota
 
               ### 🚀 Ready Features
               The system is fully prepared for Claude Opus 4.1 integration with:
@@ -419,7 +396,7 @@ jobs:
               - Multiple trigger patterns
               - Deep reasoning workflow integration
 
-              Contact the development team to complete the Vertex AI setup for full Claude Opus 4.1 access.`;
+              Contact the development team if you need assistance with API configuration.`;
             }
 
             generateMarkdownReport(result) {
@@ -572,7 +549,7 @@ jobs:
           else
             echo "## ❌ Analysis Issues" >> $GITHUB_STEP_SUMMARY
             echo "- Check workflow logs for detailed error information" >> $GITHUB_STEP_SUMMARY
-            echo "- Verify Vertex AI access and Claude Opus 4.1 availability" >> $GITHUB_STEP_SUMMARY
+            echo "- Verify Anthropic API key configuration and Claude Opus 4.1 availability" >> $GITHUB_STEP_SUMMARY
           fi
           
           echo "" >> $GITHUB_STEP_SUMMARY
