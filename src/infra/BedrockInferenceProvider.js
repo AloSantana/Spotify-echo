@@ -202,8 +202,11 @@ class BedrockInferenceProvider extends EventEmitter {
             // Prepare request
             const requestBody = this.buildRequestBody(input, options);
             
-            // Invoke model
-            const result = await this.invokeModel(modelConfig.modelId, requestBody, options);
+            // Invoke model (pass modelKey for inference profile detection)
+            const result = await this.invokeModel(modelConfig.modelId, requestBody, {
+                ...options,
+                modelKey
+            });
             
             // Cache result
             if (this.config.enableCaching) {
@@ -251,8 +254,23 @@ class BedrockInferenceProvider extends EventEmitter {
     async invokeModel(modelId, requestBody, options = {}) {
         const { InvokeModelCommand } = require('@aws-sdk/client-bedrock-runtime');
         
+        // Get model config to check for inference profile ARN
+        const modelKey = options.modelKey || this.config.defaultModel;
+        const modelConfig = this.models.get(modelKey);
+        
+        // Use inference profile ARN if required
+        const effectiveModelId = (modelConfig?.requiresInferenceProfile && modelConfig?.inferenceProfileArn)
+            ? modelConfig.inferenceProfileArn
+            : modelId;
+        
+        // Log model invocation details
+        console.log(`🔄 Invoking model: ${effectiveModelId}`);
+        if (modelConfig?.requiresInferenceProfile) {
+            console.log(`   Using inference profile ARN for cross-region access`);
+        }
+        
         const command = new InvokeModelCommand({
-            modelId,
+            modelId: effectiveModelId,
             contentType: 'application/json',
             accept: 'application/json',
             body: JSON.stringify(requestBody)
