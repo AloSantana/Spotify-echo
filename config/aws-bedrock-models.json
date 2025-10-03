@@ -8,8 +8,8 @@
       "capabilities": ["text-generation", "conversation", "analysis", "coding"],
       "contextWindow": 200000,
       "maxOutputTokens": 4096,
-      "requiresInferenceProfile": false,
-      "inferenceProfileArn": null,
+      "requiresInferenceProfile": true,
+      "inferenceProfileArn": "arn:aws:bedrock:us-east-1:394686422207:inference-profile/global.anthropic.claude-opus-4-1-20250805-v1:0",
       "regions": ["us-east-1", "us-west-2", "eu-west-1"],
       "deprecated": false,
       "priority": 1
@@ -22,8 +22,8 @@
       "capabilities": ["text-generation", "conversation", "analysis", "coding"],
       "contextWindow": 200000,
       "maxOutputTokens": 4096,
-      "requiresInferenceProfile": false,
-      "inferenceProfileArn": null,
+      "requiresInferenceProfile": true,
+      "inferenceProfileArn": "arn:aws:bedrock:us-east-1:394686422207:inference-profile/global.anthropic.claude-sonnet-4-5-20250929-v1:0",
       "regions": ["us-east-1", "us-west-2", "eu-west-1"],
       "deprecated": false,
       "priority": 2
