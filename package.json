@@ -115,6 +115,7 @@
     "bedrock:validate:live": "node scripts/validate-bedrock-live.js",
     "bedrock:evidence": "node scripts/generate-bedrock-evidence.js",
     "bedrock:preflight": "node scripts/bedrock-preflight-check.js",
+    "bedrock:demo": "node scripts/demo-claude-coding-assistant.js",
     "test:env-validation": "npx playwright test tests/e2e/env-validation.spec.ts",
     "test:database": "npx playwright test tests/e2e/database-persistence.spec.ts",
     "test:chat": "npx playwright test tests/e2e/chat-interaction.spec.ts",
