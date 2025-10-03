@@ -57,8 +57,7 @@ const aiProvidersConfigSchema = z.object({
   }).optional(),
   gemini: z.object({
     apiKey: z.string().optional(),
-    model: z.string().default('gemini-pro'),
-    useVertex: z.boolean().default(false)
+    model: z.string().default('gemini-pro')
   }).optional(),
   anthropic: z.object({
     apiKey: z.string().optional(),
@@ -183,8 +182,7 @@ class ConfigurationService {
         } : undefined,
         gemini: process.env.GOOGLE_GEMINI_API_KEY ? {
           apiKey: process.env.GOOGLE_GEMINI_API_KEY,
-          model: process.env.GEMINI_MODEL || 'gemini-pro',
-          useVertex: process.env.GEMINI_USE_VERTEX === 'true'
+          model: process.env.GEMINI_MODEL || 'gemini-pro'
         } : undefined,
         anthropic: process.env.ANTHROPIC_API_KEY ? {
           apiKey: process.env.ANTHROPIC_API_KEY,
