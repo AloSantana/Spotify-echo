@@ -384,14 +384,30 @@ class BedrockInferenceProvider extends EventEmitter {
             throw new Error('Invalid input format');
         }
         
-        return {
+        // Build base request body
+        const requestBody = {
             anthropic_version: 'bedrock-2023-05-31',
             max_tokens: options.maxTokens || 2000,
-            messages,
-            temperature: options.temperature ?? 0.7,
-            top_p: options.topP ?? 0.9,
-            top_k: options.topK ?? 40
+            messages
         };
+        
+        // Claude models require ONLY ONE sampling parameter (temperature OR top_p, not both)
+        // Priority: temperature > top_p > top_k
+        if (options.temperature !== undefined) {
+            requestBody.temperature = options.temperature;
+        } else if (options.topP !== undefined) {
+            requestBody.top_p = options.topP;
+        } else {
+            // Default to temperature if no sampling parameter specified
+            requestBody.temperature = 0.7;
+        }
+        
+        // top_k can be used with temperature or top_p
+        if (options.topK !== undefined) {
+            requestBody.top_k = options.topK;
+        }
+        
+        return requestBody;
     }
     
     /**
