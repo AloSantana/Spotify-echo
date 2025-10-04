@@ -1,6 +1,45 @@
 # AWS Bedrock Claude Access Test - Quick Summary
 
-## 🔍 Test Status: CREDENTIALS VALID BUT ACCESS DENIED
+## ⚠️  IMPORTANT: Evidence-Based Validation Required
+
+**As of January 2025**, all Bedrock integration claims must be backed by real evidence. See comprehensive guide:
+
+📖 **[AWS Bedrock Real Validation Guide](docs/AWS_BEDROCK_REAL_VALIDATION.md)**
+
+### Quick Validation Commands
+
+```bash
+# Health check
+npm run bedrock:health
+
+# Live validation (strict mode)
+npm run bedrock:validate:strict
+
+# Collect comprehensive evidence
+npm run bedrock:collect-evidence
+
+# Verify CloudWatch metrics
+npm run bedrock:verify-billing
+```
+
+### Evidence Requirements
+
+✅ **Required artifacts:**
+- AWS identity verification (`reports/aws-identity.json`)
+- Model availability listing (`reports/bedrock-models.json`)
+- Real invocation logs with request IDs (`logs/bedrock/invocations/`)
+- Token usage and cost tracking
+- Comprehensive evidence report (`reports/bedrock-evidence-complete.json`)
+
+❌ **Not accepted as evidence:**
+- Narrative descriptions without logs
+- Expected output examples
+- Placeholder data (`[DEMO]`, `[MOCK]`)
+- Zero invocation count
+
+---
+
+## 🔍 Previous Test Status: CREDENTIALS VALID BUT ACCESS DENIED
 
 **Date**: October 3, 2025  
 **Tester**: GitHub Copilot Coding Agent  

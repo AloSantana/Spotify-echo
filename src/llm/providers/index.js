@@ -1,6 +1,7 @@
 const OpenAIProvider = require('./OpenAIProvider');
 const OpenRouterProvider = require('./OpenRouterProvider');
 const GeminiProvider = require('./GeminiProvider');
+const BedrockProvider = require('../../chat/llm-providers/bedrock-provider');
 
 /**
  * LLM Provider Registry
@@ -10,7 +11,7 @@ class ProviderRegistry {
   constructor() {
     this.providers = new Map();
     this.defaultProvider = 'openai';
-    this.fallbackOrder = ['openai', 'openrouter', 'gemini'];
+    this.fallbackOrder = ['bedrock', 'openai', 'openrouter', 'gemini'];
     this.initialized = false;
   }
 
@@ -20,6 +21,23 @@ class ProviderRegistry {
   async initialize() {
     try {
       let providersInitialized = 0;
+
+      // Initialize Bedrock provider (prioritized for coding)
+      if (process.env.BEDROCK_ENABLED === 'true' && process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
+        const bedrock = new BedrockProvider({
+          region: process.env.BEDROCK_REGION || process.env.AWS_REGION || 'us-east-1',
+          defaultModel: process.env.BEDROCK_DEFAULT_MODEL || 'claude-sonnet-4-5',
+          enabled: true
+        });
+        try {
+          await bedrock.initialize();
+          this.providers.set('bedrock', bedrock);
+          providersInitialized++;
+          console.log('✅ Bedrock provider registered');
+        } catch (error) {
+          console.warn('⚠️ Bedrock provider initialization failed:', error.message);
+        }
+      }
 
       // Initialize OpenAI provider
       if (process.env.OPENAI_API_KEY) {
