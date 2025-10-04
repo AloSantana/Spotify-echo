@@ -4,7 +4,7 @@
  * Provides /use command support for switching between Claude models on Bedrock
  * 
  * Usage:
- *   /use claude-opus-4-1
+ *   /use claude-3-opus
  *   /use claude-sonnet-4-5
  */
 
@@ -13,12 +13,13 @@ const LLMProviderManager = require('./llm-provider-manager');
 class BedrockModelSwitcher {
     constructor() {
         this.models = {
-            'claude-opus-4-1': {
-                modelId: 'anthropic.claude-opus-4-1-20250805-v1:0',
-                displayName: 'Claude Opus 4.1',
-                capabilities: ['reasoning', 'complex-analysis', 'coding'],
-                description: 'Best for complex reasoning and architectural analysis',
-                pricing: { input: 0.015, output: 0.075 }
+            'claude-3-opus': {
+                modelId: 'anthropic.claude-3-opus-20240229-v1:0',
+                displayName: 'Claude 3 Opus',
+                capabilities: ['reasoning', 'complex-analysis', 'coding', 'vision'],
+                description: 'Best for complex reasoning and architectural analysis. Highest intelligence in Claude 3 family.',
+                pricing: { input: 0.015, output: 0.075 },
+                note: 'Claude 3 Opus is currently the highest-tier Claude model available on AWS Bedrock. Claude 4 Opus is not yet available as of January 2025.'
             },
             'claude-sonnet-4-5': {
                 modelId: 'anthropic.claude-sonnet-4-5-20250929-v1:0',

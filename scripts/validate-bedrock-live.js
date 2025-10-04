@@ -33,13 +33,16 @@ const VALIDATION_CONFIG = {
             testPrompt: 'Hello! Please confirm you are Claude Sonnet 4.5 from AWS Bedrock. Respond with your model name and a brief greeting.'
         },
         {
-            key: 'claude-opus-4-1',
-            displayName: 'Claude Opus 4.1',
-            testPrompt: 'Hello! Please confirm you are Claude Opus 4.1 from AWS Bedrock. Respond with your model name and capabilities.'
+            key: 'claude-3-opus',
+            displayName: 'Claude 3 Opus',
+            testPrompt: 'Hello! Please confirm you are Claude 3 Opus from AWS Bedrock. Respond with your model name and capabilities.'
         }
     ],
     region: process.env.AWS_REGION || 'us-east-1',
-    validateCredentials: true
+    validateCredentials: true,
+    retryAttempts: 3,
+    retryDelay: 2000, // 2 seconds between retries
+    requestDelay: 1000 // 1 second delay between requests to avoid rate limiting
 };
 
 // Results tracking
@@ -137,64 +140,79 @@ async function saveInvocationLog(invocationData) {
 }
 
 /**
- * Test a specific model with live API call
+ * Sleep/delay function
+ */
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Test a specific model with live API call (with retry logic)
  */
 async function testModel(provider, modelConfig) {
     console.log(`\n📡 Testing ${modelConfig.displayName} (${modelConfig.key})...`);
     console.log(`   Prompt: "${modelConfig.testPrompt}"`);
     
-    const requestTimestamp = new Date().toISOString();
-    const startTime = Date.now();
+    let lastError = null;
     
-    // Get model configuration for inference profile info
-    const config = provider.config.modelConfig[modelConfig.key];
-    const requiresInferenceProfile = config?.requiresInferenceProfile || false;
-    const inferenceProfileArn = config?.inferenceProfileArn || null;
-    const actualModelId = config?.modelId || modelConfig.key;
-    
-    console.log(`   📋 Request Details:`);
-    console.log(`      Model ID: ${actualModelId}`);
-    console.log(`      Requires Inference Profile: ${requiresInferenceProfile}`);
-    if (requiresInferenceProfile && inferenceProfileArn) {
-        console.log(`      Inference Profile ARN: ${inferenceProfileArn}`);
-    }
-    console.log(`      Region: ${VALIDATION_CONFIG.region}`);
-    console.log(`      Request Timestamp: ${requestTimestamp}`);
-    
-    try {
-        const result = await provider.predict(modelConfig.key, modelConfig.testPrompt, {
-            maxTokens: 200,
-            temperature: 0.7
-        });
+    for (let attempt = 1; attempt <= VALIDATION_CONFIG.retryAttempts; attempt++) {
+        const requestTimestamp = new Date().toISOString();
+        const startTime = Date.now();
         
-        const responseTimestamp = new Date().toISOString();
-        const latency = Date.now() - startTime;
+        // Get model configuration for inference profile info
+        const config = provider.config.modelConfig[modelConfig.key];
+        const requiresInferenceProfile = config?.requiresInferenceProfile || false;
+        const inferenceProfileArn = config?.inferenceProfileArn || null;
+        const actualModelId = config?.modelId || modelConfig.key;
         
-        console.log(`✅ Response received in ${latency}ms`);
-        console.log(`   📋 Response Details:`);
-        console.log(`      Response Timestamp: ${responseTimestamp}`);
-        console.log(`      HTTP Status: 200 (Success)`);
-        console.log(`      Model Used: ${result.modelId || actualModelId}`);
-        console.log(`      Response: "${result.text.substring(0, 150)}..."`);
-        console.log(`      Cached: ${result.cached}`);
-        console.log(`   📊 Token Usage:`);
-        console.log(`      Input Tokens: ${result.usage.input_tokens}`);
-        console.log(`      Output Tokens: ${result.usage.output_tokens}`);
-        console.log(`      Total Tokens: ${result.usage.input_tokens + result.usage.output_tokens}`);
+        if (attempt > 1) {
+            console.log(`   🔄 Retry attempt ${attempt}/${VALIDATION_CONFIG.retryAttempts}...`);
+            await sleep(VALIDATION_CONFIG.retryDelay * attempt); // Exponential backoff
+        }
         
-        // Calculate cost
-        const cost = calculateCost(modelConfig.key, result.usage);
-        console.log(`   💰 Cost Breakdown:`);
-        console.log(`      Input: ${cost.breakdown.inputTokens} tokens × $${cost.breakdown.inputCostPer1K}/1K = $${cost.inputCost.toFixed(6)}`);
-        console.log(`      Output: ${cost.breakdown.outputTokens} tokens × $${cost.breakdown.outputCostPer1K}/1K = $${cost.outputCost.toFixed(6)}`);
-        console.log(`      Total: $${cost.totalCost.toFixed(6)} USD`);
+        console.log(`   📋 Request Details:`);
+        console.log(`      Model ID: ${actualModelId}`);
+        console.log(`      Requires Inference Profile: ${requiresInferenceProfile}`);
+        if (requiresInferenceProfile && inferenceProfileArn) {
+            console.log(`      Inference Profile ARN: ${inferenceProfileArn}`);
+        }
+        console.log(`      Region: ${VALIDATION_CONFIG.region}`);
+        console.log(`      Request Timestamp: ${requestTimestamp}`);
         
-        validationResults.totalCost += cost.totalCost;
-        
-        const invocationData = {
-            model: modelConfig.key,
-            displayName: modelConfig.displayName,
-            modelId: result.modelId || actualModelId,
+        try {
+            const result = await provider.predict(modelConfig.key, modelConfig.testPrompt, {
+                maxTokens: 200,
+                temperature: 0.7
+            });
+            
+            const responseTimestamp = new Date().toISOString();
+            const latency = Date.now() - startTime;
+            
+            console.log(`✅ Response received in ${latency}ms`);
+            console.log(`   📋 Response Details:`);
+            console.log(`      Response Timestamp: ${responseTimestamp}`);
+            console.log(`      HTTP Status: 200 (Success)`);
+            console.log(`      Model Used: ${result.modelId || actualModelId}`);
+            console.log(`      Response: "${result.text.substring(0, 150)}..."`);
+            console.log(`      Cached: ${result.cached}`);
+            console.log(`   📊 Token Usage:`);
+            console.log(`      Input Tokens: ${result.usage.input_tokens}`);
+            console.log(`      Output Tokens: ${result.usage.output_tokens}`);
+            console.log(`      Total Tokens: ${result.usage.input_tokens + result.usage.output_tokens}`);
+            
+            // Calculate cost
+            const cost = calculateCost(modelConfig.key, result.usage);
+            console.log(`   💰 Cost Breakdown:`);
+            console.log(`      Input: ${cost.breakdown.inputTokens} tokens × $${cost.breakdown.inputCostPer1K}/1K = $${cost.inputCost.toFixed(6)}`);
+            console.log(`      Output: ${cost.breakdown.outputTokens} tokens × $${cost.breakdown.outputCostPer1K}/1K = $${cost.outputCost.toFixed(6)}`);
+            console.log(`      Total: $${cost.totalCost.toFixed(6)} USD`);
+            
+            validationResults.totalCost += cost.totalCost;
+            
+            const invocationData = {
+                model: modelConfig.key,
+                displayName: modelConfig.displayName,
+                modelId: result.modelId || actualModelId,
             actualModelId: actualModelId,
             requiresInferenceProfile,
             inferenceProfileArn: requiresInferenceProfile ? inferenceProfileArn : null,
@@ -223,28 +241,53 @@ async function testModel(provider, modelConfig) {
         const responseTimestamp = new Date().toISOString();
         const latency = Date.now() - startTime;
         
-        console.error(`❌ Failed to test ${modelConfig.displayName}`);
+        lastError = error;
+        
+        // Check if error is rate limiting (throttling)
+        const isRateLimited = error.message && (
+            error.message.includes('Too many requests') ||
+            error.message.includes('ThrottlingException') ||
+            error.message.includes('Rate exceeded') ||
+            error.$metadata?.httpStatusCode === 429
+        );
+        
+        if (isRateLimited && attempt < VALIDATION_CONFIG.retryAttempts) {
+            console.warn(`⚠️  Rate limited on attempt ${attempt}. Will retry...`);
+            console.warn(`   Error: ${error.message}`);
+            continue; // Retry
+        }
+        
+        // If not rate limited or final attempt, log error
+        console.error(`❌ Failed to test ${modelConfig.displayName} (attempt ${attempt}/${VALIDATION_CONFIG.retryAttempts})`);
         console.error(`   📋 Error Details:`);
         console.error(`      Error: ${error.message}`);
         console.error(`      Response Timestamp: ${responseTimestamp}`);
         console.error(`      HTTP Status: ${error.$metadata?.httpStatusCode || 'Unknown'}`);
         console.error(`      Latency: ${latency}ms`);
         
-        validationResults.models.push({
-            model: modelConfig.key,
-            displayName: modelConfig.displayName,
-            success: false,
-            error: error.message,
-            httpStatus: error.$metadata?.httpStatusCode || null,
-            requestTimestamp,
-            responseTimestamp,
-            latency
-        });
-        
-        validationResults.errors.push(`${modelConfig.displayName}: ${error.message}`);
-        
-        return false;
+        if (attempt === VALIDATION_CONFIG.retryAttempts) {
+            // Final attempt failed
+            validationResults.models.push({
+                model: modelConfig.key,
+                displayName: modelConfig.displayName,
+                success: false,
+                error: error.message,
+                httpStatus: error.$metadata?.httpStatusCode || null,
+                requestTimestamp,
+                responseTimestamp,
+                latency,
+                attempts: attempt
+            });
+            
+            validationResults.errors.push(`${modelConfig.displayName}: ${error.message}`);
+            
+            return false;
+        }
     }
+}
+
+// Should never reach here, but just in case
+return false;
 }
 
 /**
@@ -501,9 +544,16 @@ async function main() {
         
         // Test each model
         let allSuccessful = true;
-        for (const modelConfig of VALIDATION_CONFIG.models) {
+        for (let i = 0; i < VALIDATION_CONFIG.models.length; i++) {
+            const modelConfig = VALIDATION_CONFIG.models[i];
             const success = await testModel(provider, modelConfig);
             allSuccessful = allSuccessful && success;
+            
+            // Add delay between model tests to avoid rate limiting
+            if (i < VALIDATION_CONFIG.models.length - 1) {
+                console.log(`\n⏳ Waiting ${VALIDATION_CONFIG.requestDelay}ms before next model test to avoid rate limiting...`);
+                await sleep(VALIDATION_CONFIG.requestDelay);
+            }
         }
         
         // Test caching

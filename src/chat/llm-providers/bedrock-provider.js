@@ -41,7 +41,7 @@ class BedrockProvider extends BaseProvider {
                 input: 0.003,  // $0.003 per 1K tokens
                 output: 0.015  // $0.015 per 1K tokens
             },
-            'claude-opus-4-1': {
+            'claude-3-opus': {
                 input: 0.015,  // $0.015 per 1K tokens
                 output: 0.075  // $0.075 per 1K tokens
             }
