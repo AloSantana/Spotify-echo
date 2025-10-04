@@ -29,6 +29,32 @@ const unifiedRetry = require('../src/infra/bedrock/unified-retry');
 const fs = require('fs').promises;
 const path = require('path');
 
+/**
+ * Assert that a required module is available
+ */
+function assertModule(name) {
+    try {
+        require.resolve(name);
+    } catch (e) {
+        console.error(`❌ [INSTALL_FAILURE] Required module '${name}' not found.`);
+        console.error(`   This indicates the npm install phase likely failed.`);
+        console.error(`   Please check the workflow logs for dependency installation errors.`);
+        process.exit(10);
+    }
+}
+
+// Verify critical AWS SDK modules are available
+console.log('🔍 Verifying required AWS SDK modules...');
+const requiredModules = [
+    '@aws-sdk/client-bedrock-runtime',
+    '@aws-sdk/client-sts'
+];
+requiredModules.forEach(mod => {
+    assertModule(mod);
+    console.log(`   ✅ ${mod}`);
+});
+console.log('✅ All required modules verified\n');
+
 // Parse command line arguments
 const args = process.argv.slice(2);
 const STRICT_MODE = args.includes('--strict');

@@ -19,6 +19,27 @@ const { BedrockClient, ListFoundationModelsCommand, ListInferenceProfilesCommand
 const fs = require('fs').promises;
 const path = require('path');
 
+/**
+ * Assert that a required module is available
+ */
+function assertModule(name) {
+    try {
+        require.resolve(name);
+    } catch (e) {
+        console.error(`❌ [INSTALL_FAILURE] Required module '${name}' not found.`);
+        console.error(`   This indicates the npm install phase likely failed.`);
+        process.exit(10);
+    }
+}
+
+// Verify critical AWS SDK modules
+console.log('🔍 Verifying required AWS SDK modules...');
+['@aws-sdk/client-sts', '@aws-sdk/client-bedrock'].forEach(mod => {
+    assertModule(mod);
+    console.log(`   ✅ ${mod}`);
+});
+console.log('✅ All required modules verified\n');
+
 class BedrockEvidenceCollector {
     constructor() {
         this.region = process.env.AWS_REGION || 'us-east-1';
@@ -45,12 +66,30 @@ class BedrockEvidenceCollector {
     async collectIdentity() {
         console.log('🔐 Collecting AWS Identity...');
         
+        // Verify credentials are present
+        const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+        const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+        
+        if (!accessKeyId || !secretAccessKey) {
+            console.error('   ❌ AWS credentials not found in environment');
+            this.evidence.identity = { 
+                error: 'Missing AWS credentials',
+                accessKeyIdPresent: !!accessKeyId,
+                secretAccessKeyPresent: !!secretAccessKey
+            };
+            return false;
+        }
+        
+        // Log credential fingerprint (first 4 and last 4 chars only)
+        console.log(`   🔑 Access Key ID fingerprint: ${accessKeyId.substring(0, 4)}****${accessKeyId.substring(accessKeyId.length - 4)}`);
+        console.log(`   🔑 Secret Key fingerprint: ***${secretAccessKey.substring(secretAccessKey.length - 4)}`);
+        
         try {
             const stsClient = new STSClient({
                 region: this.region,
                 credentials: {
-                    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-                    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+                    accessKeyId,
+                    secretAccessKey
                 }
             });
             
