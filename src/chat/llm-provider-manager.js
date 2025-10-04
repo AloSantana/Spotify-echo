@@ -13,8 +13,8 @@ class LLMProviderManager {
     this.providers = new Map();
     this.providerConfigs = new Map();
     this.keyRefreshHandlers = new Map();
-    this.fallbackOrder = ['gemini', 'perplexity', 'grok4', 'openai', 'openrouter', 'mock']; // Prioritize new providers
-    this.currentProvider = 'gemini'; // Default to Gemini
+    this.fallbackOrder = ['bedrock', 'gemini', 'perplexity', 'grok4', 'openai', 'openrouter', 'mock']; // Bedrock first for coding
+    this.currentProvider = process.env.BEDROCK_ENABLED === 'true' ? 'bedrock' : 'gemini'; // Default to Bedrock if enabled
     this.initialized = false;
     const coalesceEnv = (...names) => {
       for (const name of names) {
@@ -75,7 +75,7 @@ class LLMProviderManager {
    * Initialize circuit breakers for all providers
    */
   initializeCircuitBreakers() {
-    const providerIds = ['gemini', 'openai', 'openrouter', 'mock'];
+    const providerIds = ['bedrock', 'gemini', 'openai', 'openrouter', 'mock'];
 
     for (const providerId of providerIds) {
       this.circuitBreakers.set(providerId, {
@@ -117,6 +117,15 @@ class LLMProviderManager {
         apiKey: 'mock-key',
         status: 'connected',
         available: true,
+        refreshable: false,
+      },
+      bedrock: {
+        name: 'AWS Bedrock',
+        enabled: process.env.BEDROCK_ENABLED === 'true',
+        region: coalesceEnv('BEDROCK_REGION', 'AWS_REGION') || 'us-east-1',
+        defaultModel: process.env.BEDROCK_DEFAULT_MODEL || 'claude-sonnet-4-5',
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
         refreshable: false,
       },
       gemini: {
@@ -192,6 +201,10 @@ class LLMProviderManager {
       if (key === 'mock') {
         config.available = true;
         config.status = 'connected';
+      } else if (key === 'bedrock') {
+        // Bedrock can use AWS credentials
+        config.available = config.enabled && !!(config.accessKeyId && config.secretAccessKey);
+        config.status = config.available ? 'unknown' : (config.enabled ? 'no_credentials' : 'disabled');
       } else if (key === 'grok4') {
         // Grok-4 can use either xAI direct or OpenRouter
         config.available = !!(config.apiKey || config.openRouterKey);
@@ -214,6 +227,7 @@ class LLMProviderManager {
     const OpenAIProvider = require('./llm-providers/openai-provider');
     const PerplexityProvider = require('./llm-providers/perplexity-provider');
     const Grok4Provider = require('./llm-providers/grok4-provider');
+    const BedrockProvider = require('./llm-providers/bedrock-provider');
 
     for (const [key, config] of this.providerConfigs) {
       try {
@@ -222,6 +236,15 @@ class LLMProviderManager {
         switch (key) {
           case 'mock':
             provider = new MockProvider();
+            break;
+          case 'bedrock':
+            if (config.available) {
+              provider = new BedrockProvider({
+                region: config.region,
+                defaultModel: config.defaultModel,
+                enabled: config.enabled
+              });
+            }
             break;
           case 'gemini':
             if (config.available) {

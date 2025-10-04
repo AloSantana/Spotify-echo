@@ -10,12 +10,19 @@
  * 
  * Usage:
  *   AWS_ACCESS_KEY_ID=xxx AWS_SECRET_ACCESS_KEY=yyy AWS_REGION=us-east-1 node scripts/validate-bedrock-live.js
+ *   node scripts/validate-bedrock-live.js --strict  # Fail if any model invocation fails
  * 
  * Or with repo secrets in GitHub Actions:
  *   node scripts/validate-bedrock-live.js
  */
 
 const BedrockInferenceProvider = require('../src/infra/BedrockInferenceProvider');
+const fs = require('fs').promises;
+const path = require('path');
+
+// Parse command line arguments
+const args = process.argv.slice(2);
+const STRICT_MODE = args.includes('--strict');
 
 // Validation configuration
 const VALIDATION_CONFIG = {
@@ -104,6 +111,32 @@ function calculateCost(model, usage) {
 }
 
 /**
+ * Save per-invocation log to logs/bedrock/invocations/
+ */
+async function saveInvocationLog(invocationData) {
+    try {
+        const logsDir = path.join(__dirname, '..', 'logs', 'bedrock', 'invocations');
+        await fs.mkdir(logsDir, { recursive: true });
+        
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `${timestamp}-${invocationData.model}.json`;
+        const filepath = path.join(logsDir, filename);
+        
+        await fs.writeFile(filepath, JSON.stringify(invocationData, null, 2));
+        console.log(`   📝 Invocation log saved: ${filename}`);
+        
+        // Detect placeholder strings (anti-mock safeguard)
+        const content = JSON.stringify(invocationData);
+        if (content.includes('[DEMO]') || content.includes('[PLACEHOLDER]') || content.includes('[MOCK]')) {
+            console.warn(`   ⚠️  WARNING: Placeholder strings detected in invocation data!`);
+            invocationData.hasPlaceholders = true;
+        }
+    } catch (error) {
+        console.error(`   ❌ Failed to save invocation log: ${error.message}`);
+    }
+}
+
+/**
  * Test a specific model with live API call
  */
 async function testModel(provider, modelConfig) {
@@ -158,7 +191,7 @@ async function testModel(provider, modelConfig) {
         
         validationResults.totalCost += cost.totalCost;
         
-        validationResults.models.push({
+        const invocationData = {
             model: modelConfig.key,
             displayName: modelConfig.displayName,
             modelId: result.modelId || actualModelId,
@@ -175,8 +208,14 @@ async function testModel(provider, modelConfig) {
             response: result.text.substring(0, 200),
             requestTimestamp,
             responseTimestamp,
-            httpStatus: 200
-        });
+            httpStatus: 200,
+            requestId: result.requestId || `bedrock-${Date.now()}-${modelConfig.key}`
+        };
+        
+        validationResults.models.push(invocationData);
+        
+        // Save per-invocation log
+        await saveInvocationLog(invocationData);
         
         return true;
         
@@ -481,8 +520,32 @@ async function main() {
         console.log(`   Average Latency: ${metrics.averageLatency.toFixed(2)}ms`);
         console.log(`   Success Rate: ${metrics.successRate.toFixed(2)}%`);
         
-        // Generate report
+        // Generate and save report
         const report = generateReport();
+        
+        // Save summary report
+        await saveSummaryReport();
+        
+        // Check strict mode validation
+        if (STRICT_MODE) {
+            const successfulInvocations = validationResults.models.filter(m => m.success).length;
+            const totalInvocations = validationResults.models.length;
+            
+            if (successfulInvocations === 0) {
+                console.error('\n❌ STRICT MODE: Zero successful invocations - FAILED');
+                process.exit(1);
+            }
+            
+            if (validationResults.models.some(m => m.hasPlaceholders)) {
+                console.error('\n❌ STRICT MODE: Placeholder strings detected in invocations - FAILED');
+                process.exit(1);
+            }
+            
+            if (!allSuccessful) {
+                console.error(`\n❌ STRICT MODE: ${totalInvocations - successfulInvocations}/${totalInvocations} invocations failed - FAILED`);
+                process.exit(1);
+            }
+        }
         
         // Exit with appropriate code
         if (allSuccessful && validationResults.errors.length === 0) {
@@ -490,15 +553,33 @@ async function main() {
             process.exit(0);
         } else {
             console.log('\n⚠️  Validation completed with errors');
-            process.exit(1);
+            process.exit(STRICT_MODE ? 1 : 0);
         }
         
     } catch (error) {
         console.error('\n❌ Validation failed with error:');
         console.error(error);
         validationResults.errors.push(`Fatal error: ${error.message}`);
+        await saveSummaryReport();
         generateReport();
         process.exit(1);
+    }
+}
+
+/**
+ * Save summary report to reports/bedrock-invocation-summary.json
+ */
+async function saveSummaryReport() {
+    try {
+        const reportsDir = path.join(__dirname, '..', 'reports');
+        await fs.mkdir(reportsDir, { recursive: true });
+        
+        const filepath = path.join(reportsDir, 'bedrock-invocation-summary.json');
+        await fs.writeFile(filepath, JSON.stringify(validationResults, null, 2));
+        
+        console.log(`\n📄 Summary report saved: reports/bedrock-invocation-summary.json`);
+    } catch (error) {
+        console.error(`❌ Failed to save summary report: ${error.message}`);
     }
 }
 
