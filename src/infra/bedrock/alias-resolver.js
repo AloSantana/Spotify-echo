@@ -122,13 +122,10 @@ class AliasResolver {
       if (config.legacyMappings && Object.prototype.hasOwnProperty.call(config.legacyMappings, current)) {
         const target = config.legacyMappings[current];
         
-        // Self-mapping check
+        // Self-mapping check: treat as terminal (already canonical)
         if (target === current) {
-          if (!this.warnedAliases.has(originalAlias)) {
-            console.error(`⚠️ [ALIAS-RESOLVER] Self-mapping detected for alias "${current}"`);
-            this.warnedAliases.add(originalAlias);
-          }
-          throw new Error(`Self-mapping detected for alias '${current}'`);
+          // Identity mapping indicates this is already canonical - stop iterating
+          break;
         }
         
         console.warn(`⚠️  Legacy alias '${current}' mapped to '${target}'`);
