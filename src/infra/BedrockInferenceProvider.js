@@ -6,11 +6,15 @@
  * - Streaming and batch predictions
  * - Intelligent caching
  * - Error handling and fallback
+ * - Alias-based model resolution
+ * - Unified retry with telemetry
  * 
  * @module infra/BedrockInferenceProvider
  */
 
 const { EventEmitter } = require('events');
+const aliasResolver = require('./bedrock/alias-resolver');
+const unifiedRetry = require('./bedrock/unified-retry');
 
 class BedrockInferenceProvider extends EventEmitter {
     constructor(options = {}) {
@@ -95,43 +99,48 @@ class BedrockInferenceProvider extends EventEmitter {
     }
     
     /**
-     * Load model configuration
+     * Load model configuration using alias resolver
      */
     loadModelConfig() {
         try {
-            const fs = require('fs');
-            const path = require('path');
-            const configPath = path.join(process.cwd(), 'config', 'aws-bedrock-models.json');
+            // Use alias resolver for model configuration
+            const aliases = aliasResolver.listAliases();
+            const config = {};
             
-            if (fs.existsSync(configPath)) {
-                const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-                return config.modelRegistry || {};
+            for (const alias of aliases) {
+                if (!alias.deprecated) {
+                    const metadata = aliasResolver.getMetadata(alias.alias);
+                    config[alias.alias] = metadata;
+                }
             }
+            
+            console.log(`📦 Loaded ${Object.keys(config).length} model aliases from alias resolver`);
+            return config;
         } catch (error) {
-            console.warn('⚠️  Could not load model config, using defaults');
+            console.warn('⚠️  Could not load alias config, using defaults:', error.message);
+            return this.getDefaultModelConfig();
         }
-        
-        return this.getDefaultModelConfig();
     }
     
     /**
-     * Get default model configuration
+     * Get default model configuration (fallback only)
      */
     getDefaultModelConfig() {
+        // Fallback configuration - should rarely be used
         return {
-            'claude-sonnet-4-5': {
-                modelId: 'anthropic.claude-sonnet-4-5-20250929-v1:0',
-                displayName: 'Claude Sonnet 4.5',
+            'claude-3-opus': {
+                modelId: aliasResolver.getModelId('claude-3-opus'),
+                displayName: 'Claude 3 Opus',
                 provider: 'anthropic',
-                capabilities: ['text-generation', 'coding', 'analysis'],
+                capabilities: ['reasoning', 'complex-analysis', 'coding'],
                 contextWindow: 200000,
                 maxOutputTokens: 4096
             },
-            'claude-opus-4-1': {
-                modelId: 'anthropic.claude-opus-4-1-20250805-v1:0',
-                displayName: 'Claude Opus 4.1',
+            'claude-sonnet-4-5': {
+                modelId: aliasResolver.getModelId('claude-sonnet-4-5'),
+                displayName: 'Claude Sonnet 4.5',
                 provider: 'anthropic',
-                capabilities: ['text-generation', 'complex-analysis', 'reasoning'],
+                capabilities: ['text-generation', 'coding', 'analysis'],
                 contextWindow: 200000,
                 maxOutputTokens: 4096
             }
@@ -249,7 +258,7 @@ class BedrockInferenceProvider extends EventEmitter {
     }
     
     /**
-     * Invoke Bedrock model
+     * Invoke Bedrock model with unified retry
      */
     async invokeModel(modelId, requestBody, options = {}) {
         const { InvokeModelCommand } = require('@aws-sdk/client-bedrock-runtime');
@@ -258,7 +267,7 @@ class BedrockInferenceProvider extends EventEmitter {
         const modelKey = options.modelKey || this.config.defaultModel;
         const modelConfig = this.models.get(modelKey);
         
-        // Use inference profile ARN if required
+        // Resolve model ID using alias resolver
         const effectiveModelId = (modelConfig?.requiresInferenceProfile && modelConfig?.inferenceProfileArn)
             ? modelConfig.inferenceProfileArn
             : modelId;
@@ -269,6 +278,7 @@ class BedrockInferenceProvider extends EventEmitter {
             console.log(`   Using inference profile ARN for cross-region access`);
         }
         
+        // Create command
         const command = new InvokeModelCommand({
             modelId: effectiveModelId,
             contentType: 'application/json',
@@ -276,10 +286,9 @@ class BedrockInferenceProvider extends EventEmitter {
             body: JSON.stringify(requestBody)
         });
         
-        // Execute with retry logic
-        let lastError;
-        for (let attempt = 0; attempt < this.config.maxRetries; attempt++) {
-            try {
+        // Execute with unified retry layer
+        const result = await unifiedRetry.execute(
+            async () => {
                 const response = await this.client.send(command);
                 const responseBody = JSON.parse(new TextDecoder().decode(response.body));
                 
@@ -291,24 +300,21 @@ class BedrockInferenceProvider extends EventEmitter {
                     },
                     stopReason: responseBody.stop_reason
                 };
-                
-            } catch (error) {
-                lastError = error;
-                
-                if (error.$metadata?.httpStatusCode === 429) {
-                    // Rate limited, retry with exponential backoff
-                    const delay = Math.min(1000 * Math.pow(2, attempt), 10000);
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    continue;
-                }
-                
-                if (attempt === this.config.maxRetries - 1) {
-                    throw error;
+            },
+            {
+                model: modelKey,
+                operationType: 'inference',
+                calculateCost: (result) => {
+                    if (result.usage) {
+                        const cost = aliasResolver.calculateCost(modelKey, result.usage);
+                        return cost.totalCost;
+                    }
+                    return 0;
                 }
             }
-        }
+        );
         
-        throw lastError;
+        return result;
     }
     
     /**

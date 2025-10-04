@@ -35,17 +35,20 @@ class BedrockProvider extends BaseProvider {
         this.healthy = false;
         this.lastError = null;
         
-        // Pricing matrix for cost tracking
-        this.pricing = {
-            'claude-sonnet-4-5': {
-                input: 0.003,  // $0.003 per 1K tokens
-                output: 0.015  // $0.015 per 1K tokens
-            },
-            'claude-3-opus': {
-                input: 0.015,  // $0.015 per 1K tokens
-                output: 0.075  // $0.075 per 1K tokens
+        // Get pricing from alias resolver
+        const aliasResolver = require('../../infra/bedrock/alias-resolver');
+        this.pricing = {};
+        
+        try {
+            const aliases = aliasResolver.listAliases();
+            for (const alias of aliases) {
+                if (!alias.deprecated) {
+                    this.pricing[alias.alias] = aliasResolver.getPricing(alias.alias);
+                }
             }
-        };
+        } catch (error) {
+            console.warn('⚠️  Could not load pricing from alias resolver:', error.message);
+        }
     }
     
     /**

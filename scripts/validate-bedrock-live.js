@@ -6,6 +6,13 @@
  * This script performs actual live AWS Bedrock API calls to validate
  * the BedrockInferenceProvider implementation with real models.
  * 
+ * Enhanced with:
+ * - Alias-based model resolution
+ * - Resilience metrics (retry counts, circuit breaker stats)
+ * - P95/P99 latency tracking
+ * - Configuration hash manifest
+ * - Cost tracking per model
+ * 
  * IMPORTANT: This will incur actual AWS charges!
  * 
  * Usage:
@@ -17,6 +24,8 @@
  */
 
 const BedrockInferenceProvider = require('../src/infra/BedrockInferenceProvider');
+const aliasResolver = require('../src/infra/bedrock/alias-resolver');
+const unifiedRetry = require('../src/infra/bedrock/unified-retry');
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -45,14 +54,23 @@ const VALIDATION_CONFIG = {
     requestDelay: 1000 // 1 second delay between requests to avoid rate limiting
 };
 
-// Results tracking
+// Results tracking with enhanced metrics
 const validationResults = {
     timestamp: new Date().toISOString(),
     region: VALIDATION_CONFIG.region,
     credentialsFound: false,
+    configHash: null,
+    configMetadata: null,
     models: [],
     totalCost: 0,
-    errors: []
+    errors: [],
+    resilienceMetrics: null,
+    latencyPercentiles: {
+        p50: 0,
+        p95: 0,
+        p99: 0,
+        max: 0
+    }
 };
 
 /**
@@ -319,17 +337,53 @@ async function testCaching(provider) {
 }
 
 /**
- * Generate validation report
+ * Generate validation report with enhanced metrics
  */
 function generateReport() {
     console.log('\n' + '='.repeat(80));
     console.log('📊 VALIDATION REPORT');
     console.log('='.repeat(80));
     
+    // Get resilience metrics from unified retry layer
+    const resilienceMetrics = unifiedRetry.getTelemetry();
+    validationResults.resilienceMetrics = resilienceMetrics;
+    
+    // Get config metadata
+    const configMetadata = aliasResolver.getConfigMetadata();
+    validationResults.configHash = configMetadata.configHash;
+    validationResults.configMetadata = configMetadata;
+    
     console.log('\n📅 Validation Details:');
     console.log(`   Timestamp: ${validationResults.timestamp}`);
     console.log(`   Region: ${validationResults.region}`);
     console.log(`   Credentials Found: ${validationResults.credentialsFound ? '✅' : '❌'}`);
+    console.log(`   Config Hash: ${validationResults.configHash?.substring(0, 12)}...`);
+    console.log(`   Config Version: ${configMetadata.version}`);
+    console.log(`   Total Aliases: ${configMetadata.totalAliases}`);
+    
+    console.log('\n🔐 Resilience Metrics:');
+    console.log(`   Total Calls: ${resilienceMetrics.totalCalls}`);
+    console.log(`   Successful: ${resilienceMetrics.successfulCalls}`);
+    console.log(`   Failed: ${resilienceMetrics.failedCalls}`);
+    console.log(`   Retried: ${resilienceMetrics.retriedCalls}`);
+    console.log(`   Success Rate: ${resilienceMetrics.successRate}`);
+    console.log(`   Retry Rate: ${resilienceMetrics.retryRate}`);
+    
+    console.log('\n⏱️  Latency Percentiles:');
+    console.log(`   Mean: ${resilienceMetrics.latency.mean}ms`);
+    console.log(`   P50: ${resilienceMetrics.latency.p50}ms`);
+    console.log(`   P95: ${resilienceMetrics.latency.p95}ms`);
+    console.log(`   P99: ${resilienceMetrics.latency.p99}ms`);
+    console.log(`   Max: ${resilienceMetrics.latency.max}ms`);
+    
+    validationResults.latencyPercentiles = resilienceMetrics.latency;
+    
+    if (Object.keys(resilienceMetrics.errorsByType).length > 0) {
+        console.log('\n⚠️  Errors by Type:');
+        for (const [type, count] of Object.entries(resilienceMetrics.errorsByType)) {
+            console.log(`   ${type}: ${count}`);
+        }
+    }
     console.log(`   Provider: AWS Bedrock (provider=bedrock)`);
     
     console.log('\n🤖 Models Tested:');

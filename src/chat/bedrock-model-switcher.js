@@ -2,6 +2,7 @@
  * Bedrock Model Switch Command Handler
  * 
  * Provides /use command support for switching between Claude models on Bedrock
+ * Uses alias resolver for dynamic model configuration
  * 
  * Usage:
  *   /use claude-3-opus
@@ -9,26 +10,46 @@
  */
 
 const LLMProviderManager = require('./llm-provider-manager');
+const aliasResolver = require('../infra/bedrock/alias-resolver');
 
 class BedrockModelSwitcher {
     constructor() {
-        this.models = {
-            'claude-3-opus': {
-                modelId: 'anthropic.claude-3-opus-20240229-v1:0',
-                displayName: 'Claude 3 Opus',
-                capabilities: ['reasoning', 'complex-analysis', 'coding', 'vision'],
-                description: 'Best for complex reasoning and architectural analysis. Highest intelligence in Claude 3 family.',
-                pricing: { input: 0.015, output: 0.075 },
-                note: 'Claude 3 Opus is currently the highest-tier Claude model available on AWS Bedrock. Claude 4 Opus is not yet available as of January 2025.'
-            },
-            'claude-sonnet-4-5': {
-                modelId: 'anthropic.claude-sonnet-4-5-20250929-v1:0',
-                displayName: 'Claude Sonnet 4.5',
-                capabilities: ['coding', 'analysis', 'text-generation'],
-                description: 'Optimized for code generation and analysis',
-                pricing: { input: 0.003, output: 0.015 }
+        // Load models from alias resolver
+        this.models = {};
+        
+        try {
+            const aliases = aliasResolver.listAliases();
+            for (const alias of aliases) {
+                if (!alias.deprecated) {
+                    const metadata = aliasResolver.getMetadata(alias.alias);
+                    this.models[alias.alias] = {
+                        modelId: metadata.modelId,
+                        displayName: metadata.displayName,
+                        capabilities: metadata.capabilities,
+                        description: this.getDescription(alias.alias, metadata),
+                        pricing: metadata.pricing,
+                        note: metadata.notes
+                    };
+                }
             }
+        } catch (error) {
+            console.error('Failed to load models from alias resolver:', error.message);
+        }
+    }
+
+    /**
+     * Get description for model
+     */
+    getDescription(alias, metadata) {
+        const descriptions = {
+            'claude-3-opus': 'Best for complex reasoning and architectural analysis. Highest intelligence in Claude 3 family.',
+            'claude-sonnet-4-5': 'Optimized for code generation and analysis',
+            'claude-3-5-sonnet-v2': 'Latest Sonnet with enhanced capabilities',
+            'claude-3-5-haiku': 'Fast and efficient for simple tasks',
+            'deepseek-r1': 'Advanced reasoning model'
         };
+        
+        return descriptions[alias] || metadata.notes || `${metadata.displayName} model`;
     }
 
     /**
