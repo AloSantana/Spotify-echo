@@ -85,6 +85,9 @@ class BedrockProvider extends BaseProvider {
             
             await this.provider.initialize();
             
+            // Setup telemetry listeners for AI metrics integration
+            this.setupMetricsIntegration();
+            
             this.initialized = true;
             this.healthy = true;
             
@@ -106,6 +109,59 @@ class BedrockProvider extends BaseProvider {
             
             return { success: false, error: this.lastError, provider: 'bedrock' };
         }
+    }
+    
+    /**
+     * Setup AI metrics integration
+     */
+    setupMetricsIntegration() {
+        if (!this.provider) {
+            return;
+        }
+        
+        // Listen for telemetry events from underlying provider
+        this.provider.on('telemetry', (data) => {
+            try {
+                // Import AI metrics (lazy load to avoid circular dependencies)
+                const AIMetrics = require('../../metrics/ai-metrics');
+                const aiMetrics = new AIMetrics();
+                
+                // Record token usage
+                if (data.usage) {
+                    aiMetrics.recordTokenUsage('bedrock', data.model, 'input', data.usage.input_tokens || 0);
+                    aiMetrics.recordTokenUsage('bedrock', data.model, 'output', data.usage.output_tokens || 0);
+                }
+                
+                // Record cost
+                if (data.cost) {
+                    aiMetrics.recordCost('bedrock', data.model, data.cost);
+                }
+                
+                // Record latency/duration
+                if (data.latency) {
+                    aiMetrics.recordAIRequest('bedrock', data.model, 'completion', data.latency / 1000); // Convert to seconds
+                }
+                
+                // Record provider health
+                aiMetrics.recordProviderHealth('bedrock', data.model, true);
+                
+            } catch (error) {
+                console.warn('Failed to record AI metrics:', error.message);
+            }
+        });
+        
+        // Listen for prediction events
+        this.provider.on('prediction', (data) => {
+            if (data.success && data.latency) {
+                try {
+                    const AIMetrics = require('../../metrics/ai-metrics');
+                    const aiMetrics = new AIMetrics();
+                    aiMetrics.recordAIRequest('bedrock', data.model, 'prediction', data.latency / 1000);
+                } catch (error) {
+                    console.warn('Failed to record prediction metrics:', error.message);
+                }
+            }
+        });
     }
     
     /**
