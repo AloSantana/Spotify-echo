@@ -1,0 +1,273 @@
+name: AWS Bedrock Real Validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      strict_mode:
+        description: 'Enable strict validation (fail on any error)'
+        required: false
+        default: 'true'
+        type: boolean
+  push:
+    branches:
+      - main
+      - 'feature/bedrock-*'
+    paths:
+      - 'src/infra/BedrockInferenceProvider.js'
+      - 'src/chat/llm-providers/bedrock-provider.js'
+      - 'config/aws-bedrock-models.json'
+      - 'scripts/validate-bedrock-live.js'
+      - 'scripts/collect-bedrock-evidence.js'
+      - 'scripts/verify-bedrock-billing.js'
+  pull_request:
+    paths:
+      - 'src/infra/BedrockInferenceProvider.js'
+      - 'src/chat/llm-providers/bedrock-provider.js'
+      - 'config/aws-bedrock-models.json'
+
+env:
+  NODE_VERSION: '18'
+  AWS_REGION: 'us-east-1'
+  BEDROCK_ENABLED: 'true'
+
+jobs:
+  bedrock-validation:
+    name: Bedrock Real Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: |
+          npm ci
+          npm install --no-save @aws-sdk/client-sts @aws-sdk/client-bedrock @aws-sdk/client-bedrock-runtime @aws-sdk/client-cloudwatch
+
+      - name: 🔐 Verify AWS Credentials
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+            echo "❌ AWS credentials not configured in repository secrets"
+            echo "Please add AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY to repository secrets"
+            exit 1
+          fi
+          echo "✅ AWS credentials found"
+
+      - name: 📸 Capture AWS Identity
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+        run: |
+          echo "🔐 Capturing AWS identity..."
+          node -e "
+            const { STSClient, GetCallerIdentityCommand } = require('@aws-sdk/client-sts');
+            const client = new STSClient({ region: process.env.AWS_REGION });
+            client.send(new GetCallerIdentityCommand({}))
+              .then(resp => {
+                console.log('✅ AWS Account:', resp.Account);
+                console.log('✅ ARN:', resp.Arn);
+              })
+              .catch(err => {
+                console.error('❌ Failed to get identity:', err.message);
+                process.exit(1);
+              });
+          "
+
+      - name: 📦 List Available Bedrock Models
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+        run: |
+          echo "📦 Listing Bedrock models..."
+          node -e "
+            const { BedrockClient, ListFoundationModelsCommand } = require('@aws-sdk/client-bedrock');
+            const client = new BedrockClient({ region: process.env.AWS_REGION });
+            client.send(new ListFoundationModelsCommand({ byProvider: 'Anthropic' }))
+              .then(resp => {
+                console.log(\`✅ Found \${resp.modelSummaries.length} Anthropic models\`);
+                const claudeModels = resp.modelSummaries.filter(m => 
+                  m.modelId.includes('claude-4') || m.modelId.includes('opus-4') || m.modelId.includes('sonnet-4')
+                );
+                claudeModels.forEach(m => console.log(\`   - \${m.modelName}: \${m.modelId}\`));
+              })
+              .catch(err => {
+                console.error('❌ Failed to list models:', err.message);
+                process.exit(1);
+              });
+          "
+
+      - name: 🧪 Run Bedrock Live Validation (Sonnet 4.5)
+        id: validate-sonnet
+        continue-on-error: true
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+          BEDROCK_ENABLED: ${{ env.BEDROCK_ENABLED }}
+        run: |
+          echo "🧪 Testing Claude Sonnet 4.5..."
+          if [ "${{ github.event.inputs.strict_mode }}" = "true" ] || [ "${{ github.event_name }}" = "push" ]; then
+            node scripts/validate-bedrock-live.js --strict
+          else
+            node scripts/validate-bedrock-live.js
+          fi
+
+      - name: 📊 Collect Bedrock Evidence
+        if: always()
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+        run: |
+          echo "📊 Collecting comprehensive evidence..."
+          node scripts/collect-bedrock-evidence.js
+
+      - name: 📈 Verify CloudWatch Metrics (Best Effort)
+        if: always()
+        continue-on-error: true
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+        run: |
+          echo "📈 Checking CloudWatch metrics..."
+          echo "ℹ️  Note: Metrics may have 15-30 minute delay"
+          node scripts/verify-bedrock-billing.js || echo "⚠️  Metrics not yet available (normal for new accounts)"
+
+      - name: 📤 Upload Evidence Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bedrock-validation-evidence
+          path: |
+            logs/bedrock/**/*.json
+            reports/*.json
+          retention-days: 30
+
+      - name: 📋 Generate Validation Summary
+        if: always()
+        run: |
+          echo "# AWS Bedrock Validation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Validation Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "reports/bedrock-invocation-summary.json" ]; then
+            echo "### Invocation Summary" >> $GITHUB_STEP_SUMMARY
+            node -e "
+              const fs = require('fs');
+              const data = JSON.parse(fs.readFileSync('reports/bedrock-invocation-summary.json', 'utf-8'));
+              console.log(\`- **Total Models Tested:** \${data.models.length}\`);
+              console.log(\`- **Successful:** \${data.models.filter(m => m.success).length}\`);
+              console.log(\`- **Failed:** \${data.models.filter(m => !m.success).length}\`);
+              console.log(\`- **Total Cost:** \$\${data.totalCost.toFixed(6)} USD\`);
+              console.log('');
+              console.log('### Models Tested');
+              data.models.forEach(m => {
+                const status = m.success ? '✅' : '❌';
+                console.log(\`- \${status} **\${m.displayName}** (\${m.model})\`);
+                if (m.success) {
+                  console.log(\`  - Latency: \${m.latency}ms\`);
+                  console.log(\`  - Tokens: \${m.usage.input_tokens} input, \${m.usage.output_tokens} output\`);
+                  console.log(\`  - Cost: \$\${m.cost.toFixed(6)}\`);
+                }
+              });
+            " >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ -f "reports/bedrock-evidence-complete.json" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Evidence Validation" >> $GITHUB_STEP_SUMMARY
+            node -e "
+              const fs = require('fs');
+              const data = JSON.parse(fs.readFileSync('reports/bedrock-evidence-complete.json', 'utf-8'));
+              const v = data.validation;
+              console.log(\`- AWS Identity: \${v.hasIdentity ? '✅' : '❌'}\`);
+              console.log(\`- Models Available: \${v.hasModels ? '✅' : '❌'}\`);
+              console.log(\`- Invocations Found: \${v.hasInvocations ? '✅' : '❌'}\`);
+              console.log(\`- Has Request IDs: \${v.hasRequestIds ? '✅' : '❌'}\`);
+              console.log(\`- No Placeholders: \${!v.hasPlaceholders ? '✅' : '❌'}\`);
+              console.log('');
+              console.log(\`**Overall Valid:** \${v.isValid ? '✅ PASS' : '❌ FAIL'}\`);
+            " >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: ✅ Check Validation Status
+        if: always()
+        run: |
+          if [ -f "reports/bedrock-evidence-complete.json" ]; then
+            IS_VALID=$(node -e "
+              const fs = require('fs');
+              const data = JSON.parse(fs.readFileSync('reports/bedrock-evidence-complete.json', 'utf-8'));
+              console.log(data.validation.isValid ? 'true' : 'false');
+            ")
+            
+            if [ "$IS_VALID" = "false" ]; then
+              echo "❌ Validation failed - evidence is not valid"
+              exit 1
+            fi
+          fi
+          
+          if [ "${{ steps.validate-sonnet.outcome }}" = "failure" ]; then
+            echo "❌ Live validation failed"
+            exit 1
+          fi
+          
+          echo "✅ All validation checks passed"
+
+  # Post-validation report
+  validation-report:
+    name: Generate Validation Report
+    runs-on: ubuntu-latest
+    needs: bedrock-validation
+    if: always()
+    
+    steps:
+      - name: 📥 Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: bedrock-validation-evidence
+          path: evidence/
+
+      - name: 📋 Create Report Comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let comment = '# 🔍 AWS Bedrock Validation Report\n\n';
+            
+            try {
+              const summary = JSON.parse(fs.readFileSync('evidence/reports/bedrock-invocation-summary.json', 'utf-8'));
+              comment += '## Invocation Results\n\n';
+              comment += `- **Total Models Tested:** ${summary.models.length}\n`;
+              comment += `- **Successful:** ${summary.models.filter(m => m.success).length}\n`;
+              comment += `- **Failed:** ${summary.models.filter(m => !m.success).length}\n`;
+              comment += `- **Total Cost:** $${summary.totalCost.toFixed(6)} USD\n\n`;
+              
+              comment += '## Evidence Artifacts\n\n';
+              comment += '✅ Validation artifacts uploaded and available for review\n';
+              comment += '- Invocation logs: `logs/bedrock/invocations/`\n';
+              comment += '- Summary reports: `reports/`\n';
+            } catch (error) {
+              comment += '⚠️ Unable to parse validation results\n';
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
