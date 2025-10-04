@@ -120,6 +120,7 @@
     "bedrock:validate:strict": "node scripts/validate-bedrock-live.js --strict",
     "bedrock:collect-evidence": "node scripts/collect-bedrock-evidence.js",
     "bedrock:verify-billing": "node scripts/verify-bedrock-billing.js",
+    "bedrock:model-switch": "node scripts/demo-bedrock-model-switcher.js",
     "test:env-validation": "npx playwright test tests/e2e/env-validation.spec.ts",
     "test:database": "npx playwright test tests/e2e/database-persistence.spec.ts",
     "test:chat": "npx playwright test tests/e2e/chat-interaction.spec.ts",
