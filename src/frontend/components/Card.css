@@ -1,0 +1,198 @@
+/**
+ * @ai-generated AWS Bedrock Claude Sonnet 4.5 (anthropic.claude-sonnet-4-20250514-v1:0)
+ * @region us-east-1
+ * @purpose Accessible Card component styles with WCAG 2.1 AA compliance
+ */
+
+.enhanced-card {
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: all 0.2s ease-in-out;
+}
+
+.enhanced-card--full-width {
+  width: 100%;
+}
+
+/* Variants */
+.enhanced-card--flat {
+  box-shadow: none;
+  border: 1px solid #e5e5e5;
+}
+
+.enhanced-card--elevated {
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.enhanced-card--elevated:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.enhanced-card--outlined {
+  box-shadow: none;
+  border: 2px solid #d4d4d4;
+}
+
+/* Interactive card */
+.enhanced-card--interactive {
+  cursor: pointer;
+  user-select: none;
+}
+
+.enhanced-card--interactive:hover {
+  transform: translateY(-2px);
+}
+
+.enhanced-card--interactive:active {
+  transform: translateY(0);
+}
+
+/* Focus state - WCAG 2.1 AA compliant */
+.enhanced-card--interactive:focus-visible {
+  outline: 2px solid #0ea5e9;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
+}
+
+/* Card sections */
+.enhanced-card__header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.enhanced-card__content {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+.enhanced-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e5e5;
+}
+
+.enhanced-card__actions--left {
+  justify-content: flex-start;
+}
+
+.enhanced-card__actions--center {
+  justify-content: center;
+}
+
+.enhanced-card__actions--right {
+  justify-content: flex-end;
+}
+
+.enhanced-card__actions--space-between {
+  justify-content: space-between;
+}
+
+/* Media section */
+.enhanced-card__media {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background-color: #f5f5f5;
+}
+
+.enhanced-card__media img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Compact variant (no padding on content) */
+.enhanced-card--compact .enhanced-card__content {
+  padding: 1rem;
+}
+
+.enhanced-card--compact .enhanced-card__header {
+  padding: 1rem;
+}
+
+.enhanced-card--compact .enhanced-card__actions {
+  padding: 0.75rem 1rem;
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .enhanced-card {
+    background-color: #262626;
+  }
+
+  .enhanced-card--flat {
+    border-color: #404040;
+  }
+
+  .enhanced-card--outlined {
+    border-color: #525252;
+  }
+
+  .enhanced-card__header {
+    border-bottom-color: #404040;
+  }
+
+  .enhanced-card__actions {
+    border-top-color: #404040;
+  }
+
+  .enhanced-card__media {
+    background-color: #171717;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .enhanced-card {
+    border: 2px solid currentColor;
+  }
+
+  .enhanced-card--interactive:focus-visible {
+    outline-width: 3px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .enhanced-card {
+    transition: none;
+  }
+
+  .enhanced-card--interactive:hover {
+    transform: none;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .enhanced-card__header {
+    padding: 1rem;
+  }
+
+  .enhanced-card__content {
+    padding: 1rem;
+  }
+
+  .enhanced-card__actions {
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+  }
+}
+
+/* Print styles */
+@media print {
+  .enhanced-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #d4d4d4;
+  }
+
+  .enhanced-card__actions {
+    display: none;
+  }
+}
