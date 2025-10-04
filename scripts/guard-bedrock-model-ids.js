@@ -20,7 +20,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const { glob } = require('glob');
 
 // Pattern to detect hardcoded Bedrock model IDs
 const MODEL_ID_PATTERNS = [
@@ -34,25 +33,55 @@ const MODEL_ID_PATTERNS = [
 
 // Files/directories to exclude
 const EXCLUDE_PATTERNS = [
-  '**/node_modules/**',
-  '**/dist/**',
-  '**/build/**',
-  '**/.git/**',
-  '**/test-artifacts/**',
-  '**/validation-reports/**',
-  '**/config/bedrock-aliases.json',  // Alias config is allowed to have model IDs
-  '**/config/aws-bedrock-models.json',  // Legacy config (will be migrated)
-  '**/BEDROCK_*.md',  // Documentation files
-  '**/scripts/guard-bedrock-model-ids.js'  // This file
+  'node_modules',
+  'dist',
+  'build',
+  '.git',
+  'test-artifacts',
+  'validation-reports',
+  'bedrock-aliases.json',
+  'aws-bedrock-models.json',
+  'BEDROCK_',
+  'guard-bedrock-model-ids.js'
 ];
 
-// Files to scan
-const INCLUDE_PATTERNS = [
-  '**/*.js',
-  '**/*.ts',
-  '**/*.json',
-  '**/*.md'
-];
+// File extensions to scan
+const INCLUDE_EXTENSIONS = ['.js', '.ts', '.json', '.md'];
+
+/**
+ * Check if path should be excluded
+ */
+function shouldExclude(filePath) {
+  return EXCLUDE_PATTERNS.some(pattern => filePath.includes(pattern));
+}
+
+/**
+ * Recursively find files to scan
+ */
+function findFiles(dir, fileList = []) {
+  const files = fs.readdirSync(dir);
+  
+  for (const file of files) {
+    const filePath = path.join(dir, file);
+    
+    if (shouldExclude(filePath)) {
+      continue;
+    }
+    
+    const stat = fs.statSync(filePath);
+    
+    if (stat.isDirectory()) {
+      findFiles(filePath, fileList);
+    } else {
+      const ext = path.extname(file);
+      if (INCLUDE_EXTENSIONS.includes(ext)) {
+        fileList.push(filePath);
+      }
+    }
+  }
+  
+  return fileList;
+}
 
 class ModelIdGuard {
   constructor(options = {}) {
@@ -106,11 +135,8 @@ class ModelIdGuard {
   async scan() {
     console.log('🔍 Scanning codebase for hardcoded Bedrock model IDs...\n');
     
-    const files = await glob(INCLUDE_PATTERNS, {
-      ignore: EXCLUDE_PATTERNS,
-      absolute: true,
-      cwd: path.join(__dirname, '..')
-    });
+    const rootDir = path.join(__dirname, '..');
+    const files = findFiles(rootDir);
     
     if (this.options.verbose) {
       console.log(`Found ${files.length} files to scan\n`);
