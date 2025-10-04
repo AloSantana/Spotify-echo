@@ -27,6 +27,7 @@ class AliasResolver {
     this.configHash = null;
     this.lastLoadTime = null;
     this.cache = new Map();
+    this.warnedAliases = new Set(); // Warning deduplication for cycle detection
   }
 
   /**
@@ -63,7 +64,7 @@ class AliasResolver {
   }
 
   /**
-   * Resolve alias to model configuration
+   * Resolve alias to model configuration with cycle detection (ITERATIVE - no recursion)
    * @param {string} alias - Model alias (e.g., 'claude-3-opus')
    * @param {Object} options - Resolution options
    * @returns {Object} Model configuration with resolved modelId
@@ -71,35 +72,85 @@ class AliasResolver {
   resolve(alias, options = {}) {
     const { allowDeprecated = false, warnDeprecated = true } = options;
     
+    if (typeof alias !== 'string' || !alias.trim()) {
+      throw new Error('Alias must be a non-empty string');
+    }
+    
+    const originalAlias = alias;
+    const cacheKey = `${originalAlias}:${allowDeprecated}`;
+    
     // Check cache first
-    const cacheKey = `${alias}:${allowDeprecated}`;
     if (this.cache.has(cacheKey)) {
       return this.cache.get(cacheKey);
     }
-
+    
     const config = this.getConfig();
-
-    // Check if alias is in legacy mappings
-    if (config.legacyMappings && config.legacyMappings[alias]) {
-      const mappedAlias = config.legacyMappings[alias];
-      console.warn(`⚠️  Legacy alias '${alias}' mapped to '${mappedAlias}'`);
-      return this.resolve(mappedAlias, options);
+    const visited = new Set();
+    const chain = [];
+    let current = alias;
+    let depth = 0;
+    const MAX_DEPTH = 50;
+    
+    // ITERATIVE legacy remapping resolution with cycle detection
+    while (true) {
+      // Cycle detection
+      if (visited.has(current)) {
+        chain.push(current);
+        const loop = [...chain.slice(chain.indexOf(current)), current];
+        if (!this.warnedAliases.has(originalAlias)) {
+          console.error(`⚠️ [ALIAS-RESOLVER] Cycle detected: ${loop.join(' -> ')}`);
+          this.warnedAliases.add(originalAlias);
+        }
+        throw new Error(
+          `Legacy alias cycle detected: ${loop.join(' -> ')}. ` +
+          `Please fix the 'legacyMappings' in bedrock-aliases.json`
+        );
+      }
+      
+      visited.add(current);
+      chain.push(current);
+      
+      // Depth protection
+      if (depth++ > MAX_DEPTH) {
+        throw new Error(
+          `Maximum alias resolution depth (${MAX_DEPTH}) exceeded for '${originalAlias}'. ` +
+          `Chain: ${chain.join(' -> ')}`
+        );
+      }
+      
+      // Check for legacy mapping and continue iteration
+      if (config.legacyMappings && Object.prototype.hasOwnProperty.call(config.legacyMappings, current)) {
+        const target = config.legacyMappings[current];
+        
+        // Self-mapping check: treat as terminal (already canonical)
+        if (target === current) {
+          // Identity mapping indicates this is already canonical - stop iterating
+          break;
+        }
+        
+        console.warn(`⚠️  Legacy alias '${current}' mapped to '${target}'`);
+        current = target;
+        continue; // Continue iteration with new target
+      }
+      
+      // No more legacy mappings, break to check deprecated/active aliases
+      break;
     }
-
-    // Check deprecated aliases first
-    if (config.deprecatedAliases && config.deprecatedAliases[alias]) {
-      const deprecated = config.deprecatedAliases[alias];
+    
+    // Now check deprecated aliases
+    if (config.deprecatedAliases && config.deprecatedAliases[current]) {
+      const deprecated = config.deprecatedAliases[current];
       
       if (!allowDeprecated) {
         throw new Error(
-          `Model alias '${alias}' is deprecated. ${deprecated.deprecationNote} ` +
+          `Model alias '${current}' is deprecated. ${deprecated.deprecationNote} ` +
           `Use '${deprecated.replacement}' instead.`
         );
       }
       
       if (warnDeprecated) {
         console.warn(
-          `⚠️  DEPRECATED: '${alias}' - ${deprecated.deprecationNote} ` +
+          `⚠️  DEPRECATED: '${current}' - ${deprecated.deprecationNote} ` +
           `Use '${deprecated.replacement}' instead.`
         );
       }
@@ -115,14 +166,15 @@ class AliasResolver {
       this.cache.set(cacheKey, result);
       return result;
     }
-
+    
     // Check active aliases
-    if (config.aliases && config.aliases[alias]) {
-      const modelConfig = config.aliases[alias];
+    if (config.aliases && config.aliases[current]) {
+      const modelConfig = config.aliases[current];
       
       const result = {
         ...modelConfig,
-        alias,
+        alias: current,
+        originalAlias: originalAlias,
         resolved: true,
         deprecated: false
       };
@@ -130,10 +182,10 @@ class AliasResolver {
       this.cache.set(cacheKey, result);
       return result;
     }
-
+    
     // Alias not found
     throw new Error(
-      `Unknown model alias: '${alias}'. ` +
+      `Unknown model alias: '${current}' (resolved from '${originalAlias}'). ` +
       `Available aliases: ${Object.keys(config.aliases || {}).join(', ')}`
     );
   }

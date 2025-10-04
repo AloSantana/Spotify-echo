@@ -82,7 +82,7 @@ class PreflightCheck {
             }
             
             // Check specific models
-            const requiredModels = ['claude-sonnet-4-5', 'claude-opus-4-1'];
+            const requiredModels = ['claude-sonnet-4-5', 'claude-3-opus'];
             let allModelsPresent = true;
             
             requiredModels.forEach(modelKey => {

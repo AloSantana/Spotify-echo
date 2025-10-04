@@ -207,7 +207,7 @@
       "replacement": "claude-3-5-haiku",
       "deprecationNote": "Claude Instant is deprecated. Use Claude 3 Haiku or 3.5 Haiku for fast responses."
     },
-    "claude-opus-4-1": {
+    "claude-3-opus": {
       "modelId": "INVALID_SPECULATIVE_ID",
       "displayName": "Claude Opus 4.1 (Non-existent)",
       "provider": "anthropic",
@@ -219,7 +219,7 @@
     }
   },
   "legacyMappings": {
-    "claude-opus-4-1": "claude-3-opus",
+    "claude-3-opus": "claude-3-opus",
     "claude-4-opus": "claude-3-opus",
     "claude-opus": "claude-3-opus",
     "claude-sonnet": "claude-3-5-sonnet-v2",

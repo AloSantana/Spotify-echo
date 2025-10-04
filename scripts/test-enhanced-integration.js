@@ -215,7 +215,7 @@ async function testClaudeOpusEnhancements() {
         const VertexAnthropicProvider = require('../src/chat/llm-providers/vertex-anthropic-provider');
         const provider = new VertexAnthropicProvider({
           projectId: 'test-project',
-          model: 'claude-opus-4-1'
+          model: 'claude-3-opus'
         });
         
         const capabilities = provider.getCapabilities();
@@ -229,7 +229,7 @@ async function testClaudeOpusEnhancements() {
         const VertexAnthropicProvider = require('../src/chat/llm-providers/vertex-anthropic-provider');
         const provider = new VertexAnthropicProvider({
           projectId: 'test-project',
-          model: 'claude-opus-4-1'
+          model: 'claude-3-opus'
         });
         
         const budget = provider.getExtendedThinkingBudget({ extendedThinkingBudget: 5000 });
@@ -242,7 +242,7 @@ async function testClaudeOpusEnhancements() {
         const VertexAnthropicProvider = require('../src/chat/llm-providers/vertex-anthropic-provider');
         const provider = new VertexAnthropicProvider({
           projectId: 'test-project',
-          model: 'claude-opus-4-1'
+          model: 'claude-3-opus'
         });
         
         const prompt = provider.buildExtendedThinkingPrompt({ taskType: 'deep-reasoning' });
@@ -257,11 +257,11 @@ async function testClaudeOpusEnhancements() {
         const VertexAnthropicProvider = require('../src/chat/llm-providers/vertex-anthropic-provider');
         const provider = new VertexAnthropicProvider({
           projectId: 'test-project',
-          model: 'claude-opus-4-1'
+          model: 'claude-3-opus'
         });
         
         const content = '<thinking>This is internal reasoning.</thinking>Here is the final answer.';
-        const result = provider.extractThinkingTokens(content, 'claude-opus-4-1');
+        const result = provider.extractThinkingTokens(content, 'claude-3-opus');
         
         return result.count > 0 && 
                result.cleanedContent === 'Here is the final answer.' &&

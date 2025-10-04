@@ -27,7 +27,7 @@ class BedrockIntegrationTests {
   constructor(options = {}) {
     this.options = {
       region: options.region || process.env.AWS_REGION || 'us-east-1',
-      specificModels: options.specificModels || ['claude-sonnet-4-5', 'claude-opus-4-1'],
+      specificModels: options.specificModels || ['claude-sonnet-4-5', 'claude-3-opus'],
       maxRetries: options.maxRetries || 3
     };
 
@@ -487,7 +487,7 @@ USAGE:
 
 OPTIONS:
   --models <model1,model2>   Comma-separated model keys to test
-                             (default: claude-sonnet-4-5,claude-opus-4-1)
+                             (default: claude-sonnet-4-5,claude-3-opus)
   --region <region>          AWS region (default: us-east-1)
   --help                     Show this help message
 

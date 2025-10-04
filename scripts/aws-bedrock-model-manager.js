@@ -32,7 +32,7 @@ class BedrockModelManager {
     this.currentModel = null;
     this.defaultModels = {
       coding: 'claude-sonnet-4-5',
-      analysis: 'claude-opus-4-1',
+      analysis: 'claude-3-opus',
       reasoning: 'deepseek-r1'
     };
     
@@ -188,7 +188,7 @@ class BedrockModelManager {
     if (args.length === 0) {
       return {
         success: false,
-        message: 'Usage: /use <model-key>\nExample: /use claude-opus-4-1'
+        message: 'Usage: /use <model-key>\nExample: /use claude-3-opus'
       };
     }
 
@@ -351,7 +351,7 @@ class BedrockModelManager {
     console.log('');
     console.log('Model Selection:');
     console.log('  /use <model-key>          Switch to a specific model');
-    console.log('  /use claude-opus-4-1      Switch to Claude Opus 4.1');
+    console.log('  /use claude-3-opus      Switch to Claude Opus 4.1');
     console.log('  /use claude-sonnet-4-5    Switch to Claude Sonnet 4.5');
     console.log('  /use deepseek-r1          Switch to DeepSeek R1');
     console.log('');
@@ -362,7 +362,7 @@ class BedrockModelManager {
     console.log('  /model help               Show this help message');
     console.log('');
     console.log('Quick Switches:');
-    console.log('  /use claude-opus-4-1      → Complex analysis & architecture');
+    console.log('  /use claude-3-opus      → Complex analysis & architecture');
     console.log('  /use claude-sonnet-4-5    → Code generation (default)');
     console.log('  /use claude-3-5-sonnet-v2 → Multimodal with vision');
     console.log('  /use deepseek-r1          → Reasoning & problem solving');

@@ -12,23 +12,14 @@ on:
     branches:
       - main
       - 'feature/bedrock-*'
-    paths:
-      - 'src/infra/BedrockInferenceProvider.js'
-      - 'src/chat/llm-providers/bedrock-provider.js'
-      - 'config/aws-bedrock-models.json'
-      - 'scripts/validate-bedrock-live.js'
-      - 'scripts/collect-bedrock-evidence.js'
-      - 'scripts/verify-bedrock-billing.js'
+      - 'copilot/**'
   pull_request:
-    paths:
-      - 'src/infra/BedrockInferenceProvider.js'
-      - 'src/chat/llm-providers/bedrock-provider.js'
-      - 'config/aws-bedrock-models.json'
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '20'
   AWS_REGION: 'us-east-1'
   BEDROCK_ENABLED: 'true'
+  PUPPETEER_SKIP_DOWNLOAD: '1'
 
 jobs:
   bedrock-validation:
@@ -47,9 +38,51 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Install dependencies
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: '1'
         run: |
-          npm ci
+          echo "📦 Installing dependencies with Node $(node --version)..."
+          npm ci --prefer-offline --no-audit || {
+            echo "⚠️  npm ci failed, attempting npm install..."
+            npm install --prefer-offline --no-audit
+          }
+          
+          echo "✅ Base dependencies installed"
+          
+          echo "📦 Installing critical AWS SDK packages..."
           npm install --no-save @aws-sdk/client-sts @aws-sdk/client-bedrock @aws-sdk/client-bedrock-runtime @aws-sdk/client-cloudwatch
+          
+          echo "✅ AWS SDK packages installed"
+          
+          echo "🔍 Verifying critical modules..."
+          node -e "
+            const modules = [
+              '@aws-sdk/client-sts',
+              '@aws-sdk/client-bedrock',
+              '@aws-sdk/client-bedrock-runtime',
+              '@aws-sdk/client-cloudwatch'
+            ];
+            let missing = [];
+            modules.forEach(mod => {
+              try {
+                require.resolve(mod);
+                console.log('✅', mod);
+              } catch (e) {
+                console.error('❌', mod, 'NOT FOUND');
+                missing.push(mod);
+              }
+            });
+            if (missing.length > 0) {
+              console.error('\\n❌ Missing modules:', missing.join(', '));
+              process.exit(1);
+            }
+            console.log('\\n✅ All critical modules verified');
+          "
+
+      - name: 📁 Create required directories
+        run: |
+          mkdir -p reports logs/bedrock/invocations
+          echo "✅ Directories created"
 
       - name: 🔐 Verify AWS Credentials
         env:
@@ -154,7 +187,28 @@ jobs:
           path: |
             logs/bedrock/**/*.json
             reports/*.json
+            npm-debug.log*
+            .npm/_logs/*
           retention-days: 30
+
+      - name: 📋 Create Fallback Artifacts
+        if: failure()
+        run: |
+          echo "⚠️  Creating fallback artifacts due to workflow failure..."
+          mkdir -p reports
+          
+          cat > reports/bedrock-install-failure.json << EOF
+          {
+            "status": "INSTALL_FAILURE",
+            "timestamp": "$(date -Iseconds)",
+            "nodeVersion": "$(node --version)",
+            "npmVersion": "$(npm --version)",
+            "error": "Workflow failed before Bedrock validation could complete",
+            "reason": "Check npm install logs and module verification step for details"
+          }
+          EOF
+          
+          echo "✅ Fallback artifact created: reports/bedrock-install-failure.json"
 
       - name: 📋 Generate Validation Summary
         if: always()
@@ -207,25 +261,89 @@ jobs:
       - name: ✅ Check Validation Status
         if: always()
         run: |
-          if [ -f "reports/bedrock-evidence-complete.json" ]; then
-            IS_VALID=$(node -e "
-              const fs = require('fs');
-              const data = JSON.parse(fs.readFileSync('reports/bedrock-evidence-complete.json', 'utf-8'));
-              console.log(data.validation.isValid ? 'true' : 'false');
-            ")
+          echo "🔍 Running post-validation assertions..."
+          
+          # Check if evidence file exists
+          if [ ! -f "reports/bedrock-evidence-complete.json" ]; then
+            echo "⚠️  Evidence file missing: reports/bedrock-evidence-complete.json"
             
-            if [ "$IS_VALID" = "false" ]; then
-              echo "❌ Validation failed - evidence is not valid"
+            # Check if it's an install failure
+            if [ -f "reports/bedrock-install-failure.json" ]; then
+              echo "❌ INSTALL_FAILURE detected - dependencies failed to install"
+              cat reports/bedrock-install-failure.json
               exit 1
             fi
+            
+            echo "❌ Evidence file missing but no install failure marker found"
+            exit 1
           fi
           
+          # Check if invocation summary exists
+          if [ ! -f "reports/bedrock-invocation-summary.json" ]; then
+            echo "⚠️  Invocation summary missing: reports/bedrock-invocation-summary.json"
+            echo "   This may indicate validation script failed before completion"
+            exit 1
+          fi
+          
+          # Validate evidence file
+          IS_VALID=$(node -e "
+            const fs = require('fs');
+            try {
+              const data = JSON.parse(fs.readFileSync('reports/bedrock-evidence-complete.json', 'utf-8'));
+              console.log(data.validation && data.validation.isValid ? 'true' : 'false');
+            } catch (e) {
+              console.log('false');
+            }
+          ")
+          
+          if [ "$IS_VALID" = "false" ]; then
+            echo "❌ Validation failed - evidence is not valid"
+            exit 1
+          fi
+          
+          # Check total cost is non-zero
+          TOTAL_COST=$(node -e "
+            const fs = require('fs');
+            try {
+              const data = JSON.parse(fs.readFileSync('reports/bedrock-invocation-summary.json', 'utf-8'));
+              console.log(data.totalCost || 0);
+            } catch (e) {
+              console.log('0');
+            }
+          ")
+          
+          if [ "$TOTAL_COST" = "0" ] || [ "$TOTAL_COST" = "0.000000" ]; then
+            echo "❌ Total cost is zero - no real invocations detected"
+            exit 1
+          fi
+          
+          echo "✅ Total cost: \$$TOTAL_COST (non-zero confirms real AWS usage)"
+          
+          # Check if models succeeded
+          SUCCESSFUL_MODELS=$(node -e "
+            const fs = require('fs');
+            try {
+              const data = JSON.parse(fs.readFileSync('reports/bedrock-invocation-summary.json', 'utf-8'));
+              console.log(data.models.filter(m => m.success).length);
+            } catch (e) {
+              console.log('0');
+            }
+          ")
+          
+          if [ "$SUCCESSFUL_MODELS" = "0" ]; then
+            echo "❌ No models succeeded - validation failed"
+            exit 1
+          fi
+          
+          echo "✅ Successful models: $SUCCESSFUL_MODELS"
+          
+          # Check if live validation step passed
           if [ "${{ steps.validate-sonnet.outcome }}" = "failure" ]; then
             echo "❌ Live validation failed"
             exit 1
           fi
           
-          echo "✅ All validation checks passed"
+          echo "✅ All post-validation assertions passed"
 
   # Post-validation report
   validation-report:

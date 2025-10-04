@@ -545,7 +545,7 @@ await integration.initialize();
 
 integration.displaySessionHeader();
 
-await integration.handleSlashCommand('/use claude-opus-4-1');
+await integration.handleSlashCommand('/use claude-3-opus');
 
 integration.trackInteraction({ total: 300 });
 

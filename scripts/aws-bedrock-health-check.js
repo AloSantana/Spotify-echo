@@ -288,7 +288,7 @@ EXAMPLES:
   node scripts/aws-bedrock-health-check.js
 
   # Test specific model
-  node scripts/aws-bedrock-health-check.js --model claude-opus-4-1
+  node scripts/aws-bedrock-health-check.js --model claude-3-opus
 
   # Test in different region
   node scripts/aws-bedrock-health-check.js --region us-west-2

@@ -289,7 +289,7 @@ class CostTracker {
   constructor(pricingConfig = {}) {
     // Default pricing per 1K tokens (as of Jan 2025)
     this.pricing = {
-      'claude-opus-4-1': { input: 0.015, output: 0.075 },
+      'claude-3-opus': { input: 0.015, output: 0.075 },
       'claude-sonnet-4-5': { input: 0.003, output: 0.015 },
       'claude-3-5-sonnet-v2': { input: 0.003, output: 0.015 },
       'claude-3-5-sonnet-v1': { input: 0.003, output: 0.015 },

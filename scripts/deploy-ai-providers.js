@@ -207,14 +207,14 @@ class MultiProviderDeployment {
       const vertexAnthropic = new VertexAnthropicProvider({
         projectId: process.env.GCP_PROJECT_ID,
         location: process.env.GCP_VERTEX_LOCATION || 'us-central1',
-        model: 'claude-opus-4-1'
+        model: 'claude-3-opus'
       });
 
       await vertexAnthropic.initialize();
       
       if (this.dryRun) {
         this.log('🔍 DRY RUN: Would test Claude Opus 4.1 via Vertex AI connection');
-        return { status: 'dry-run', model: 'claude-opus-4-1' };
+        return { status: 'dry-run', model: 'claude-3-opus' };
       }
 
       // Test with a simple prompt
@@ -227,7 +227,7 @@ class MultiProviderDeployment {
         this.log(`   Response: ${response.content.substring(0, 50)}...\n`);
         return { 
           status: 'success', 
-          model: 'claude-opus-4-1',
+          model: 'claude-3-opus',
           provider: 'vertex-anthropic',
           response: response.content.substring(0, 100)
         };

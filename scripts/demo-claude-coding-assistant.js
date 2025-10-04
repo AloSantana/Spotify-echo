@@ -19,7 +19,7 @@ const BedrockInferenceProvider = require('../src/infra/BedrockInferenceProvider'
 class ClaudeCodingAssistant {
     constructor() {
         this.provider = null;
-        this.model = 'claude-opus-4-1'; // Using Claude Opus 4.1 with inference profile ARN
+        this.model = 'claude-3-opus'; // Using Claude Opus 4.1 with inference profile ARN
     }
 
     async initialize() {
@@ -36,7 +36,7 @@ class ClaudeCodingAssistant {
             await this.provider.initialize();
             
             const models = this.provider.getAvailableModels();
-            const claudeOpus = models.find(m => m.key === 'claude-opus-4-1');
+            const claudeOpus = models.find(m => m.key === 'claude-3-opus');
             
             if (!claudeOpus) {
                 throw new Error('Claude Opus 4.1 not available');

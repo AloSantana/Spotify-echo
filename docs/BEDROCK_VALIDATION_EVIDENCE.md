@@ -100,7 +100,7 @@ node scripts/test-claude-opus-4.1-bedrock.js
 
 - [ ] **Inference Profile ARNs Used**
   - [ ] Claude Sonnet 4.5 uses: `arn:aws:bedrock:us-east-1:394686422207:inference-profile/global.anthropic.claude-sonnet-4-5-20250929-v1:0`
-  - [ ] Claude Opus 4.1 uses: `arn:aws:bedrock:us-east-1:394686422207:inference-profile/global.anthropic.claude-opus-4-1-20250805-v1:0`
+  - [ ] Claude Opus 4.1 uses: `arn:aws:bedrock:us-east-1:394686422207:inference-profile/global.anthropic.claude-3-opus-20250805-v1:0`
   - [ ] Logs show ARN usage, not direct model IDs
 
 - [ ] **Token Counts Tracked**
@@ -155,7 +155,7 @@ aws cloudwatch get-metric-statistics \
 aws cloudwatch get-metric-statistics \
   --namespace AWS/Bedrock \
   --metric-name InvocationCount \
-  --dimensions Name=InferenceProfileId,Value=global.anthropic.claude-opus-4-1-20250805-v1:0 \
+  --dimensions Name=InferenceProfileId,Value=global.anthropic.claude-3-opus-20250805-v1:0 \
   --start-time <REQUEST_TIMESTAMP> \
   --end-time <RESPONSE_TIMESTAMP> \
   --period 300 \
@@ -181,7 +181,7 @@ aws logs filter-log-events \
   --log-group-name /aws/bedrock/modelinvocations \
   --start-time <TIMESTAMP_MS> \
   --end-time <TIMESTAMP_MS> \
-  --filter-pattern "global.anthropic.claude-opus-4-1-20250805-v1:0" \
+  --filter-pattern "global.anthropic.claude-3-opus-20250805-v1:0" \
   --region us-east-1 \
   --limit 10
 ```
@@ -223,18 +223,18 @@ aws logs filter-log-events \
    💰 Cost Breakdown:
       Total: $0.000774 USD
 
-📡 Testing Claude Opus 4.1 (claude-opus-4-1)...
+📡 Testing Claude Opus 4.1 (claude-3-opus)...
    📋 Request Details:
-      Model ID: anthropic.claude-opus-4-1-20250805-v1:0
+      Model ID: anthropic.claude-3-opus-20250805-v1:0
       Requires Inference Profile: true
-      Inference Profile ARN: arn:aws:bedrock:us-east-1:394686422207:inference-profile/global.anthropic.claude-opus-4-1-20250805-v1:0
+      Inference Profile ARN: arn:aws:bedrock:us-east-1:394686422207:inference-profile/global.anthropic.claude-3-opus-20250805-v1:0
       Region: us-east-1
       Request Timestamp: 2025-01-15T14:30:02.000Z
 ✅ Response received in 2156ms
    📋 Response Details:
       Response Timestamp: 2025-01-15T14:30:04.156Z
       HTTP Status: 200 (Success)
-      Model Used: anthropic.claude-opus-4-1-20250805-v1:0
+      Model Used: anthropic.claude-3-opus-20250805-v1:0
    📊 Token Usage:
       Input Tokens: 24
       Output Tokens: 89

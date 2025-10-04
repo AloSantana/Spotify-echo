@@ -50,11 +50,11 @@ async function demo() {
 
     // Test 4: Switch to Claude Opus 4.1
     console.log('4️⃣  Switching to Claude Opus 4.1...');
-    console.log('Command: /use claude-opus-4-1');
+    console.log('Command: /use claude-3-opus');
     console.log('');
     
     try {
-        const switchResult2 = await bedrockModelSwitcher.processCommand('use', ['claude-opus-4-1']);
+        const switchResult2 = await bedrockModelSwitcher.processCommand('use', ['claude-3-opus']);
         console.log(bedrockModelSwitcher.formatResponse(switchResult2));
     } catch (error) {
         console.log(`Note: ${error.message}`);
