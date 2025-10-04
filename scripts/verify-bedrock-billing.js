@@ -6,12 +6,15 @@
  * Polls CloudWatch for Bedrock invocation metrics to verify actual usage.
  * Provides billing/cost signal corroboration.
  * 
+ * Enhanced with alias resolution for accurate cost attribution.
+ * 
  * Usage:
  *   node scripts/verify-bedrock-billing.js
  *   node scripts/verify-bedrock-billing.js --start-time 2025-01-15T10:00:00Z
  */
 
 const { CloudWatchClient, GetMetricStatisticsCommand } = require('@aws-sdk/client-cloudwatch');
+const aliasResolver = require('../src/infra/bedrock/alias-resolver');
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -37,17 +40,39 @@ class BedrockBillingVerifier {
             models: {}
         };
         
-        // Models to check
-        this.modelsToCheck = [
-            {
-                key: 'claude-sonnet-4-5',
-                modelId: 'anthropic.claude-sonnet-4-5-20250929-v1:0',
-                displayName: 'Claude Sonnet 4.5'
-            },
-            {
-                key: 'claude-opus-4-1',
-                modelId: 'anthropic.claude-opus-4-1-20250805-v1:0',
-                displayName: 'Claude Opus 4.1'
+        // Models to check - load from alias resolver
+        this.modelsToCheck = [];
+        
+        try {
+            const aliases = aliasResolver.listAliases();
+            for (const alias of aliases) {
+                if (!alias.deprecated) {
+                    const metadata = aliasResolver.getMetadata(alias.alias);
+                    this.modelsToCheck.push({
+                        key: alias.alias,
+                        modelId: metadata.modelId,
+                        displayName: metadata.displayName,
+                        pricing: metadata.pricing
+                    });
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to load models from alias resolver:', error.message);
+            // Fallback to default models
+            this.modelsToCheck = [
+                {
+                    key: 'claude-sonnet-4-5',
+                    modelId: 'anthropic.claude-sonnet-4-5-20250929-v1:0',
+                    displayName: 'Claude Sonnet 4.5'
+                },
+                {
+                    key: 'claude-3-opus',
+                    modelId: 'anthropic.claude-3-opus-20240229-v1:0',
+                    displayName: 'Claude 3 Opus'
+                }
+            ];
+        }
+    }
             }
         ];
     }
