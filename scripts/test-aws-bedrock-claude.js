@@ -33,7 +33,7 @@ class AWSBedrockClaudeTester {
 
     // Comprehensive model list including Claude 4.x, 3.5, and other models
     this.modelIds = [
-      'anthropic.claude-opus-4-1-20250805-v1:0',        // Claude Opus 4.1
+      'anthropic.claude-3-opus-20250805-v1:0',        // Claude Opus 4.1
       'anthropic.claude-sonnet-4-5-20250929-v1:0',      // Claude Sonnet 4.5
       'anthropic.claude-3-5-sonnet-v2-20240620-v1:0',   // Claude 3.5 Sonnet v2
       'anthropic.claude-3-5-sonnet-20240620-v1:0',      // Claude 3.5 Sonnet v1

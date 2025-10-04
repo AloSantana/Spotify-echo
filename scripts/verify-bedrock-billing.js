@@ -73,8 +73,44 @@ class BedrockBillingVerifier {
             ];
         }
     }
+    
+    /**
+     * Reconcile invocation logs with CloudWatch metrics
+     */
+    async reconcileWithInvocationLogs() {
+        console.log('\n🔄 Reconciling with invocation logs...');
+        
+        try {
+            const logsDir = path.join(__dirname, '..', 'logs', 'bedrock', 'invocations');
+            const files = await fs.readdir(logsDir).catch(() => []);
+            
+            let reconciledInvocations = 0;
+            let reconciledCost = 0;
+            
+            for (const file of files) {
+                if (file.endsWith('.json')) {
+                    const logData = JSON.parse(await fs.readFile(path.join(logsDir, file), 'utf-8'));
+                    if (logData.success) {
+                        reconciledInvocations++;
+                        reconciledCost += logData.cost || 0;
+                    }
+                }
             }
-        ];
+            
+            this.metrics.reconciliation = {
+                invocationLogsFound: reconciledInvocations,
+                costFromLogs: reconciledCost,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log(`   ✅ Found ${reconciledInvocations} invocations in logs`);
+            console.log(`   ✅ Total cost from logs: $${reconciledCost.toFixed(6)}`);
+            
+            return true;
+        } catch (error) {
+            console.error(`   ❌ Failed to reconcile logs: ${error.message}`);
+            return false;
+        }
     }
 
     /**
@@ -256,6 +292,9 @@ class BedrockBillingVerifier {
             const found = await this.queryModelMetrics(model);
             anyMetricsFound = anyMetricsFound || found;
         }
+        
+        // Reconcile with invocation logs
+        await this.reconcileWithInvocationLogs();
         
         await this.generateReport();
         

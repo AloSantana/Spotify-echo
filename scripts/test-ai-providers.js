@@ -75,7 +75,7 @@ class AIProviderTester {
       response = await provider.generateCompletion(messages, { 
         maxTokens: 200,
         temperature: 0.7,
-        model: 'claude-opus-4-1'
+        model: 'claude-3-opus'
       });
     } else {
       // For other providers, use the standard format

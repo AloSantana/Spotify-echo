@@ -88,7 +88,7 @@ aws bedrock list-foundation-models \
 
 **Expected Models:**
 - `anthropic.claude-sonnet-4-5-20250929-v1:0`
-- `anthropic.claude-opus-4-1-20250805-v1:0`
+- `anthropic.claude-3-opus-20250805-v1:0`
 
 **Script:** `scripts/collect-bedrock-evidence.js`
 
@@ -309,7 +309,7 @@ bedrock-validation-evidence/
 │   └── bedrock/
 │       └── invocations/
 │           ├── 2025-01-15T10-30-45-123Z-claude-sonnet-4-5.json
-│           └── 2025-01-15T10-32-15-456Z-claude-opus-4-1.json
+│           └── 2025-01-15T10-32-15-456Z-claude-3-opus.json
 └── reports/
     ├── aws-identity.json
     ├── bedrock-models.json
@@ -549,7 +549,7 @@ const response = await LLMProviderManager.sendMessage([
 // Force Bedrock provider
 const response = await LLMProviderManager.sendMessage(
   [{ role: 'user', content: 'Analyze this code...' }],
-  { provider: 'bedrock', model: 'claude-opus-4-1' }
+  { provider: 'bedrock', model: 'claude-3-opus' }
 );
 ```
 

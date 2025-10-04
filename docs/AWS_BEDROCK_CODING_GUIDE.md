@@ -162,7 +162,7 @@ const prompt = 'Write a function to validate email addresses in JavaScript';
 
 **Example:**
 ```javascript
-const modelKey = 'claude-opus-4-1';
+const modelKey = 'claude-3-opus';
 const prompt = 'Analyze this microservices architecture and suggest improvements';
 ```
 
@@ -533,12 +533,12 @@ class BedrockClient {
 ```javascript
 // ✅ Good: Use appropriate model for task
 const modelForTask = (task) => {
-  if (task.complexity === 'high') return 'claude-opus-4-1';
+  if (task.complexity === 'high') return 'claude-3-opus';
   return 'claude-sonnet-4-5';
 };
 
 // ❌ Bad: Always using expensive model
-const model = 'claude-opus-4-1'; // Overkill for simple tasks
+const model = 'claude-3-opus'; // Overkill for simple tasks
 ```
 
 ### 2. Context Management
@@ -772,7 +772,7 @@ ${codeToReview}
 Provide specific recommendations.
 `;
 
-const review = await invokeModel(prompt, 'claude-opus-4-1');
+const review = await invokeModel(prompt, 'claude-3-opus');
 ```
 
 ### Example 3: Test Generation

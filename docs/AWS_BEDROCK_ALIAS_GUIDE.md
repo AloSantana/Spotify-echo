@@ -100,13 +100,13 @@ const allModels = listAliases({ includeDeprecated: true });
 |-------|-------------|------------------|
 | `claude-v2-1` | `claude-3-sonnet` | Claude 2.1 is deprecated. Use Claude 3 or later. |
 | `claude-instant-v1` | `claude-3-5-haiku` | Use Claude 3 Haiku or 3.5 Haiku for fast responses. |
-| `claude-opus-4-1` | `claude-3-opus` | Claude 4 Opus does not exist in AWS Bedrock. |
+| `claude-3-opus` | `claude-3-opus` | Claude 4 Opus does not exist in AWS Bedrock. |
 
 ### Legacy Mappings
 
 For backward compatibility, these legacy aliases automatically map to current models:
 
-- `claude-opus-4-1` → `claude-3-opus`
+- `claude-3-opus` → `claude-3-opus`
 - `claude-4-opus` → `claude-3-opus`
 - `claude-opus` → `claude-3-opus`
 - `claude-sonnet` → `claude-3-5-sonnet-v2`

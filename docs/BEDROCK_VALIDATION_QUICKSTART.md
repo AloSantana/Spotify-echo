@@ -175,7 +175,7 @@ No Vertex AI dependencies
    - OutputTokens
 5. Filter by:
    - Dimension: InferenceProfileId
-   - Value: `global.anthropic.claude-sonnet-4-5-20250929-v1:0` or `global.anthropic.claude-opus-4-1-20250805-v1:0`
+   - Value: `global.anthropic.claude-sonnet-4-5-20250929-v1:0` or `global.anthropic.claude-3-opus-20250805-v1:0`
 
 ### CloudWatch Logs
 

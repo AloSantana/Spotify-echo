@@ -97,7 +97,7 @@ class ClaudeOpus41Test {
       const provider = new VertexAnthropicProvider({
         projectId: process.env.GCP_PROJECT_ID || 'test-project',
         location: process.env.GCP_VERTEX_LOCATION || 'us-central1',
-        model: 'claude-opus-4-1'
+        model: 'claude-3-opus'
       });
 
       // Test configuration validation
@@ -151,7 +151,7 @@ class ClaudeOpus41Test {
         { role: 'user', content: 'Hello! Please respond with "Claude Opus 4.1 via Vertex AI is working" and nothing else.' }
       ], { 
         maxTokens: 50,
-        model: 'claude-opus-4-1'
+        model: 'claude-3-opus'
       });
       const latency = Date.now() - startTime;
 
@@ -207,7 +207,7 @@ class ClaudeOpus41Test {
         { role: 'user', content: complexProblem }
       ], { 
         maxTokens: 1000,
-        model: 'claude-opus-4-1',
+        model: 'claude-3-opus',
         enableExtendedThinking: true
       });
 
@@ -262,7 +262,7 @@ class ClaudeOpus41Test {
         { role: 'user', content: codingTask }
       ], { 
         maxTokens: 1500,
-        model: 'claude-opus-4-1'
+        model: 'claude-3-opus'
       });
 
       if (!response || !response.content || !response.content.includes('function')) {
@@ -307,7 +307,7 @@ class ClaudeOpus41Test {
       
       this.log('✅ Deployment Integration: Claude Opus 4.1 included in pipeline');
       this.log(`   - Status: ${vertexAnthropicResult.status}`);
-      this.log(`   - Model: ${vertexAnthropicResult.model || 'claude-opus-4-1'}`);
+      this.log(`   - Model: ${vertexAnthropicResult.model || 'claude-3-opus'}`);
       
       this.results.deployment = { 
         status: 'success', 

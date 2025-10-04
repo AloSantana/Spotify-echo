@@ -125,10 +125,10 @@ if aws bedrock list-foundation-models --region us-east-1 --by-provider Anthropic
         print_result "WARN" "Claude Sonnet 4.5 not found in model list"
     fi
     
-    if jq -e '.[] | select(.modelId == "anthropic.claude-opus-4-1-20250805-v1:0")' reports/bedrock-models.json > /dev/null; then
-        print_result "PASS" "Claude Opus 4.1 available"
+    if jq -e '.[] | select(.modelId == "anthropic.claude-3-opus-20240229-v1:0")' reports/bedrock-models.json > /dev/null; then
+        print_result "PASS" "Claude 3 Opus available"
     else
-        print_result "WARN" "Claude Opus 4.1 not found in model list"
+        print_result "WARN" "Claude 3 Opus not found in model list"
     fi
 else
     print_result "FAIL" "Bedrock list-foundation-models failed"

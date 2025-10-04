@@ -36,7 +36,7 @@ class ClaudeOpus41BedrockTest {
       const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
       
       // Check if Claude Opus 4.1 is in the registry
-      const claudeOpusModel = config.modelRegistry['claude-opus-4-1'];
+      const claudeOpusModel = config.modelRegistry['claude-3-opus'];
       
       if (!claudeOpusModel) {
         throw new Error('Claude Opus 4.1 not found in model registry');
@@ -84,7 +84,7 @@ class ClaudeOpus41BedrockTest {
     try {
       const provider = new BedrockInferenceProvider({
         region: process.env.AWS_REGION || 'us-east-1',
-        defaultModel: 'claude-opus-4-1',
+        defaultModel: 'claude-3-opus',
         enableCaching: true,
         maxRetries: 3
       });
@@ -93,7 +93,7 @@ class ClaudeOpus41BedrockTest {
       
       // Check available models
       const availableModels = provider.getAvailableModels();
-      const claudeOpus = availableModels.find(m => m.key === 'claude-opus-4-1');
+      const claudeOpus = availableModels.find(m => m.key === 'claude-3-opus');
       
       if (!claudeOpus) {
         throw new Error('Claude Opus 4.1 not available in provider');
@@ -143,7 +143,7 @@ class ClaudeOpus41BedrockTest {
       const testPrompt = 'Hello! Please confirm you are Claude Opus 4.1 from AWS Bedrock. Respond with your model name and a brief description of your capabilities.';
       
       const startTime = Date.now();
-      const result = await provider.predict('claude-opus-4-1', testPrompt, {
+      const result = await provider.predict('claude-3-opus', testPrompt, {
         maxTokens: 200,
         temperature: 0.7
       });
@@ -192,13 +192,13 @@ class ClaudeOpus41BedrockTest {
       await provider.initialize();
 
       // Get the model config to verify inference profile ARN
-      const modelConfig = provider.models.get('claude-opus-4-1');
+      const modelConfig = provider.models.get('claude-3-opus');
       
       if (!modelConfig) {
         throw new Error('Claude Opus 4.1 not found in loaded models');
       }
 
-      const config = provider.config.modelConfig['claude-opus-4-1'];
+      const config = provider.config.modelConfig['claude-3-opus'];
       
       if (!config.requiresInferenceProfile) {
         throw new Error('Claude Opus 4.1 should require inference profile');
@@ -249,7 +249,7 @@ class ClaudeOpus41BedrockTest {
 
       const codingTask = `Write a simple JavaScript function that takes an array of music tracks with properties: name, artist, genre, energy_level (0-1), and returns the top 3 tracks sorted by energy level. Include JSDoc comments.`;
 
-      const result = await provider.predict('claude-opus-4-1', codingTask, {
+      const result = await provider.predict('claude-3-opus', codingTask, {
         maxTokens: 500,
         temperature: 0.3
       });
@@ -302,7 +302,7 @@ class ClaudeOpus41BedrockTest {
 
       const testPrompt = 'Count from 1 to 5.';
       
-      const result = await provider.predict('claude-opus-4-1', testPrompt, {
+      const result = await provider.predict('claude-3-opus', testPrompt, {
         maxTokens: 100
       });
 

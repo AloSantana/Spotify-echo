@@ -99,6 +99,68 @@ function validateCredentials() {
 }
 
 /**
+ * Validate request ID format (not placeholder)
+ */
+function validateRequestId(requestId) {
+    if (!requestId) return false;
+    
+    // Check for placeholder patterns
+    const placeholderPatterns = [
+        /bedrock-\d+-/,  // bedrock-{timestamp}-{model}
+        /req-\d+-/,      // req-{timestamp}-{hash}
+        /\[DEMO\]/,
+        /\[PLACEHOLDER\]/,
+        /\[MOCK\]/,
+        /example/i,
+        /test-request/i
+    ];
+    
+    for (const pattern of placeholderPatterns) {
+        if (pattern.test(requestId)) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+/**
+ * Validate latency is within reasonable bounds
+ */
+function validateLatency(latency, modelKey) {
+    // Warn if latency seems unrealistic
+    if (latency < 100) {
+        console.warn(`   ⚠️  WARNING: Latency ${latency}ms is suspiciously low (< 100ms). May indicate cached/mocked response.`);
+        return false;
+    }
+    
+    if (latency > 60000) {
+        console.warn(`   ⚠️  WARNING: Latency ${latency}ms is very high (> 60s). May indicate network issues.`);
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * Check for distinct request IDs (no duplicates)
+ */
+function checkDistinctRequestIds(results) {
+    const requestIds = results.models
+        .filter(m => m.success && m.requestId)
+        .map(m => m.requestId);
+    
+    const uniqueIds = new Set(requestIds);
+    
+    if (requestIds.length !== uniqueIds.size) {
+        console.warn(`   ⚠️  WARNING: Duplicate request IDs detected! This may indicate mocked data.`);
+        return false;
+    }
+    
+    return true;
+}
+
+/**
  * Calculate estimated cost based on token usage
  */
 function calculateCost(model, usage) {
@@ -107,7 +169,7 @@ function calculateCost(model, usage) {
             input: 0.003,  // per 1K tokens
             output: 0.015  // per 1K tokens
         },
-        'claude-opus-4-1': {
+        'claude-3-opus': {
             input: 0.015,   // per 1K tokens
             output: 0.075   // per 1K tokens
         }
@@ -231,22 +293,42 @@ async function testModel(provider, modelConfig) {
                 model: modelConfig.key,
                 displayName: modelConfig.displayName,
                 modelId: result.modelId || actualModelId,
-            actualModelId: actualModelId,
-            requiresInferenceProfile,
-            inferenceProfileArn: requiresInferenceProfile ? inferenceProfileArn : null,
-            region: VALIDATION_CONFIG.region,
-            success: true,
-            latency,
-            cached: result.cached,
-            usage: result.usage,
-            cost: cost.totalCost,
-            costBreakdown: cost.breakdown,
-            response: result.text.substring(0, 200),
-            requestTimestamp,
-            responseTimestamp,
-            httpStatus: 200,
-            requestId: result.requestId || `bedrock-${Date.now()}-${modelConfig.key}`
-        };
+                actualModelId: actualModelId,
+                requiresInferenceProfile,
+                inferenceProfileArn: requiresInferenceProfile ? inferenceProfileArn : null,
+                region: VALIDATION_CONFIG.region,
+                success: true,
+                latency,
+                cached: result.cached,
+                usage: result.usage,
+                cost: cost.totalCost,
+                costBreakdown: cost.breakdown,
+                response: result.text.substring(0, 200),
+                requestTimestamp,
+                responseTimestamp,
+                httpStatus: 200,
+                requestId: result.requestId || `bedrock-${Date.now()}-${modelConfig.key}`,
+                validations: {
+                    requestIdValid: validateRequestId(result.requestId),
+                    latencyValid: validateLatency(latency, modelConfig.key),
+                    hasRealTokens: result.usage.input_tokens > 0 && result.usage.output_tokens > 0
+                }
+            };
+            
+            // In strict mode, fail if validations don't pass
+            if (STRICT_MODE) {
+                if (!invocationData.validations.requestIdValid) {
+                    console.error(`   ❌ STRICT MODE: Request ID validation failed`);
+                    throw new Error('Request ID appears to be a placeholder');
+                }
+                if (!invocationData.validations.latencyValid) {
+                    console.error(`   ❌ STRICT MODE: Latency validation failed`);
+                }
+                if (!invocationData.validations.hasRealTokens) {
+                    console.error(`   ❌ STRICT MODE: Token counts are zero or missing`);
+                    throw new Error('No real tokens detected');
+                }
+            }
         
         validationResults.models.push(invocationData);
         
@@ -627,11 +709,21 @@ async function main() {
         // Generate and save report
         const report = generateReport();
         
+        // Check for distinct request IDs
+        console.log('\n🔍 Checking for distinct request IDs...');
+        const hasDistinctIds = checkDistinctRequestIds(validationResults);
+        if (!hasDistinctIds && STRICT_MODE) {
+            console.error('\n❌ STRICT MODE: Duplicate request IDs detected - FAILED');
+            process.exit(1);
+        }
+        
         // Save summary report
         await saveSummaryReport();
         
         // Check strict mode validation
         if (STRICT_MODE) {
+            console.log('\n🔒 Running STRICT MODE validations...');
+            
             const successfulInvocations = validationResults.models.filter(m => m.success).length;
             const totalInvocations = validationResults.models.length;
             
@@ -640,15 +732,28 @@ async function main() {
                 process.exit(1);
             }
             
+            // Check per-model success enforcement
+            if (successfulInvocations < totalInvocations) {
+                console.error(`\n❌ STRICT MODE: Not all models succeeded (${successfulInvocations}/${totalInvocations}) - FAILED`);
+                process.exit(1);
+            }
+            
             if (validationResults.models.some(m => m.hasPlaceholders)) {
                 console.error('\n❌ STRICT MODE: Placeholder strings detected in invocations - FAILED');
                 process.exit(1);
             }
             
-            if (!allSuccessful) {
-                console.error(`\n❌ STRICT MODE: ${totalInvocations - successfulInvocations}/${totalInvocations} invocations failed - FAILED`);
+            // Check validations passed for all models
+            const allValidationsPassed = validationResults.models
+                .filter(m => m.success)
+                .every(m => m.validations && m.validations.requestIdValid && m.validations.hasRealTokens);
+            
+            if (!allValidationsPassed) {
+                console.error('\n❌ STRICT MODE: Some validation checks failed (request ID or token validation) - FAILED');
                 process.exit(1);
             }
+            
+            console.log('✅ STRICT MODE: All validations passed');
         }
         
         // Exit with appropriate code

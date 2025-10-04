@@ -104,7 +104,7 @@ class BedrockEvidenceCollector {
             
             // Log key models
             const claudeModels = this.evidence.models.filter(m => 
-                m.modelId.includes('claude-4') || m.modelId.includes('opus-4') || m.modelId.includes('sonnet-4')
+                m.modelId.includes('claude-4') || m.modelId.includes('opus') || m.modelId.includes('sonnet-4') || m.modelId.includes('claude-3-opus')
             );
             
             claudeModels.forEach(model => {

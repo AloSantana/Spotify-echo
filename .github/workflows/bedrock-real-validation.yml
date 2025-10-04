@@ -12,18 +12,8 @@ on:
     branches:
       - main
       - 'feature/bedrock-*'
-    paths:
-      - 'src/infra/BedrockInferenceProvider.js'
-      - 'src/chat/llm-providers/bedrock-provider.js'
-      - 'config/aws-bedrock-models.json'
-      - 'scripts/validate-bedrock-live.js'
-      - 'scripts/collect-bedrock-evidence.js'
-      - 'scripts/verify-bedrock-billing.js'
+      - 'copilot/**'
   pull_request:
-    paths:
-      - 'src/infra/BedrockInferenceProvider.js'
-      - 'src/chat/llm-providers/bedrock-provider.js'
-      - 'config/aws-bedrock-models.json'
 
 env:
   NODE_VERSION: '18'
@@ -207,25 +197,67 @@ jobs:
       - name: ✅ Check Validation Status
         if: always()
         run: |
-          if [ -f "reports/bedrock-evidence-complete.json" ]; then
-            IS_VALID=$(node -e "
-              const fs = require('fs');
-              const data = JSON.parse(fs.readFileSync('reports/bedrock-evidence-complete.json', 'utf-8'));
-              console.log(data.validation.isValid ? 'true' : 'false');
-            ")
-            
-            if [ "$IS_VALID" = "false" ]; then
-              echo "❌ Validation failed - evidence is not valid"
-              exit 1
-            fi
+          echo "🔍 Running post-validation assertions..."
+          
+          # Check if evidence file exists
+          if [ ! -f "reports/bedrock-evidence-complete.json" ]; then
+            echo "❌ Evidence file missing: reports/bedrock-evidence-complete.json"
+            exit 1
           fi
           
+          # Check if invocation summary exists
+          if [ ! -f "reports/bedrock-invocation-summary.json" ]; then
+            echo "❌ Invocation summary missing: reports/bedrock-invocation-summary.json"
+            exit 1
+          fi
+          
+          # Validate evidence file
+          IS_VALID=$(node -e "
+            const fs = require('fs');
+            const data = JSON.parse(fs.readFileSync('reports/bedrock-evidence-complete.json', 'utf-8'));
+            console.log(data.validation.isValid ? 'true' : 'false');
+          ")
+          
+          if [ "$IS_VALID" = "false" ]; then
+            echo "❌ Validation failed - evidence is not valid"
+            exit 1
+          fi
+          
+          # Check total cost is non-zero
+          TOTAL_COST=$(node -e "
+            const fs = require('fs');
+            const data = JSON.parse(fs.readFileSync('reports/bedrock-invocation-summary.json', 'utf-8'));
+            console.log(data.totalCost || 0);
+          ")
+          
+          if [ "$TOTAL_COST" = "0" ] || [ "$TOTAL_COST" = "0.000000" ]; then
+            echo "❌ Total cost is zero - no real invocations detected"
+            exit 1
+          fi
+          
+          echo "✅ Total cost: \$$TOTAL_COST (non-zero confirms real AWS usage)"
+          
+          # Check if models succeeded
+          SUCCESSFUL_MODELS=$(node -e "
+            const fs = require('fs');
+            const data = JSON.parse(fs.readFileSync('reports/bedrock-invocation-summary.json', 'utf-8'));
+            console.log(data.models.filter(m => m.success).length);
+          ")
+          
+          if [ "$SUCCESSFUL_MODELS" = "0" ]; then
+            echo "❌ No models succeeded - validation failed"
+            exit 1
+          fi
+          
+          echo "✅ Successful models: $SUCCESSFUL_MODELS"
+          
+          # Check if live validation step passed
           if [ "${{ steps.validate-sonnet.outcome }}" = "failure" ]; then
             echo "❌ Live validation failed"
             exit 1
           fi
           
-          echo "✅ All validation checks passed"
+          echo "✅ All post-validation assertions passed"
 
   # Post-validation report
   validation-report:

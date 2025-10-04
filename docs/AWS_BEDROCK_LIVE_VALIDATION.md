@@ -68,7 +68,7 @@ The repository includes an automated validation workflow that uses repository se
      - Input: 23 tokens × $0.003/1K = $0.000069
      - Output: 47 tokens × $0.015/1K = $0.000705
 
-📡 Testing Claude Opus 4.1 (claude-opus-4-1)...
+📡 Testing Claude Opus 4.1 (claude-3-opus)...
    Prompt: "Hello! Please confirm you are Claude Opus 4.1..."
 ✅ Response received in 2156ms
    Response: "Hello! I am Claude Opus 4.1, Anthropic's most capable..."
@@ -95,7 +95,7 @@ The repository includes an automated validation workflow that uses repository se
       Cost: $0.000774 USD
 
    ✅ Claude Opus 4.1
-      Model ID: anthropic.claude-opus-4-1-20250805-v1:0
+      Model ID: anthropic.claude-3-opus-20250805-v1:0
       Latency: 2156ms
       Tokens: 24 in + 89 out
       Cost: $0.007035 USD
@@ -157,7 +157,7 @@ Navigate to CloudWatch → Log Groups → Look for:
 - Filter by timestamp of your validation run
 - Confirm you see log entries for:
   - `anthropic.claude-sonnet-4-5-20250929-v1:0`
-  - `anthropic.claude-opus-4-1-20250805-v1:0`
+  - `anthropic.claude-3-opus-20250805-v1:0`
 
 **Expected Log Entry:**
 ```json
@@ -216,7 +216,7 @@ Model: anthropic.claude-sonnet-4-5-20250929-v1:0
 - Output tokens: 47 × $0.015/1K = $0.000705
 Subtotal: $0.000774
 
-Model: anthropic.claude-opus-4-1-20250805-v1:0
+Model: anthropic.claude-3-opus-20250805-v1:0
 - Input tokens: 24 × $0.015/1K = $0.000360
 - Output tokens: 89 × $0.075/1K = $0.006675
 Subtotal: $0.007035

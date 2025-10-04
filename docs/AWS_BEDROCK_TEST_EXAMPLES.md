@@ -18,7 +18,7 @@ Skip streaming: false
 Skip variations: false
 
 ================================================================================
-Testing Model: Claude Opus 4.1 (anthropic.claude-opus-4-1-20250805-v1:0)
+Testing Model: Claude Opus 4.1 (anthropic.claude-3-opus-20250805-v1:0)
 ================================================================================
 🧪 Testing Claude Opus 4.1: Basic text generation...
 ✅ ✓ Basic generation successful (342ms)
@@ -104,7 +104,7 @@ Configuration: 10 models to test
 Region: us-east-1
 
 ================================================================================
-Testing Model: Claude Opus 4.1 (anthropic.claude-opus-4-1-20250805-v1:0)
+Testing Model: Claude Opus 4.1 (anthropic.claude-3-opus-20250805-v1:0)
 ================================================================================
 🧪 Testing Claude Opus 4.1: Basic text generation...
 ❌ ✗ Basic generation failed: User is not authorized to perform: bedrock:InvokeModel with an EXPLICIT DENY
@@ -168,8 +168,8 @@ TEST SUMMARY REPORT
     "skippedModels": 2
   },
   "modelResults": {
-    "anthropic.claude-opus-4-1-20250805-v1:0": {
-      "modelId": "anthropic.claude-opus-4-1-20250805-v1:0",
+    "anthropic.claude-3-opus-20250805-v1:0": {
+      "modelId": "anthropic.claude-3-opus-20250805-v1:0",
       "displayName": "Claude Opus 4.1",
       "provider": "anthropic",
       "family": "claude-4",
@@ -306,7 +306,7 @@ TEST SUMMARY REPORT
 
 \`\`\`json
 {
-  "anthropic.claude-opus-4-1-20250805-v1:0": {
+  "anthropic.claude-3-opus-20250805-v1:0": {
     "overall": "success",
     "tests": { ... }
   }

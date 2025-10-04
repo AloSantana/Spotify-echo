@@ -49,7 +49,7 @@ Switch between models dynamically during your session:
 
 ```bash
 # Switch to specific models
-/use claude-opus-4-1          # For complex architectural analysis
+/use claude-3-opus          # For complex architectural analysis
 /use claude-sonnet-4-5        # For code generation (default)
 /use claude-3-5-sonnet-v2     # For multimodal tasks with vision
 /use deepseek-r1              # For advanced reasoning
@@ -75,7 +75,7 @@ $ npm run bedrock:status
 $ npm run bedrock:list
 
 # Switch models
-$ node scripts/aws-bedrock-copilot-integration.js /use claude-opus-4-1
+$ node scripts/aws-bedrock-copilot-integration.js /use claude-3-opus
 
 # Get help
 $ npm run bedrock:help
@@ -88,7 +88,7 @@ When you switch models, you'll see a confirmation:
 ```
 📝 Model Changed
 • Previous: Claude Sonnet 4.5
-• Current: Claude Opus 4.1 (anthropic.claude-opus-4-1-20250805-v1:0)
+• Current: Claude Opus 4.1 (anthropic.claude-3-opus-20250805-v1:0)
 • Region: us-east-1
 • Reason: User requested via /use command
 ```
@@ -124,7 +124,7 @@ npm run bedrock:status
 npm run bedrock:list
 
 # Switch models (example)
-node scripts/aws-bedrock-copilot-integration.js /use claude-opus-4-1
+node scripts/aws-bedrock-copilot-integration.js /use claude-3-opus
 ```
 
 ### Integration in Code
@@ -140,7 +140,7 @@ await integration.initialize();
 integration.displaySessionHeader();
 
 // Switch model
-await integration.handleSlashCommand('/use', ['claude-opus-4-1']);
+await integration.handleSlashCommand('/use', ['claude-3-opus']);
 
 // Track an interaction
 integration.trackInteraction({ total: 1523 });
@@ -158,7 +158,7 @@ console.log(summary);
 The integration supports all models from `config/aws-bedrock-models.json`:
 
 ### Claude 4.x Family
-- **claude-opus-4-1**: Complex analysis and architectural review
+- **claude-3-opus**: Complex analysis and architectural review
 - **claude-sonnet-4-5**: Code generation and analysis (default)
 
 ### Claude 3.5 Family
@@ -181,7 +181,7 @@ The integration supports all models from `config/aws-bedrock-models.json`:
 
 | Command | Description | Example |
 |---------|-------------|---------|
-| `/use <model>` | Switch to specified model | `/use claude-opus-4-1` |
+| `/use <model>` | Switch to specified model | `/use claude-3-opus` |
 | `/model status` | Show current model info | `/model status` |
 | `/model list` | List all available models | `/model list` |
 | `/model reset` | Reset to default model | `/model reset` |
@@ -366,7 +366,7 @@ Use the terminal to run commands:
 npm run bedrock:status
 
 # Switch models
-node scripts/aws-bedrock-copilot-integration.js /use claude-opus-4-1
+node scripts/aws-bedrock-copilot-integration.js /use claude-3-opus
 ```
 
 ### In CI/CD
@@ -385,7 +385,7 @@ Reference the current model in automated workflows:
 
 ```bash
 # Start session with architecture model
-node scripts/aws-bedrock-copilot-integration.js /use claude-opus-4-1
+node scripts/aws-bedrock-copilot-integration.js /use claude-3-opus
 
 # Perform review
 # ... review code ...
@@ -404,7 +404,7 @@ npm run bedrock:session
 # ... write code with Sonnet 4.5 ...
 
 # Switch for complex analysis
-node scripts/aws-bedrock-copilot-integration.js /use claude-opus-4-1
+node scripts/aws-bedrock-copilot-integration.js /use claude-3-opus
 # ... analyze architecture ...
 
 # Switch for reasoning task
@@ -429,7 +429,7 @@ integration.displayCompletionHeader('Feature implementation');
 integration.trackInteraction({ total: 2341 });
 
 // Switch model
-await integration.handleSlashCommand('/use', ['claude-opus-4-1']);
+await integration.handleSlashCommand('/use', ['claude-3-opus']);
 integration.displayCompletionHeader('Architecture review');
 integration.trackInteraction({ total: 3452 });
 

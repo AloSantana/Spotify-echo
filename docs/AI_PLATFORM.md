@@ -27,7 +27,7 @@ EchoTune AI provides enterprise-grade AI integration with intelligent routing, c
 - **Pricing**: $0.003/1K input, $0.015/1K output
 
 ### 🚀 Claude Opus 4.1 (Vertex AI + Anthropic) **[NEW]**
-- **Models**: claude-opus-4-1@20250805 via publishers/anthropic/models/claude-opus-4-1
+- **Models**: claude-3-opus@20250805 via publishers/anthropic/models/claude-3-opus
 - **Features**: Industry-leading coding capabilities, extended thinking mode, agent workflows, long-horizon tasks
 - **Advanced Capabilities**:
   - 🧠 **Extended Thinking**: Budget-controlled deep reasoning with transparent thought processes
