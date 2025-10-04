@@ -27,6 +27,7 @@ class AliasResolver {
     this.configHash = null;
     this.lastLoadTime = null;
     this.cache = new Map();
+    this.warnedAliases = new Set(); // Warning deduplication for cycle detection
   }
 
   /**
@@ -63,13 +64,26 @@ class AliasResolver {
   }
 
   /**
-   * Resolve alias to model configuration
+   * Resolve alias to model configuration with cycle detection
    * @param {string} alias - Model alias (e.g., 'claude-3-opus')
    * @param {Object} options - Resolution options
+   * @param {Set} visited - Set of visited aliases for cycle detection (internal use)
    * @returns {Object} Model configuration with resolved modelId
    */
-  resolve(alias, options = {}) {
+  resolve(alias, options = {}, visited = new Set()) {
     const { allowDeprecated = false, warnDeprecated = true } = options;
+    
+    // Cycle detection: check if we've seen this alias before in the current resolution chain
+    if (visited.has(alias)) {
+      if (!this.warnedAliases.has(alias)) {
+        console.error(`⚠️ [ALIAS-RESOLVER] Cycle detected in alias resolution for "${alias}". Breaking cycle to prevent infinite loop.`);
+        this.warnedAliases.add(alias); // Deduplicate warnings
+      }
+      throw new Error(`Circular alias reference detected for '${alias}'`);
+    }
+
+    // Add current alias to visited set
+    visited.add(alias);
     
     // Check cache first
     const cacheKey = `${alias}:${allowDeprecated}`;
@@ -79,11 +93,20 @@ class AliasResolver {
 
     const config = this.getConfig();
 
+    // Check for self-mapping (alias points to itself)
+    if (config.legacyMappings && config.legacyMappings[alias] === alias) {
+      if (!this.warnedAliases.has(alias)) {
+        console.error(`⚠️ [ALIAS-RESOLVER] Self-mapping detected for alias "${alias}". This would cause infinite recursion.`);
+        this.warnedAliases.add(alias);
+      }
+      throw new Error(`Self-mapping detected for alias '${alias}'`);
+    }
+
     // Check if alias is in legacy mappings
     if (config.legacyMappings && config.legacyMappings[alias]) {
       const mappedAlias = config.legacyMappings[alias];
       console.warn(`⚠️  Legacy alias '${alias}' mapped to '${mappedAlias}'`);
-      return this.resolve(mappedAlias, options);
+      return this.resolve(mappedAlias, options, visited);
     }
 
     // Check deprecated aliases first
