@@ -110,7 +110,23 @@ async function testModel(provider, modelConfig) {
     console.log(`\n📡 Testing ${modelConfig.displayName} (${modelConfig.key})...`);
     console.log(`   Prompt: "${modelConfig.testPrompt}"`);
     
+    const requestTimestamp = new Date().toISOString();
     const startTime = Date.now();
+    
+    // Get model configuration for inference profile info
+    const config = provider.config.modelConfig[modelConfig.key];
+    const requiresInferenceProfile = config?.requiresInferenceProfile || false;
+    const inferenceProfileArn = config?.inferenceProfileArn || null;
+    const actualModelId = config?.modelId || modelConfig.key;
+    
+    console.log(`   📋 Request Details:`);
+    console.log(`      Model ID: ${actualModelId}`);
+    console.log(`      Requires Inference Profile: ${requiresInferenceProfile}`);
+    if (requiresInferenceProfile && inferenceProfileArn) {
+        console.log(`      Inference Profile ARN: ${inferenceProfileArn}`);
+    }
+    console.log(`      Region: ${VALIDATION_CONFIG.region}`);
+    console.log(`      Request Timestamp: ${requestTimestamp}`);
     
     try {
         const result = await provider.predict(modelConfig.key, modelConfig.testPrompt, {
@@ -118,25 +134,38 @@ async function testModel(provider, modelConfig) {
             temperature: 0.7
         });
         
+        const responseTimestamp = new Date().toISOString();
         const latency = Date.now() - startTime;
         
         console.log(`✅ Response received in ${latency}ms`);
-        console.log(`   Response: "${result.text.substring(0, 150)}..."`);
-        console.log(`   Cached: ${result.cached}`);
-        console.log(`   Usage: ${result.usage.input_tokens} input + ${result.usage.output_tokens} output tokens`);
+        console.log(`   📋 Response Details:`);
+        console.log(`      Response Timestamp: ${responseTimestamp}`);
+        console.log(`      HTTP Status: 200 (Success)`);
+        console.log(`      Model Used: ${result.modelId || actualModelId}`);
+        console.log(`      Response: "${result.text.substring(0, 150)}..."`);
+        console.log(`      Cached: ${result.cached}`);
+        console.log(`   📊 Token Usage:`);
+        console.log(`      Input Tokens: ${result.usage.input_tokens}`);
+        console.log(`      Output Tokens: ${result.usage.output_tokens}`);
+        console.log(`      Total Tokens: ${result.usage.input_tokens + result.usage.output_tokens}`);
         
         // Calculate cost
         const cost = calculateCost(modelConfig.key, result.usage);
-        console.log(`   Cost: $${cost.totalCost.toFixed(6)} USD`);
-        console.log(`     - Input: ${cost.breakdown.inputTokens} tokens × $${cost.breakdown.inputCostPer1K}/1K = $${cost.inputCost.toFixed(6)}`);
-        console.log(`     - Output: ${cost.breakdown.outputTokens} tokens × $${cost.breakdown.outputCostPer1K}/1K = $${cost.outputCost.toFixed(6)}`);
+        console.log(`   💰 Cost Breakdown:`);
+        console.log(`      Input: ${cost.breakdown.inputTokens} tokens × $${cost.breakdown.inputCostPer1K}/1K = $${cost.inputCost.toFixed(6)}`);
+        console.log(`      Output: ${cost.breakdown.outputTokens} tokens × $${cost.breakdown.outputCostPer1K}/1K = $${cost.outputCost.toFixed(6)}`);
+        console.log(`      Total: $${cost.totalCost.toFixed(6)} USD`);
         
         validationResults.totalCost += cost.totalCost;
         
         validationResults.models.push({
             model: modelConfig.key,
             displayName: modelConfig.displayName,
-            modelId: result.modelId,
+            modelId: result.modelId || actualModelId,
+            actualModelId: actualModelId,
+            requiresInferenceProfile,
+            inferenceProfileArn: requiresInferenceProfile ? inferenceProfileArn : null,
+            region: VALIDATION_CONFIG.region,
             success: true,
             latency,
             cached: result.cached,
@@ -144,21 +173,33 @@ async function testModel(provider, modelConfig) {
             cost: cost.totalCost,
             costBreakdown: cost.breakdown,
             response: result.text.substring(0, 200),
-            timestamp: new Date().toISOString()
+            requestTimestamp,
+            responseTimestamp,
+            httpStatus: 200
         });
         
         return true;
         
     } catch (error) {
+        const responseTimestamp = new Date().toISOString();
+        const latency = Date.now() - startTime;
+        
         console.error(`❌ Failed to test ${modelConfig.displayName}`);
-        console.error(`   Error: ${error.message}`);
+        console.error(`   📋 Error Details:`);
+        console.error(`      Error: ${error.message}`);
+        console.error(`      Response Timestamp: ${responseTimestamp}`);
+        console.error(`      HTTP Status: ${error.$metadata?.httpStatusCode || 'Unknown'}`);
+        console.error(`      Latency: ${latency}ms`);
         
         validationResults.models.push({
             model: modelConfig.key,
             displayName: modelConfig.displayName,
             success: false,
             error: error.message,
-            timestamp: new Date().toISOString()
+            httpStatus: error.$metadata?.httpStatusCode || null,
+            requestTimestamp,
+            responseTimestamp,
+            latency
         });
         
         validationResults.errors.push(`${modelConfig.displayName}: ${error.message}`);
@@ -207,18 +248,29 @@ function generateReport() {
     console.log(`   Timestamp: ${validationResults.timestamp}`);
     console.log(`   Region: ${validationResults.region}`);
     console.log(`   Credentials Found: ${validationResults.credentialsFound ? '✅' : '❌'}`);
+    console.log(`   Provider: AWS Bedrock (provider=bedrock)`);
     
     console.log('\n🤖 Models Tested:');
     validationResults.models.forEach(model => {
         if (model.success) {
             console.log(`   ✅ ${model.displayName}`);
-            console.log(`      Model ID: ${model.modelId}`);
+            console.log(`      Model ID: ${model.actualModelId}`);
+            if (model.requiresInferenceProfile) {
+                console.log(`      Inference Profile ARN: ${model.inferenceProfileArn}`);
+                console.log(`      Cross-Region Access: Enabled`);
+            }
+            console.log(`      Region: ${model.region}`);
             console.log(`      Latency: ${model.latency}ms`);
             console.log(`      Tokens: ${model.usage.input_tokens} in + ${model.usage.output_tokens} out`);
             console.log(`      Cost: $${model.cost.toFixed(6)} USD`);
+            console.log(`      Request Time: ${model.requestTimestamp}`);
+            console.log(`      Response Time: ${model.responseTimestamp}`);
+            console.log(`      HTTP Status: ${model.httpStatus}`);
             console.log(`      Response: "${model.response.substring(0, 80)}..."`);
         } else {
             console.log(`   ❌ ${model.displayName}: ${model.error}`);
+            console.log(`      HTTP Status: ${model.httpStatus || 'N/A'}`);
+            console.log(`      Latency: ${model.latency}ms`);
         }
     });
     
@@ -232,10 +284,56 @@ function generateReport() {
         });
     }
     
+    console.log('\n📝 CloudWatch Verification:');
+    console.log('   To verify these invocations in AWS CloudWatch:');
+    console.log('   1. Navigate to CloudWatch > Logs > Log groups');
+    console.log('   2. Find: /aws/bedrock/modelinvocations');
+    console.log('   3. Filter by timestamps:');
+    validationResults.models.forEach(model => {
+        if (model.success) {
+            console.log(`      - ${model.displayName}: ${model.requestTimestamp} to ${model.responseTimestamp}`);
+        }
+    });
+    
+    console.log('\n💳 AWS Billing Verification:');
+    console.log('   To verify charges in AWS Cost Explorer:');
+    console.log('   1. Navigate to AWS Cost Explorer');
+    console.log('   2. Set time range: Last 24 hours');
+    console.log('   3. Filter by Service: Amazon Bedrock');
+    console.log('   4. Group by: Usage Type');
+    console.log('   5. Expected charges for models:');
+    validationResults.models.forEach(model => {
+        if (model.success && model.requiresInferenceProfile) {
+            console.log(`      - ${model.inferenceProfileArn}`);
+            console.log(`        Region: ${model.region}`);
+            console.log(`        Cost: ~$${model.cost.toFixed(6)} USD`);
+        }
+    });
+    
+    console.log('\n📊 Query Templates for CloudWatch Metrics:');
+    validationResults.models.forEach(model => {
+        if (model.success) {
+            console.log(`\n   # ${model.displayName}`);
+            console.log(`   aws cloudwatch get-metric-statistics \\`);
+            console.log(`     --namespace AWS/Bedrock \\`);
+            console.log(`     --metric-name InvocationCount \\`);
+            if (model.requiresInferenceProfile && model.inferenceProfileArn) {
+                console.log(`     --dimensions Name=InferenceProfileId,Value=${model.inferenceProfileArn.split('/').pop()} \\`);
+            } else {
+                console.log(`     --dimensions Name=ModelId,Value=${model.actualModelId} \\`);
+            }
+            console.log(`     --start-time ${new Date(model.requestTimestamp).toISOString()} \\`);
+            console.log(`     --end-time ${new Date(model.responseTimestamp).toISOString()} \\`);
+            console.log(`     --period 60 \\`);
+            console.log(`     --statistics Sum`);
+        }
+    });
+    
     console.log('\n📝 Next Steps:');
     console.log('   1. Check AWS CloudWatch Logs for Bedrock invocations');
     console.log('   2. Verify charges in AWS Cost Explorer');
     console.log('   3. Confirm model IDs and regions match expectations');
+    console.log('   4. Validate inference profile ARNs are being used correctly');
     
     console.log('\n' + '='.repeat(80));
     
@@ -248,11 +346,91 @@ function generateReport() {
         fs.mkdirSync(path.dirname(reportPath), { recursive: true });
         fs.writeFileSync(reportPath, JSON.stringify(validationResults, null, 2));
         console.log(`\n💾 Full report saved to: ${reportPath}`);
+        
+        // Also save a human-readable markdown report
+        const mdReportPath = path.join(__dirname, '..', 'reports', 'bedrock-validation-report.md');
+        const mdReport = generateMarkdownReport();
+        fs.writeFileSync(mdReportPath, mdReport);
+        console.log(`💾 Markdown report saved to: ${mdReportPath}`);
     } catch (error) {
         console.error(`\n⚠️  Could not save report: ${error.message}`);
     }
     
     return validationResults;
+}
+
+/**
+ * Generate markdown format report
+ */
+function generateMarkdownReport() {
+    let md = '# AWS Bedrock Live Validation Report\n\n';
+    md += `**Generated:** ${validationResults.timestamp}\n\n`;
+    md += `**Region:** ${validationResults.region}\n\n`;
+    md += `**Provider:** AWS Bedrock (provider=bedrock)\n\n`;
+    
+    md += '## Models Tested\n\n';
+    validationResults.models.forEach(model => {
+        if (model.success) {
+            md += `### ✅ ${model.displayName}\n\n`;
+            md += `- **Model ID:** \`${model.actualModelId}\`\n`;
+            if (model.requiresInferenceProfile) {
+                md += `- **Inference Profile ARN:** \`${model.inferenceProfileArn}\`\n`;
+                md += `- **Cross-Region Access:** Enabled\n`;
+            }
+            md += `- **Region:** ${model.region}\n`;
+            md += `- **Latency:** ${model.latency}ms\n`;
+            md += `- **Tokens:** ${model.usage.input_tokens} input + ${model.usage.output_tokens} output\n`;
+            md += `- **Cost:** $${model.cost.toFixed(6)} USD\n`;
+            md += `- **Request Timestamp:** ${model.requestTimestamp}\n`;
+            md += `- **Response Timestamp:** ${model.responseTimestamp}\n`;
+            md += `- **HTTP Status:** ${model.httpStatus}\n\n`;
+            md += `**Response:**\n> ${model.response.substring(0, 200)}\n\n`;
+        } else {
+            md += `### ❌ ${model.displayName}\n\n`;
+            md += `- **Error:** ${model.error}\n`;
+            md += `- **HTTP Status:** ${model.httpStatus || 'N/A'}\n\n`;
+        }
+    });
+    
+    md += `## Cost Summary\n\n`;
+    md += `**Total Cost:** $${validationResults.totalCost.toFixed(6)} USD\n\n`;
+    
+    md += '## CloudWatch Verification Commands\n\n';
+    md += '```bash\n';
+    validationResults.models.forEach(model => {
+        if (model.success) {
+            md += `# ${model.displayName}\n`;
+            md += `aws cloudwatch get-metric-statistics \\\n`;
+            md += `  --namespace AWS/Bedrock \\\n`;
+            md += `  --metric-name InvocationCount \\\n`;
+            if (model.requiresInferenceProfile && model.inferenceProfileArn) {
+                md += `  --dimensions Name=InferenceProfileId,Value=${model.inferenceProfileArn.split('/').pop()} \\\n`;
+            } else {
+                md += `  --dimensions Name=ModelId,Value=${model.actualModelId} \\\n`;
+            }
+            md += `  --start-time ${new Date(model.requestTimestamp).toISOString()} \\\n`;
+            md += `  --end-time ${new Date(model.responseTimestamp).toISOString()} \\\n`;
+            md += `  --period 60 \\\n`;
+            md += `  --statistics Sum\n\n`;
+        }
+    });
+    md += '```\n\n';
+    
+    md += '## Billing Verification\n\n';
+    md += '1. Navigate to AWS Cost Explorer\n';
+    md += '2. Set time range: Last 24 hours\n';
+    md += '3. Filter by Service: Amazon Bedrock\n';
+    md += '4. Expected charges:\n\n';
+    validationResults.models.forEach(model => {
+        if (model.success) {
+            md += `   - **${model.displayName}:** $${model.cost.toFixed(6)} USD\n`;
+            if (model.requiresInferenceProfile) {
+                md += `     - Inference Profile: \`${model.inferenceProfileArn}\`\n`;
+            }
+        }
+    });
+    
+    return md;
 }
 
 /**

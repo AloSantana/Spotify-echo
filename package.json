@@ -112,6 +112,11 @@
     "bedrock:health:json": "node scripts/aws-bedrock-health-check.js --json",
     "bedrock:health:verbose": "node scripts/aws-bedrock-health-check.js --verbose",
     "bedrock:validate": "node scripts/validate-bedrock-test-harness.js",
+    "bedrock:validate:live": "node scripts/validate-bedrock-live.js",
+    "bedrock:evidence": "node scripts/generate-bedrock-evidence.js",
+    "bedrock:preflight": "node scripts/bedrock-preflight-check.js",
+    "bedrock:demo": "node scripts/demo-claude-coding-assistant.js",
+    "bedrock:verify-opus": "node scripts/verify-claude-opus-availability.js",
     "test:env-validation": "npx playwright test tests/e2e/env-validation.spec.ts",
     "test:database": "npx playwright test tests/e2e/database-persistence.spec.ts",
     "test:chat": "npx playwright test tests/e2e/chat-interaction.spec.ts",
@@ -459,7 +464,6 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.60.0",
-    "@aws-sdk/client-bedrock-runtime": "^3.901.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@emotion/react": "^11.14.0",
@@ -523,6 +527,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.901.0",
     "@aws-sdk/client-iam": "^3.901.0",
     "@aws-sdk/client-sts": "^3.901.0",
     "@azure/openai": "^2.0.0",

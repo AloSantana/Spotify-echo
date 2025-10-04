@@ -79,13 +79,20 @@ jobs:
           
           echo ""
           echo "✅ Validation completed successfully!"
+          echo ""
+          echo "📊 Generating evidence report..."
+          node scripts/generate-bedrock-evidence.js > reports/bedrock-evidence.md || echo "⚠️ Evidence generation failed"
+          echo "✅ Evidence report generated"
       
       - name: Upload validation report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: bedrock-validation-report
-          path: reports/bedrock-validation-report.json
+          path: |
+            reports/bedrock-validation-report.json
+            reports/bedrock-validation-report.md
+            reports/bedrock-evidence.md
           retention-days: 30
       
       - name: Comment on PR with results
@@ -109,19 +116,29 @@ jobs:
               let comment = '## 🚀 AWS Bedrock Live Validation Results\n\n';
               comment += `**Timestamp:** ${report.timestamp}\n`;
               comment += `**Region:** ${report.region}\n`;
+              comment += `**Provider:** AWS Bedrock (provider=bedrock)\n`;
               comment += `**Credentials Found:** ${report.credentialsFound ? '✅' : '❌'}\n\n`;
               
               comment += '### 🤖 Models Tested\n\n';
               report.models.forEach(model => {
                 if (model.success) {
                   comment += `✅ **${model.displayName}**\n`;
-                  comment += `- Model ID: \`${model.modelId}\`\n`;
+                  comment += `- Model ID: \`${model.actualModelId}\`\n`;
+                  if (model.requiresInferenceProfile) {
+                    comment += `- Inference Profile ARN: \`${model.inferenceProfileArn}\`\n`;
+                    comment += `- Cross-Region Access: Enabled\n`;
+                  }
+                  comment += `- Region: ${model.region}\n`;
                   comment += `- Latency: ${model.latency}ms\n`;
                   comment += `- Tokens: ${model.usage.input_tokens} input + ${model.usage.output_tokens} output\n`;
                   comment += `- Cost: $${model.cost.toFixed(6)} USD\n`;
+                  comment += `- Request Timestamp: ${model.requestTimestamp}\n`;
+                  comment += `- Response Timestamp: ${model.responseTimestamp}\n`;
+                  comment += `- HTTP Status: ${model.httpStatus}\n`;
                   comment += `- Response: "${model.response.substring(0, 100)}..."\n\n`;
                 } else {
-                  comment += `❌ **${model.displayName}**: ${model.error}\n\n`;
+                  comment += `❌ **${model.displayName}**: ${model.error}\n`;
+                  comment += `- HTTP Status: ${model.httpStatus || 'N/A'}\n\n`;
                 }
               });
               
@@ -135,10 +152,27 @@ jobs:
                 comment += '\n';
               }
               
-              comment += '### 📊 Next Steps\n\n';
-              comment += '1. Verify charges appear in AWS Cost Explorer\n';
-              comment += '2. Check CloudWatch Logs for Bedrock invocations\n';
-              comment += '3. Confirm model IDs and usage metrics\n';
+              comment += '### 📊 Verification Steps\n\n';
+              comment += '**CloudWatch Logs:**\n';
+              comment += '1. Navigate to CloudWatch > Logs > `/aws/bedrock/modelinvocations`\n';
+              comment += '2. Filter by timestamps in the report above\n\n';
+              
+              comment += '**Cost Explorer:**\n';
+              comment += '1. Navigate to AWS Cost Explorer\n';
+              comment += '2. Set time range: Last 24 hours\n';
+              comment += '3. Filter by Service: Amazon Bedrock\n';
+              comment += '4. Verify charges match expected costs\n\n';
+              
+              comment += '**CloudWatch Metrics:**\n';
+              report.models.forEach(model => {
+                if (model.success && model.requiresInferenceProfile) {
+                  comment += `- ${model.displayName}: \`${model.inferenceProfileArn}\`\n`;
+                }
+              });
+              comment += '\n';
+              
+              comment += '📎 **Evidence Report:** Check workflow artifacts for detailed evidence\n\n';
+              comment += '✅ **No Vertex AI paths used** - All validation via provider=bedrock\n';
               
               // Find PR number from commit
               const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({

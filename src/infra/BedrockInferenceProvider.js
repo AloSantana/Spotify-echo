@@ -202,8 +202,11 @@ class BedrockInferenceProvider extends EventEmitter {
             // Prepare request
             const requestBody = this.buildRequestBody(input, options);
             
-            // Invoke model
-            const result = await this.invokeModel(modelConfig.modelId, requestBody, options);
+            // Invoke model (pass modelKey for inference profile detection)
+            const result = await this.invokeModel(modelConfig.modelId, requestBody, {
+                ...options,
+                modelKey
+            });
             
             // Cache result
             if (this.config.enableCaching) {
@@ -251,8 +254,23 @@ class BedrockInferenceProvider extends EventEmitter {
     async invokeModel(modelId, requestBody, options = {}) {
         const { InvokeModelCommand } = require('@aws-sdk/client-bedrock-runtime');
         
+        // Get model config to check for inference profile ARN
+        const modelKey = options.modelKey || this.config.defaultModel;
+        const modelConfig = this.models.get(modelKey);
+        
+        // Use inference profile ARN if required
+        const effectiveModelId = (modelConfig?.requiresInferenceProfile && modelConfig?.inferenceProfileArn)
+            ? modelConfig.inferenceProfileArn
+            : modelId;
+        
+        // Log model invocation details
+        console.log(`🔄 Invoking model: ${effectiveModelId}`);
+        if (modelConfig?.requiresInferenceProfile) {
+            console.log(`   Using inference profile ARN for cross-region access`);
+        }
+        
         const command = new InvokeModelCommand({
-            modelId,
+            modelId: effectiveModelId,
             contentType: 'application/json',
             accept: 'application/json',
             body: JSON.stringify(requestBody)
@@ -366,14 +384,30 @@ class BedrockInferenceProvider extends EventEmitter {
             throw new Error('Invalid input format');
         }
         
-        return {
+        // Build base request body
+        const requestBody = {
             anthropic_version: 'bedrock-2023-05-31',
             max_tokens: options.maxTokens || 2000,
-            messages,
-            temperature: options.temperature ?? 0.7,
-            top_p: options.topP ?? 0.9,
-            top_k: options.topK ?? 40
+            messages
         };
+        
+        // Claude models require ONLY ONE sampling parameter (temperature OR top_p, not both)
+        // Priority: temperature > top_p > top_k
+        if (options.temperature !== undefined) {
+            requestBody.temperature = options.temperature;
+        } else if (options.topP !== undefined) {
+            requestBody.top_p = options.topP;
+        } else {
+            // Default to temperature if no sampling parameter specified
+            requestBody.temperature = 0.7;
+        }
+        
+        // top_k can be used with temperature or top_p
+        if (options.topK !== undefined) {
+            requestBody.top_k = options.topK;
+        }
+        
+        return requestBody;
     }
     
     /**
