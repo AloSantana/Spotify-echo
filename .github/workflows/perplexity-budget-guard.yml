@@ -23,6 +23,7 @@ env:
 jobs:
   budget-monitor:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       can_proceed: ${{ steps.guard.outputs.can_proceed }}
       state: ${{ steps.guard.outputs.state }}
@@ -179,6 +180,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: budget-monitor
     if: always()
+    timeout-minutes: 10
     
     steps:
       - name: Checkout Repository
