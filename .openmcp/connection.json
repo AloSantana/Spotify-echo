@@ -1,1 +1,95 @@
-{"items":[]}
+{
+  "mcpServers": {
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "env": {},
+      "disabled": false,
+      "autostart": true
+    },
+    "mongodb": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mongodb-mcp-server"
+      ],
+      "env": {
+        "MONGODB_URI": "${MONGODB_URI}",
+        "MONGODB_DATABASE": "${MONGODB_DATABASE:-spotify-echo}"
+      },
+      "disabled": false,
+      "autostart": true
+    },
+    "spotify": {
+      "command": "node",
+      "args": [
+        "scripts/mcp/spotify-mcp-server.js"
+      ],
+      "env": {
+        "SPOTIFY_CLIENT_ID": "${SPOTIFY_CLIENT_ID}",
+        "SPOTIFY_CLIENT_SECRET": "${SPOTIFY_CLIENT_SECRET}",
+        "SPOTIFY_REDIRECT_URI": "${SPOTIFY_REDIRECT_URI}"
+      },
+      "disabled": false,
+      "autostart": true
+    },
+    "sqlite": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sqlite",
+        "--db-path",
+        "./data/spotify.db"
+      ],
+      "env": {},
+      "disabled": false,
+      "autostart": true
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-playwright"
+      ],
+      "env": {},
+      "disabled": false,
+      "autostart": true
+    },
+    "docker": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-docker"
+      ],
+      "env": {},
+      "disabled": true,
+      "autostart": false
+    },
+    "time": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-time"
+      ],
+      "env": {},
+      "disabled": true,
+      "autostart": false
+    },
+    "google-drive": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-google-drive"
+      ],
+      "env": {
+        "GOOGLE_CLIENT_ID": "${GOOGLE_CLIENT_ID}",
+        "GOOGLE_CLIENT_SECRET": "${GOOGLE_CLIENT_SECRET}"
+      },
+      "disabled": true,
+      "autostart": false
+    }
+  }
+}
