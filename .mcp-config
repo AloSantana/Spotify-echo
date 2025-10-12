@@ -1,25 +1,32 @@
-# MCP Configuration - Updated for comprehensive MCP server setup
-install_timestamp=2025-10-13T00:14:00Z
-os_type=linux
-
-# Core MCP Servers (Enabled)
-sequential_thinking_enabled=true
-mongodb_enabled=true
-spotify_enabled=true
-sqlite_enabled=true
-playwright_enabled=true
-
-# Advanced MCP Servers (Disabled - Ready for Future Use)
-docker_enabled=false
-time_enabled=false
-google_drive_enabled=false
-
-# Legacy/Other Services
-browserbase_enabled=false
-openai_enabled=false
-gemini_enabled=false
-
-# MCP Server Health Check
-mcp_health_check_enabled=true
-mcp_auto_reconnect=true
-mcp_startup_validation=true
+{
+  "mcpServers": {
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "mongodb": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-mongodb"],
+      "env": {
+        "MONGODB_URI": "mongodb://localhost:27017"
+      }
+    },
+    "spotify": {
+      "command": "node",
+      "args": ["./mcp-servers/spotify-server.js"],
+      "env": {
+        "SPOTIFY_CLIENT_ID": "",
+        "SPOTIFY_CLIENT_SECRET": "",
+        "SPOTIFY_REDIRECT_URI": "http://localhost:8888/callback"
+      }
+    },
+    "sqlite": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sqlite", "--db-path", "./data/spotify.db"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@executeautomation/playwright-mcp-server"]
+    }
+  }
+}
