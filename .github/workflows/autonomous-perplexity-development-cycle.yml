@@ -105,49 +105,17 @@ jobs:
     if: needs.detect-trigger.outputs.should_run == 'true'
     timeout-minutes: 5
     outputs:
-      can_proceed: ${{ steps.check.outputs.can_proceed }}
-      budget_state: ${{ steps.check.outputs.state }}
-      usage_percentage: ${{ steps.check.outputs.usage }}
+      can_proceed: ${{ steps.budget.outputs.can_proceed }}
+      budget_state: ${{ steps.budget.outputs.budget_state }}
+      usage_percentage: ${{ steps.budget.outputs.usage_percentage }}
     
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
       
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      
-      - name: Install Python Dependencies
-        run: pip install pyyaml
-      
-      - name: Check Budget Status
-        id: check
-        run: |
-          echo "💰 Checking Perplexity API budget..."
-          
-          if python3 scripts/perplexity_costs.py budget > budget.json 2>&1; then
-            CAN_PROCEED=$(python3 -c "import json; print(json.load(open('budget.json'))['can_proceed'])" 2>/dev/null || echo "true")
-            STATE=$(python3 -c "import json; print(json.load(open('budget.json'))['state'])" 2>/dev/null || echo "UNKNOWN")
-            USAGE=$(python3 -c "import json; print(json.load(open('budget.json'))['usage_percentage'])" 2>/dev/null || echo "0")
-            
-            echo "can_proceed=$CAN_PROCEED" >> $GITHUB_OUTPUT
-            echo "state=$STATE" >> $GITHUB_OUTPUT
-            echo "usage=$USAGE" >> $GITHUB_OUTPUT
-            
-            echo "  State: $STATE"
-            echo "  Usage: $USAGE%"
-            echo "  Can Proceed: $CAN_PROCEED"
-            
-            if [ "$CAN_PROCEED" != "true" ]; then
-              echo "⚠️ WARNING: Budget limit reached - autonomous development will run in limited mode"
-            fi
-          else
-            echo "⚠️ Budget check failed - assuming cautious mode"
-            echo "can_proceed=true" >> $GITHUB_OUTPUT
-            echo "state=WARNING" >> $GITHUB_OUTPUT
-            echo "usage=50" >> $GITHUB_OUTPUT
-          fi
+      - name: Run Budget Check
+        id: budget
+        uses: ./.github/actions/budget-check
 
   autonomous-development-cycle:
     name: Execute Autonomous Development Cycle

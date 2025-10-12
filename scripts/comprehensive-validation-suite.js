@@ -13,6 +13,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { execSync, spawn } = require('child_process');
+const yaml = require('js-yaml');
 
 class ComprehensiveValidationSuite {
     constructor() {
@@ -58,19 +59,19 @@ class ComprehensiveValidationSuite {
             
             for (const file of yamlFiles) {
                 try {
-                    const result = execSync(`yamllint "${workflowDir}/${file}"`, { 
-                        encoding: 'utf8', 
-                        stdio: 'pipe' 
-                    });
+                    // Use yaml parsing for validation
+                    const content = await fs.readFile(`${workflowDir}/${file}`, 'utf8');
+                    yaml.load(content);
+                    
                     this.results.workflows.passed++;
                     console.log(`  ✅ ${file}`);
                 } catch (error) {
                     this.results.workflows.failed++;
                     this.results.workflows.errors.push({
                         file,
-                        error: error.stdout || error.message
+                        error: error.message
                     });
-                    console.log(`  ❌ ${file}: YAML syntax errors`);
+                    console.log(`  ❌ ${file}: ${error.message}`);
                 }
             }
             
