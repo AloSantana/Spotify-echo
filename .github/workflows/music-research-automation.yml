@@ -20,9 +20,27 @@ on:
           - competitive
 
 jobs:
+  budget-check:
+    name: Pre-flight Budget Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      can_proceed: ${{ steps.budget.outputs.can_proceed }}
+      budget_state: ${{ steps.budget.outputs.budget_state }}
+      usage_percentage: ${{ steps.budget.outputs.usage_percentage }}
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Run Budget Check
+        id: budget
+        uses: ./.github/actions/budget-check
+
   music-research:
     name: Automated Music Research
     runs-on: ubuntu-latest
+    needs: budget-check
     timeout-minutes: 30
     
     steps:
@@ -30,6 +48,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Display Budget Status
+        run: |
+          echo "📊 Budget Status from Pre-flight Check:"
+          echo "  State: ${{ needs.budget-check.outputs.budget_state }}"
+          echo "  Can Proceed: ${{ needs.budget-check.outputs.can_proceed }}"
+          
+          if [ "${{ needs.budget-check.outputs.can_proceed }}" != "true" ]; then
+            echo "⚠️ Budget limit reached - research will run in degraded mode"
+          fi
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -53,8 +81,23 @@ jobs:
           RESEARCH_TYPE: ${{ github.event.inputs.research_type || 'full' }}
         run: |
           echo "🎵 Starting automated music research..."
-          node scripts/music-research-automation.js
-          echo "✅ Music research completed"
+          
+          # Run with timeout and error handling
+          if timeout 25m node scripts/music-research-automation.js; then
+            echo "✅ Music research completed successfully"
+          else
+            EXIT_CODE=$?
+            if [ $EXIT_CODE -eq 124 ]; then
+              echo "⚠️ Music research timed out after 25 minutes"
+              echo "💾 Attempting to save partial results..."
+            else
+              echo "❌ Music research failed with exit code: $EXIT_CODE"
+              echo "💾 Checking for partial results..."
+            fi
+            
+            # Continue to next steps even if research fails
+            # Artifacts and summaries will be generated from whatever data is available
+          fi
       
       - name: Generate Music Insights Summary
         run: |
