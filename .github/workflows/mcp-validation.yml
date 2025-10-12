@@ -1,5 +1,4 @@
 name: MCP Validation Pipeline
-
 on:
   pull_request:
     branches: [ main, develop ]
@@ -26,14 +25,11 @@ on:
           - 'minimal'
           - 'standard' 
           - 'comprehensive'
-
 env:
   NODE_VERSION: '20'
   PYTHON_VERSION: '3.11'
-
 permissions:
   contents: read
-
 jobs:
   mcp-config-validation:
     name: MCP Configuration Validation
@@ -42,40 +38,35 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
-
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-
     - name: Install system dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y jq curl
-
     - name: Install Node.js dependencies
       run: npm ci
-
+    - name: Run MCP validate required
+      run: npm run mcp:validate-required
     - name: Validate JSON configuration files
       run: |
         echo "Validating MCP configuration files..."
         jq empty .vscode/mcp.json
         jq empty mcp-config/mcp_servers.json
         echo "✅ All JSON files are valid"
-
     - name: Validate shell scripts
       run: |
         echo "Validating shell scripts syntax..."
         bash -n scripts/install-mcp.sh
         bash -n mcp-config/validate_mcp.sh
         echo "✅ All shell scripts have valid syntax"
-
     - name: Test environment template
       run: |
         echo "Testing environment template..."
@@ -88,7 +79,6 @@ jobs:
           echo "❌ Environment template missing"
           exit 1
         fi
-
     - name: Validate Docker Compose configuration
       run: |
         cd mcp-config
@@ -101,7 +91,6 @@ jobs:
           echo "❌ Docker Compose configuration missing"
           exit 1
         fi
-
     - name: Test MCP validation script
       run: |
         echo "Testing MCP validation script..."
@@ -109,14 +98,12 @@ jobs:
         # Run in dry-run mode (without actually installing)
         ./mcp-config/validate_mcp.sh || true
         echo "✅ MCP validation script executed"
-
     - name: Test MCP install script help
       run: |
         echo "Testing MCP install script..."
         chmod +x scripts/install-mcp.sh
         ./scripts/install-mcp.sh --help
         echo "✅ MCP install script help works"
-
   mcp-connectivity-test:
     name: MCP Server Connectivity Test
     runs-on: ubuntu-latest
@@ -125,26 +112,21 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
-
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-
     - name: Install dependencies
       run: |
         npm ci
         pip install uvx
-
     - name: Setup Docker for MCP servers
       uses: docker/setup-buildx-action@v3
-
     - name: Test NPX package availability
       run: |
         echo "Testing NPX packages..."
@@ -156,7 +138,6 @@ jobs:
         timeout 30s npx -y @modelcontextprotocol/server-memory --help || echo "Memory server timeout (expected)"
         
         echo "✅ NPX packages can be downloaded"
-
     - name: Test Docker image pulls
       run: |
         echo "Testing Docker image availability..."
@@ -165,13 +146,11 @@ jobs:
         docker pull ghcr.io/github/github-mcp-server || echo "⚠️ GitHub MCP image may not be publicly available"
         
         echo "✅ Docker connectivity test completed"
-
     - name: Run connectivity validation
       run: |
         echo "Running MCP connectivity validation..."
         chmod +x mcp-config/validate_mcp.sh
         ./mcp-config/validate_mcp.sh || echo "⚠️ Some MCP servers may not be available in CI"
-
     - name: Run legacy MCP validation (compatibility)
       shell: bash
       run: |
@@ -179,7 +158,6 @@ jobs:
           echo "Running legacy MCP validation for compatibility..."
           bash scripts/mcp/run.sh || true
         fi
-
     - name: Generate validation report
       run: |
         echo "Generating validation summary..."
@@ -209,7 +187,6 @@ jobs:
         EOF
         
         cat mcp-validation-summary.md
-
     - name: Upload validation artifacts
       uses: actions/upload-artifact@v3
       if: always()
@@ -223,7 +200,6 @@ jobs:
           mcp-servers-report.json
         retention-days: 30
         if-no-files-found: ignore
-
   validation-summary:
     name: Validation Summary
     runs-on: ubuntu-latest
@@ -243,8 +219,8 @@ jobs:
           echo "✅ **All validations passed!** MCP integration is ready for use."
           echo ""
           echo "### Next Steps:"
-          echo "1. Configure your GitHub token in \`.env.mcp\`"
-          echo "2. Run \`npm run mcp:install\` to install MCP servers"  
+          echo "1. Configure your GitHub token in `.env.mcp`"
+          echo "2. Run `npm run mcp:install` to install MCP servers"  
           echo "3. Test with your IDE (VS Code/Cursor)"
         else
           echo ""
