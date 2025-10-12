@@ -8,7 +8,12 @@
       ],
       "env": {},
       "disabled": false,
-      "autostart": true
+      "autostart": true,
+      "connection": {
+        "host": "localhost",
+        "port": 3001,
+        "healthEndpoint": "/health"
+      }
     },
     "mongodb": {
       "command": "npx",
@@ -21,7 +26,12 @@
         "MONGODB_DATABASE": "${MONGODB_DATABASE:-spotify-echo}"
       },
       "disabled": false,
-      "autostart": true
+      "autostart": true,
+      "connection": {
+        "host": "localhost",
+        "port": 3002,
+        "healthEndpoint": "/health"
+      }
     },
     "spotify": {
       "command": "node",
@@ -34,7 +44,12 @@
         "SPOTIFY_REDIRECT_URI": "${SPOTIFY_REDIRECT_URI}"
       },
       "disabled": false,
-      "autostart": true
+      "autostart": true,
+      "connection": {
+        "host": "localhost",
+        "port": 3003,
+        "healthEndpoint": "/health"
+      }
     },
     "sqlite": {
       "command": "npx",
@@ -46,7 +61,12 @@
       ],
       "env": {},
       "disabled": false,
-      "autostart": true
+      "autostart": true,
+      "connection": {
+        "host": "localhost",
+        "port": 3004,
+        "healthEndpoint": "/health"
+      }
     },
     "playwright": {
       "command": "npx",
@@ -56,7 +76,12 @@
       ],
       "env": {},
       "disabled": false,
-      "autostart": true
+      "autostart": true,
+      "connection": {
+        "host": "localhost",
+        "port": 3005,
+        "healthEndpoint": "/health"
+      }
     },
     "docker": {
       "command": "npx",
@@ -66,7 +91,12 @@
       ],
       "env": {},
       "disabled": true,
-      "autostart": false
+      "autostart": false,
+      "connection": {
+        "host": "localhost",
+        "port": 3006,
+        "healthEndpoint": "/health"
+      }
     },
     "time": {
       "command": "npx",
@@ -76,7 +106,12 @@
       ],
       "env": {},
       "disabled": true,
-      "autostart": false
+      "autostart": false,
+      "connection": {
+        "host": "localhost",
+        "port": 3007,
+        "healthEndpoint": "/health"
+      }
     },
     "google-drive": {
       "command": "npx",
@@ -89,7 +124,12 @@
         "GOOGLE_CLIENT_SECRET": "${GOOGLE_CLIENT_SECRET}"
       },
       "disabled": true,
-      "autostart": false
+      "autostart": false,
+      "connection": {
+        "host": "localhost",
+        "port": 3008,
+        "healthEndpoint": "/health"
+      }
     }
   }
 }
