@@ -1,7 +1,48 @@
 {
   "modelRegistry": {
+    "claude-opus-4-1": {
+      "modelId": "us.anthropic.claude-opus-4-1-20250805-v1:0",
+      "displayName": "Claude Opus 4.1",
+      "provider": "anthropic",
+      "family": "claude-4",
+      "capabilities": ["reasoning", "complex-analysis", "coding", "text-generation", "conversation", "analysis", "vision", "extended-thinking", "long-horizon-tasks"],
+      "contextWindow": 200000,
+      "maxOutputTokens": 32000,
+      "requiresInferenceProfile": true,
+      "inferenceProfileArn": "arn:aws:bedrock:us-east-1:394686422207:inference-profile/us.anthropic.claude-opus-4-1-20250805-v1:0",
+      "regions": ["us-east-1", "us-west-2", "eu-west-1"],
+      "deprecated": false,
+      "priority": 1,
+      "pricing": {
+        "input": 0.015,
+        "output": 0.075,
+        "currency": "USD",
+        "unit": "per 1K tokens"
+      },
+      "notes": "Claude Opus 4.1 is the most advanced model in the Claude 4 family with extended thinking and long-horizon task capabilities."
+    },
+    "claude-sonnet-4-5": {
+      "modelId": "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "displayName": "Claude Sonnet 4.5",
+      "provider": "anthropic",
+      "family": "claude-4",
+      "capabilities": ["text-generation", "coding", "analysis", "conversation"],
+      "contextWindow": 200000,
+      "maxOutputTokens": 4096,
+      "requiresInferenceProfile": true,
+      "inferenceProfileArn": "arn:aws:bedrock:us-east-1:394686422207:inference-profile/us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "regions": ["us-east-1", "us-west-2", "eu-west-1"],
+      "deprecated": false,
+      "priority": 2,
+      "pricing": {
+        "input": 0.003,
+        "output": 0.015,
+        "currency": "USD",
+        "unit": "per 1K tokens"
+      }
+    },
     "claude-3-opus": {
-      "modelId": "anthropic.claude-3-opus-20240229-v1:0",
+      "modelId": "us.anthropic.claude-3-opus-20240229-v1:0",
       "displayName": "Claude 3 Opus",
       "provider": "anthropic",
       "family": "claude-3",
@@ -12,52 +53,18 @@
       "inferenceProfileArn": null,
       "regions": ["us-east-1", "us-west-2", "eu-west-1"],
       "deprecated": false,
-      "priority": 2,
+      "priority": 3,
       "pricing": {
         "input": 0.015,
         "output": 0.075,
         "currency": "USD",
         "unit": "per 1K tokens"
       },
-      "notes": "Claude 3 Opus is the highest intelligence model in the Claude 3 family. Claude 4 Opus is not yet available in AWS Bedrock as of January 2025."
-    },
-    "claude-sonnet-4-5": {
-      "modelId": "anthropic.claude-sonnet-4-5-20250929-v1:0",
-      "displayName": "Claude Sonnet 4.5",
-      "provider": "anthropic",
-      "family": "claude-4",
-      "capabilities": ["text-generation", "coding", "analysis", "conversation"],
-      "contextWindow": 200000,
-      "maxOutputTokens": 4096,
-      "requiresInferenceProfile": true,
-      "inferenceProfileArn": "arn:aws:bedrock:us-east-1:394686422207:inference-profile/global.anthropic.claude-sonnet-4-5-20250929-v1:0",
-      "regions": ["us-east-1", "us-west-2", "eu-west-1"],
-      "deprecated": false,
-      "priority": 1,
-      "pricing": {
-        "input": 0.003,
-        "output": 0.015,
-        "currency": "USD",
-        "unit": "per 1K tokens"
-      }
+      "notes": "Claude 3 Opus is the highest intelligence model in the Claude 3 family."
     },
     "claude-3-5-sonnet-v2": {
-      "modelId": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+      "modelId": "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
       "displayName": "Claude 3.5 Sonnet v2",
-      "provider": "anthropic",
-      "family": "claude-3-5",
-      "capabilities": ["text-generation", "conversation", "analysis", "vision"],
-      "contextWindow": 200000,
-      "maxOutputTokens": 8192,
-      "requiresInferenceProfile": false,
-      "inferenceProfileArn": null,
-      "regions": ["us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1"],
-      "deprecated": false,
-      "priority": 3
-    },
-    "claude-3-5-sonnet-v1": {
-      "modelId": "anthropic.claude-3-5-sonnet-20240620-v1:0",
-      "displayName": "Claude 3.5 Sonnet v1",
       "provider": "anthropic",
       "family": "claude-3-5",
       "capabilities": ["text-generation", "conversation", "analysis", "vision"],
@@ -69,8 +76,22 @@
       "deprecated": false,
       "priority": 4
     },
+    "claude-3-5-sonnet-v1": {
+      "modelId": "us.anthropic.claude-3-5-sonnet-20240620-v1:0",
+      "displayName": "Claude 3.5 Sonnet v1",
+      "provider": "anthropic",
+      "family": "claude-3-5",
+      "capabilities": ["text-generation", "conversation", "analysis", "vision"],
+      "contextWindow": 200000,
+      "maxOutputTokens": 8192,
+      "requiresInferenceProfile": false,
+      "inferenceProfileArn": null,
+      "regions": ["us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1"],
+      "deprecated": false,
+      "priority": 5
+    },
     "claude-3-5-haiku": {
-      "modelId": "anthropic.claude-3-5-haiku-20241022-v1:0",
+      "modelId": "us.anthropic.claude-3-5-haiku-20241022-v1:0",
       "displayName": "Claude 3.5 Haiku",
       "provider": "anthropic",
       "family": "claude-3-5",
@@ -81,10 +102,10 @@
       "inferenceProfileArn": null,
       "regions": ["us-east-1", "us-west-2", "eu-west-1"],
       "deprecated": false,
-      "priority": 5
+      "priority": 6
     },
     "claude-3-sonnet": {
-      "modelId": "anthropic.claude-3-sonnet-20240229-v1:0",
+      "modelId": "us.anthropic.claude-3-sonnet-20240229-v1:0",
       "displayName": "Claude 3 Sonnet",
       "provider": "anthropic",
       "family": "claude-3",
@@ -95,7 +116,7 @@
       "inferenceProfileArn": null,
       "regions": ["us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1", "ap-northeast-1"],
       "deprecated": false,
-      "priority": 6
+      "priority": 7
     },
 
     "claude-3-haiku": {
@@ -112,34 +133,19 @@
       "deprecated": false,
       "priority": 8
     },
-    "claude-v2-1": {
-      "modelId": "anthropic.claude-v2:1",
-      "displayName": "Claude 2.1",
-      "provider": "anthropic",
-      "family": "claude-2",
-      "capabilities": ["text-generation", "conversation"],
-      "contextWindow": 100000,
-      "maxOutputTokens": 4096,
-      "requiresInferenceProfile": false,
-      "inferenceProfileArn": null,
-      "regions": ["us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1", "ap-northeast-1"],
-      "deprecated": true,
-      "priority": 99,
-      "deprecationNote": "Claude 2.1 is deprecated. Use Claude 3 or later."
-    },
     "deepseek-r1": {
-      "modelId": "deepseek.r1-v1:0",
-      "displayName": "DeepSeek R1",
+      "modelId": "us.deepseek.r1-v1:0",
+      "displayName": "DeepSeek-R1",
       "provider": "deepseek",
       "family": "deepseek-r1",
-      "capabilities": ["text-generation", "reasoning", "coding"],
+      "capabilities": ["text-generation", "reasoning", "coding", "deep-reasoning"],
       "contextWindow": 64000,
       "maxOutputTokens": 8192,
-      "requiresInferenceProfile": false,
-      "inferenceProfileArn": null,
+      "requiresInferenceProfile": true,
+      "inferenceProfileArn": "arn:aws:bedrock:us-east-1:394686422207:inference-profile/us.deepseek.r1-v1:0",
       "regions": ["us-east-1", "us-west-2"],
       "deprecated": false,
-      "priority": 10
+      "priority": 9
     },
     "titan-text-express-v1": {
       "modelId": "amazon.titan-text-express-v1",
@@ -200,15 +206,17 @@
     }
   },
   "metadata": {
-    "version": "1.0.0",
-    "lastUpdated": "2025-01-15",
+    "version": "2.0.0",
+    "lastUpdated": "2025-10-12",
     "maintainer": "EchoTune AI Team",
-    "documentation": "docs/AWS_BEDROCK_TESTING_README.md",
+    "documentation": "docs/BEDROCK_INTEGRATION.md",
     "notes": [
-      "Model IDs are based on AWS Bedrock documentation as of January 2025",
-      "Inference profile ARNs should be updated when available",
-      "Region availability may change - always verify in AWS Console",
-      "Deprecated models are excluded from default tests but can be enabled"
+      "Model IDs updated to use us. prefix for system-defined inference profiles",
+      "Claude Opus 4.1, Claude Sonnet 4.5, and DeepSeek-R1 require inference profile ARNs",
+      "Deprecated Claude 2.1 model has been removed from the registry",
+      "All model identifiers updated to match AWS Bedrock latest specifications",
+      "Inference profile ARNs are system-defined and region-specific",
+      "Region availability may change - always verify in AWS Console"
     ]
   }
 }
