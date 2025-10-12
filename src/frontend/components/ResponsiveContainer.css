@@ -1,0 +1,72 @@
+/* Responsive Container Component Styles */
+
+.responsive-container {
+  box-sizing: border-box;
+  transition: padding 0.3s ease, gap 0.3s ease;
+}
+
+/* Layout-specific styles */
+.responsive-container--default {
+  /* Uses flex column layout */
+}
+
+.responsive-container--grid {
+  /* Uses CSS Grid */
+}
+
+.responsive-container--flex {
+  /* Uses flex row/column based on screen size */
+}
+
+/* Smooth transitions for layout changes */
+.responsive-container > * {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+  .responsive-container {
+    width: 100%;
+  }
+
+  /* Ensure grid collapses to single column on mobile */
+  .responsive-container--grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Stack flex items on mobile */
+  .responsive-container--flex {
+    flex-direction: column !important;
+  }
+}
+
+/* Tablet-specific adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Grid items can be 2 columns max on tablet */
+  .responsive-container--grid[data-tablet="true"] {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}
+
+/* Desktop optimizations */
+@media (min-width: 1025px) {
+  .responsive-container {
+    /* Ensure proper spacing on large screens */
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .responsive-container,
+  .responsive-container > * {
+    transition: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .responsive-container {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+}

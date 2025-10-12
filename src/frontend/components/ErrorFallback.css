@@ -1,0 +1,133 @@
+/* Error Fallback Component Styles */
+
+.error-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  width: 100%;
+  padding: 2rem;
+}
+
+.error-fallback__container {
+  max-width: 600px;
+  width: 100%;
+  padding: 3rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.error-fallback__icon {
+  font-size: 4rem !important;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+.error-fallback__title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.error-fallback__message {
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+.error-fallback__details {
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1rem;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  text-align: left;
+}
+
+.error-fallback__stack {
+  font-size: 0.75rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #666;
+  margin-top: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.error-fallback__actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.error-fallback__button {
+  min-width: 120px;
+}
+
+/* Inline variant */
+.error-fallback--inline {
+  margin: 1rem 0;
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .error-fallback__details {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .error-fallback__stack {
+    color: #aaa;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .error-fallback {
+    padding: 1rem;
+    min-height: 300px;
+  }
+
+  .error-fallback__container {
+    padding: 2rem 1.5rem;
+  }
+
+  .error-fallback__icon {
+    font-size: 3rem !important;
+  }
+
+  .error-fallback__actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .error-fallback__button {
+    width: 100%;
+  }
+}
+
+/* Animation for error display */
+@keyframes fadeInError {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-fallback__container {
+  animation: fadeInError 0.3s ease-out;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .error-fallback__container {
+    animation: none;
+  }
+}

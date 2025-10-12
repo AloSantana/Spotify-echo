@@ -44,6 +44,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/AuthContext';
 import { LLMProvider } from './contexts/LLMContext';
 // import { DatabaseProvider } from './contexts/DatabaseContext';
+import { EnhancedErrorBoundary } from './components/ErrorFallback';
+import LoadingState from './components/LoadingState';
 import './styles/App.css';
 
 // Prefetch maps to warm lazy chunks on hover
@@ -78,35 +80,37 @@ const prefetchers = {
  */
 function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <LLMProvider>
-          <Router>
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading…</div>}>
-              <Routes>
-                <Route path="/" element={<MainApplication />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/auth/callback" element={<AuthCallbackHandler />} />
-                <Route path="/chat" element={<MainApplication initialTab="chat" />} />
-                <Route
-                  path="/recommendations"
-                  element={<MainApplication initialTab="recommendations" />}
-                />
-                <Route path="/playlist" element={<MainApplication initialTab="playlist" />} />
-                <Route path="/playlists" element={<MainApplication initialTab="playlists" />} />
-                <Route path="/songs" element={<MainApplication initialTab="songs" />} />
-                <Route path="/discovery" element={<MainApplication initialTab="discovery" />} />
-                <Route path="/analytics" element={<MainApplication initialTab="analytics" />} />
-                <Route path="/insights" element={<MainApplication initialTab="insights" />} />
+    <EnhancedErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <LLMProvider>
+            <Router>
+              <Suspense fallback={<LoadingState size="large" message="Loading EchoTune AI..." />}>
+                <Routes>
+                  <Route path="/" element={<MainApplication />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/auth/callback" element={<AuthCallbackHandler />} />
+                  <Route path="/chat" element={<MainApplication initialTab="chat" />} />
+                  <Route
+                    path="/recommendations"
+                    element={<MainApplication initialTab="recommendations" />}
+                  />
+                  <Route path="/playlist" element={<MainApplication initialTab="playlist" />} />
+                  <Route path="/playlists" element={<MainApplication initialTab="playlists" />} />
+                  <Route path="/songs" element={<MainApplication initialTab="songs" />} />
+                  <Route path="/discovery" element={<MainApplication initialTab="discovery" />} />
+                  <Route path="/analytics" element={<MainApplication initialTab="analytics" />} />
+                  <Route path="/insights" element={<MainApplication initialTab="insights" />} />
                 <Route path="/autonomous" element={<MainApplication initialTab="autonomous" />} />
                 <Route path="/settings" element={<MainApplication initialTab="settings" />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </Suspense>
-          </Router>
-        </LLMProvider>
-      </AuthProvider>
-    </ThemeProvider>
+                </Routes>
+              </Suspense>
+            </Router>
+          </LLMProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </EnhancedErrorBoundary>
   );
 }
 
