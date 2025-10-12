@@ -48,9 +48,9 @@
       "priority": 1,
       "plannedUsage": [
         "Complex problem decomposition",
-        "Step-by-step reasoning",
-        "Decision tree analysis",
-        "Structured problem solving"
+        "Step-by-step reasoning for PR reviews",
+        "Decision tree analysis for code changes",
+        "Structured problem solving in coding agent workflows"
       ],
       "healthCheck": {
         "command": "node -e \"console.log('sequential-thinking available')\"",
@@ -66,12 +66,73 @@
       "priority": 1,
       "plannedUsage": [
         "Git operations and version control",
-        "Branch management and merging",
-        "Commit history analysis",
-        "Repository status checking"
+        "Branch management and merging in PR workflows",
+        "Commit history analysis for coding agent",
+        "Repository status checking for CI/CD"
       ],
       "healthCheck": {
         "command": "git --version",
+        "timeout": 3000
+      }
+    },
+    "sqlite": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-sqlite",
+        "--db-path",
+        "./data/coding-agent.db"
+      ],
+      "capabilities": ["database-operations", "query-execution", "data-persistence"],
+      "category": "extended",
+      "required": false,
+      "priority": 2,
+      "plannedUsage": [
+        "Store coding agent session data and PR analysis",
+        "Cache GitHub API responses to reduce rate limiting",
+        "Track PR review history and decisions",
+        "Maintain coding agent knowledge base"
+      ],
+      "healthCheck": {
+        "command": "node -e \"const db = require('better-sqlite3')('./data/coding-agent.db'); db.close();\"",
+        "timeout": 3000
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-playwright"],
+      "capabilities": ["browser-automation", "ui-testing", "screenshot-capture"],
+      "category": "extended",
+      "required": false,
+      "priority": 2,
+      "plannedUsage": [
+        "Automated UI testing in PR validation workflows",
+        "Screenshot capture for visual regression testing",
+        "Browser-based integration tests for coding agent",
+        "Automated testing of deployed PR previews"
+      ],
+      "healthCheck": {
+        "command": "npx playwright --version",
+        "timeout": 5000
+      }
+    },
+    "github": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "capabilities": ["github-api", "pr-operations", "issue-management"],
+      "category": "extended",
+      "required": false,
+      "priority": 2,
+      "plannedUsage": [
+        "GitHub API operations for coding agent",
+        "Automated PR creation and updates",
+        "Issue tracking and management",
+        "Repository insights and analytics"
+      ],
+      "healthCheck": {
+        "command": "node -e \"console.log(process.env.GITHUB_TOKEN ? 'GitHub token configured' : 'Missing GITHUB_TOKEN')\"",
         "timeout": 3000
       }
     }

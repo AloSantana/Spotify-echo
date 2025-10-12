@@ -1,8 +1,39 @@
-# MCP Configuration - Generated Sun Aug 10 12:34:03 AM UTC 2025
-install_timestamp=2025-08-10T00:34:03Z
-os_type=linux
-browserbase_enabled=false
-spotify_enabled=true
-openai_enabled=false
-gemini_enabled=false
-mongodb_enabled=true
+{
+  "mcpServers": {
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "mongodb": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-mongodb"],
+      "env": {
+        "MONGODB_URI": "mongodb://localhost:27017"
+      }
+    },
+    "spotify": {
+      "command": "node",
+      "args": ["./mcp-servers/spotify-server.js"],
+      "env": {
+        "SPOTIFY_CLIENT_ID": "",
+        "SPOTIFY_CLIENT_SECRET": "",
+        "SPOTIFY_REDIRECT_URI": "http://localhost:8888/callback"
+      }
+    },
+    "sqlite": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sqlite", "--db-path", "./data/spotify.db"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@executeautomation/playwright-mcp-server"]
+    },
+    "hyperbrowser": {
+      "command": "npx",
+      "args": ["-y", "hyperbrowser-mcp"],
+      "env": {
+        "HYPERBROWSER_API_KEY": "hb_9bc8977fa67913fb46f3a11bfbbb"
+      }
+    }
+  }
+}

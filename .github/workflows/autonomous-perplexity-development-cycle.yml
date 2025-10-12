@@ -23,8 +23,8 @@ on:
         required: false
         type: string
   schedule:
-    # Run every 6 hours to check for new roadmap updates
-    - cron: '0 */6 * * *'
+    # Run every 12 hours to check for new roadmap updates
+    - cron: '0 */12 * * *'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -98,11 +98,31 @@ jobs:
           echo "  Should Run: $SHOULD_RUN"
           echo "  Trigger Type: $TRIGGER_TYPE"
 
-  autonomous-development-cycle:
-    name: Execute Autonomous Development Cycle
+  budget-check:
+    name: Pre-flight Budget Check
     runs-on: ubuntu-latest
     needs: detect-trigger
     if: needs.detect-trigger.outputs.should_run == 'true'
+    timeout-minutes: 5
+    outputs:
+      can_proceed: ${{ steps.budget.outputs.can_proceed }}
+      budget_state: ${{ steps.budget.outputs.budget_state }}
+      usage_percentage: ${{ steps.budget.outputs.usage_percentage }}
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Run Budget Check
+        id: budget
+        uses: ./.github/actions/budget-check
+
+  autonomous-development-cycle:
+    name: Execute Autonomous Development Cycle
+    runs-on: ubuntu-latest
+    needs: [detect-trigger, budget-check]
+    if: needs.detect-trigger.outputs.should_run == 'true'
+    timeout-minutes: 60
     
     steps:
       - name: Checkout Repository
@@ -140,6 +160,18 @@ jobs:
           echo "Trigger: ${{ needs.detect-trigger.outputs.trigger_type }}"
           echo "Max Iterations: $MAX_ITERATIONS"
           echo "Focus Area: $FOCUS_AREA"
+          echo "Budget State: ${{ needs.budget-check.outputs.budget_state }}"
+          echo "Budget Usage: ${{ needs.budget-check.outputs.usage_percentage }}%"
+          
+          # Adjust max iterations based on budget
+          BUDGET_USAGE=${{ needs.budget-check.outputs.usage_percentage }}
+          if [ "$BUDGET_USAGE" -gt 80 ]; then
+            MAX_ITERATIONS=2
+            echo "⚠️ High budget usage - limiting to $MAX_ITERATIONS iterations"
+          elif [ "$BUDGET_USAGE" -gt 60 ]; then
+            MAX_ITERATIONS=3
+            echo "⚠️ Moderate budget usage - limiting to $MAX_ITERATIONS iterations"
+          fi
           
           # Create session directory
           mkdir -p .autonomous-session
@@ -147,6 +179,7 @@ jobs:
           # Generate session ID
           SESSION_ID="autonomous-$(date +%Y%m%d-%H%M%S)-$RANDOM"
           echo "session_id=$SESSION_ID" >> $GITHUB_OUTPUT
+          echo "max_iterations=$MAX_ITERATIONS" >> $GITHUB_OUTPUT
           echo "$SESSION_ID" > .autonomous-session/session_id
           
           # Initialize session log
@@ -157,6 +190,8 @@ jobs:
           **Trigger**: ${{ needs.detect-trigger.outputs.trigger_type }}
           **Max Iterations**: $MAX_ITERATIONS
           **Focus Area**: ${FOCUS_AREA:-"Full roadmap"}
+          **Budget State**: ${{ needs.budget-check.outputs.budget_state }}
+          **Budget Usage**: ${{ needs.budget-check.outputs.usage_percentage }}%
           
           ## Session Progress
           

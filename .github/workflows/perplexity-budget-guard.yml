@@ -2,8 +2,8 @@ name: Perplexity Budget Guard and Monitoring
 
 on:
   schedule:
-    # Run every 4 hours to monitor budget status
-    - cron: '0 */4 * * *'
+    # Run every 6 hours to monitor budget status
+    - cron: '0 */6 * * *'
   workflow_dispatch:
     inputs:
       force_check:
@@ -23,6 +23,7 @@ env:
 jobs:
   budget-monitor:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       can_proceed: ${{ steps.guard.outputs.can_proceed }}
       state: ${{ steps.guard.outputs.state }}
@@ -68,9 +69,29 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "🔍 Running budget guard check..."
-          python3 scripts/budget_guard.py --output-file budget-summary.json --verbose
           
-          echo "📊 Budget check completed"
+          # Run budget guard with error handling
+          if python3 scripts/budget_guard.py --output-file budget-summary.json --verbose; then
+            echo "📊 Budget check completed successfully"
+          else
+            echo "⚠️ Budget check failed, using fallback mode"
+            # Create minimal budget summary for fallback
+            cat > budget-summary.json << 'EOF'
+          {
+            "status": "error",
+            "message": "Budget check failed - assuming WARNING state for safety",
+            "can_proceed": false,
+            "state": "WARNING",
+            "usage_percentage": 100,
+            "remaining_usd": 0
+          }
+          EOF
+          fi
+          
+          # Ensure output file exists
+          if [ ! -f budget-summary.json ]; then
+            echo '{"status":"error","can_proceed":false}' > budget-summary.json
+          fi
 
       - name: Upload Budget Summary
         uses: actions/upload-artifact@v4
@@ -159,6 +180,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: budget-monitor
     if: always()
+    timeout-minutes: 10
     
     steps:
       - name: Checkout Repository

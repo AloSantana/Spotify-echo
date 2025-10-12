@@ -9,10 +9,17 @@
  * - Music industry insights and competitive analysis
  * - Integration with recommendation algorithms
  * - Weekly research reports for strategy planning
+ * 
+ * Enhanced with:
+ * - Budget-aware API usage with circuit breaker pattern
+ * - Request throttling and rate limiting
+ * - Graceful degradation for API failures
+ * - Comprehensive error handling and recovery
  */
 
 const fs = require('fs').promises;
 const path = require('path');
+const { execSync } = require('child_process');
 
 class MusicResearchAutomator {
   constructor() {
@@ -26,35 +33,350 @@ class MusicResearchAutomator {
       insights: []
     };
     
+    // Circuit breaker state
+    this.circuitBreaker = {
+      failureCount: 0,
+      lastFailureTime: null,
+      state: 'CLOSED', // CLOSED, OPEN, HALF_OPEN
+      failureThreshold: 3,
+      resetTimeout: 60000, // 1 minute
+      consecutiveSuccesses: 0
+    };
+    
+    // Rate limiting
+    this.rateLimiter = {
+      requestCount: 0,
+      windowStart: Date.now(),
+      maxRequestsPerMinute: 20, // Conservative limit
+      requestQueue: []
+    };
+    
+    // Budget tracking
+    this.budgetInfo = {
+      canProceed: true,
+      remainingBudget: 0,
+      usagePercentage: 0,
+      state: 'UNKNOWN'
+    };
+    
+    // Statistics
+    this.stats = {
+      totalRequests: 0,
+      successfulRequests: 0,
+      failedRequests: 0,
+      cachedResponses: 0,
+      budgetChecks: 0
+    };
+    
     if (!this.perplexityApiKey) {
       console.warn('⚠️ PERPLEXITY_API_KEY not found. Research features will be limited.');
     }
+  }
+  
+  /**
+   * Check budget status before proceeding with API-intensive operations
+   */
+  async checkBudgetStatus() {
+    console.log('💰 Checking Perplexity API budget status...');
+    this.stats.budgetChecks++;
+    
+    try {
+      // Run budget check using Python script
+      const result = execSync(
+        'python3 scripts/perplexity_costs.py budget',
+        { encoding: 'utf-8', timeout: 10000 }
+      );
+      
+      const budgetData = JSON.parse(result);
+      this.budgetInfo = {
+        canProceed: budgetData.can_proceed || false,
+        remainingBudget: budgetData.remaining_amount || 0,
+        usagePercentage: budgetData.usage_percentage || 0,
+        state: budgetData.state || 'UNKNOWN'
+      };
+      
+      console.log(`  Budget State: ${this.budgetInfo.state}`);
+      console.log(`  Usage: ${this.budgetInfo.usagePercentage}%`);
+      console.log(`  Remaining: $${this.budgetInfo.remainingBudget.toFixed(2)}`);
+      
+      if (!this.budgetInfo.canProceed) {
+        console.warn('  ⚠️ Budget limit reached - using degraded mode');
+      }
+      
+      return this.budgetInfo.canProceed;
+      
+    } catch (error) {
+      console.warn(`  ⚠️ Budget check failed: ${error.message}`);
+      // Fail safe - assume we can proceed but with caution
+      this.budgetInfo.canProceed = true;
+      this.budgetInfo.state = 'WARNING';
+      return true;
+    }
+  }
+  
+  /**
+   * Circuit breaker check - prevent cascading failures
+   */
+  canMakeRequest() {
+    const now = Date.now();
+    
+    // Check if circuit is OPEN
+    if (this.circuitBreaker.state === 'OPEN') {
+      // Check if timeout has elapsed
+      if (now - this.circuitBreaker.lastFailureTime > this.circuitBreaker.resetTimeout) {
+        console.log('🔄 Circuit breaker moving to HALF_OPEN state');
+        this.circuitBreaker.state = 'HALF_OPEN';
+        this.circuitBreaker.consecutiveSuccesses = 0;
+        return true;
+      }
+      
+      console.warn('⚡ Circuit breaker is OPEN - request blocked');
+      return false;
+    }
+    
+    return true;
+  }
+  
+  /**
+   * Record successful request for circuit breaker
+   */
+  recordSuccess() {
+    this.circuitBreaker.consecutiveSuccesses++;
+    this.stats.successfulRequests++;
+    
+    if (this.circuitBreaker.state === 'HALF_OPEN' && 
+        this.circuitBreaker.consecutiveSuccesses >= 2) {
+      console.log('✅ Circuit breaker moving to CLOSED state');
+      this.circuitBreaker.state = 'CLOSED';
+      this.circuitBreaker.failureCount = 0;
+    }
+  }
+  
+  /**
+   * Record failed request for circuit breaker
+   */
+  recordFailure() {
+    this.circuitBreaker.failureCount++;
+    this.circuitBreaker.lastFailureTime = Date.now();
+    this.circuitBreaker.consecutiveSuccesses = 0;
+    this.stats.failedRequests++;
+    
+    if (this.circuitBreaker.failureCount >= this.circuitBreaker.failureThreshold) {
+      console.warn('⚡ Circuit breaker opening due to repeated failures');
+      this.circuitBreaker.state = 'OPEN';
+    }
+  }
+  
+  /**
+   * Rate limiting check
+   */
+  async waitForRateLimit() {
+    const now = Date.now();
+    const windowElapsed = now - this.rateLimiter.windowStart;
+    
+    // Reset window if a minute has passed
+    if (windowElapsed >= 60000) {
+      this.rateLimiter.requestCount = 0;
+      this.rateLimiter.windowStart = now;
+    }
+    
+    // Check if we're at the limit
+    if (this.rateLimiter.requestCount >= this.rateLimiter.maxRequestsPerMinute) {
+      const waitTime = 60000 - windowElapsed;
+      console.log(`⏳ Rate limit reached, waiting ${Math.ceil(waitTime / 1000)}s...`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+      
+      // Reset after waiting
+      this.rateLimiter.requestCount = 0;
+      this.rateLimiter.windowStart = Date.now();
+    }
+    
+    this.rateLimiter.requestCount++;
   }
 
   async runWeeklyMusicResearch() {
     console.log('🎵 Starting Weekly Music Research Automation...\n');
 
     try {
-      await Promise.all([
-        this.researchMusicTrends(),
-        this.discoverEmergingArtists(),
-        this.analyzeGenreEvolution(),
-        this.monitorIndustryDevelopments(),
-        this.competitiveAnalysis()
-      ]);
+      // Pre-flight budget check
+      const budgetOk = await this.checkBudgetStatus();
+      
+      if (!budgetOk) {
+        console.warn('⚠️ Budget limit reached - running in degraded mode');
+        await this.runDegradedMode();
+        return;
+      }
+      
+      // Determine research scope based on budget state
+      const researchScope = this.determineResearchScope();
+      console.log(`📊 Research scope: ${researchScope.mode}`);
+      console.log(`📝 Planning ${researchScope.maxQueries} API queries\n`);
+      
+      // Run research with proper sequencing to respect rate limits
+      if (researchScope.includeTrends) {
+        await this.researchMusicTrends(researchScope.queriesPerCategory);
+      }
+      
+      if (researchScope.includeArtists) {
+        await this.discoverEmergingArtists(researchScope.queriesPerCategory);
+      }
+      
+      if (researchScope.includeGenres) {
+        await this.analyzeGenreEvolution(researchScope.queriesPerCategory);
+      }
+      
+      if (researchScope.includeIndustry) {
+        await this.monitorIndustryDevelopments(researchScope.queriesPerCategory);
+      }
+      
+      if (researchScope.includeCompetitive) {
+        await this.competitiveAnalysis(researchScope.queriesPerCategory);
+      }
 
       await this.generateMusicResearchReport();
       await this.updateRecommendationData();
+      
+      this.printStatistics();
       
       console.log('✅ Weekly music research completed successfully!');
       
     } catch (error) {
       console.error('❌ Music research failed:', error.message);
+      console.error('Stack trace:', error.stack);
+      
+      // Save partial results if any research was completed
+      if (this.getTotalResearchCount() > 0) {
+        console.log('💾 Saving partial research results...');
+        await this.generateMusicResearchReport();
+      }
+      
       throw error;
     }
   }
+  
+  /**
+   * Determine research scope based on budget state
+   */
+  determineResearchScope() {
+    const state = this.budgetInfo.state;
+    const percentage = this.budgetInfo.usagePercentage;
+    
+    // Full mode - under 50% budget usage
+    if (percentage < 50) {
+      return {
+        mode: 'FULL',
+        maxQueries: 25,
+        queriesPerCategory: 5,
+        includeTrends: true,
+        includeArtists: true,
+        includeGenres: true,
+        includeIndustry: true,
+        includeCompetitive: true
+      };
+    }
+    
+    // Reduced mode - 50-70% budget usage
+    if (percentage < 70) {
+      return {
+        mode: 'REDUCED',
+        maxQueries: 15,
+        queriesPerCategory: 3,
+        includeTrends: true,
+        includeArtists: true,
+        includeGenres: true,
+        includeIndustry: false,
+        includeCompetitive: false
+      };
+    }
+    
+    // Minimal mode - 70-90% budget usage
+    if (percentage < 90) {
+      return {
+        mode: 'MINIMAL',
+        maxQueries: 8,
+        queriesPerCategory: 2,
+        includeTrends: true,
+        includeArtists: true,
+        includeGenres: false,
+        includeIndustry: false,
+        includeCompetitive: false
+      };
+    }
+    
+    // Critical mode - over 90% budget usage
+    return {
+      mode: 'CRITICAL',
+      maxQueries: 3,
+      queriesPerCategory: 1,
+      includeTrends: true,
+      includeArtists: false,
+      includeGenres: false,
+      includeIndustry: false,
+      includeCompetitive: false
+    };
+  }
+  
+  /**
+   * Run degraded mode when budget is exhausted - use only cached data
+   */
+  async runDegradedMode() {
+    console.log('🔄 Running in DEGRADED MODE - using cached data only\n');
+    
+    // Try to load previous research data
+    try {
+      const cachedReportPath = path.join('automation-artifacts', 'music-research-report.json');
+      const cachedReport = JSON.parse(await fs.readFile(cachedReportPath, 'utf8'));
+      
+      console.log('📦 Found cached research report from:', cachedReport.reportInfo.generated);
+      console.log('📊 Using cached data for current report\n');
+      
+      // Update timestamps but use cached content
+      cachedReport.reportInfo.generated = new Date().toISOString();
+      cachedReport.reportInfo.mode = 'DEGRADED - Budget Exhausted';
+      cachedReport.reportInfo.note = 'This report uses cached data from previous research due to budget limits';
+      
+      // Save updated report
+      const reportPath = path.join('automation-artifacts', 'music-research-report.json');
+      await fs.writeFile(reportPath, JSON.stringify(cachedReport, null, 2));
+      
+      console.log('✅ Degraded mode report generated from cache');
+      
+    } catch (error) {
+      console.error('❌ No cached data available for degraded mode:', error.message);
+      
+      // Create minimal report indicating budget exhaustion
+      const minimalReport = {
+        reportInfo: {
+          title: 'Weekly Music Research Report - Budget Exhausted',
+          generated: new Date().toISOString(),
+          mode: 'DEGRADED',
+          status: 'Budget limit reached - no new research performed'
+        },
+        message: 'Weekly budget for Perplexity API has been exhausted. Research will resume when budget resets.',
+        budgetInfo: this.budgetInfo
+      };
+      
+      const reportPath = path.join('automation-artifacts', 'music-research-report.json');
+      await fs.writeFile(reportPath, JSON.stringify(minimalReport, null, 2));
+    }
+  }
+  
+  /**
+   * Print execution statistics
+   */
+  printStatistics() {
+    console.log('\n📊 EXECUTION STATISTICS');
+    console.log('=' .repeat(50));
+    console.log(`Total API Requests: ${this.stats.totalRequests}`);
+    console.log(`Successful: ${this.stats.successfulRequests}`);
+    console.log(`Failed: ${this.stats.failedRequests}`);
+    console.log(`Cached Responses: ${this.stats.cachedResponses}`);
+    console.log(`Budget Checks: ${this.stats.budgetChecks}`);
+    console.log(`Circuit Breaker State: ${this.circuitBreaker.state}`);
+    console.log(`Success Rate: ${((this.stats.successfulRequests / Math.max(this.stats.totalRequests, 1)) * 100).toFixed(1)}%`);
+  }
 
-  async researchMusicTrends() {
+  async researchMusicTrends(maxQueries = 4) {
     console.log('📈 Researching Current Music Trends...');
 
     const trendQueries = [
@@ -62,7 +384,7 @@ class MusicResearchAutomator {
       'Emerging music genres and subgenres gaining popularity in 2025',
       'Current music production trends and audio engineering innovations',
       'Music streaming platform algorithm changes and their impact on discovery'
-    ];
+    ].slice(0, maxQueries);
 
     for (const query of trendQueries) {
       try {
@@ -87,7 +409,7 @@ class MusicResearchAutomator {
     }
   }
 
-  async discoverEmergingArtists() {
+  async discoverEmergingArtists(maxQueries = 4) {
     console.log('🎤 Discovering Emerging Artists...');
 
     const artistQueries = [
@@ -95,7 +417,7 @@ class MusicResearchAutomator {
       'Independent artists and labels making significant impact in music discovery',
       'Rising artists in electronic, indie, hip-hop, and alternative genres',
       'Artists with innovative approaches to music distribution and fan engagement'
-    ];
+    ].slice(0, maxQueries);
 
     for (const query of artistQueries) {
       try {
@@ -122,10 +444,10 @@ class MusicResearchAutomator {
     }
   }
 
-  async analyzeGenreEvolution() {
+  async analyzeGenreEvolution(maxGenres = 8) {
     console.log('🎼 Analyzing Genre Evolution...');
 
-    const genres = ['electronic', 'indie', 'hip-hop', 'pop', 'rock', 'r&b', 'folk', 'jazz'];
+    const genres = ['electronic', 'indie', 'hip-hop', 'pop', 'rock', 'r&b', 'folk', 'jazz'].slice(0, maxGenres);
     
     for (const genre of genres) {
       try {
@@ -154,7 +476,7 @@ class MusicResearchAutomator {
     }
   }
 
-  async monitorIndustryDevelopments() {
+  async monitorIndustryDevelopments(maxQueries = 4) {
     console.log('🏢 Monitoring Music Industry Developments...');
 
     const industryQueries = [
@@ -162,7 +484,7 @@ class MusicResearchAutomator {
       'AI and machine learning applications in music recommendation and discovery',
       'Music licensing, royalties, and artist compensation developments',
       'New music discovery platforms and technologies emerging in 2025'
-    ];
+    ].slice(0, maxQueries);
 
     for (const query of industryQueries) {
       try {
@@ -189,10 +511,10 @@ class MusicResearchAutomator {
     }
   }
 
-  async competitiveAnalysis() {
+  async competitiveAnalysis(maxPlatforms = 5) {
     console.log('🔍 Performing Competitive Analysis...');
 
-    const platforms = ['Spotify', 'Apple Music', 'YouTube Music', 'Amazon Music', 'Tidal'];
+    const platforms = ['Spotify', 'Apple Music', 'YouTube Music', 'Amazon Music', 'Tidal'].slice(0, maxPlatforms);
     
     for (const platform of platforms) {
       try {
@@ -225,18 +547,35 @@ class MusicResearchAutomator {
     if (!this.perplexityApiKey) {
       throw new Error('Perplexity API key not configured');
     }
+    
+    // Check circuit breaker
+    if (!this.canMakeRequest()) {
+      throw new Error('Circuit breaker is OPEN - too many recent failures');
+    }
 
     // Check cache first
     const cacheKey = this.generateCacheKey(query, options);
     if (this.researchCache.has(cacheKey)) {
+      console.log('  📦 Using cached result');
+      this.stats.cachedResponses++;
       return this.researchCache.get(cacheKey);
     }
+
+    // Wait for rate limiter
+    await this.waitForRateLimit();
+    
+    this.stats.totalRequests++;
 
     try {
       const axios = require('axios');
       
+      // Use a more conservative model to save costs
+      const model = this.budgetInfo.usagePercentage > 70 
+        ? 'llama-3.1-sonar-small-128k-online'  // Cheaper model when budget is tight
+        : 'llama-3.1-sonar-huge-128k-online';   // Full model when budget allows
+      
       const response = await axios.post('https://api.perplexity.ai/chat/completions', {
-        model: 'llama-3.1-sonar-huge-128k-online',
+        model: model,
         messages: [
           {
             role: 'user',
@@ -245,7 +584,8 @@ class MusicResearchAutomator {
         ],
         stream: false,
         return_citations: true,
-        search_domain_filter: options.domains || []
+        search_domain_filter: options.domains || [],
+        max_tokens: this.budgetInfo.usagePercentage > 70 ? 1000 : 2000 // Reduce tokens when budget is tight
       }, {
         headers: {
           'Authorization': `Bearer ${this.perplexityApiKey}`,
@@ -257,18 +597,37 @@ class MusicResearchAutomator {
       const result = {
         content: response.data.choices[0].message.content,
         citations: response.data.citations || [],
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        model: model
       };
 
       // Cache the result
       this.researchCache.set(cacheKey, result);
       
-      // Rate limiting
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Record success
+      this.recordSuccess();
+      
+      // Add delay between requests to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       return result;
       
     } catch (error) {
+      // Record failure
+      this.recordFailure();
+      
+      // Check if this is a rate limit error
+      if (error.response?.status === 429) {
+        console.error('⚠️ Rate limit hit - increasing delay');
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
+      
+      // Check if this is a budget error
+      if (error.response?.status === 402 || error.message.includes('quota')) {
+        console.error('💰 Budget/quota exceeded');
+        this.budgetInfo.canProceed = false;
+      }
+      
       console.error('Perplexity API error:', error.message);
       throw new Error(`Research failed: ${error.message}`);
     }
