@@ -2,8 +2,8 @@ name: Perplexity Budget Guard and Monitoring
 
 on:
   schedule:
-    # Run every 4 hours to monitor budget status
-    - cron: '0 */4 * * *'
+    # Run every 6 hours to monitor budget status
+    - cron: '0 */6 * * *'
   workflow_dispatch:
     inputs:
       force_check:

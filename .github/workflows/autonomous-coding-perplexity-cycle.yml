@@ -24,8 +24,8 @@ on:
         default: '5'
         type: string
   schedule:
-    # Run every 4 hours to maintain continuous development
-    - cron: '0 */4 * * *'
+    # Run every 12 hours to maintain development with reduced API usage
+    - cron: '0 */12 * * *'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -99,11 +99,63 @@ jobs:
           echo "  Should Run: $SHOULD_RUN"
           echo "  Trigger Type: $TRIGGER_TYPE"
 
-  autonomous-coding-cycle:
-    name: Execute Autonomous Coding and Research Cycle
+  budget-check:
+    name: Pre-flight Budget Check
     runs-on: ubuntu-latest
     needs: detect-trigger
     if: needs.detect-trigger.outputs.should_run == 'true'
+    timeout-minutes: 5
+    outputs:
+      can_proceed: ${{ steps.check.outputs.can_proceed }}
+      budget_state: ${{ steps.check.outputs.state }}
+      usage_percentage: ${{ steps.check.outputs.usage }}
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install Python Dependencies
+        run: pip install pyyaml
+      
+      - name: Check Budget Status
+        id: check
+        run: |
+          echo "💰 Checking Perplexity API budget..."
+          
+          if python3 scripts/perplexity_costs.py budget > budget.json 2>&1; then
+            CAN_PROCEED=$(python3 -c "import json; print(json.load(open('budget.json'))['can_proceed'])" 2>/dev/null || echo "true")
+            STATE=$(python3 -c "import json; print(json.load(open('budget.json'))['state'])" 2>/dev/null || echo "UNKNOWN")
+            USAGE=$(python3 -c "import json; print(json.load(open('budget.json'))['usage_percentage'])" 2>/dev/null || echo "0")
+            
+            echo "can_proceed=$CAN_PROCEED" >> $GITHUB_OUTPUT
+            echo "state=$STATE" >> $GITHUB_OUTPUT
+            echo "usage=$USAGE" >> $GITHUB_OUTPUT
+            
+            echo "  State: $STATE"
+            echo "  Usage: $USAGE%"
+            echo "  Can Proceed: $CAN_PROCEED"
+            
+            if [ "$CAN_PROCEED" != "true" ]; then
+              echo "⚠️ WARNING: Budget limit reached - autonomous coding will skip research phase"
+            fi
+          else
+            echo "⚠️ Budget check failed - proceeding with caution"
+            echo "can_proceed=false" >> $GITHUB_OUTPUT
+            echo "state=WARNING" >> $GITHUB_OUTPUT
+            echo "usage=100" >> $GITHUB_OUTPUT
+          fi
+
+  autonomous-coding-cycle:
+    name: Execute Autonomous Coding and Research Cycle
+    runs-on: ubuntu-latest
+    needs: [detect-trigger, budget-check]
+    if: needs.detect-trigger.outputs.should_run == 'true'
+    timeout-minutes: 120
     
     steps:
       - name: Checkout Repository
@@ -141,6 +193,18 @@ jobs:
           echo "Trigger: ${{ needs.detect-trigger.outputs.trigger_type }}"
           echo "Task Threshold: $TASK_THRESHOLD"
           echo "Max Cycles: $MAX_CYCLES"
+          echo "Budget State: ${{ needs.budget-check.outputs.budget_state }}"
+          echo "Budget Usage: ${{ needs.budget-check.outputs.usage_percentage }}%"
+          echo "Can Use Perplexity: ${{ needs.budget-check.outputs.can_proceed }}"
+          
+          # Adjust behavior based on budget
+          if [ "${{ needs.budget-check.outputs.can_proceed }}" != "true" ]; then
+            echo "⚠️ Budget exhausted - Perplexity research will be skipped"
+            echo "SKIP_RESEARCH=true" >> $GITHUB_ENV
+          else
+            echo "✅ Budget available for research"
+            echo "SKIP_RESEARCH=false" >> $GITHUB_ENV
+          fi
           
           # Create session directory
           mkdir -p .autonomous-coding-session

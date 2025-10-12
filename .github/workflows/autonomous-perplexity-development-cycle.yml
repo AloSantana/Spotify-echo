@@ -23,8 +23,8 @@ on:
         required: false
         type: string
   schedule:
-    # Run every 6 hours to check for new roadmap updates
-    - cron: '0 */6 * * *'
+    # Run every 12 hours to check for new roadmap updates
+    - cron: '0 */12 * * *'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -98,11 +98,63 @@ jobs:
           echo "  Should Run: $SHOULD_RUN"
           echo "  Trigger Type: $TRIGGER_TYPE"
 
-  autonomous-development-cycle:
-    name: Execute Autonomous Development Cycle
+  budget-check:
+    name: Pre-flight Budget Check
     runs-on: ubuntu-latest
     needs: detect-trigger
     if: needs.detect-trigger.outputs.should_run == 'true'
+    timeout-minutes: 5
+    outputs:
+      can_proceed: ${{ steps.check.outputs.can_proceed }}
+      budget_state: ${{ steps.check.outputs.state }}
+      usage_percentage: ${{ steps.check.outputs.usage }}
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install Python Dependencies
+        run: pip install pyyaml
+      
+      - name: Check Budget Status
+        id: check
+        run: |
+          echo "💰 Checking Perplexity API budget..."
+          
+          if python3 scripts/perplexity_costs.py budget > budget.json 2>&1; then
+            CAN_PROCEED=$(python3 -c "import json; print(json.load(open('budget.json'))['can_proceed'])" 2>/dev/null || echo "true")
+            STATE=$(python3 -c "import json; print(json.load(open('budget.json'))['state'])" 2>/dev/null || echo "UNKNOWN")
+            USAGE=$(python3 -c "import json; print(json.load(open('budget.json'))['usage_percentage'])" 2>/dev/null || echo "0")
+            
+            echo "can_proceed=$CAN_PROCEED" >> $GITHUB_OUTPUT
+            echo "state=$STATE" >> $GITHUB_OUTPUT
+            echo "usage=$USAGE" >> $GITHUB_OUTPUT
+            
+            echo "  State: $STATE"
+            echo "  Usage: $USAGE%"
+            echo "  Can Proceed: $CAN_PROCEED"
+            
+            if [ "$CAN_PROCEED" != "true" ]; then
+              echo "⚠️ WARNING: Budget limit reached - autonomous development will run in limited mode"
+            fi
+          else
+            echo "⚠️ Budget check failed - assuming cautious mode"
+            echo "can_proceed=true" >> $GITHUB_OUTPUT
+            echo "state=WARNING" >> $GITHUB_OUTPUT
+            echo "usage=50" >> $GITHUB_OUTPUT
+          fi
+
+  autonomous-development-cycle:
+    name: Execute Autonomous Development Cycle
+    runs-on: ubuntu-latest
+    needs: [detect-trigger, budget-check]
+    if: needs.detect-trigger.outputs.should_run == 'true'
+    timeout-minutes: 60
     
     steps:
       - name: Checkout Repository
@@ -140,6 +192,18 @@ jobs:
           echo "Trigger: ${{ needs.detect-trigger.outputs.trigger_type }}"
           echo "Max Iterations: $MAX_ITERATIONS"
           echo "Focus Area: $FOCUS_AREA"
+          echo "Budget State: ${{ needs.budget-check.outputs.budget_state }}"
+          echo "Budget Usage: ${{ needs.budget-check.outputs.usage_percentage }}%"
+          
+          # Adjust max iterations based on budget
+          BUDGET_USAGE=${{ needs.budget-check.outputs.usage_percentage }}
+          if [ "$BUDGET_USAGE" -gt 80 ]; then
+            MAX_ITERATIONS=2
+            echo "⚠️ High budget usage - limiting to $MAX_ITERATIONS iterations"
+          elif [ "$BUDGET_USAGE" -gt 60 ]; then
+            MAX_ITERATIONS=3
+            echo "⚠️ Moderate budget usage - limiting to $MAX_ITERATIONS iterations"
+          fi
           
           # Create session directory
           mkdir -p .autonomous-session
@@ -147,6 +211,7 @@ jobs:
           # Generate session ID
           SESSION_ID="autonomous-$(date +%Y%m%d-%H%M%S)-$RANDOM"
           echo "session_id=$SESSION_ID" >> $GITHUB_OUTPUT
+          echo "max_iterations=$MAX_ITERATIONS" >> $GITHUB_OUTPUT
           echo "$SESSION_ID" > .autonomous-session/session_id
           
           # Initialize session log
@@ -157,6 +222,8 @@ jobs:
           **Trigger**: ${{ needs.detect-trigger.outputs.trigger_type }}
           **Max Iterations**: $MAX_ITERATIONS
           **Focus Area**: ${FOCUS_AREA:-"Full roadmap"}
+          **Budget State**: ${{ needs.budget-check.outputs.budget_state }}
+          **Budget Usage**: ${{ needs.budget-check.outputs.usage_percentage }}%
           
           ## Session Progress
           
