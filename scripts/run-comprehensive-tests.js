@@ -149,7 +149,8 @@ class ComprehensiveTestOrchestrator {
             'env-validation.json',
             'provider-status.json',
             'recommendation-probe.json',
-            'api-test-results.json'
+            'api-test-results.json',
+            'mcp-server-validation.json'
         ];
         
         for (const file of reportFiles) {
@@ -371,8 +372,18 @@ class ComprehensiveTestOrchestrator {
             true // Optional - requires running server
         );
         
-        // Phase 6: Aggregation & Reporting
-        console.log('📊 PHASE 6: Aggregation & Reporting');
+        // Phase 6: MCP Server Validation
+        console.log('🔧 PHASE 6: MCP Server Validation');
+        console.log('─'.repeat(70));
+        await this.runTestSuite(
+            'MCP Server Health Check',
+            'node scripts/validate-mcp-servers.js',
+            'Validates all MCP servers and attempts fixes',
+            true // Optional - may have config issues
+        );
+        
+        // Phase 7: Aggregation & Reporting
+        console.log('📊 PHASE 7: Aggregation & Reporting');
         console.log('─'.repeat(70));
         await this.aggregateReports();
         await this.captureScreenshots();

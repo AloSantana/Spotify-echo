@@ -10,6 +10,7 @@ npm run test:comprehensive
 
 # Run specific components
 npm run test:installation        # Validate dependencies & setup
+npm run test:mcp-servers         # Check MCP server health
 node scripts/env-validate.js     # Check environment configuration
 node scripts/comprehensive-api-testing.js  # Test all APIs
 ```
@@ -22,6 +23,13 @@ node scripts/comprehensive-api-testing.js  # Test all APIs
 - Python and pip (for ML features)
 - Project structure and critical files
 - Playwright browsers for E2E tests
+
+### ✅ MCP Server Health
+- All 8+ MCP servers validated
+- Connection status checked
+- Configuration issues detected
+- Automatic fixes applied where possible
+- Missing dependencies identified
 
 ### ✅ Environment & Configuration
 - Required environment variables

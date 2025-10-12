@@ -105,7 +105,55 @@ npm run validate:all          # Alias for comprehensive tests
 node scripts/env-validate.js
 ```
 
-### 4. API Comprehensive Testing (`scripts/comprehensive-api-testing.js`)
+### 4. MCP Server Validation (`scripts/validate-mcp-servers.js`)
+
+**Purpose**: Validates all MCP (Model Context Protocol) servers and attempts automatic fixes.
+
+**Validation Checks**:
+- Server file existence and accessibility
+- Required dependencies (npx packages)
+- Environment variable configuration
+- Data directories for database servers
+- Configuration file syntax
+
+**Issues Detected**:
+- ❌ Missing server files
+- ❌ Missing or empty environment variables
+- ❌ Non-existent data directories
+- ⚠️ Missing npm packages (auto-installable via npx)
+- ⚠️ Configuration issues
+
+**Automatic Fixes**:
+- ✅ Creates missing data directories
+- ✅ Copies server files from alternate locations
+- ✅ Documents missing environment variables
+- ✅ Creates server stubs for missing implementations
+
+**MCP Servers Validated**:
+- sequential-thinking (reasoning)
+- mongodb (database operations)
+- spotify (Spotify API integration)
+- sqlite (local database)
+- playwright (browser automation)
+- hyperbrowser (cloud browser)
+- filesystem (file operations)
+- memory (context storage)
+- git (version control)
+- github (GitHub API)
+
+**Usage**:
+```bash
+npm run test:mcp-servers
+# or
+node scripts/validate-mcp-servers.js
+```
+
+**Output**:
+- `reports/mcp-server-validation.json` - Detailed JSON report
+- `reports/mcp-server-validation.md` - Human-readable summary
+- `MCP_SERVER_VALIDATION_REPORT.md` - Copy in root directory
+
+### 5. API Comprehensive Testing (`scripts/comprehensive-api-testing.js`)
 
 **Purpose**: Tests all API keys and external service integrations.
 
@@ -126,7 +174,7 @@ node scripts/env-validate.js
 node scripts/comprehensive-api-testing.js
 ```
 
-### 5. UI Screenshot Capture (`scripts/comprehensive-screenshot-capture.js`)
+### 6. UI Screenshot Capture (`scripts/comprehensive-screenshot-capture.js`)
 
 **Purpose**: Captures comprehensive screenshots of all UI components.
 
@@ -185,6 +233,9 @@ npm run test:comprehensive
 ```bash
 # Installation validation only
 npm run test:installation
+
+# MCP server health check
+npm run test:mcp-servers
 
 # Environment validation
 node scripts/env-validate.js

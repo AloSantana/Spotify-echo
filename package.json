@@ -12,6 +12,7 @@
     "test:unit": "jest --testPathPattern=tests/unit",
     "test:comprehensive": "node scripts/run-comprehensive-tests.js",
     "test:installation": "node scripts/validate-installation.js",
+    "test:mcp-servers": "node scripts/validate-mcp-servers.js",
     "validate:all": "npm run test:comprehensive",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
