@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useLLM } from '../contexts/LLMContext';
 import { useDatabase } from '../contexts/DatabaseContext';
+import LoadingState from './LoadingState';
+import ErrorFallback from './ErrorFallback';
 import './Settings.css';
 
 /**
@@ -26,6 +28,7 @@ const Settings = () => {
   const [message, setMessage] = useState(null);
   const [databaseStats, setDatabaseStats] = useState(null);
   const [mongodbInsights, setMongodbInsights] = useState(null);
+  const [error, setError] = useState(null);
 
   // Load settings on component mount
   useEffect(() => {
@@ -39,8 +42,14 @@ const Settings = () => {
    */
   const loadSettings = async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await fetch('/api/settings');
+      
+      if (!response.ok) {
+        throw new Error(`Failed to load settings: ${response.status}`);
+      }
+      
       const data = await response.json();
 
       if (data.success) {
@@ -50,7 +59,8 @@ const Settings = () => {
       }
     } catch (error) {
       console.error('Error loading settings:', error);
-      setMessage({ type: 'error', text: 'Error loading settings' });
+      setError(error);
+      setMessage({ type: 'error', text: 'Error loading settings. Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -537,32 +547,64 @@ const Settings = () => {
 
   return (
     <div className="settings-container">
-      <div className="settings-header">
-        <h2>Settings</h2>
-        <p>Configure EchoTune AI to match your preferences and requirements</p>
-      </div>
-
-      {message && (
-        <div className={`settings-message ${message.type}`}>
-          {message.text}
-          <button onClick={() => setMessage(null)} className="close-message">
-            ×
-          </button>
-        </div>
+      {/* Show loading state while initially loading settings */}
+      {loading && !settings && (
+        <LoadingState size="large" message="Loading settings..." />
       )}
 
-      {renderTabs()}
+      {/* Show error state if there was an error loading */}
+      {error && !loading && (
+        <ErrorFallback 
+          error={error} 
+          variant="inline" 
+          resetError={loadSettings}
+        />
+      )}
 
-      <div className="settings-content">{renderTabContent()}</div>
+      {/* Show settings content when loaded */}
+      {!loading && !error && (
+        <>
+          <div className="settings-header">
+            <h2>Settings</h2>
+            <p>Configure EchoTune AI to match your preferences and requirements</p>
+          </div>
 
-      <div className="settings-actions">
-        <button onClick={() => saveSettings(settings)} disabled={saving} className="save-settings">
-          {saving ? 'Saving...' : 'Save Settings'}
-        </button>
-        <button onClick={loadSettings} className="reset-settings">
-          Reset
-        </button>
-      </div>
+          {message && (
+            <div className={`settings-message ${message.type}`}>
+              {message.text}
+              <button onClick={() => setMessage(null)} className="close-message">
+                ×
+              </button>
+            </div>
+          )}
+
+          {renderTabs()}
+
+          <div className="settings-content">
+            {renderTabContent()}
+          </div>
+
+          <div className="settings-actions">
+            <button 
+              onClick={() => saveSettings(settings)} 
+              disabled={saving} 
+              className="save-settings"
+            >
+              {saving ? (
+                <>
+                  <LoadingState size="small" variant="inline" showSpinner message="" />
+                  Saving...
+                </>
+              ) : (
+                'Save Settings'
+              )}
+            </button>
+            <button onClick={loadSettings} className="reset-settings">
+              Reset
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
