@@ -1,8 +1,25 @@
-# MCP Configuration - Generated Sun Aug 10 12:34:03 AM UTC 2025
-install_timestamp=2025-08-10T00:34:03Z
+# MCP Configuration - Updated for comprehensive MCP server setup
+install_timestamp=2025-10-13T00:14:00Z
 os_type=linux
-browserbase_enabled=false
+
+# Core MCP Servers (Enabled)
+sequential_thinking_enabled=true
+mongodb_enabled=true
 spotify_enabled=true
+sqlite_enabled=true
+playwright_enabled=true
+
+# Advanced MCP Servers (Disabled - Ready for Future Use)
+docker_enabled=false
+time_enabled=false
+google_drive_enabled=false
+
+# Legacy/Other Services
+browserbase_enabled=false
 openai_enabled=false
 gemini_enabled=false
-mongodb_enabled=true
+
+# MCP Server Health Check
+mcp_health_check_enabled=true
+mcp_auto_reconnect=true
+mcp_startup_validation=true
