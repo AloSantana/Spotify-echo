@@ -567,6 +567,60 @@ To add new MCP servers:
 
 For detailed guidelines, see: [Contributing Guide](CONTRIBUTING.md)
 
+## 🧪 Testing & Validation
+
+EchoTune AI includes a comprehensive test suite that validates installation, configuration, APIs, authentication, and UI components.
+
+### Quick Test Commands
+
+```bash
+# Run complete test suite
+npm run test:comprehensive
+
+# Run individual test components
+npm run test:installation        # Validate dependencies & setup
+node scripts/env-validate.js     # Check environment configuration
+node scripts/comprehensive-api-testing.js  # Test all APIs
+```
+
+### What Gets Tested
+
+- ✅ **Installation & Setup**: Node.js, npm, Python, dependencies, project structure
+- ✅ **Environment & Configuration**: Required variables, placeholder detection, API keys
+- ✅ **APIs & Services**: Spotify, MongoDB, Redis, LLM providers, infrastructure services
+- ✅ **Authentication & Security**: OAuth flows, JWT tokens, session management
+- ✅ **UI & Screenshots**: All pages, responsive design, error states
+
+### Test Reports
+
+All tests generate detailed reports in two formats:
+
+- **JSON Reports** (`reports/*.json`): Machine-readable, schema v2 compliant
+- **Markdown Reports** (`reports/*.md`): Human-readable summaries
+- **Main Report**: `COMPREHENSIVE_TEST_REPORT.md` (copied to root)
+
+### Documentation
+
+- **[📚 Comprehensive Test Guide](docs/COMPREHENSIVE_TEST_GUIDE.md)** - Detailed test documentation
+- **[🧪 Testing README](TESTING_README.md)** - Quick reference guide
+- **[📋 Test Strategy](docs/TEST_STRATEGY.md)** - Testing architecture and philosophy
+
+### CI/CD Integration
+
+The test suite integrates seamlessly with GitHub Actions. See `.github/workflows/comprehensive-tests.yml` for the workflow configuration.
+
+```yaml
+# Example: Run tests on push
+- name: Run Comprehensive Tests
+  run: npm run test:comprehensive
+  env:
+    MONGODB_URI: ${{ secrets.MONGODB_URI }}
+    SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+    # ... other secrets
+```
+
+For more details, see [Comprehensive Test Guide](docs/COMPREHENSIVE_TEST_GUIDE.md).
+
 ## 📖 Documentation
 
 ### Quick Links
