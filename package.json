@@ -104,6 +104,8 @@
     "test:bedrock:quick": "node scripts/test-aws-bedrock-comprehensive.js --skip-streaming --skip-variations",
     "test:bedrock:legacy": "node scripts/test-aws-bedrock-claude.js",
     "test:bedrock:integration": "node scripts/aws-bedrock-integration-tests.js",
+    "test:bedrock:dryrun": "node scripts/test-bedrock-config-dryrun.js",
+    "bedrock:validate:config": "node scripts/validate-bedrock-config.js",
     "bedrock:manager": "node scripts/aws-bedrock-model-manager.js",
     "bedrock:status": "node scripts/aws-bedrock-model-manager.js /model status",
     "bedrock:list": "node scripts/aws-bedrock-model-manager.js /model list",
