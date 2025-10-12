@@ -24,8 +24,8 @@ on:
         default: '5'
         type: string
   schedule:
-    # Run every 4 hours to maintain continuous development
-    - cron: '0 */4 * * *'
+    # Run every 12 hours to maintain development with reduced API usage
+    - cron: '0 */12 * * *'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -99,11 +99,31 @@ jobs:
           echo "  Should Run: $SHOULD_RUN"
           echo "  Trigger Type: $TRIGGER_TYPE"
 
-  autonomous-coding-cycle:
-    name: Execute Autonomous Coding and Research Cycle
+  budget-check:
+    name: Pre-flight Budget Check
     runs-on: ubuntu-latest
     needs: detect-trigger
     if: needs.detect-trigger.outputs.should_run == 'true'
+    timeout-minutes: 5
+    outputs:
+      can_proceed: ${{ steps.budget.outputs.can_proceed }}
+      budget_state: ${{ steps.budget.outputs.budget_state }}
+      usage_percentage: ${{ steps.budget.outputs.usage_percentage }}
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Run Budget Check
+        id: budget
+        uses: ./.github/actions/budget-check
+
+  autonomous-coding-cycle:
+    name: Execute Autonomous Coding and Research Cycle
+    runs-on: ubuntu-latest
+    needs: [detect-trigger, budget-check]
+    if: needs.detect-trigger.outputs.should_run == 'true'
+    timeout-minutes: 120
     
     steps:
       - name: Checkout Repository
@@ -141,6 +161,18 @@ jobs:
           echo "Trigger: ${{ needs.detect-trigger.outputs.trigger_type }}"
           echo "Task Threshold: $TASK_THRESHOLD"
           echo "Max Cycles: $MAX_CYCLES"
+          echo "Budget State: ${{ needs.budget-check.outputs.budget_state }}"
+          echo "Budget Usage: ${{ needs.budget-check.outputs.usage_percentage }}%"
+          echo "Can Use Perplexity: ${{ needs.budget-check.outputs.can_proceed }}"
+          
+          # Adjust behavior based on budget
+          if [ "${{ needs.budget-check.outputs.can_proceed }}" != "true" ]; then
+            echo "⚠️ Budget exhausted - Perplexity research will be skipped"
+            echo "SKIP_RESEARCH=true" >> $GITHUB_ENV
+          else
+            echo "✅ Budget available for research"
+            echo "SKIP_RESEARCH=false" >> $GITHUB_ENV
+          fi
           
           # Create session directory
           mkdir -p .autonomous-coding-session
