@@ -79,7 +79,7 @@ COPY --from=build /app/package.json ./package.json
 EXPOSE 3000
 
 # Healthcheck for DigitalOcean/Docker
-HEALTHCHECK --interval=30s --timeout=5s --retries=5 CMD wget -qO- http://localhost:${PORT:-3000}/health || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --retries=5 CMD wget -qO- http://localhost:${PORT:-3000}/healthz || exit 1
 
 # Run server
 USER nodeapp
