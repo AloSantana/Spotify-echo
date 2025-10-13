@@ -87,7 +87,7 @@ jobs:
           --flag-definitions feature_flags.json
 
     - name: Upload validation results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: experiment-validation-${{ github.sha }}
         path: |
@@ -196,7 +196,7 @@ jobs:
           --output analysis-validation.json
 
     - name: Upload simulation results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: experiment-simulation-${{ github.sha }}
         path: |
@@ -258,7 +258,7 @@ jobs:
           --output ethics-review.json
 
     - name: Upload safety check results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: experiment-safety-${{ github.sha }}
         path: |
@@ -311,7 +311,7 @@ jobs:
           --output experiment-readiness.html
 
     - name: Upload gate decision
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: experiment-gate-decision-${{ github.sha }}
         path: |

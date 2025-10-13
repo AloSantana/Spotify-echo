@@ -73,7 +73,7 @@ jobs:
           --output dependency-validation.json
 
     - name: Upload validation results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: model-validation-${{ github.sha }}
         path: |
@@ -136,7 +136,7 @@ jobs:
           --output format-validation.json
 
     - name: Upload integrity results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: model-integrity-${{ github.sha }}
         path: |
@@ -219,7 +219,7 @@ jobs:
           --output memory-testing.json
 
     - name: Upload performance results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: model-performance-${{ github.sha }}
         path: |
@@ -280,7 +280,7 @@ jobs:
           --output privacy-compliance.json
 
     - name: Upload security results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: model-security-${{ github.sha }}
         path: |
@@ -338,7 +338,7 @@ jobs:
           --output degradation-analysis.json
 
     - name: Upload drift detection results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: model-drift-${{ github.sha }}
         path: |
@@ -392,7 +392,7 @@ jobs:
           --output model-validation-report.html
 
     - name: Upload final decision
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: model-final-decision-${{ github.sha }}
         path: |

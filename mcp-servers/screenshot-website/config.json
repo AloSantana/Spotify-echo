@@ -1,0 +1,14 @@
+{
+  "name": "screenshot-website-fast",
+  "version": "1.0.0",
+  "description": "High-speed screenshot generation for EchoTune AI (CI stub)",
+  "server": {
+    "port": 3015,
+    "host": "localhost"
+  },
+  "testing": {
+    "visualRegression": true,
+    "batchProcessing": true,
+    "mobileResponsive": true
+  }
+}

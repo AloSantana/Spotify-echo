@@ -82,7 +82,7 @@ jobs:
         docker stop test-container
 
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-results-${{ matrix.node-version }}-${{ matrix.python-version }}
@@ -92,7 +92,7 @@ jobs:
           jest-junit.xml
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-artifacts-${{ github.sha }}
         path: |
@@ -147,7 +147,7 @@ jobs:
         npm run test:playwright
 
     - name: Upload integration test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: integration-test-results
