@@ -188,7 +188,7 @@ jobs:
         
         cat mcp-validation-summary.md
     - name: Upload validation artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: mcp-validation-results

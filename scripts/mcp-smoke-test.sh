@@ -22,7 +22,7 @@ REPORTS_DIR="${ROOT_DIR}/reports"
 
 # Environment variables with defaults
 MCP_STRICT_REQUIRED="${MCP_STRICT_REQUIRED:-false}"
-ENABLE_COMMUNITY_MCP="${ENABLE_COMMUNITY_MCP:-1}"
+ENABLE_COMMUNITY_MCP="${ENABLE_COMMUNITY_MCP:-0}"
 
 # Output files
 CAPABILITIES_REPORT="${REPORTS_DIR}/mcp-capabilities.json"

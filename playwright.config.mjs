@@ -1,4 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Enhanced Playwright Configuration for EchoTune AI
@@ -74,7 +79,7 @@ export default defineConfig({
   },
   
   /* Global environment variables available to all tests */
-  globalSetup: require.resolve('./tests/setup/global-env-setup.js'),
+  globalSetup: path.resolve(__dirname, './tests/setup/global-env-setup.js'),
 
   /* Configure projects for major browsers and viewports */
   projects: [

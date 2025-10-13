@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 
+const fs = require('fs').promises;
+const path = require('path');
+const util = require('util');
+const { exec } = require('child_process');
+const execAsync = util.promisify(exec);
+
 /**
  * Autonomous Coding Orchestrator
  */
@@ -62,7 +68,7 @@ class AutonomousCodingOrchestrator {
      * PHASE 3: Update Roadmap with Research
      */
     async updateRoadmapWithResearch(cycle, researchResults) {
-        console.log(`  📊 Updating roadmap with research findings...`);
+        console.log('  📊 Updating roadmap with research findings...');
 
         try {
             // Run the research-driven task creator
@@ -97,7 +103,7 @@ class AutonomousCodingOrchestrator {
             return results;
 
         } catch (error) {
-            console.error(`  ❌ Roadmap update failed:`, error.message);
+            console.error('  ❌ Roadmap update failed:', error.message);
             return { 
                 error: error.message,
                 researchTasksCreated: 0,
@@ -134,7 +140,7 @@ class AutonomousCodingOrchestrator {
             console.log(`    ✅ Added ${newFeatures.length} new features to roadmap`);
 
         } catch (error) {
-            console.error(`    ❌ Failed to add features to roadmap:`, error.message);
+            console.error('    ❌ Failed to add features to roadmap:', error.message);
         }
     }
 
@@ -195,8 +201,6 @@ class AutonomousCodingOrchestrator {
 }
 
 module.exports = AutonomousCodingOrchestrator;
-    }
-}
 
 // Main execution
 if (require.main === module) {
@@ -218,5 +222,3 @@ if (require.main === module) {
 
     main();
 }
-
-module.exports = AutonomousCodingOrchestrator;
