@@ -139,10 +139,82 @@ jobs:
             test-results/
           retention-days: 30
 
+  api-validation:
+    name: 🔍 Comprehensive API Validation
+    runs-on: ubuntu-latest
+    needs: [npm-qa]
+    timeout-minutes: 20
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📦 Install Dependencies
+        run: npm ci
+      
+      - name: 🔍 Discover API Endpoints
+        run: npm run test:api:discover
+        continue-on-error: false
+      
+      - name: 🚀 Start Server in Background
+        run: |
+          npm run start:ci &
+          sleep 10
+        env:
+          CI: true
+          PORT: 3000
+          NODE_ENV: production
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_REDIRECT_URI: ${{ secrets.SPOTIFY_REDIRECT_URI || 'http://localhost:3000/auth/callback' }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET || 'test-jwt-secret-for-ci' }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET || 'test-session-secret-for-ci' }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI || 'mongodb://localhost:27017/echotune_test' }}
+      
+      - name: ⏳ Wait for Server Health
+        run: npm run wait:health || echo "Server health check timeout"
+        timeout-minutes: 2
+        continue-on-error: true
+      
+      - name: 🧪 Run Comprehensive API Tests
+        run: npm run test:api:comprehensive
+        continue-on-error: true
+        env:
+          CI: true
+          PORT: 3000
+          BASE_URL: http://localhost:3000
+          TEST_AUTH_TOKEN: ${{ secrets.TEST_AUTH_TOKEN }}
+      
+      - name: 📝 Generate API Validation Report
+        if: always()
+        run: npm run test:api:report
+        continue-on-error: true
+      
+      - name: 📊 Upload API Validation Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-validation-results
+          path: |
+            api-endpoint-inventory.json
+            comprehensive-api-test-results.json
+            API-VALIDATION-REPORT.md
+          retention-days: 90
+      
+      - name: 🛑 Stop Server
+        if: always()
+        run: pkill -f "node.*server.js" || true
+
   comprehensive-qa:
     name: 🎯 Master QA Orchestrator
     runs-on: ubuntu-latest
-    needs: [npm-qa, docker-qa, playwright-e2e]
+    needs: [npm-qa, docker-qa, playwright-e2e, api-validation]
     if: always()
     timeout-minutes: 45
     
