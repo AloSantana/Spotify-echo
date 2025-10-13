@@ -1,9 +1,9 @@
 
-# Task: Persist Rolling Window Metrics to Redis
-# Description: Implement persistence of API latency and error metrics to Redis for durability and multi-instance aggregation. This will allow metrics to survive restarts and be shared across horizontally scaled instances.
-# Files to modify: ['scripts/bench/api-latency.js', 'src/api/middleware/metrics.js', 'src/config/redis.js']
+# Task: Implement Circuit Breaker Pattern for Provider Failover
+# Description: Add a circuit breaker mechanism to the backend provider selection logic to automatically failover to a healthy provider when the current one is unresponsive or error-prone. This improves system resilience and reliability.
+# Files to modify: ['src/providers/providerManager.js', 'src/providers/index.js', 'src/utils/circuitBreaker.js', 'test/providers/circuitBreaker.test.js']
 
-print("Implementing: Persist Rolling Window Metrics to Redis")
+print("Implementing: Implement Circuit Breaker Pattern for Provider Failover")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

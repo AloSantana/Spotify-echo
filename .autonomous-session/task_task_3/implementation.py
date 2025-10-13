@@ -1,9 +1,9 @@
 
-# Task: Expand Jest Integration/Security Tests for MCP Endpoints
-# Description: Add additional Jest tests to cover MCP endpoints and provider health checks, focusing on integration and basic security (e.g., input validation, error handling).
-# Files to modify: ['tests/integration/mcp.test.js', 'src/api/routes/providers.js']
+# Task: Expand Automated Test Coverage
+# Description: Increase automated test coverage for critical backend modules, focusing on provider switching, chat pipeline, and analytics endpoints.
+# Files to modify: ['test/providers/', 'test/chat/', 'test/analytics/', 'src/providers/', 'src/chat/', 'src/analytics/']
 
-print("Implementing: Expand Jest Integration/Security Tests for MCP Endpoints")
+print("Implementing: Expand Automated Test Coverage")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
