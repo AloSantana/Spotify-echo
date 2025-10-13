@@ -21,7 +21,8 @@
     "qa:docker": "node scripts/docker-qa-automation.js",
     "qa:npm": "npm install && npm run test:comprehensive",
     "qa:all": "node scripts/master-qa-orchestrator.js",
-    "qa:master": "node scripts/master-qa-orchestrator.js"
+    "qa:master": "node scripts/master-qa-orchestrator.js",
+    "qa:validate": "node scripts/validate-qa-setup.js"
   },
   "keywords": [
     "music",
