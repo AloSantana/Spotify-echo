@@ -34,6 +34,34 @@
       "env": {
         "HYPERBROWSER_API_KEY": "hb_9bc8977fa67913fb46f3a11bfbbb"
       }
+    },
+    "perplexity": {
+      "command": "npx",
+      "args": ["-y", "@perplexity-ai/mcp-server"],
+      "env": {
+        "PERPLEXITY_API_KEY": "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"
+      }
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@brave/brave-search-mcp-server"],
+      "env": {
+        "BRAVE_API_KEY": "BSAQ0gsYuaYuEZHayb_Ek1pnl1l2RiW"
+      }
+    },
+    "gemini": {
+      "command": "npx",
+      "args": ["-y", "@georgejeffers/gemini-mcp-server"],
+      "env": {
+        "GEMINI_API_KEY": "AIzaSyDhoHNAyyOyLetgzAZOoirvHRKpSFmFlBk"
+      }
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
+      }
     }
   }
 }
