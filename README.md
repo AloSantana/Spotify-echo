@@ -17,6 +17,47 @@
 
 ---
 
+<!-- QA-AUTOMATION-START -->
+## 🧪 Latest QA Automation Results
+
+**Last Run:** 2025-10-13  
+**Duration:** 43.21s  
+**Status:** ⚠️ ISSUES DETECTED
+
+### Installation & Build
+- **NPM Install:** ✅ PASS
+- **Docker Build:** ❌ FAIL
+
+### Test Results
+- **Total Tests:** 4
+- **Passed:** 0 ✅
+- **Failed:** 0 ❌
+- **Skipped:** 4 ⏭️
+
+### UI Screenshots
+10 screenshots captured for regression testing.
+
+### ⚠️ Issues Detected
+1. **docker-build:** Docker build failed
+2. **comprehensive-tests:** Docker build failed
+
+### 📊 Full Reports
+Detailed reports available in: [`QA-AUTOMATION-RESULTS/master-qa-1760318996225`](./QA-AUTOMATION-RESULTS/master-qa-1760318996225)
+
+### Running QA Automation
+```bash
+# Run full QA suite
+npm run qa:all
+
+# Run specific phases
+npm run qa:npm      # NPM installation & tests
+npm run qa:docker   # Docker build & validation
+npm run qa:full     # Comprehensive automation
+```
+
+<!-- QA-AUTOMATION-END -->
+
+
 ## 🌟 What is EchoTune AI?
 
 EchoTune AI is a comprehensive music discovery platform that combines Spotify's vast music catalog with AI-powered recommendations and conversational search. The platform provides personalized music discovery through hybrid recommendation algorithms, natural language chat interfaces, and comprehensive user preference management.
@@ -677,3 +718,5 @@ For more details, see [Comprehensive Test Guide](docs/COMPREHENSIVE_TEST_GUIDE.m
 - **[🐳 Docker Deployment](docs/deployment/DOCKER.md)** - Containerized deployment
 - **[☁️ Vercel Deployment](docs/DEPLOYMENT_VERCEL.md)** - Serverless deployment guide
 - **[🔧 Performance Optimization](docs/guides/production-optimization.md)** - Performance tuning guide
+
+

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-10-12T23:48:52.158Z",
+  "timestamp": "2025-10-13T01:30:14.545Z",
   "totalTests": 12,
   "passed": 5,
   "failed": 7,
@@ -7,7 +7,7 @@
   "secrets": {
     "SPOTIFY_API": {
       "status": "✅ WORKING",
-      "responseTime": "467ms",
+      "responseTime": "685ms",
       "features": [
         "OAuth authentication",
         "Search API",
@@ -15,17 +15,17 @@
       ],
       "testData": "Found 1 tracks in search test",
       "tested": true,
-      "timestamp": "2025-10-12T23:48:52.631Z"
+      "timestamp": "2025-10-13T01:30:15.234Z"
     },
     "PERPLEXITY_API": {
       "status": "❌ FAILED",
       "error": "Perplexity API failed: 401 Unauthorized",
       "tested": true,
-      "timestamp": "2025-10-12T23:48:52.680Z"
+      "timestamp": "2025-10-13T01:30:15.540Z"
     },
     "BRAVE_API": {
       "status": "✅ WORKING",
-      "responseTime": "270ms",
+      "responseTime": "485ms",
       "features": [
         "Privacy-focused search",
         "Web results",
@@ -33,11 +33,11 @@
       ],
       "testData": "Found 5 search results",
       "tested": true,
-      "timestamp": "2025-10-12T23:48:52.950Z"
+      "timestamp": "2025-10-13T01:30:16.026Z"
     },
     "BROWSERBASE_API": {
       "status": "✅ WORKING",
-      "responseTime": "644ms",
+      "responseTime": "593ms",
       "features": [
         "Cloud browser automation",
         "Session management",
@@ -47,25 +47,25 @@
       "testData": "Projects accessible: 1",
       "projectId": "df31bafd-8541-40f2-80a8-2f6ea30df60e",
       "projectIdValid": "✅ Valid project ID",
-      "sessionCreation": "❌ Failed",
+      "sessionCreation": "✅ Working",
       "planDetails": "Free plan: 1 browser concurrency",
       "stagehendReady": "✅ Ready",
       "apiKeyStatus": "LATEST: bb_live_P4BWp-i1Atz_NMBWXr521kxcrXw",
       "authMethod": "✅ Fixed: Uses x-bb-api-key header instead of Bearer token",
       "tested": true,
-      "timestamp": "2025-10-12T23:48:53.594Z"
+      "timestamp": "2025-10-13T01:30:16.620Z"
     },
     "DIGITALOCEAN_API": {
       "status": "❌ FAILED",
       "error": "DigitalOcean API failed: 401 Unauthorized",
       "tested": true,
-      "timestamp": "2025-10-12T23:48:53.664Z"
+      "timestamp": "2025-10-13T01:30:16.931Z"
     },
     "GITHUB_API": {
       "status": "❌ FAILED",
       "error": "Both tokens failed: ",
       "tested": true,
-      "timestamp": "2025-10-12T23:48:53.664Z"
+      "timestamp": "2025-10-13T01:30:16.931Z"
     },
     "CURSOR_API": {
       "status": "✅ VALIDATED",
@@ -77,13 +77,13 @@
       ],
       "testData": "Key format valid: 68 characters starting with 'key_'",
       "tested": true,
-      "timestamp": "2025-10-12T23:48:53.664Z"
+      "timestamp": "2025-10-13T01:30:16.932Z"
     },
     "MONGODB_URI": {
       "status": "❌ FAILED",
       "error": "Cannot find module 'mongodb'\nRequire stack:\n- /home/runner/work/Spotify-echo/Spotify-echo/scripts/comprehensive-api-testing.js",
       "tested": true,
-      "timestamp": "2025-10-12T23:48:53.665Z"
+      "timestamp": "2025-10-13T01:30:16.932Z"
     },
     "REDIS_ALTERNATIVE_API": {
       "status": "✅ API KEYS AVAILABLE",
@@ -95,25 +95,25 @@
       ],
       "testData": "Account API: 51 chars, Used API: 51 chars",
       "tested": true,
-      "timestamp": "2025-10-12T23:48:53.665Z"
+      "timestamp": "2025-10-13T01:30:16.933Z"
     },
     "GEMINI_API": {
       "status": "❌ FAILED",
       "error": "All 6 keys failed: ❌ Key 1: 429 Too Many Requests, ❌ Key 2: 429 Too Many Requests, ❌ Key 3: 429 Too Many Requests, ❌ Key 4: 404 Not Found, ❌ Key 5: 404 Not Found, ❌ Key 6: 404 Not Found",
       "tested": true,
-      "timestamp": "2025-10-12T23:48:54.058Z"
+      "timestamp": "2025-10-13T01:30:17.524Z"
     },
     "OPENROUTER_API": {
       "status": "❌ FAILED",
       "error": "All 3 keys failed: ❌ Key 1: 401 Unauthorized, ❌ Key 2: 401 Unauthorized, ❌ Key 3: 401 Unauthorized",
       "tested": true,
-      "timestamp": "2025-10-12T23:48:54.431Z"
+      "timestamp": "2025-10-13T01:30:18.453Z"
     },
     "SECURITY_SECRETS": {
       "status": "❌ FAILED",
       "error": "Cannot find module 'jsonwebtoken'\nRequire stack:\n- /home/runner/work/Spotify-echo/Spotify-echo/scripts/comprehensive-api-testing.js",
       "tested": true,
-      "timestamp": "2025-10-12T23:48:54.432Z"
+      "timestamp": "2025-10-13T01:30:18.454Z"
     }
   },
   "performance": {},
