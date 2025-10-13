@@ -16,7 +16,12 @@
     "validate:all": "npm run test:comprehensive",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "security:scan": "node scripts/security-scan.js"
+    "security:scan": "node scripts/security-scan.js",
+    "qa:full": "node scripts/comprehensive-qa-automation.js",
+    "qa:docker": "node scripts/docker-qa-automation.js",
+    "qa:npm": "npm install && npm run test:comprehensive",
+    "qa:all": "node scripts/master-qa-orchestrator.js",
+    "qa:master": "node scripts/master-qa-orchestrator.js"
   },
   "keywords": [
     "music",

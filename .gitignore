@@ -611,3 +611,8 @@ coverage/
 .nyc_output/
 junit.xml
 test-results/
+# QA Automation Results
+QA-AUTOMATION-RESULTS/
+BROWSERTESTIMAGES/
+BROWSERSCREENSHOT-TESTING/
+qa-*.log
