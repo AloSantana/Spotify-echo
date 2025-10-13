@@ -66,7 +66,15 @@ export default defineConfig({
     
     /* Action timeout */
     actionTimeout: 10 * 1000,
+    
+    /* Environment variables for tests */
+    extraHTTPHeaders: {
+      'X-Test-Mode': process.env.CI ? 'ci' : 'local',
+    },
   },
+  
+  /* Global environment variables available to all tests */
+  globalSetup: require.resolve('./tests/setup/global-env-setup.js'),
 
   /* Configure projects for major browsers and viewports */
   projects: [

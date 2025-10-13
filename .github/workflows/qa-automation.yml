@@ -122,6 +122,11 @@ jobs:
         continue-on-error: true
         env:
           CI: true
+          PORT: 3000
+          BASE_URL: http://localhost:3000
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_REDIRECT_URI: ${{ secrets.SPOTIFY_REDIRECT_URI || 'http://localhost:3000/auth/callback' }}
       
       - name: 📸 Upload Screenshots
         if: always()
@@ -176,7 +181,10 @@ jobs:
           NODE_ENV: production
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
           SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
-          SPOTIFY_REDIRECT_URI: ${{ secrets.SPOTIFY_REDIRECT_URI }}
+          SPOTIFY_REDIRECT_URI: ${{ secrets.SPOTIFY_REDIRECT_URI || 'http://localhost:3000/auth/callback' }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET || 'test-jwt-secret-for-ci' }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET || 'test-session-secret-for-ci' }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI || 'mongodb://localhost:27017/echotune_test' }}
       
       - name: 📊 Upload QA Reports
         if: always()
