@@ -47,6 +47,30 @@ class ComprehensiveTestOrchestrator {
 
     async runCommand(command, cwd = process.cwd()) {
         return new Promise((resolve, reject) => {
+            // Validate command input
+            if (!command || typeof command !== 'string') {
+                reject(new Error('Invalid command: must be a non-empty string'));
+                return;
+            }
+            
+            // Validate cwd path
+            if (!cwd || typeof cwd !== 'string') {
+                reject(new Error('Invalid working directory'));
+                return;
+            }
+            
+            // Verify cwd exists and is a directory
+            try {
+                const stats = fs.statSync(cwd);
+                if (!stats.isDirectory()) {
+                    reject(new Error(`Working directory is not a directory: ${cwd}`));
+                    return;
+                }
+            } catch (error) {
+                reject(new Error(`Working directory does not exist: ${cwd}`));
+                return;
+            }
+            
             const parts = command.split(' ');
             const cmd = parts[0];
             const args = parts.slice(1);
@@ -139,8 +163,21 @@ class ComprehensiveTestOrchestrator {
         this.log('Aggregating test reports...', 'info');
         
         const reportDir = path.join(process.cwd(), 'reports');
-        if (!fs.existsSync(reportDir)) {
-            this.log('Reports directory not found', 'warning');
+        
+        // Check if reports directory exists
+        try {
+            if (!fs.existsSync(reportDir)) {
+                this.log('Reports directory not found', 'warning');
+                return;
+            }
+            
+            const stats = fs.statSync(reportDir);
+            if (!stats.isDirectory()) {
+                this.log('Reports path exists but is not a directory', 'warning');
+                return;
+            }
+        } catch (error) {
+            this.log(`Error checking reports directory: ${error.message}`, 'warning');
             return;
         }
         
@@ -154,18 +191,33 @@ class ComprehensiveTestOrchestrator {
         ];
         
         for (const file of reportFiles) {
+            // Sanitize file name to prevent path traversal
+            if (file.includes('..') || file.includes('/')) {
+                this.log(`  ✗ Invalid file name: ${file}`, 'warning');
+                continue;
+            }
+            
             const filePath = path.join(reportDir, file);
-            if (fs.existsSync(filePath)) {
-                try {
-                    const content = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+            
+            try {
+                if (fs.existsSync(filePath)) {
+                    const stats = fs.statSync(filePath);
+                    if (!stats.isFile()) {
+                        this.log(`  ✗ ${file} is not a file`, 'warning');
+                        continue;
+                    }
+                    
+                    const content = fs.readFileSync(filePath, 'utf8');
+                    const parsed = JSON.parse(content);
+                    
                     this.results.aggregatedReports.push({
                         file,
-                        data: content
+                        data: parsed
                     });
                     this.log(`  ✓ Loaded ${file}`, 'info');
-                } catch (error) {
-                    this.log(`  ✗ Failed to load ${file}: ${error.message}`, 'warning');
                 }
+            } catch (error) {
+                this.log(`  ✗ Failed to load ${file}: ${error.message}`, 'warning');
             }
         }
     }
@@ -174,8 +226,15 @@ class ComprehensiveTestOrchestrator {
         this.log('Checking for UI screenshots...', 'info');
         
         const screenshotDir = path.join(process.cwd(), 'BROWSERSCREENSHOT-TESTING');
-        if (fs.existsSync(screenshotDir)) {
-            try {
+        
+        try {
+            if (fs.existsSync(screenshotDir)) {
+                const stats = fs.statSync(screenshotDir);
+                if (!stats.isDirectory()) {
+                    this.log('  Screenshot path exists but is not a directory', 'warning');
+                    return;
+                }
+                
                 const subdirs = fs.readdirSync(screenshotDir, { withFileTypes: true })
                     .filter(d => d.isDirectory())
                     .map(d => d.name);
@@ -187,11 +246,11 @@ class ComprehensiveTestOrchestrator {
                 };
                 
                 this.log(`  Found ${subdirs.length} screenshot runs`, 'success');
-            } catch (error) {
-                this.log(`  Error reading screenshots: ${error.message}`, 'warning');
+            } else {
+                this.log('  No screenshots directory found', 'warning');
             }
-        } else {
-            this.log('  No screenshots directory found', 'warning');
+        } catch (error) {
+            this.log(`  Error reading screenshots: ${error.message}`, 'warning');
         }
     }
 
@@ -199,25 +258,45 @@ class ComprehensiveTestOrchestrator {
         this.results.summary.totalDuration = Date.now() - this.startTime;
         
         const reportDir = path.join(process.cwd(), 'reports');
-        if (!fs.existsSync(reportDir)) {
-            fs.mkdirSync(reportDir, { recursive: true });
+        
+        // Ensure reports directory exists with proper error handling
+        try {
+            if (!fs.existsSync(reportDir)) {
+                fs.mkdirSync(reportDir, { recursive: true });
+            } else {
+                const stats = fs.statSync(reportDir);
+                if (!stats.isDirectory()) {
+                    throw new Error('Reports path exists but is not a directory');
+                }
+            }
+        } catch (error) {
+            this.log(`Error creating reports directory: ${error.message}`, 'error');
+            return;
         }
         
-        // Save JSON report
-        const jsonPath = path.join(reportDir, 'comprehensive-test-results.json');
-        fs.writeFileSync(jsonPath, JSON.stringify(this.results, null, 2));
-        this.log(`JSON report saved: ${jsonPath}`, 'success');
+        // Save JSON report with error handling
+        try {
+            const jsonPath = path.join(reportDir, 'comprehensive-test-results.json');
+            fs.writeFileSync(jsonPath, JSON.stringify(this.results, null, 2), 'utf8');
+            this.log(`JSON report saved: ${jsonPath}`, 'success');
+        } catch (error) {
+            this.log(`Error saving JSON report: ${error.message}`, 'error');
+        }
         
-        // Generate markdown report
-        const markdown = this.generateMarkdownReport();
-        const mdPath = path.join(reportDir, 'COMPREHENSIVE_TEST_REPORT.md');
-        fs.writeFileSync(mdPath, markdown);
-        this.log(`Markdown report saved: ${mdPath}`, 'success');
-        
-        // Copy to root for visibility
-        const rootMdPath = path.join(process.cwd(), 'COMPREHENSIVE_TEST_REPORT.md');
-        fs.copyFileSync(mdPath, rootMdPath);
-        this.log(`Report copied to: ${rootMdPath}`, 'success');
+        // Generate markdown report with error handling
+        try {
+            const markdown = this.generateMarkdownReport();
+            const mdPath = path.join(reportDir, 'COMPREHENSIVE_TEST_REPORT.md');
+            fs.writeFileSync(mdPath, markdown, 'utf8');
+            this.log(`Markdown report saved: ${mdPath}`, 'success');
+            
+            // Copy to root for visibility
+            const rootMdPath = path.join(process.cwd(), 'COMPREHENSIVE_TEST_REPORT.md');
+            fs.copyFileSync(mdPath, rootMdPath);
+            this.log(`Report copied to: ${rootMdPath}`, 'success');
+        } catch (error) {
+            this.log(`Error saving markdown report: ${error.message}`, 'error');
+        }
     }
 
     generateMarkdownReport() {

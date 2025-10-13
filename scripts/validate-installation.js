@@ -108,10 +108,29 @@ class InstallationValidator {
     async validateNodeDependencies() {
         console.log('\n📚 Validating Node.js Dependencies...');
         
+        // Sanitize and validate path
         const packageJsonPath = path.join(process.cwd(), 'package.json');
-        if (!fs.existsSync(packageJsonPath)) {
+        
+        // Check file existence before operations
+        try {
+            if (!fs.existsSync(packageJsonPath)) {
+                this.logCheck('package.json', 'fail', {
+                    message: 'package.json not found'
+                });
+                return;
+            }
+            
+            // Verify it's actually a file, not a directory
+            const stats = fs.statSync(packageJsonPath);
+            if (!stats.isFile()) {
+                this.logCheck('package.json', 'fail', {
+                    message: 'package.json is not a valid file'
+                });
+                return;
+            }
+        } catch (error) {
             this.logCheck('package.json', 'fail', {
-                message: 'package.json not found'
+                message: `Error checking package.json: ${error.message}`
             });
             return;
         }
@@ -121,37 +140,65 @@ class InstallationValidator {
         });
         
         const nodeModulesPath = path.join(process.cwd(), 'node_modules');
-        if (fs.existsSync(nodeModulesPath)) {
-            this.logCheck('node_modules', 'pass', {
-                message: 'Dependencies installed'
-            });
-            
-            // Check critical dependencies
-            const criticalDeps = [
-                'express',
-                'mongoose',
-                'redis',
-                'playwright',
-                '@playwright/test',
-                'axios',
-                'dotenv'
-            ];
-            
-            for (const dep of criticalDeps) {
-                const depPath = path.join(nodeModulesPath, dep);
-                if (fs.existsSync(depPath)) {
-                    this.logCheck(`Dependency: ${dep}`, 'pass', {
-                        message: 'Installed'
+        
+        try {
+            if (fs.existsSync(nodeModulesPath)) {
+                // Verify it's a directory
+                const stats = fs.statSync(nodeModulesPath);
+                if (!stats.isDirectory()) {
+                    this.logCheck('node_modules', 'fail', {
+                        message: 'node_modules exists but is not a directory'
                     });
-                } else {
-                    this.logCheck(`Dependency: ${dep}`, 'warning', {
-                        message: 'Not found - may be optional'
-                    });
+                    return;
                 }
+                
+                this.logCheck('node_modules', 'pass', {
+                    message: 'Dependencies installed'
+                });
+                
+                // Check critical dependencies
+                const criticalDeps = [
+                    'express',
+                    'mongoose',
+                    'redis',
+                    'playwright',
+                    '@playwright/test',
+                    'axios',
+                    'dotenv'
+                ];
+                
+                for (const dep of criticalDeps) {
+                    // Sanitize dependency name to prevent path traversal
+                    if (dep.includes('..') || dep.includes('/') && !dep.startsWith('@')) {
+                        continue;
+                    }
+                    
+                    const depPath = path.join(nodeModulesPath, dep);
+                    
+                    try {
+                        if (fs.existsSync(depPath)) {
+                            this.logCheck(`Dependency: ${dep}`, 'pass', {
+                                message: 'Installed'
+                            });
+                        } else {
+                            this.logCheck(`Dependency: ${dep}`, 'warning', {
+                                message: 'Not found - may be optional'
+                            });
+                        }
+                    } catch (error) {
+                        this.logCheck(`Dependency: ${dep}`, 'warning', {
+                            message: `Error checking: ${error.message}`
+                        });
+                    }
+                }
+            } else {
+                this.logCheck('node_modules', 'fail', {
+                    message: 'Dependencies not installed - run npm install'
+                });
             }
-        } else {
+        } catch (error) {
             this.logCheck('node_modules', 'fail', {
-                message: 'Dependencies not installed - run npm install'
+                message: `Error checking dependencies: ${error.message}`
             });
         }
     }
@@ -182,15 +229,28 @@ class InstallationValidator {
             });
         }
         
-        // Check if requirements.txt exists
+        // Check if requirements.txt exists with proper error handling
         const requirementsPath = path.join(process.cwd(), 'requirements.txt');
-        if (fs.existsSync(requirementsPath)) {
-            this.logCheck('requirements.txt', 'pass', {
-                message: 'Found in project root'
-            });
-        } else {
+        try {
+            if (fs.existsSync(requirementsPath)) {
+                const stats = fs.statSync(requirementsPath);
+                if (stats.isFile()) {
+                    this.logCheck('requirements.txt', 'pass', {
+                        message: 'Found in project root'
+                    });
+                } else {
+                    this.logCheck('requirements.txt', 'warning', {
+                        message: 'requirements.txt exists but is not a file'
+                    });
+                }
+            } else {
+                this.logCheck('requirements.txt', 'warning', {
+                    message: 'Not found - Python dependencies may not be defined'
+                });
+            }
+        } catch (error) {
             this.logCheck('requirements.txt', 'warning', {
-                message: 'Not found - Python dependencies may not be defined'
+                message: `Error checking requirements.txt: ${error.message}`
             });
         }
     }
@@ -210,23 +270,49 @@ class InstallationValidator {
         ];
         
         for (const item of criticalPaths) {
-            const itemPath = path.join(process.cwd(), item.path);
-            const exists = fs.existsSync(itemPath);
-            
-            if (exists) {
-                this.logCheck(`Project Structure: ${item.path}`, 'pass', {
-                    message: `${item.type} exists`
+            // Sanitize path to prevent traversal
+            if (item.path.includes('..')) {
+                this.logCheck(`Project Structure: ${item.path}`, 'fail', {
+                    message: 'Invalid path detected'
                 });
-            } else {
-                if (item.critical) {
-                    this.logCheck(`Project Structure: ${item.path}`, 'fail', {
-                        message: `Critical ${item.type} not found`
-                    });
+                continue;
+            }
+            
+            const itemPath = path.join(process.cwd(), item.path);
+            
+            try {
+                const exists = fs.existsSync(itemPath);
+                
+                if (exists) {
+                    // Verify the type matches what we expect
+                    const stats = fs.statSync(itemPath);
+                    const isCorrectType = (item.type === 'directory' && stats.isDirectory()) ||
+                                         (item.type === 'file' && stats.isFile());
+                    
+                    if (isCorrectType) {
+                        this.logCheck(`Project Structure: ${item.path}`, 'pass', {
+                            message: `${item.type} exists`
+                        });
+                    } else {
+                        this.logCheck(`Project Structure: ${item.path}`, 'fail', {
+                            message: `Exists but wrong type (expected ${item.type})`
+                        });
+                    }
                 } else {
-                    this.logCheck(`Project Structure: ${item.path}`, 'warning', {
-                        message: `Optional ${item.type} not found`
-                    });
+                    if (item.critical) {
+                        this.logCheck(`Project Structure: ${item.path}`, 'fail', {
+                            message: `Critical ${item.type} not found`
+                        });
+                    } else {
+                        this.logCheck(`Project Structure: ${item.path}`, 'warning', {
+                            message: `Optional ${item.type} not found`
+                        });
+                    }
                 }
+            } catch (error) {
+                this.logCheck(`Project Structure: ${item.path}`, 'fail', {
+                    message: `Error checking: ${error.message}`
+                });
             }
         }
     }
@@ -237,19 +323,37 @@ class InstallationValidator {
         const envExamplePath = path.join(process.cwd(), '.env.example');
         const envPath = path.join(process.cwd(), '.env');
         
-        if (fs.existsSync(envExamplePath)) {
-            this.logCheck('.env.example', 'pass', {
-                message: 'Template file exists'
+        try {
+            if (fs.existsSync(envExamplePath)) {
+                const stats = fs.statSync(envExamplePath);
+                if (stats.isFile()) {
+                    this.logCheck('.env.example', 'pass', {
+                        message: 'Template file exists'
+                    });
+                }
+            }
+        } catch (error) {
+            this.logCheck('.env.example', 'warning', {
+                message: `Error checking .env.example: ${error.message}`
             });
         }
         
-        if (fs.existsSync(envPath)) {
-            this.logCheck('.env file', 'pass', {
-                message: 'Environment file configured'
-            });
-        } else {
+        try {
+            if (fs.existsSync(envPath)) {
+                const stats = fs.statSync(envPath);
+                if (stats.isFile()) {
+                    this.logCheck('.env file', 'pass', {
+                        message: 'Environment file configured'
+                    });
+                }
+            } else {
+                this.logCheck('.env file', 'warning', {
+                    message: 'Not found - create from .env.example'
+                });
+            }
+        } catch (error) {
             this.logCheck('.env file', 'warning', {
-                message: 'Not found - create from .env.example'
+                message: `Error checking .env: ${error.message}`
             });
         }
     }
