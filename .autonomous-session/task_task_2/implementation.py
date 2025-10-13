@@ -1,9 +1,9 @@
 
-# Task: TypeScript Migration Plan for High-Change Backend Modules
-# Description: Draft and begin implementing a TypeScript migration plan for backend modules with high change-rate, focusing on `src/api/routes/*` and `src/chat/*`.
-# Files to modify: ['src/api/routes/*', 'src/chat/*', 'tsconfig.json']
+# Task: Add Request Correlation IDs for End-to-End Tracing
+# Description: Attach a unique correlation ID to each incoming request and propagate it through backend services and logs to enable traceability and easier debugging.
+# Files to modify: ['src/middleware/requestLogger.js', 'src/api/routes/*', 'src/utils/logger.js', 'test/middleware/requestLogger.test.js']
 
-print("Implementing: TypeScript Migration Plan for High-Change Backend Modules")
+print("Implementing: Add Request Correlation IDs for End-to-End Tracing")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
