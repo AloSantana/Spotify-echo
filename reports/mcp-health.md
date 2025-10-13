@@ -1,77 +1,46 @@
-# MCP Health Check Report
+# MCP Health Report
 
-**Generated:** 2025-08-15T21:31:52Z  
-**Overall Status:** warning  
-**Total Checks:** 38
+**Generated**: 10/13/2025, 11:09:52 AM
+**Node.js**: v20.19.5
+**Platform**: linux
 
-## Executive Summary
+## Server Status
 
-🟡 **Minor issues detected** - MCP infrastructure is functional with some warnings.
+| Server | Status | Port | Environment Requirements |
+|--------|---------|------|-------------------------|
+| filesystem | ✅ Ready | 3020 | None |
+| memory | ✅ Ready | 3021 | None |
+| github-repos-manager | ⚠️ Skipped | 3022 | GITHUB_TOKEN |
+| brave-search | ⚠️ Skipped | 3023 | BRAVE_API_KEY |
+| sequential-thinking | ✅ Ready | 3024 | None |
+| code-sandbox | ✅ Ready | 3025 | None |
+| perplexity-mcp | ⚠️ Skipped | 3026 | PERPLEXITY_API_KEY |
+| screenshot-website | ⚠️ Skipped | 3051 | BROWSERBASE_API_KEY, BROWSERBASE_PROJECT_ID |
 
-## Health Check Results
+## Summary
 
-| Component | Status | Message |
-|-----------|--------|---------|
-| nodejs | ✅ healthy | Node.js v20.19.4 available |
-| npm | ✅ healthy | npm 10.8.2 available |
-| Enhanced File MCP | ✅ healthy | File present at mcp-servers/enhanced-file-utilities.js |
-| Comprehensive Validator MCP | ✅ healthy | File present at mcp-servers/comprehensive-validator.js |
-| MCP Orchestrator | ✅ healthy | File present at mcp-server/enhanced-mcp-orchestrator.js |
-| Workflow Manager | ✅ healthy | File present at mcp-server/workflow-manager.js |
-| MCP SDK | ⚠️ warning | Package not installed locally |
-| Filesystem MCP | ⚠️ warning | Package not installed locally |
-| Browserbase MCP | ⚠️ warning | Package not installed locally |
-| FileScope MCP | ⚠️ warning | Package not installed locally |
-| MongoDB Connection | ⚠️ warning | Environment variable not set (optional) |
-| MongoDB Database | ⚠️ warning | Environment variable not set (optional) |
-| N8N Base URL | ⚠️ warning | Environment variable not set (optional) |
-| N8N API Key | ⚠️ warning | Environment variable not set (optional) |
-| Brave Search API | ⚠️ warning | Environment variable not set (optional) |
-| Screenshot Engine | ⚠️ warning | Environment variable not set (optional) |
-| Browserbase API | ⚠️ warning | Environment variable not set (optional) |
-| Browserbase Project | ⚠️ warning | Environment variable not set (optional) |
-| Spotify API | ⚠️ warning | Environment variable not set (optional) |
-| Spotify API Secret | ⚠️ warning | Environment variable not set (optional) |
-| OpenAI API | ⚠️ warning | Environment variable not set (optional) |
-| Gemini API | ⚠️ warning | Environment variable not set (optional) |
-| MCP Servers Example | ✅ healthy | Valid JSON file |
-| MCP Registry | ✅ healthy | Valid JSON file |
-| Package Configuration | ✅ healthy | Valid JSON file |
-| install:MCP Installation | ✅ healthy | Script available and functional |
-| health:MCP Health Check | ✅ healthy | Script available and functional |
-| validate:MCP Validation | ✅ healthy | Script available and functional |
-| report:MCP Report Generation | ✅ healthy | Script available and functional |
-| Reports Directory | ✅ healthy | Directory exists and is writable |
-| MCP Directory | ✅ healthy | Directory exists and is writable |
-| Logs Directory | ⚠️ warning | Directory does not exist |
-| Logs Directory | ✅ healthy | Directory created successfully |
-| MCP Servers Directory | ✅ healthy | Directory exists and is writable |
-| MCP Server Directory | ✅ healthy | Directory exists and is writable |
-| Main MCP Server | ⚠️ warning | Server not running on port 3001 (expected in most environments) |
-| Secondary MCP Server | ⚠️ warning | Server not running on port 3002 (expected in most environments) |
-| Analytics MCP Server | ⚠️ warning | Server not running on port 3003 (expected in most environments) |
-
-## System Information
-
-- **Operating System:** Linux
-- **Node.js Version:** v20.19.4  
-- **npm Version:** 10.8.2
-- **Project Root:** /home/runner/work/Spotify-echo/Spotify-echo
-
-## Recommendations
+- **Total Servers**: 8
+- **Ready to Start**: 4
+- **Skipped (Missing Env)**: 4
 
 
-1. **Environment Variables:** Set missing optional environment variables for full functionality
-2. **Server Startup:** Consider starting MCP servers for live validation
-3. **Regular Monitoring:** Run this health check periodically with `npm run mcp:health`
-4. **Full Validation:** Run `npm run mcp:validate` for comprehensive validation
+## Environment Issues
 
-## Next Steps
+- **github-repos-manager**: Missing environment variables: GITHUB_TOKEN
+- **brave-search**: Missing environment variables: BRAVE_API_KEY
+- **perplexity-mcp**: Missing environment variables: PERPLEXITY_API_KEY
+- **screenshot-website**: Missing environment variables: BROWSERBASE_API_KEY, BROWSERBASE_PROJECT_ID
 
-- Review any warnings or failures above
-- Set required environment variables in your `.env` file
-- Run `scripts/install-mcp-servers.sh` if packages are missing
-- Start MCP servers for live health monitoring
+
+## File Status
+
+- ✅ mcp-server/health.js
+- ✅ mcp-server/package.json
+- ✅ mcp-servers/package.json
+- ✅ mcp-registry.json
+- ✅ .env.example
+- ✅ docs/mcp-servers.md
+- ✅ docs/MCP_INTEGRATION.md
 
 ---
-*This report was generated automatically by the EchoTune AI MCP health check system.*
+*Report generated by MCP Manager v1.0*

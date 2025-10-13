@@ -2,7 +2,8 @@
 
 /**
  * MCP Server Manager (hardened)
- * - Discovers servers from mcp-server/package.json (servers block)
+ * - Discovers servers from mcp-server/package.json or mcp-servers/package.json
+ * - Supports both "servers" and "mcpServers" blocks
  * - Can install deps, start ephemeral servers, health-check, test, and report
  * - Uses curl -fsS for reliable health probing
  */
@@ -17,8 +18,23 @@ const util = require('util');
 const execAsync = util.promisify(exec);
 
 const ROOT = process.cwd();
-const MCP_DIR = path.join(ROOT, 'mcp-server');
-const MCP_PKG = path.join(MCP_DIR, 'package.json');
+
+// Auto-detect MCP directory
+function detectMCPDirectory() {
+  const candidates = ['mcp-servers', 'mcp-server'];
+  for (const dir of candidates) {
+    const fullPath = path.join(ROOT, dir);
+    const pkgPath = path.join(fullPath, 'package.json');
+    if (fs.existsSync(fullPath) && fs.existsSync(pkgPath)) {
+      return { dir: fullPath, name: dir, pkg: pkgPath };
+    }
+  }
+  return null;
+}
+
+const mcpInfo = detectMCPDirectory();
+const MCP_DIR = mcpInfo ? mcpInfo.dir : path.join(ROOT, 'mcp-server');
+const MCP_PKG = mcpInfo ? mcpInfo.pkg : path.join(MCP_DIR, 'package.json');
 
 function log(msg) { console.log(msg); }
 function logH(msg) { console.log(`\n${msg}`); }
@@ -30,9 +46,19 @@ async function readServers() {
   try {
     const raw = await fsp.readFile(MCP_PKG, 'utf8');
     const pkg = JSON.parse(raw);
-    servers = pkg.servers || {};
+    // Support both "servers" and "mcpServers" keys
+    servers = pkg.servers || pkg.mcpServers || {};
+    
+    if (mcpInfo) {
+      log(`ℹ️ Using MCP directory: ${mcpInfo.name}/`);
+      const keyUsed = pkg.servers ? 'servers' : (pkg.mcpServers ? 'mcpServers' : 'none');
+      log(`ℹ️ Reading servers from "${keyUsed}" block`);
+    }
   } catch (e) {
     // no package or no servers block
+    if (mcpInfo) {
+      log(`⚠️ Could not read servers from ${mcpInfo.name}/package.json: ${e.message}`);
+    }
   }
   return servers;
 }
@@ -54,22 +80,27 @@ async function probeHealth(url, timeoutMs = 10000, intervalMs = 500) {
 async function install() {
   logH('📦 Installing MCP dependencies...');
   try {
-    if (fs.existsSync(MCP_DIR)) {
-      if (fs.existsSync(MCP_PKG)) {
-        log('→ Installing/updating npm packages in mcp-server');
+    // Auto-detect and use the correct MCP directory
+    const detectedMCP = detectMCPDirectory();
+    const targetDir = detectedMCP ? detectedMCP.dir : MCP_DIR;
+    const targetName = detectedMCP ? detectedMCP.name : 'mcp-server';
+    
+    if (fs.existsSync(targetDir)) {
+      if (fs.existsSync(path.join(targetDir, 'package.json'))) {
+        log(`→ Installing/updating npm packages in ${targetName}`);
         try {
-          await execAsync('npm ci', { cwd: MCP_DIR });
+          await execAsync('npm ci', { cwd: targetDir });
         } catch (ciError) {
           log('→ npm ci failed, trying npm install...');
-          await execAsync('npm install', { cwd: MCP_DIR });
+          await execAsync('npm install', { cwd: targetDir });
         }
       }
-      if (fs.existsSync(path.join(MCP_DIR, 'requirements.txt'))) {
-        log('→ pip install -r requirements.txt in mcp-server');
-        await execAsync('python3 -m pip install -r requirements.txt', { cwd: MCP_DIR });
+      if (fs.existsSync(path.join(targetDir, 'requirements.txt'))) {
+        log(`→ pip install -r requirements.txt in ${targetName}`);
+        await execAsync('python3 -m pip install -r requirements.txt', { cwd: targetDir });
       }
     } else {
-      log('ℹ️ mcp-server directory not found, skipping');
+      log(`ℹ️ ${targetName} directory not found, skipping`);
     }
     log('✅ Install complete');
   } catch (e) {
@@ -91,8 +122,9 @@ function startServer(name, def) {
   const cmd = def.command;
   const args = def.args || [];
 
+  // Set cwd to repository root so relative paths like mcp-servers/... work
   const child = spawn(cmd, args, {
-    cwd: MCP_DIR,
+    cwd: ROOT,
     env,
     stdio: ['ignore', 'pipe', 'pipe']
   });
@@ -117,10 +149,18 @@ async function health() {
   logH('🔍 MCP health check');
   const servers = await readServers();
   const names = Object.keys(servers);
+  
+  if (mcpInfo) {
+    log(`📁 MCP Directory: ${mcpInfo.name}/`);
+  }
+  
   if (names.length === 0) {
-    log('ℹ️ No servers configured in mcp-server/package.json (servers block).');
+    log(`ℹ️ No servers configured in ${mcpInfo ? mcpInfo.name : 'mcp-server'}/package.json (servers or mcpServers block).`);
     return;
   }
+
+  log(`📋 Configured servers: ${names.join(', ')}`);
+  log('');
 
   for (const name of names) {
     const def = servers[name];
@@ -191,8 +231,14 @@ async function report() {
   logH('📊 MCP status report');
   const start = Date.now();
   const servers = await readServers();
+  
+  if (mcpInfo) {
+    log(`📁 MCP Directory: ${mcpInfo.name}/`);
+  }
+  
   const reportData = {
     timestamp: new Date().toISOString(),
+    mcpDirectory: mcpInfo ? mcpInfo.name : 'not-detected',
     environment: {
       nodeVersion: process.version,
       platform: process.platform,
@@ -246,6 +292,7 @@ async function report() {
   const files = [
     'mcp-server/health.js',
     'mcp-server/package.json',
+    'mcp-servers/package.json',
     'mcp-registry.json',
     '.env.example',
     'docs/mcp-servers.md',
