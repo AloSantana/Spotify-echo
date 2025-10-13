@@ -96,7 +96,7 @@ jobs:
         fi
 
     - name: Upload validation results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: validation-results
         path: validation-results.json
@@ -161,7 +161,7 @@ jobs:
           --warmup-requests 100
 
     - name: Upload deployment info
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: deployment-info
         path: deployment-info.json
@@ -230,7 +230,7 @@ jobs:
           --output statistical-analysis.json
 
     - name: Upload monitoring results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: monitoring-results
         path: |
@@ -269,7 +269,7 @@ jobs:
           --output traffic-monitoring.json
 
     - name: Upload traffic management results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: traffic-management
         path: |
@@ -304,7 +304,7 @@ jobs:
           --output rollback-verification.json
 
     - name: Upload rollback results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: rollback-results
         path: |
@@ -398,7 +398,7 @@ jobs:
           }
 
     - name: Upload final report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: deployment-report
         path: deployment-report.html

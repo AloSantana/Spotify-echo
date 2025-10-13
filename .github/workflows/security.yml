@@ -71,12 +71,18 @@ jobs:
         with:
           fetch-depth: 0  # Full history for comprehensive scanning
           
+      - name: Configure Git safe directory and fetch history
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git fetch --prune --unshallow || true
+          
       - name: Create reports directory
         run: mkdir -p reports
         
       - name: Gitleaks scan
-        uses: zricethezav/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v2
         with:
+          version: latest
           args: "detect --no-banner --redact --exit-code 0 --report-format json --report-path reports/gitleaks.json"
           
       - name: Enhanced secret pattern scanning

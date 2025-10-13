@@ -86,6 +86,12 @@ jobs:
           echo "SKIP_ENV_LOADING=1" >> $GITHUB_ENV
           echo "NODE_ENV=test" >> $GITHUB_ENV
           
+      - name: Enforce core-only allowlist
+        if: matrix.variant == 'core-only'
+        run: |
+          echo "CORE_ONLY=1" >> $GITHUB_ENV
+          echo "MCP_SERVER_WHITELIST=filesystem,memory,sequential-thinking" >> $GITHUB_ENV
+          
       - name: Configure secrets for testing (${{ matrix.secrets_mode }})
         run: |
           case "${{ matrix.secrets_mode }}" in
@@ -209,6 +215,17 @@ jobs:
             
             echo "✅ Secrets-gating validation completed"
           fi
+          
+      - name: Enforce no community servers in core-only
+        if: matrix.variant == 'core-only'
+        run: |
+          MATCH=$(grep -iE "playwright|sqlite|git|github-repos|browserbase" -R . --exclude-dir=node_modules --exclude-dir=.git || true)
+          if [ -n "$MATCH" ]; then
+            echo "❌ Community servers detected in core-only variant:"
+            echo "$MATCH"
+            exit 1
+          fi
+          echo "✅ Core-only enforcement passed"
           
       - name: Generate comprehensive test report
         run: |
