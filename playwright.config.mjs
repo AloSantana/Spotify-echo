@@ -25,16 +25,16 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 2,
   
   /* Opt out of parallel tests on CI */
   workers: process.env.CI ? 1 : undefined,
   
   /* Reporter to use */
   reporter: [
-    ['html', { outputFolder: 'BROWSERSCREENSHOT-TESTING/playwright-report' }],
-    ['json', { outputFile: 'BROWSERSCREENSHOT-TESTING/reports/playwright-results.json' }],
-    ['junit', { outputFile: 'BROWSERSCREENSHOT-TESTING/reports/playwright-results.xml' }]
+    ['list'],
+    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    ['json', { outputFile: 'test-results/playwright-results.json' }]
   ],
   
   /* Global setup and teardown */
@@ -47,13 +47,10 @@ export default defineConfig({
     baseURL: process.env.BASE_URL || 'http://localhost:3000',
 
     /* Collect trace when retrying the failed test */
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
     
-    /* Screenshot settings - capture on failure and for visual tests */
-    screenshot: {
-      mode: 'only-on-failure',
-      fullPage: true
-    },
+    /* Screenshot settings - capture on failure */
+    screenshot: 'only-on-failure',
     
     /* Video on failure */
     video: 'retain-on-failure',

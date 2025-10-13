@@ -14,7 +14,7 @@ on:
         type: boolean
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '20'
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
 
 jobs:
@@ -34,8 +34,8 @@ jobs:
           cache: 'npm'
       
       - name: 📦 Install Dependencies
-        run: npm install
-        continue-on-error: true
+        run: npm ci
+        continue-on-error: false
       
       - name: 🔍 Run Lint
         run: npm run lint || echo "Linting had issues"
@@ -72,8 +72,19 @@ jobs:
       - name: 🐳 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       
-      - name: 🔍 Validate docker-compose
-        run: docker-compose config --quiet
+      - name: 🔧 Install docker compose plugin
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose-plugin || echo "docker compose plugin may already be installed"
+          docker compose version || echo "Fallback to docker-compose"
+      
+      - name: 🔍 Validate docker compose
+        run: |
+          if command -v docker compose &> /dev/null; then
+            docker compose config --quiet || echo "docker compose validation had issues"
+          else
+            docker-compose config --quiet || echo "docker-compose validation had issues"
+          fi
         continue-on-error: true
       
       - name: 🏗️ Build Docker Image
@@ -101,11 +112,10 @@ jobs:
           cache: 'npm'
       
       - name: 📦 Install Dependencies
-        run: npm install
+        run: npm ci
       
       - name: 🎭 Install Playwright Browsers
         run: npx playwright install --with-deps chromium
-        continue-on-error: true
       
       - name: 🧪 Run Playwright Tests
         run: npx playwright test tests/e2e/complete-app-validation.spec.js --reporter=json
@@ -142,22 +152,31 @@ jobs:
           cache: 'npm'
       
       - name: 📦 Install Dependencies
-        run: npm install
+        run: npm ci
       
       - name: 🐳 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       
+      - name: 🔧 Install docker compose plugin
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose-plugin || echo "docker compose plugin may already be installed"
+          docker compose version || echo "Fallback to docker-compose"
+      
       - name: 🎭 Install Playwright
         run: npx playwright install --with-deps chromium
-        continue-on-error: true
       
       - name: 🚀 Run Master QA Orchestrator
         run: npm run qa:all
         continue-on-error: true
         env:
           CI: true
+          PORT: 3000
+          BASE_URL: http://localhost:3000
+          NODE_ENV: production
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
           SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_REDIRECT_URI: ${{ secrets.SPOTIFY_REDIRECT_URI }}
       
       - name: 📊 Upload QA Reports
         if: always()

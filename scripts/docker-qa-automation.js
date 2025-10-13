@@ -13,6 +13,21 @@ const util = require('util');
 
 const execPromise = util.promisify(exec);
 
+// Helper to check which docker compose command is available
+async function getDockerComposeCommand() {
+    try {
+        await execPromise('docker compose version');
+        return 'docker compose';
+    } catch {
+        try {
+            await execPromise('docker-compose --version');
+            return 'docker-compose';
+        } catch {
+            return null;
+        }
+    }
+}
+
 class DockerQA {
     constructor() {
         this.results = {
@@ -75,23 +90,33 @@ class DockerQA {
     }
 
     async testDockerCompose() {
-        this.log('Testing docker-compose configuration...');
+        this.log('Testing docker compose configuration...');
         try {
-            // Validate docker-compose.yml
-            const validateResult = await execPromise('docker-compose config --quiet');
-            if (validateResult.stderr) {
-                this.log(`⚠️ docker-compose validation warnings: ${validateResult.stderr}`, 'WARN');
+            // Get available docker compose command
+            const composeCmd = await getDockerComposeCommand();
+            if (!composeCmd) {
+                this.log('⚠️ Neither docker compose nor docker-compose found', 'WARN');
+                this.results.composeSuccess = false;
+                return false;
             }
             
-            this.log('✅ docker-compose configuration valid');
+            this.log(`Using: ${composeCmd}`);
+            
+            // Validate docker-compose.yml
+            const validateResult = await execPromise(`${composeCmd} config --quiet`);
+            if (validateResult.stderr) {
+                this.log(`⚠️ docker compose validation warnings: ${validateResult.stderr}`, 'WARN');
+            }
+            
+            this.log('✅ docker compose configuration valid');
             this.results.composeSuccess = true;
             
             // Don't actually start services in QA to avoid port conflicts
-            this.log('ℹ️  Skipping actual docker-compose up to avoid conflicts', 'INFO');
+            this.log('ℹ️  Skipping actual docker compose up to avoid conflicts', 'INFO');
             
             return true;
         } catch (error) {
-            this.log(`❌ docker-compose validation failed: ${error.message}`, 'ERROR');
+            this.log(`❌ docker compose validation failed: ${error.message}`, 'ERROR');
             this.results.composeSuccess = false;
             return false;
         }
