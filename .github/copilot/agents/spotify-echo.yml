@@ -1,0 +1,35 @@
+name: "Spotify Echo Agent"
+description: "Agent for PR validation with MCP servers (Gemini, Perplexity, Brave, Hyperbrowser)"
+secrets:
+  - GOOGLE_API_KEY
+  - GEMINI_API_KEY
+  - PERPLEXITY_API_KEY
+  - BRAVE_API
+  - HYPERBROWSER_API_KEY
+
+env: {}
+
+setup:
+  - run: npx -y playwright install --with-deps
+
+mcpServers:
+  gemini:
+    command: npx -y @modelcontextprotocol/server-gemini
+    env:
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      # GEMINI_MODEL: "gemini-1.5-flash"
+  perplexity:
+    command: npx -y @modelcontextprotocol/server-perplexity
+    env:
+      PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+      # PERPLEXITY_MODEL: "sonar-small-online"
+  brave-search:
+    command: npx -y @modelcontextprotocol/server-brave-search
+    env:
+      BRAVE_API_KEY: ${{ secrets.BRAVE_API }}
+      BRAVE_API: ${{ secrets.BRAVE_API }}
+  hyperbrowser:
+    command: npx -y @modelcontextprotocol/server-hyperbrowser
+    env:
+      HYPERBROWSER_API_KEY: ${{ secrets.HYPERBROWSER_API_KEY }}
