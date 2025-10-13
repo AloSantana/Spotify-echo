@@ -1,13 +1,13 @@
 {
-  "timestamp": "2025-08-15T17:43:27.362Z",
+  "timestamp": "2025-10-12T23:48:52.158Z",
   "totalTests": 12,
-  "passed": 9,
-  "failed": 3,
+  "passed": 5,
+  "failed": 7,
   "warnings": 0,
   "secrets": {
     "SPOTIFY_API": {
       "status": "✅ WORKING",
-      "responseTime": "433ms",
+      "responseTime": "467ms",
       "features": [
         "OAuth authentication",
         "Search API",
@@ -15,24 +15,17 @@
       ],
       "testData": "Found 1 tracks in search test",
       "tested": true,
-      "timestamp": "2025-08-15T17:43:27.800Z"
+      "timestamp": "2025-10-12T23:48:52.631Z"
     },
     "PERPLEXITY_API": {
-      "status": "✅ WORKING",
-      "responseTime": "4088ms",
-      "features": [
-        "AI research queries",
-        "Citations",
-        "Real-time web data"
-      ],
-      "testData": "Response length: 1118 characters",
-      "cost": "$0.003 per query (estimated)",
+      "status": "❌ FAILED",
+      "error": "Perplexity API failed: 401 Unauthorized",
       "tested": true,
-      "timestamp": "2025-08-15T17:43:31.889Z"
+      "timestamp": "2025-10-12T23:48:52.680Z"
     },
     "BRAVE_API": {
       "status": "✅ WORKING",
-      "responseTime": "220ms",
+      "responseTime": "270ms",
       "features": [
         "Privacy-focused search",
         "Web results",
@@ -40,11 +33,11 @@
       ],
       "testData": "Found 5 search results",
       "tested": true,
-      "timestamp": "2025-08-15T17:43:32.109Z"
+      "timestamp": "2025-10-12T23:48:52.950Z"
     },
     "BROWSERBASE_API": {
       "status": "✅ WORKING",
-      "responseTime": "716ms",
+      "responseTime": "644ms",
       "features": [
         "Cloud browser automation",
         "Session management",
@@ -54,25 +47,25 @@
       "testData": "Projects accessible: 1",
       "projectId": "df31bafd-8541-40f2-80a8-2f6ea30df60e",
       "projectIdValid": "✅ Valid project ID",
-      "sessionCreation": "✅ Working",
+      "sessionCreation": "❌ Failed",
       "planDetails": "Free plan: 1 browser concurrency",
       "stagehendReady": "✅ Ready",
       "apiKeyStatus": "LATEST: bb_live_P4BWp-i1Atz_NMBWXr521kxcrXw",
       "authMethod": "✅ Fixed: Uses x-bb-api-key header instead of Bearer token",
       "tested": true,
-      "timestamp": "2025-08-15T17:43:32.825Z"
+      "timestamp": "2025-10-12T23:48:53.594Z"
     },
     "DIGITALOCEAN_API": {
       "status": "❌ FAILED",
       "error": "DigitalOcean API failed: 401 Unauthorized",
       "tested": true,
-      "timestamp": "2025-08-15T17:43:32.985Z"
+      "timestamp": "2025-10-12T23:48:53.664Z"
     },
     "GITHUB_API": {
       "status": "❌ FAILED",
-      "error": "Both tokens failed: ❌ GH_PAT: 401 Unauthorized",
+      "error": "Both tokens failed: ",
       "tested": true,
-      "timestamp": "2025-08-15T17:43:33.186Z"
+      "timestamp": "2025-10-12T23:48:53.664Z"
     },
     "CURSOR_API": {
       "status": "✅ VALIDATED",
@@ -84,88 +77,54 @@
       ],
       "testData": "Key format valid: 68 characters starting with 'key_'",
       "tested": true,
-      "timestamp": "2025-08-15T17:43:33.186Z"
+      "timestamp": "2025-10-12T23:48:53.664Z"
     },
     "MONGODB_URI": {
-      "status": "✅ WORKING",
-      "responseTime": "2079ms",
-      "features": [
-        "Database connectivity",
-        "User data storage",
-        "Analytics storage"
-      ],
-      "testData": "Ping result: Connected",
+      "status": "❌ FAILED",
+      "error": "Cannot find module 'mongodb'\nRequire stack:\n- /home/runner/work/Spotify-echo/Spotify-echo/scripts/comprehensive-api-testing.js",
       "tested": true,
-      "timestamp": "2025-08-15T17:43:35.268Z"
+      "timestamp": "2025-10-12T23:48:53.665Z"
     },
-    "REDIS_URI": {
-      "status": "✅ WORKING",
-      "responseTime": "1122ms",
+    "REDIS_ALTERNATIVE_API": {
+      "status": "✅ API KEYS AVAILABLE",
+      "responseTime": "0ms (validation only)",
       "features": [
-        "High-speed caching",
-        "Session storage",
-        "Performance optimization"
+        "Redis Cloud management",
+        "Database administration",
+        "Backup operations"
       ],
-      "testData": "Ping successful, Set/Get operations working",
-      "connectionDetails": {
-        "host": "redis-15392.crce175.eu-north-1-1.ec2.redns.redis-cloud.com:15392",
-        "username": "default",
-        "passwordLength": "32 chars"
-      },
-      "alternativeAPIs": {
-        "accountAPI": "✅ Available",
-        "usedAPI": "✅ Available"
-      },
+      "testData": "Account API: 51 chars, Used API: 51 chars",
       "tested": true,
-      "timestamp": "2025-08-15T17:43:36.545Z"
+      "timestamp": "2025-10-12T23:48:53.665Z"
     },
     "GEMINI_API": {
-      "status": "✅ WORKING",
-      "responseTime": "2046ms",
-      "features": [
-        "AI text generation",
-        "Multimodal AI",
-        "Alternative LLM provider"
-      ],
-      "testData": "Working key: 1 of 6",
-      "workingKey": "Key 1: ...W7ssz3bzTw",
-      "allResults": [
-        "✅ Key 1: Working (Response: \"Four\")",
-        "✅ Key 2: Working (Response: \"Four\")",
-        "✅ Key 3: Working (Response: \"Four\")",
-        "✅ Key 4: Working (Response: \"Four\")",
-        "✅ Key 5: Working (Response: \"Four\")",
-        "✅ Key 6: Working (Response: \"Four\")"
-      ],
-      "totalKeys": 6,
-      "workingKeys": 6,
+      "status": "❌ FAILED",
+      "error": "All 6 keys failed: ❌ Key 1: 429 Too Many Requests, ❌ Key 2: 429 Too Many Requests, ❌ Key 3: 429 Too Many Requests, ❌ Key 4: 404 Not Found, ❌ Key 5: 404 Not Found, ❌ Key 6: 404 Not Found",
       "tested": true,
-      "timestamp": "2025-08-15T17:43:38.592Z"
+      "timestamp": "2025-10-12T23:48:54.058Z"
     },
     "OPENROUTER_API": {
       "status": "❌ FAILED",
       "error": "All 3 keys failed: ❌ Key 1: 401 Unauthorized, ❌ Key 2: 401 Unauthorized, ❌ Key 3: 401 Unauthorized",
       "tested": true,
-      "timestamp": "2025-08-15T17:43:39.527Z"
+      "timestamp": "2025-10-12T23:48:54.431Z"
     },
     "SECURITY_SECRETS": {
-      "status": "✅ WORKING",
-      "responseTime": "23ms",
-      "features": [
-        "JWT token generation",
-        "Session security",
-        "Data encryption"
-      ],
-      "testData": "JWT secret length: 64 characters",
+      "status": "❌ FAILED",
+      "error": "Cannot find module 'jsonwebtoken'\nRequire stack:\n- /home/runner/work/Spotify-echo/Spotify-echo/scripts/comprehensive-api-testing.js",
       "tested": true,
-      "timestamp": "2025-08-15T17:43:39.550Z"
+      "timestamp": "2025-10-12T23:48:54.432Z"
     }
   },
   "performance": {},
   "recommendations": [],
   "errors": [
+    "PERPLEXITY_API: Perplexity API failed: 401 Unauthorized",
     "DIGITALOCEAN_API: DigitalOcean API failed: 401 Unauthorized",
-    "GITHUB_API: Both tokens failed: ❌ GH_PAT: 401 Unauthorized",
-    "OPENROUTER_API: All 3 keys failed: ❌ Key 1: 401 Unauthorized, ❌ Key 2: 401 Unauthorized, ❌ Key 3: 401 Unauthorized"
+    "GITHUB_API: Both tokens failed: ",
+    "MONGODB_URI: Cannot find module 'mongodb'\nRequire stack:\n- /home/runner/work/Spotify-echo/Spotify-echo/scripts/comprehensive-api-testing.js",
+    "GEMINI_API: All 6 keys failed: ❌ Key 1: 429 Too Many Requests, ❌ Key 2: 429 Too Many Requests, ❌ Key 3: 429 Too Many Requests, ❌ Key 4: 404 Not Found, ❌ Key 5: 404 Not Found, ❌ Key 6: 404 Not Found",
+    "OPENROUTER_API: All 3 keys failed: ❌ Key 1: 401 Unauthorized, ❌ Key 2: 401 Unauthorized, ❌ Key 3: 401 Unauthorized",
+    "SECURITY_SECRETS: Cannot find module 'jsonwebtoken'\nRequire stack:\n- /home/runner/work/Spotify-echo/Spotify-echo/scripts/comprehensive-api-testing.js"
   ]
 }
