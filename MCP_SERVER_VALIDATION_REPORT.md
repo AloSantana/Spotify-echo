@@ -1,21 +1,21 @@
 # MCP Server Validation Report
 
-**Generated**: 2025-10-12T23:48:54.630Z
-**Run ID**: mcp-validation-1760312934630
+**Generated**: 2025-10-13T01:30:18.624Z
+**Run ID**: mcp-validation-1760319018624
 **Overall Status**: ✅ PASS
 
 ## Summary
 
 | Metric | Count |
 |--------|-------|
-| Total Servers | 13 |
-| Working | 13 |
+| Total Servers | 17 |
+| Working | 17 |
 | Failing | 0 |
 | Fixed | 0 |
 
 ## Server Status
 
-### ✅ Healthy Servers (11)
+### ✅ Healthy Servers (15)
 
 - **sequential-thinking**
   - Command: `npx -y @modelcontextprotocol/server-sequential-thinking`
@@ -27,6 +27,14 @@
   - Command: `npx -y @executeautomation/playwright-mcp-server`
 - **hyperbrowser**
   - Command: `npx -y hyperbrowser-mcp`
+- **perplexity**
+  - Command: `npx -y @perplexity-ai/mcp-server`
+- **brave-search**
+  - Command: `npx -y @brave/brave-search-mcp-server`
+- **gemini**
+  - Command: `npx -y @georgejeffers/gemini-mcp-server`
+- **github**
+  - Command: `npx -y @modelcontextprotocol/server-github`
 - **filesystem**
   - Command: `node mcp-servers/filesystem/index.js`
 - **memory**

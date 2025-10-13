@@ -1,8 +1,8 @@
 # 🧪 EchoTune AI - Comprehensive Test Report
 
-**Generated**: 2025-10-12T23:48:51.662Z
-**Run ID**: comprehensive-1760312931662
-**Total Duration**: 15.70s
+**Generated**: 2025-10-13T01:30:12.605Z
+**Run ID**: comprehensive-1760319012605
+**Total Duration**: 23.01s
 **Overall Status**: ❌ FAILED
 
 ## 📊 Executive Summary
@@ -17,26 +17,26 @@
 
 ## 🔍 Test Suite Results
 
-### ❌ Installation Validation (0.42s)
+### ❌ Installation Validation (1.89s)
 
 - **Description**: Validates Node.js, npm, dependencies, and project structure
 - **Status**: FAILED
 - **Command**: `node scripts/validate-installation.js`
 - **Error**: Exit code: 1
 
-### ✅ Environment Validation (0.04s)
+### ✅ Environment Validation (0.03s)
 
 - **Description**: Validates environment variables and configuration
 - **Status**: PASSED
 - **Command**: `node scripts/env-validate.js`
 
-### ⚠️ Comprehensive API Testing (2.31s)
+### ⚠️ Comprehensive API Testing (3.94s)
 
 - **Description**: Tests all API endpoints and external services
 - **Status**: WARNING
 - **Command**: `node scripts/comprehensive-api-testing.js`
 
-### ⚠️ Authentication Tests (0.14s)
+### ⚠️ Authentication Tests (0.12s)
 
 - **Description**: Tests authentication flows and security
 - **Status**: WARNING
@@ -48,7 +48,7 @@
 - **Status**: WARNING
 - **Command**: `node scripts/comprehensive-screenshot-capture.js`
 
-### ✅ MCP Server Health Check (12.75s)
+### ✅ MCP Server Health Check (17.01s)
 
 - **Description**: Validates all MCP servers and attempts fixes
 - **Status**: PASSED

@@ -25,6 +25,15 @@ function configureHealthRoutes(app) {
     });
   });
 
+  // Kubernetes-style healthz endpoint for compatibility
+  app.get('/healthz', (req, res) => {
+    res.status(200).json({ 
+      ok: true,
+      status: 'healthy',
+      timestamp: new Date().toISOString()
+    });
+  });
+
   // Comprehensive health check endpoint (bypass rate limiting)
   app.get('/health', async (req, res) => {
     try {
