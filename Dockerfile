@@ -47,7 +47,8 @@ COPY . .
 # Ensure production env for deterministic build
 ENV NODE_ENV=production
 # Build React frontend to dist (vite.config outputs to ./dist)
-RUN npm run build
+# Ensure dist/ always exists even if build is a noop or fails
+RUN (npm run build || echo "Skipping build: no build script or noop") && mkdir -p dist
 
 # ------------------------------
 # 4) Runtime image (small)

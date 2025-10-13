@@ -29,7 +29,7 @@ class ClaudeOpusCommandProcessor {
                 this.client = new Anthropic({
                     apiKey: process.env.ANTHROPIC_API_KEY,
                 });
-                console.log(`✅ Anthropic API configured`);
+                console.log('✅ Anthropic API configured');
             } catch (error) {
                 console.log('⚠️ Anthropic API initialization failed, falling back to mock mode');
                 this.client = null;

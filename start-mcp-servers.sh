@@ -17,8 +17,8 @@ NC='\033[0m' # No Color
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Environment variables with defaults - ENABLE_COMMUNITY_MCP defaults to 1 (enabled)
-ENABLE_COMMUNITY_MCP="${ENABLE_COMMUNITY_MCP:-1}"
+# Environment variables with defaults - ENABLE_COMMUNITY_MCP defaults to 0 (disabled)
+ENABLE_COMMUNITY_MCP="${ENABLE_COMMUNITY_MCP:-0}"
 MCP_STRICT_REQUIRED="${MCP_STRICT_REQUIRED:-false}"
 
 # Enhanced Configuration Loading with core + community split
