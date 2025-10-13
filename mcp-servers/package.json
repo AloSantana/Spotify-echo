@@ -53,6 +53,84 @@
     "type": "git",
     "url": "https://github.com/dzp5103/Spotify-echo.git"
   },
+  "servers": {
+    "filesystem": {
+      "command": "node",
+      "args": [
+        "mcp-servers/filesystem/index.js"
+      ],
+      "port": 3020,
+      "healthPath": "/health",
+      "description": "Secure file operations, directory management, and code analysis"
+    },
+    "memory": {
+      "command": "node",
+      "args": [
+        "mcp-servers/memory/index.js"
+      ],
+      "port": 3021,
+      "healthPath": "/health",
+      "description": "Persistent context across sessions and knowledge graph storage"
+    },
+    "github-repos-manager": {
+      "command": "node",
+      "args": [
+        "mcp-servers/github-repos-manager/index.js"
+      ],
+      "port": 3022,
+      "healthPath": "/health",
+      "requiredEnv": ["GITHUB_TOKEN"],
+      "description": "GitHub repository management with 80+ GitHub tools and automation"
+    },
+    "brave-search": {
+      "command": "node",
+      "args": [
+        "mcp-servers/brave-search/brave-search-mcp.js"
+      ],
+      "port": 3023,
+      "healthPath": "/health",
+      "requiredEnv": ["BRAVE_API_KEY"],
+      "description": "Privacy-focused web research with 2000 free queries per month"
+    },
+    "sequential-thinking": {
+      "command": "node",
+      "args": [
+        "mcp-servers/sequential-thinking/dist/index.js"
+      ],
+      "port": 3024,
+      "healthPath": "/health",
+      "description": "Enhanced AI reasoning and step-by-step problem solving"
+    },
+    "code-sandbox": {
+      "command": "node",
+      "args": [
+        "mcp-servers/code-sandbox/code-sandbox-mcp.js"
+      ],
+      "port": 3025,
+      "healthPath": "/health",
+      "description": "Secure code execution environment for TypeScript, JavaScript, and Python"
+    },
+    "perplexity-mcp": {
+      "command": "node",
+      "args": [
+        "mcp-servers/perplexity-mcp/index.js"
+      ],
+      "port": 3026,
+      "healthPath": "/health",
+      "requiredEnv": ["PERPLEXITY_API_KEY"],
+      "description": "AI-powered research and question answering via Perplexity API"
+    },
+    "screenshot-website": {
+      "command": "npx",
+      "args": [
+        "@browserbasehq/mcp-server-browserbase"
+      ],
+      "port": 3051,
+      "healthPath": "/health",
+      "requiredEnv": ["BROWSERBASE_API_KEY", "BROWSERBASE_PROJECT_ID"],
+      "description": "Fast website screenshot capabilities via Browserbase"
+    }
+  },
   "mcpServers": {
     "filesystem": {
       "command": "node",
