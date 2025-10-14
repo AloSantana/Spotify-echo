@@ -1,9 +1,9 @@
 
-# Task: Add Request Correlation IDs for End-to-End Tracing
-# Description: Attach a unique correlation ID to each incoming request and propagate it through backend services and logs to enable traceability and easier debugging.
-# Files to modify: ['src/middleware/requestLogger.js', 'src/api/routes/*', 'src/utils/logger.js', 'test/middleware/requestLogger.test.js']
+# Task: Expand Automated Test Coverage
+# Description: Increase the number of automated tests for critical backend endpoints, focusing on provider switching and health metrics.
+# Files to modify: ['src/api/routes/providers.test.js', 'src/api/routes/health.test.js']
 
-print("Implementing: Add Request Correlation IDs for End-to-End Tracing")
+print("Implementing: Expand Automated Test Coverage")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
