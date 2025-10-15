@@ -1966,8 +1966,8 @@
     ]
   },
   "2025-W42": {
-    "total_cost": 1.425138,
-    "request_count": 21,
+    "total_cost": 1.7452899999999998,
+    "request_count": 26,
     "requests": [
       {
         "timestamp": "2025-10-13 12:39:03.479557",
@@ -2196,6 +2196,61 @@
         "output_tokens": 1314,
         "searches_performed": 5,
         "estimated_cost": 0.07946,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-10-15 01:21:58.107738",
+        "model": "sonar-pro",
+        "input_tokens": 338,
+        "output_tokens": 1534,
+        "searches_performed": 5,
+        "estimated_cost": 0.064028,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-10-15 01:22:19.361674",
+        "model": "sonar-pro",
+        "input_tokens": 338,
+        "output_tokens": 1199,
+        "searches_performed": 5,
+        "estimated_cost": 0.064028,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-10-15 01:22:48.404102",
+        "model": "sonar-pro",
+        "input_tokens": 338,
+        "output_tokens": 1433,
+        "searches_performed": 5,
+        "estimated_cost": 0.064028,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-10-15 01:23:06.534719",
+        "model": "sonar-pro",
+        "input_tokens": 339,
+        "output_tokens": 1072,
+        "searches_performed": 5,
+        "estimated_cost": 0.06403400000000001,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2025-10-15 01:23:25.299206",
+        "model": "sonar-pro",
+        "input_tokens": 339,
+        "output_tokens": 1509,
+        "searches_performed": 5,
+        "estimated_cost": 0.06403400000000001,
         "actual_cost": null,
         "cache_hit": false,
         "complexity_score": 10
