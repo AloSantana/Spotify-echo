@@ -2,103 +2,81 @@
   "actionable_tasks": [
     {
       "id": "task_1",
-      "title": "Implement Circuit Breaker Pattern for Provider Failover",
-      "description": "Add a circuit breaker mechanism to the backend provider selection logic to automatically failover to a healthy LLM provider if the current one is unresponsive or error-prone. This improves system resilience and user experience.",
+      "title": "Frontend Spotify Authentication Interface Completion",
+      "description": "Finish the implementation of the Spotify OAuth authentication UI, ensuring users can log in and authorize the app for playlist creation and streaming.",
       "priority": "high",
-      "estimated_time": "60-90 minutes",
+      "estimated_time": "45-60 minutes",
       "files_to_modify": [
-        "src/api/providers.js",
-        "src/api/utils/circuitBreaker.js",
-        "src/api/routes/providers.js"
+        "src/frontend/SpotifyAuth.js",
+        "src/frontend/components/AuthPanel.jsx"
       ],
       "implementation_steps": [
-        "Design a simple circuit breaker class or utility (open/half-open/closed states, failure thresholds, reset timers).",
-        "Integrate the circuit breaker into provider request logic: track failures, open circuit on threshold, auto-retry after cooldown.",
-        "Add logging for circuit breaker state changes.",
-        "Write a basic test to simulate provider failure and verify failover."
+        "Review current Spotify OAuth UI implementation for missing elements.",
+        "Add login button and callback handler for OAuth flow.",
+        "Test authentication flow with Spotify sandbox account.",
+        "Update UI to show authentication status and error messages."
       ],
-      "complexity_score": 7
+      "complexity_score": 6
     },
     {
       "id": "task_2",
-      "title": "Add Request Correlation IDs for End-to-End Tracing",
-      "description": "Attach a unique correlation ID to each incoming request and propagate it through backend services and logs for improved traceability and debugging.",
+      "title": "Expand Automated Test Coverage",
+      "description": "Increase the number of automated tests for critical backend endpoints, focusing on provider switching and health telemetry.",
       "priority": "medium",
       "estimated_time": "30-45 minutes",
       "files_to_modify": [
-        "src/api/middleware/requestLogger.js",
-        "src/api/routes/*",
-        "src/utils/logger.js"
+        "src/api/providers.test.js",
+        "src/api/health.test.js"
       ],
       "implementation_steps": [
-        "Generate a UUID for each incoming request in middleware.",
-        "Attach the correlation ID to the request object and response headers.",
-        "Update logging utilities to include the correlation ID in all log entries.",
-        "Test by making a request and verifying the correlation ID appears in logs and responses."
+        "Identify endpoints with low test coverage using coverage reports.",
+        "Write additional unit and integration tests for provider switching logic.",
+        "Add tests for error handling and edge cases in health telemetry.",
+        "Run test suite and verify increased coverage."
       ],
       "complexity_score": 5
     },
     {
       "id": "task_3",
-      "title": "Expand Automated Test Coverage for MCP Endpoints",
-      "description": "Increase automated test coverage for MCP provider endpoints, focusing on health checks, error handling, and switching logic.",
+      "title": "Add Quality Maintenance Scripts to CI Workflow",
+      "description": "Integrate lint, security audit, and quality check scripts into the CI pipeline for automated code health validation.",
       "priority": "medium",
-      "estimated_time": "45-60 minutes",
+      "estimated_time": "30-45 minutes",
       "files_to_modify": [
-        "tests/api/providers.test.js",
-        "src/api/providers.js"
+        ".github/workflows/ci.yml",
+        "package.json"
       ],
       "implementation_steps": [
-        "Identify untested MCP endpoint scenarios (e.g., provider down, latency spikes, error responses).",
-        "Write new Jest tests to cover these cases.",
-        "Run the test suite and ensure all tests pass.",
-        "Document new test cases in the test report."
+        "Update CI workflow YAML to include lint, security:audit, and quality:check steps.",
+        "Ensure scripts are present in package.json and run correctly in CI environment.",
+        "Test CI pipeline locally and on remote to confirm successful execution.",
+        "Document CI workflow changes in project README."
       ],
-      "complexity_score": 6
+      "complexity_score": 4
     },
     {
       "id": "task_4",
-      "title": "Optimize Dockerfile for Multi-Stage Builds and Caching",
-      "description": "Refactor the Dockerfile(s) for backend and frontend to use multi-stage builds, reducing image size and improving build cache efficiency.",
-      "priority": "medium",
-      "estimated_time": "45-60 minutes",
-      "files_to_modify": [
-        "Dockerfile",
-        "Dockerfile.frontend",
-        "docker-compose.yml"
-      ],
-      "implementation_steps": [
-        "Update Dockerfile to use builder and runtime stages.",
-        "Move dependency installation and build steps to the builder stage.",
-        "Copy only necessary artifacts to the runtime stage.",
-        "Test build and run locally to verify reduced image size and correct functionality."
-      ],
-      "complexity_score": 6
-    },
-    {
-      "id": "task_5",
-      "title": "Implement MongoDB TTL Indexes for Telemetry Data Rotation",
-      "description": "Add TTL (Time-To-Live) indexes to MongoDB collections storing telemetry data to automatically expire and remove old records, improving storage efficiency.",
+      "title": "Backend TypeScript Migration (High-Change Modules)",
+      "description": "Begin gradual migration of backend modules with frequent changes to TypeScript for improved type safety and maintainability.",
       "priority": "low",
-      "estimated_time": "30-45 minutes",
+      "estimated_time": "60 minutes",
       "files_to_modify": [
-        "src/db/telemetry.js",
-        "src/db/initIndexes.js"
+        "src/api/routes/*",
+        "src/chat/*"
       ],
       "implementation_steps": [
-        "Identify telemetry collections requiring TTL (e.g., logs, metrics).",
-        "Add index creation logic with expireAfterSeconds in database initialization.",
-        "Test by inserting sample data and verifying automatic expiration.",
-        "Document TTL policy in code comments."
+        "Select one high-change backend module (e.g., src/api/routes/providers.js).",
+        "Rename file to .ts and add TypeScript configuration.",
+        "Add type annotations for function parameters and return values.",
+        "Fix type errors and run tests to verify correctness."
       ],
-      "complexity_score": 4
+      "complexity_score": 7
     }
   ],
   "next_research_topics": [
-    "Best practices for circuit breaker implementation in Node.js microservices",
-    "Correlation ID propagation in distributed systems",
-    "Optimizing Docker multi-stage builds for Node.js and React apps",
-    "MongoDB TTL index limitations and monitoring"
+    "Implementing circuit breaker pattern for provider failover in Node.js",
+    "MongoDB compound and TTL indexes for analytics optimization",
+    "OpenTelemetry distributed tracing integration for observability"
   ],
   "completion_percentage": 75
 }
