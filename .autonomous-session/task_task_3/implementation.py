@@ -1,9 +1,9 @@
 
-# Task: Implement MongoDB Compound Indexes for Analytics Queries
-# Description: Optimize analytics query performance by creating compound indexes on frequently queried fields. This directly addresses M4 milestone requirements for performance optimization.
-# Files to modify: ['src/db/models/analytics.js', 'src/db/migrations/add-compound-indexes.js', 'src/config/database.js']
+# Task: Expand Automated Test Coverage for MCP Endpoints
+# Description: Increase automated test coverage for MCP endpoints and provider health logic using Jest, focusing on edge cases and error handling.
+# Files to modify: ['tests/mcpEndpoints.test.js', 'src/providers/providerManager.js']
 
-print("Implementing: Implement MongoDB Compound Indexes for Analytics Queries")
+print("Implementing: Expand Automated Test Coverage for MCP Endpoints")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

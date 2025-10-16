@@ -1,7 +1,7 @@
 
 # Task: Implement Circuit Breaker Pattern for Provider Failover
-# Description: Add circuit breaker implementation to handle LLM provider failures gracefully. This will automatically switch to fallback providers when primary provider experiences repeated failures, improving system resilience.
-# Files to modify: ['src/api/services/llm-provider-manager.js', 'src/api/middleware/circuit-breaker.js', 'src/config/provider-config.js']
+# Description: Add a circuit breaker mechanism to the backend provider selection logic to automatically failover to a healthy provider when the current one is unresponsive or error-prone. This increases system reliability and is research-derived from the Perplexity sweep.
+# Files to modify: ['src/providers/providerManager.js', 'src/providers/circuitBreaker.js', 'src/api/routes/providers.js']
 
 print("Implementing: Implement Circuit Breaker Pattern for Provider Failover")
 

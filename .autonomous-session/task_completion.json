@@ -5,20 +5,20 @@
       "task_id": "task_1",
       "title": "Implement Circuit Breaker Pattern for Provider Failover",
       "status": "attempted",
-      "complexity": 6
+      "complexity": 7
     },
     {
       "task_id": "task_2",
       "title": "Add Request Correlation IDs for End-to-End Tracing",
       "status": "attempted",
-      "complexity": 4
+      "complexity": 5
     },
     {
       "task_id": "task_3",
-      "title": "Implement MongoDB Compound Indexes for Analytics Queries",
+      "title": "Expand Automated Test Coverage for MCP Endpoints",
       "status": "attempted",
-      "complexity": 5
+      "complexity": 6
     }
   ],
-  "timestamp": "Thu Oct 16 01:40:31 UTC 2025"
+  "timestamp": "Thu Oct 16 12:46:02 UTC 2025"
 }
