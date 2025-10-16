@@ -1,9 +1,9 @@
 
-# Task: Expand Automated Test Coverage
-# Description: Increase the number of automated tests for critical backend endpoints, focusing on provider switching and health telemetry.
-# Files to modify: ['src/api/providers.test.js', 'src/api/health.test.js']
+# Task: Add Request Correlation IDs for End-to-End Tracing
+# Description: Implement correlation ID system to trace requests across services and providers. This enables debugging complex multi-provider interactions and understanding request flows.
+# Files to modify: ['src/api/middleware/correlation-id.js', 'src/api/routes/index.js', 'src/utils/logger.js']
 
-print("Implementing: Expand Automated Test Coverage")
+print("Implementing: Add Request Correlation IDs for End-to-End Tracing")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

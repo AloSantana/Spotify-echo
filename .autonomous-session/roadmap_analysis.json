@@ -1,1 +1,254 @@
-{"actionable_tasks": [], "error": "Expecting property name enclosed in double quotes: line 71 column 6 (char 3455)", "fallback": true}
+{
+  "actionable_tasks": [
+    {
+      "id": "task_1",
+      "title": "Implement Circuit Breaker Pattern for Provider Failover",
+      "description": "Add circuit breaker implementation to handle LLM provider failures gracefully. This will automatically switch to fallback providers when primary provider experiences repeated failures, improving system resilience.",
+      "priority": "high",
+      "estimated_time": "90-120 minutes",
+      "files_to_modify": [
+        "src/api/services/llm-provider-manager.js",
+        "src/api/middleware/circuit-breaker.js",
+        "src/config/provider-config.js"
+      ],
+      "implementation_steps": [
+        "Create circuit-breaker.js middleware with states (CLOSED, OPEN, HALF_OPEN)",
+        "Define failure thresholds (e.g., 5 failures in 60 seconds triggers OPEN state)",
+        "Add timeout period (30-60 seconds) before attempting HALF_OPEN state",
+        "Integrate with existing provider switching logic in llm-provider-manager.js",
+        "Add circuit breaker state tracking to health metrics",
+        "Create unit tests for all three circuit breaker states"
+      ],
+      "complexity_score": 6
+    },
+    {
+      "id": "task_2",
+      "title": "Add Request Correlation IDs for End-to-End Tracing",
+      "description": "Implement correlation ID system to trace requests across services and providers. This enables debugging complex multi-provider interactions and understanding request flows.",
+      "priority": "high",
+      "estimated_time": "60-90 minutes",
+      "files_to_modify": [
+        "src/api/middleware/correlation-id.js",
+        "src/api/routes/index.js",
+        "src/utils/logger.js"
+      ],
+      "implementation_steps": [
+        "Create correlation-id middleware to generate/extract UUIDs from request headers",
+        "Add X-Correlation-ID header to all outgoing provider requests",
+        "Modify logger utility to include correlation ID in all log entries",
+        "Update existing API routes to use correlation middleware",
+        "Add correlation ID to provider health check responses",
+        "Document correlation ID usage in API documentation"
+      ],
+      "complexity_score": 4
+    },
+    {
+      "id": "task_3",
+      "title": "Implement MongoDB Compound Indexes for Analytics Queries",
+      "description": "Optimize analytics query performance by creating compound indexes on frequently queried fields. This directly addresses M4 milestone requirements for performance optimization.",
+      "priority": "high",
+      "estimated_time": "45-60 minutes",
+      "files_to_modify": [
+        "src/db/models/analytics.js",
+        "src/db/migrations/add-compound-indexes.js",
+        "src/config/database.js"
+      ],
+      "implementation_steps": [
+        "Identify top 5 most frequent analytics query patterns from existing code",
+        "Create compound indexes for userId + timestamp combinations",
+        "Add compound index for provider + status + timestamp for health queries",
+        "Create index for sessionId + eventType for listening pattern queries",
+        "Write migration script to create indexes on existing collections",
+        "Add index creation to database initialization script",
+        "Verify index usage with explain() queries"
+      ],
+      "complexity_score": 5
+    },
+    {
+      "id": "task_4",
+      "title": "Add TTL Indexes for Telemetry Data Rotation",
+      "description": "Implement time-to-live indexes to automatically remove old telemetry data, preventing database bloat and maintaining optimal query performance.",
+      "priority": "medium",
+      "estimated_time": "30-45 minutes",
+      "files_to_modify": [
+        "src/db/models/telemetry.js",
+        "src/db/models/provider-health.js",
+        "src/config/database.js"
+      ],
+      "implementation_steps": [
+        "Add TTL index on telemetry collection with 30-day expiration on createdAt field",
+        "Add TTL index on provider health metrics with 7-day expiration",
+        "Configure TTL for request correlation logs with 14-day expiration",
+        "Add configuration option for TTL duration in environment variables",
+        "Create migration script for existing collections",
+        "Add monitoring for TTL index effectiveness"
+      ],
+      "complexity_score": 3
+    },
+    {
+      "id": "task_5",
+      "title": "Implement Backend Chat Pipeline with User Context",
+      "description": "Build context-aware chat functionality that attaches user mood, history, and preferences to AI conversations for personalized music recommendations.",
+      "priority": "high",
+      "estimated_time": "120-150 minutes",
+      "files_to_modify": [
+        "src/api/routes/chat.js",
+        "src/chat/context-manager.js",
+        "src/chat/conversation-store.js",
+        "src/db/models/chat-session.js"
+      ],
+      "implementation_steps": [
+        "Create context-manager.js to aggregate user mood, listening history, and preferences",
+        "Implement conversation-store.js for persisting chat summaries in MongoDB",
+        "Build POST /api/chat endpoint with context injection",
+        "Add user preference extraction from Spotify listening history",
+        "Implement conversation summary generation after N messages",
+        "Create context opt-out flag and persistence logic",
+        "Add tests for context attachment and opt-out behavior"
+      ],
+      "complexity_score": 7
+    },
+    {
+      "id": "task_6",
+      "title": "Add Prometheus Metrics Export for Alerting",
+      "description": "Expose application metrics in Prometheus format to enable production monitoring and alerting on critical system health indicators.",
+      "priority": "medium",
+      "estimated_time": "60-75 minutes",
+      "files_to_modify": [
+        "src/api/routes/metrics.js",
+        "src/monitoring/prometheus-exporter.js",
+        "package.json"
+      ],
+      "implementation_steps": [
+        "Install prom-client npm package",
+        "Create prometheus-exporter.js with counter, gauge, and histogram metrics",
+        "Define key metrics: request_duration, provider_latency, circuit_breaker_state, error_rate",
+        "Add GET /metrics endpoint returning Prometheus format",
+        "Instrument existing provider health checks with metrics",
+        "Add custom metrics for MongoDB query performance",
+        "Document metrics in prometheus-metrics.md"
+      ],
+      "complexity_score": 5
+    },
+    {
+      "id": "task_7",
+      "title": "Implement Response Streaming for Large Analytics Datasets",
+      "description": "Add streaming support for analytics endpoints to handle large result sets without memory exhaustion, improving scalability.",
+      "priority": "medium",
+      "estimated_time": "75-90 minutes",
+      "files_to_modify": [
+        "src/api/routes/analytics.js",
+        "src/api/services/analytics-streamer.js"
+      ],
+      "implementation_steps": [
+        "Create analytics-streamer.js using Node.js streams",
+        "Implement MongoDB cursor streaming for large query results",
+        "Add streaming support to GET /api/analytics/listening-patterns endpoint",
+        "Implement chunked JSON response encoding",
+        "Add Content-Type: application/x-ndjson header for newline-delimited JSON",
+        "Set threshold for when to use streaming (e.g., >1000 records)",
+        "Add client-side streaming parser documentation"
+      ],
+      "complexity_score": 6
+    },
+    {
+      "id": "task_8",
+      "title": "Create Backend Settings Validation Endpoints",
+      "description": "Implement server-side validation for LLM provider configurations and database operations before applying changes, preventing invalid configurations.",
+      "priority": "medium",
+      "estimated_time": "60-75 minutes",
+      "files_to_modify": [
+        "src/api/routes/settings.js",
+        "src/api/validators/provider-config-validator.js",
+        "src/api/services/settings-service.js"
+      ],
+      "implementation_steps": [
+        "Create provider-config-validator.js with Joi or express-validator schemas",
+        "Add validation for API key format, model names, and timeout values",
+        "Implement POST /api/settings/validate endpoint",
+        "Add test connection functionality for provider configs before saving",
+        "Create validation for MongoDB connection strings and operations",
+        "Add validation error response with specific field-level errors",
+        "Write unit tests for all validation scenarios"
+      ],
+      "complexity_score": 5
+    },
+    {
+      "id": "task_9",
+      "title": "Add Memory Profiling with clinic.js Integration",
+      "description": "Integrate clinic.js for memory leak detection and performance profiling to ensure production stability under load.",
+      "priority": "low",
+      "estimated_time": "45-60 minutes",
+      "files_to_modify": [
+        "package.json",
+        "scripts/profile-memory.sh",
+        ".github/workflows/performance-tests.yml"
+      ],
+      "implementation_steps": [
+        "Install clinic, clinic-doctor, clinic-bubbleprof npm packages",
+        "Add npm scripts: 'profile:memory', 'profile:cpu', 'profile:analyze'",
+        "Create profile-memory.sh bash script for automated profiling runs",
+        "Configure clinic to profile critical endpoints (chat, recommendations, analytics)",
+        "Set up automated profiling in CI for PR performance regression detection",
+        "Document profiling usage in CONTRIBUTING.md",
+        "Add memory threshold alerts based on profiling results"
+      ],
+      "complexity_score": 4
+    },
+    {
+      "id": "task_10",
+      "title": "Fix Roadmap Auto-Refresh Workflow Push Permissions",
+      "description": "Resolve GitHub Actions permissions issue preventing automated roadmap updates from being committed back to repository.",
+      "priority": "low",
+      "estimated_time": "15-30 minutes",
+      "files_to_modify": [
+        ".github/workflows/roadmap-auto-refresh.yml"
+      ],
+      "implementation_steps": [
+        "Add 'contents: write' permission to workflow job",
+        "Configure git user.name and user.email for commit author",
+        "Replace GITHUB_TOKEN with PAT if fine-grained permissions needed",
+        "Add branch protection bypass if main branch is protected",
+        "Test workflow with manual trigger",
+        "Add error handling for push failures with notification"
+      ],
+      "complexity_score": 2
+    }
+  ],
+  "next_research_topics": [
+    "OpenTelemetry distributed tracing implementation patterns for Node.js microservices",
+    "Circuit breaker implementation best practices with real-world failure scenarios",
+    "MongoDB aggregation pipeline optimization techniques for time-series analytics",
+    "Streaming JSON response patterns for large dataset delivery in Express.js",
+    "Machine learning model deployment strategies for real-time music recommendation systems",
+    "Spotify Audio Features API integration patterns and audio analysis techniques"
+  ],
+  "completion_percentage": 75,
+  "summary": {
+    "total_incomplete_tasks": 18,
+    "high_priority_actionable": 5,
+    "medium_priority_actionable": 4,
+    "low_priority_actionable": 1,
+    "quick_wins": [
+      "task_4",
+      "task_10"
+    ],
+    "high_impact_tasks": [
+      "task_1",
+      "task_2",
+      "task_5"
+    ],
+    "recommended_sequence": [
+      "task_10 - Quick fix, unblocks automation",
+      "task_2 - Foundation for debugging",
+      "task_4 - Prevents database bloat",
+      "task_3 - Improves query performance",
+      "task_1 - Critical resilience feature",
+      "task_8 - Prevents configuration errors",
+      "task_6 - Enables production monitoring",
+      "task_7 - Scalability improvement",
+      "task_5 - Complex feature requiring prior tasks",
+      "task_9 - Performance optimization tooling"
+    ]
+  }
+}
