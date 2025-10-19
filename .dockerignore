@@ -1,3 +1,7 @@
+# VCS
+.git
+.github
+
 # Node
 node_modules
 npm-debug.log*
@@ -12,10 +16,6 @@ coverage
 .playwright
 .next
 .next/cache
-
-# VCS
-.git
-.gitignore
 
 # Env
 .env
@@ -41,10 +41,22 @@ perf_reports
 perplexity-test-results
 
 # Docker
-Dockerfile.*
 Dockerfile*
 docker-compose*.yml
 **/*.local.*
+
+# Documentation
+*.md
+!README.md
+
+# Logs
+*.log
+
+# MCP and agent workflows
+mcp-*/
+coding-agent-workflows/
+agent-workflow/
+QA-AUTOMATION-RESULTS/
 
 # Misc
 *.tmp
