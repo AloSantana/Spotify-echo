@@ -62,8 +62,8 @@ ENV NODE_ENV=production \
     BUILD_SHA=${BUILD_SHA} \
     BUILD_TIME=${BUILD_TIME}
 
-# Install curl/wget and runtime libs for native modules, plus Chromium for Puppeteer
-RUN apk add --no-cache curl wget libstdc++ chromium
+# Install curl/wget, runtime libs for native modules, Chromium for Puppeteer, and dumb-init
+RUN apk add --no-cache curl wget libstdc++ chromium dumb-init
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 # Create non-root user
@@ -79,15 +79,16 @@ COPY --from=build /app/package.json ./package.json
 # Expose app port (configurable via PORT)
 EXPOSE 3000
 
-# Healthcheck for DigitalOcean/Docker
-HEALTHCHECK --interval=30s --timeout=5s --retries=5 CMD wget -qO- http://localhost:${PORT:-3000}/healthz || exit 1
+# Healthcheck using /health endpoint
+HEALTHCHECK --interval=30s --timeout=5s --retries=5 CMD wget -qO- http://localhost:${PORT:-3000}/health || exit 1
 
-# Run server
+# Run server with dumb-init as PID 1 for proper signal handling
 USER nodeapp
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD ["node", "server.js"]
 
 # OCI labels
-LABEL org.opencontainers.image.source="https://github.com/dzp5103/Spotify-echo" \
+LABEL org.opencontainers.image.source="https://github.com/primoscope/Spotify-echo" \
       org.opencontainers.image.title="EchoTune AI" \
       org.opencontainers.image.description="Advanced music discovery platform with Spotify integration" \
       org.opencontainers.image.revision=${BUILD_SHA} \

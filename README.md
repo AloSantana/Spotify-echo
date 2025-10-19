@@ -355,9 +355,14 @@ cd Spotify-echo
 # Install dependencies
 npm install
 
-# Validate your setup
-npm run auth:url  # Generate authorization URL
-npm run auth:test-credentials  # Test client credentials
+# Validate environment configuration
+npm run validate:env
+
+# Optional: Test Spotify credentials
+npm run auth:test-credentials
+
+# Optional: Generate authorization URL for manual OAuth testing
+npm run auth:url
 
 # Start the application
 npm start
@@ -365,6 +370,97 @@ npm start
 # Access the application
 open http://localhost:3000
 ```
+
+#### Windows 11 + WSL Setup
+
+If you're using Windows 11 with WSL (Windows Subsystem for Linux), follow these guidelines for optimal performance:
+
+**1. Use WSL2 and Ubuntu Terminal**
+```bash
+# Ensure you're using WSL2 (recommended for better file system performance)
+wsl --set-default-version 2
+wsl --install -d Ubuntu
+```
+
+**2. Store Repository in Linux Filesystem**
+```bash
+# Store repo in your Linux home directory (not /mnt/c/)
+# This provides better file watching and performance
+cd ~
+mkdir -p ~/projects
+cd ~/projects
+git clone https://github.com/primoscope/Spotify-echo.git
+cd Spotify-echo
+```
+
+**3. Line Endings Configuration**
+```bash
+# Configure Git to use LF line endings (prevents CRLF issues)
+git config --global core.autocrlf false
+```
+Alternatively, the repository includes a `.gitattributes` file to enforce LF endings.
+
+**4. Node.js Version**
+```bash
+# Ensure Node.js 20.x is installed
+node --version  # Should show v20.x.x
+
+# If not, install Node.js 20.x using nvm:
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+source ~/.bashrc
+nvm install 20
+nvm use 20
+```
+
+**5. Opening URLs from WSL**
+```bash
+# If `open` or `xdg-open` commands don't work in WSL:
+# 1. Copy the URL shown in the terminal
+# 2. Manually paste it into your Windows browser
+# Example: http://localhost:3000
+
+# Or configure WSL to open URLs in Windows browser:
+export BROWSER=wslview  # If you have wslu installed
+```
+
+**6. Common WSL Pitfalls**
+- ❌ Don't store the repo in `/mnt/c/Users/...` (Windows filesystem) - slower and file watching may not work
+- ✅ Do store the repo in `~/projects/...` (Linux filesystem) - faster and reliable file watching
+- ✅ Always run `npm install` and `npm start` from within WSL terminal (not Windows Command Prompt)
+- ✅ Access the app via `http://localhost:3000` from your Windows browser
+
+### 🐳 Docker Installation
+
+You can run EchoTune AI using Docker for a containerized setup:
+
+```bash
+# Build and start with docker compose
+docker compose up --build
+
+# Or run in detached mode
+docker compose up --build -d
+
+# Check container health
+curl -fsS http://localhost:3000/health
+
+# View logs
+docker compose logs -f app
+
+# Stop containers
+docker compose down
+```
+
+**Docker Environment Variables:**
+- Create a `.env` file in the project root with your configuration
+- The Docker setup includes MongoDB and Redis containers
+- The app container runs as non-root user for security
+- Health checks are configured on `/health` endpoint
+
+**Troubleshooting Docker:**
+- Ensure ports 3000, 27017 (MongoDB), and 6379 (Redis) are available
+- Check logs with `docker compose logs app` for errors
+- Verify `.env` file exists and contains required variables
+- Use `docker compose down -v` to reset volumes if needed
 
 ### 🔐 Authentication Testing
 
