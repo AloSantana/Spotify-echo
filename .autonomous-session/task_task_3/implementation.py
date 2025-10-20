@@ -1,9 +1,9 @@
 
-# Task: Expand Automated Test Coverage for Provider Switching
-# Description: Increase the number of automated tests for provider switching and telemetry endpoints to ensure reliability and catch regressions.
-# Files to modify: ['src/api/providers.test.js', 'src/api/telemetry.test.js']
+# Task: Expand Automated Test Coverage
+# Description: Increase automated test coverage for critical backend modules, focusing on provider switching and chat pipeline logic.
+# Files to modify: ['tests/providers.test.js', 'tests/chatPipeline.test.js']
 
-print("Implementing: Expand Automated Test Coverage for Provider Switching")
+print("Implementing: Expand Automated Test Coverage")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

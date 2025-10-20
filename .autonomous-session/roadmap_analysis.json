@@ -3,97 +3,99 @@
     {
       "id": "task_1",
       "title": "Implement Circuit Breaker Pattern for Provider Failover",
-      "description": "Add a circuit breaker mechanism to the backend provider switching logic to automatically failover when a provider is unhealthy. This improves reliability and resilience for multi-provider LLM support.",
+      "description": "Add a circuit breaker mechanism to the backend provider selection logic to automatically failover to alternate LLM providers when the primary provider is unhealthy or experiencing high error rates.",
       "priority": "high",
       "estimated_time": "60-90 minutes",
       "files_to_modify": [
-        "src/api/providers.js",
-        "src/api/utils/circuitBreaker.js",
-        "src/chat/pipeline.js"
+        "src/providers/providerManager.js",
+        "src/providers/circuitBreaker.js",
+        "src/api/routes/providers.js"
       ],
       "implementation_steps": [
-        "Design a simple circuit breaker class or utility (open/closed/half-open states, error threshold, reset timeout).",
-        "Integrate circuit breaker checks into provider request logic in src/api/providers.js.",
-        "Log state transitions and trigger failover to alternate providers when threshold is exceeded.",
-        "Add basic unit tests for circuit breaker behavior."
+        "Create a new module (circuitBreaker.js) implementing the circuit breaker logic (open/half-open/closed states, error thresholds, reset timers).",
+        "Integrate the circuit breaker into providerManager.js so that each provider instance is wrapped and monitored.",
+        "Update provider selection logic in routes/providers.js to respect circuit breaker state when routing requests.",
+        "Add basic unit tests to verify failover and recovery behavior."
       ],
       "complexity_score": 7
     },
     {
       "id": "task_2",
       "title": "Add Request Correlation IDs for End-to-End Tracing",
-      "description": "Attach a unique correlation ID to each incoming request and propagate it through backend pipelines for improved observability and debugging.",
+      "description": "Attach a unique correlation ID to each incoming API request and propagate it through backend services for improved traceability and debugging.",
       "priority": "medium",
       "estimated_time": "30-45 minutes",
       "files_to_modify": [
         "src/api/middleware/requestLogger.js",
-        "src/chat/pipeline.js",
-        "src/api/routes/*"
+        "src/api/routes/*",
+        "src/utils/tracing.js"
       ],
       "implementation_steps": [
-        "Generate a UUID for each incoming request in middleware.",
-        "Attach correlation ID to request context and logs.",
-        "Ensure correlation ID is included in responses and error logs for traceability."
+        "Install a UUID library if not present.",
+        "Update requestLogger middleware to generate and attach a correlation ID to req.headers and logs.",
+        "Ensure all outgoing requests to providers include the correlation ID in headers.",
+        "Update logs and error handlers to include the correlation ID for traceability."
       ],
       "complexity_score": 5
     },
     {
       "id": "task_3",
-      "title": "Expand Automated Test Coverage for Provider Switching",
-      "description": "Increase the number of automated tests for provider switching and telemetry endpoints to ensure reliability and catch regressions.",
+      "title": "Expand Automated Test Coverage",
+      "description": "Increase automated test coverage for critical backend modules, focusing on provider switching and chat pipeline logic.",
       "priority": "medium",
-      "estimated_time": "45-60 minutes",
+      "estimated_time": "60-90 minutes",
       "files_to_modify": [
-        "src/api/providers.test.js",
-        "src/api/telemetry.test.js"
+        "tests/providers.test.js",
+        "tests/chatPipeline.test.js"
       ],
       "implementation_steps": [
-        "Review existing tests for provider switching and telemetry.",
-        "Add new test cases for edge scenarios (failover, latency spikes, error handling).",
-        "Run tests and verify coverage improvements."
+        "Identify untested code paths in provider switching and chat pipeline modules.",
+        "Write additional Jest tests to cover edge cases (e.g., provider failover, context persistence).",
+        "Run tests and ensure all new cases pass.",
+        "Update coverage reports."
       ],
       "complexity_score": 6
     },
     {
       "id": "task_4",
-      "title": "Frontend: Complete Spotify Authentication Interface",
-      "description": "Finish the Spotify OAuth login and token management UI to enable users to connect their Spotify accounts for music discovery features.",
-      "priority": "high",
-      "estimated_time": "60-90 minutes",
+      "title": "Optimize Dockerfile for Multi-Stage Builds",
+      "description": "Refactor the existing Dockerfile(s) to use multi-stage builds, reducing final image size and improving build caching for faster CI/CD.",
+      "priority": "medium",
+      "estimated_time": "45-60 minutes",
       "files_to_modify": [
-        "src/frontend/components/SpotifyAuth.js",
-        "src/frontend/pages/Login.js"
+        "Dockerfile",
+        "docker-compose.yml"
       ],
       "implementation_steps": [
-        "Implement OAuth flow UI (login button, redirect, token storage).",
-        "Handle success/error states and display appropriate messages.",
-        "Test with a real Spotify account to verify end-to-end flow."
+        "Refactor Dockerfile to separate build and runtime stages (e.g., install dependencies, build app, copy to minimal runtime image).",
+        "Test local build and run to verify functionality.",
+        "Update docker-compose.yml if needed to use the new image structure.",
+        "Document the changes in README or deployment notes."
       ],
-      "complexity_score": 7
+      "complexity_score": 5
     },
     {
       "id": "task_5",
-      "title": "Add MongoDB Compound Indexes for Analytics Queries",
-      "description": "Create compound indexes on MongoDB collections used for analytics to optimize query performance and reduce latency.",
-      "priority": "medium",
+      "title": "Implement MongoDB TTL Index for Telemetry Data Rotation",
+      "description": "Add a TTL (Time-To-Live) index to the MongoDB telemetry collection to automatically expire old telemetry documents and manage storage growth.",
+      "priority": "low",
       "estimated_time": "30-45 minutes",
       "files_to_modify": [
-        "src/db/analytics.js",
-        "src/db/migrations/compoundIndexes.js"
+        "src/db/telemetry.js",
+        "src/db/initIndexes.js"
       ],
       "implementation_steps": [
-        "Identify high-frequency analytics queries and relevant fields.",
-        "Define compound indexes in migration scripts.",
-        "Apply indexes and benchmark query performance improvements."
+        "Update initIndexes.js to create a TTL index on the telemetry collection (e.g., expireAfterSeconds: 604800 for 7 days).",
+        "Test index creation and verify that old documents are purged as expected.",
+        "Document the TTL policy in code comments and developer docs."
       ],
-      "complexity_score": 5
+      "complexity_score": 4
     }
   ],
   "next_research_topics": [
-    "Best practices for circuit breaker implementation in Node.js",
-    "Correlation ID propagation in distributed systems",
-    "Optimizing MongoDB indexes for analytics workloads",
-    "Spotify OAuth integration patterns for React frontends"
+    "Best practices for OpenTelemetry distributed tracing integration in Node.js",
+    "Memory profiling with clinic.js for Node.js applications",
+    "Advanced analytics dashboard UX patterns for music discovery platforms"
   ],
   "completion_percentage": 75
 }
