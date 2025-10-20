@@ -48,59 +48,73 @@ LOG_LEVEL=trace npm start
 
 ---
 
-## ⚠️ CONFIGURATION ISSUES
+## ✅ RESOLVED: OAuth Redirect URI Configuration
 
-### 1. OAuth Redirect URI Configuration
+### Issue
+OAuth authentication error: **'INVALID_CLIENT: Invalid redirect URI'**
 
-**Issue:** OAuth authentication error: 'INVALID_CLIENT: Invalid redirect URI'
+This occurred when the redirect URI in the application didn't match what was registered in the Spotify Developer Dashboard.
 
-**Analysis:**
-The Spotify OAuth redirect URI configuration may be inconsistent between:
-- Environment variables (`SPOTIFY_REDIRECT_URI`)
-- Spotify Developer Dashboard settings
-- Application code defaults
+### Resolution
+**Status:** ✅ Fixed in this PR
 
-**Current Configuration Logic** (`src/routes/auth.js`):
-```javascript
-function getDefaultRedirectUri() {
-  if (config.server.ssl) {
-    return `https://${process.env.DOMAIN || 'primosphere.studio'}/auth/callback`;
-  }
-  return `http://localhost:${config.server.port}/auth/callback`;
-}
-const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI || getDefaultRedirectUri();
-```
+**Changes Made:**
+1. **Updated `.env.example`** with comprehensive OAuth configuration instructions
+2. **Created `docs/SPOTIFY_OAUTH_SETUP.md`** - Complete step-by-step OAuth setup guide
+3. **Documented both OAuth entry points** in the application:
+   - Main route: `/auth/spotify` → `/auth/callback`
+   - API route: `/api/spotify/auth/login` → `/api/spotify/auth/callback`
+4. **Added troubleshooting section** for common OAuth errors
 
-**Recommendation:**
-1. Verify your `.env` file has the correct redirect URI:
-   ```bash
-   SPOTIFY_REDIRECT_URI=http://localhost:3000/auth/callback
-   ```
+**Quick Fix:**
 
-2. Ensure the Spotify Developer Dashboard has the exact same URI registered:
+1. **Register redirect URI in Spotify Developer Dashboard:**
    - Go to https://developer.spotify.com/dashboard
-   - Select your application
-   - Click "Edit Settings"
-   - Add `http://localhost:3000/auth/callback` to "Redirect URIs"
+   - Select your application → "Edit Settings"
+   - Add to "Redirect URIs": `http://localhost:3000/auth/callback`
    - Click "Save"
 
-3. For production deployment, set:
+2. **Update your `.env` file:**
    ```bash
-   SPOTIFY_REDIRECT_URI=https://your-domain.com/auth/callback
-   DOMAIN=your-domain.com
-   SSL_ENABLED=true
+   SPOTIFY_CLIENT_ID=your_client_id_from_dashboard
+   SPOTIFY_CLIENT_SECRET=your_client_secret_from_dashboard
+   SPOTIFY_REDIRECT_URI=http://localhost:3000/auth/callback
+   PORT=3000
    ```
 
-4. Restart the application after making changes
+3. **Verify configuration:**
+   ```bash
+   curl http://localhost:3000/auth/health
+   ```
 
-**Verification:**
+4. **Restart the application:**
+   ```bash
+   npm start
+   ```
+
+5. **Test authentication:**
+   - Navigate to: `http://localhost:3000/auth/spotify`
+   - You should be redirected to Spotify login
+   - After login, you'll be redirected back to the application
+
+**Important Notes:**
+- The redirect URI must EXACTLY match between `.env` and Spotify Dashboard
+- Use `http://` for localhost (not `https://`)
+- No trailing slashes
+- Port must match (default: 3000)
+
+**For Production:**
 ```bash
-# Check current configuration
-npm run auth:url
-
-# Test credentials
-npm run auth:test-credentials
+SPOTIFY_REDIRECT_URI=https://yourdomain.com/auth/callback
+NODE_ENV=production
+SSL_ENABLED=true
 ```
+
+**See:** [docs/SPOTIFY_OAUTH_SETUP.md](docs/SPOTIFY_OAUTH_SETUP.md) for complete guide
+
+---
+
+## ⚠️ CONFIGURATION ISSUES
 
 ---
 
@@ -170,21 +184,32 @@ MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/echotune_ai?retr
 Supabase connection failed Cannot find module supabase/supabase-js
 ```
 
-**Analysis:**
-The application attempts to connect to Supabase but the module is not installed. This appears to be an optional feature.
+**Resolution:**
+**Status:** ✅ Fixed in this PR
 
-**Recommendation:**
+**Changes Made:**
+1. **Removed Supabase dependency** completely from the project
+2. **Removed Supabase code** from `src/database/database-manager.js`:
+   - Removed `initializeSupabase()` method
+   - Removed Supabase health checks
+   - Removed Supabase from `saveUser()` method
+   - Removed Supabase reference from constructor
+3. **Updated database routes** to remove Supabase from valid database types
+4. **Simplified database architecture** to MongoDB + SQLite only
+
+**Current Database Support:**
+- **MongoDB** - Primary database for analytics (optional)
+- **SQLite** - Fallback database for local development (always available)
+
+**No Action Needed:**
+The Supabase error will no longer appear. The application now uses only MongoDB and SQLite.
+
+**Database Configuration:**
 ```bash
-# Option A: Install Supabase if you need it
-npm install @supabase/supabase-js
+# MongoDB (optional, recommended for production)
+MONGODB_URI=mongodb://localhost:27017/echotune_ai
 
-# Add to .env
-SUPABASE_URL=your-supabase-url
-SUPABASE_KEY=your-supabase-anon-key
-
-# Option B: Disable Supabase (recommended if not using)
-# The application will skip Supabase initialization automatically
-# No action needed - this is expected behavior if Supabase is not configured
+# SQLite is automatic fallback (no configuration needed)
 ```
 
 ### 4. SQLite3 Module Not Installed
