@@ -28,6 +28,10 @@ class BusinessIntelligenceDashboardService extends EventEmitter {
   constructor(options = {}) {
     super();
     
+    // Check logging level - only log verbose messages if LOG_LEVEL is debug or trace
+    const logLevel = (process.env.LOG_LEVEL || 'info').toLowerCase();
+    this.enableVerboseLogging = logLevel === 'debug' || logLevel === 'trace';
+    
     this.config = {
       enabled: options.enabled !== false,
       environment: options.environment || 'production',
@@ -1101,11 +1105,15 @@ class BusinessIntelligenceDashboardService extends EventEmitter {
    */
   setupEventListeners() {
     this.on('insightsGenerated', (insights) => {
-      console.log(`💡 BI Insights: ${insights.length} new insights generated`);
+      if (this.enableVerboseLogging) {
+        console.log(`💡 BI Insights: ${insights.length} new insights generated`);
+      }
     });
     
     this.on('reportGenerated', (report) => {
-      console.log(`📋 BI Report: ${report.type} report generated`);
+      if (this.enableVerboseLogging) {
+        console.log(`📋 BI Report: ${report.type} report generated`);
+      }
     });
   }
   

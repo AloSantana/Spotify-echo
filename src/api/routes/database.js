@@ -350,7 +350,7 @@ router.post('/test', async (req, res) => {
   try {
     const { database } = req.body;
 
-    if (database && !['mongodb', 'supabase', 'sqlite'].includes(database)) {
+    if (database && !['mongodb', 'sqlite'].includes(database)) {
       return res.status(400).json({
         success: false,
         error: 'Invalid database type',

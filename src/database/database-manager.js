@@ -9,7 +9,6 @@ class DatabaseManager {
   constructor() {
     this.mongodb = null;
     this.sqlite = null;
-    this.supabase = null;
     this.activeDatabases = [];
     this.fallbackMode = false;
     this.initialized = false;
@@ -30,15 +29,6 @@ class DatabaseManager {
       }
     }
 
-    // Try Supabase (PostgreSQL) for application data
-    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-      try {
-        await this.initializeSupabase();
-      } catch (error) {
-        console.warn('Supabase initialization failed:', error.message);
-      }
-    }
-
     // Initialize SQLite as fallback
     try {
       await this.initializeSQLite();
@@ -47,7 +37,7 @@ class DatabaseManager {
     }
 
     // Set fallback mode if no primary databases are available
-    if (this.activeDatabases.length === 0 || (!this.mongodb && !this.supabase && this.sqlite)) {
+    if (this.activeDatabases.length === 0 || (!this.mongodb && this.sqlite)) {
       this.fallbackMode = true;
       console.log('📦 Database running in fallback mode (SQLite only)');
     }
@@ -85,33 +75,7 @@ class DatabaseManager {
     }
   }
 
-  /**
-   * Initialize Supabase (PostgreSQL) connection
-   */
-  async initializeSupabase() {
-    try {
-      // Import Supabase client
-      const { createClient } = require('@supabase/supabase-js');
 
-      this.supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-
-      // Test connection
-      const { data: _data, error } = await this.supabase.from('test').select('*').limit(1);
-
-      if (error && error.code !== 'PGRST116') {
-        // Table not found is ok
-        throw error;
-      }
-
-      this.activeDatabases.push('supabase');
-      console.log('✅ Supabase connected successfully');
-      return true;
-    } catch (error) {
-      console.error('❌ Supabase connection failed:', error.message);
-      this.supabase = null;
-      return false;
-    }
-  }
 
   /**
    * Initialize SQLite fallback database
@@ -160,19 +124,7 @@ class DatabaseManager {
       }
     }
 
-    // Try Supabase
-    if (this.supabase) {
-      try {
-        const { data, error } = await this.supabase.from('users').upsert([userData]).select();
 
-        if (error) throw error;
-
-        results.push({ database: 'supabase', success: true, data });
-      } catch (error) {
-        console.error('Supabase save user error:', error);
-        results.push({ database: 'supabase', success: false, error: error.message });
-      }
-    }
 
     // Always save to SQLite as backup
     if (this.sqlite) {
@@ -339,7 +291,6 @@ class DatabaseManager {
   async healthCheck() {
     const status = {
       mongodb: { connected: false, status: 'disconnected' },
-      supabase: { connected: false, status: 'disconnected' },
       sqlite: { connected: false, status: 'disconnected' },
     };
 
@@ -350,19 +301,6 @@ class DatabaseManager {
         status.mongodb = { connected: true, status: 'healthy' };
       } catch (error) {
         status.mongodb = { connected: false, status: 'error', error: error.message };
-      }
-    }
-
-    // Check Supabase
-    if (this.supabase) {
-      try {
-        const { data: _data, error: _error } = await this.supabase
-          .from('test')
-          .select('*')
-          .limit(1);
-        status.supabase = { connected: true, status: 'healthy' };
-      } catch (error) {
-        status.supabase = { connected: false, status: 'error', error: error.message };
       }
     }
 

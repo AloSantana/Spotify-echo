@@ -62,9 +62,28 @@ function initializeTracing() {
       });
       logger.info('Using OTLP trace exporter');
     } else {
-      const { ConsoleSpanExporter } = require('@opentelemetry/sdk-trace-base');
-      traceExporter = new ConsoleSpanExporter();
-      logger.info('Using Console span exporter for development');
+      // Only use ConsoleSpanExporter if LOG_LEVEL is trace or debug
+      const logLevel = (process.env.LOG_LEVEL || 'info').toLowerCase();
+      const enableConsoleExporter = logLevel === 'trace' || logLevel === 'debug';
+      
+      if (enableConsoleExporter) {
+        const { ConsoleSpanExporter } = require('@opentelemetry/sdk-trace-base');
+        traceExporter = new ConsoleSpanExporter();
+        logger.info('Using Console span exporter for development (LOG_LEVEL=' + logLevel + ')');
+      } else {
+        // Use a no-op exporter to avoid console spam
+        const { SpanExporter, ExportResult, ExportResultCode } = require('@opentelemetry/sdk-trace-base');
+        class NoOpSpanExporter extends SpanExporter {
+          export(spans, resultCallback) {
+            resultCallback({ code: ExportResultCode.SUCCESS });
+          }
+          shutdown() {
+            return Promise.resolve();
+          }
+        }
+        traceExporter = new NoOpSpanExporter();
+        logger.info('Using No-Op span exporter (set LOG_LEVEL=trace or LOG_LEVEL=debug for console output)');
+      }
     }
 
     // Initialize the SDK

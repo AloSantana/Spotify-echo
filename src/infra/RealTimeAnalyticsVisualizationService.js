@@ -29,6 +29,10 @@ class RealTimeAnalyticsVisualizationService extends EventEmitter {
   constructor(options = {}) {
     super();
     
+    // Check logging level - only log verbose messages if LOG_LEVEL is debug or trace
+    const logLevel = (process.env.LOG_LEVEL || 'info').toLowerCase();
+    this.enableVerboseLogging = logLevel === 'debug' || logLevel === 'trace';
+    
     this.config = {
       enabled: options.enabled !== false,
       environment: options.environment || 'production',
@@ -820,7 +824,9 @@ class RealTimeAnalyticsVisualizationService extends EventEmitter {
     
     this.emit('alertTriggered', alertMessage);
     
-    console.log(`🚨 Real-time alert triggered: ${alert.title}`);
+    if (this.enableVerboseLogging) {
+      console.log(`🚨 Real-time alert triggered: ${alert.title}`);
+    }
   }
   
   /**
@@ -1012,7 +1018,9 @@ class RealTimeAnalyticsVisualizationService extends EventEmitter {
         
         this.emit('patternDetected', patternEvent);
         
-        console.log(`🔍 Pattern detected: ${patternName} in stream ${streamId}`);
+        if (this.enableVerboseLogging) {
+          console.log(`🔍 Pattern detected: ${patternName} in stream ${streamId}`);
+        }
       }
     });
   }
@@ -1149,11 +1157,15 @@ class RealTimeAnalyticsVisualizationService extends EventEmitter {
    */
   setupEventListeners() {
     this.on('patternDetected', (event) => {
-      console.log(`🔍 Analytics Pattern: ${event.pattern} detected in ${event.streamId}`);
+      if (this.enableVerboseLogging) {
+        console.log(`🔍 Analytics Pattern: ${event.pattern} detected in ${event.streamId}`);
+      }
     });
     
     this.on('alertTriggered', (alert) => {
-      console.log(`🚨 Real-time Alert: ${alert.title}`);
+      if (this.enableVerboseLogging) {
+        console.log(`🚨 Real-time Alert: ${alert.title}`);
+      }
     });
   }
   
