@@ -81,6 +81,11 @@
         "PERPLEXITY_COST_BUDGET_USD": "0.50"
       },
       "description": "Enhanced Perplexity research with model comparison (grok-4, sonar-pro, GPT-5) and workflow optimization"
+    },
+    "screenshot-fast": {
+      "command": "npx",
+      "args": ["-y", "mcp-screenshot-website-fast"],
+      "description": "Fast website screenshot capture for AI agent workflows - optimized for coding agents"
     }
   }
 }
