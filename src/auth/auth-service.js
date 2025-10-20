@@ -21,11 +21,33 @@ const {
 
 class AuthService {
   constructor(options = {}) {
+    // Environment-aware redirect URI configuration
+    const getDefaultRedirectUri = () => {
+      if (process.env.NODE_ENV === 'production') {
+        // Check for Vercel-specific variables first
+        if (process.env.VERCEL_URL) {
+          return `https://${process.env.VERCEL_URL}/auth/callback`;
+        }
+        // Check for custom frontend URL
+        if (process.env.FRONTEND_URL) {
+          const url = new URL(process.env.FRONTEND_URL);
+          return `${url.origin}/auth/callback`;
+        }
+        // Fall back to DOMAIN if specified
+        if (process.env.DOMAIN) {
+          return `https://${process.env.DOMAIN}/auth/callback`;
+        }
+        // Default production fallback
+        return 'https://spotify-echo-eight.vercel.app/auth/callback';
+      }
+      return `http://localhost:${process.env.PORT || 3000}/auth/callback`;
+    };
+
     this.config = {
       spotify: {
         clientId: process.env.SPOTIFY_CLIENT_ID,
         clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-        redirectUri: process.env.SPOTIFY_REDIRECT_URI,
+        redirectUri: process.env.SPOTIFY_REDIRECT_URI || getDefaultRedirectUri(),
         scopes: [
           'user-read-private',
           'user-read-email',
@@ -613,6 +635,7 @@ class AuthService {
     const status = {
       auth_service: 'healthy',
       spotify_configured: !!(this.config.spotify.clientId && this.config.spotify.clientSecret),
+      redirect_uri: this.config.spotify.redirectUri,
       redis_connected: this.redisManager
         ? await this.redisManager
             .ping()
