@@ -1,4 +1,9 @@
-const sqlite3 = require('sqlite3').verbose();
+let sqlite3;
+try {
+  sqlite3 = require('sqlite3').verbose();
+} catch (error) {
+  console.warn('sqlite3 module not available, SQLite fallback disabled');
+}
 const path = require('path');
 const fs = require('fs');
 
@@ -18,6 +23,11 @@ class SQLiteManager {
    * Initialize SQLite database with required tables
    */
   async initialize() {
+    if (!sqlite3) {
+      console.warn('SQLite not available - sqlite3 module not installed');
+      return false;
+    }
+    
     try {
       // Ensure data directory exists
       const dataDir = path.dirname(this.dbPath);

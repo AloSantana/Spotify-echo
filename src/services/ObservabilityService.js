@@ -83,7 +83,7 @@ class ObservabilityService extends EventEmitter {
     try {
       // Initialize OpenTelemetry tracing
       const { NodeSDK } = require('@opentelemetry/sdk-node');
-      const { Resource } = require('@opentelemetry/semantic-conventions');
+      const { Resource } = require('@opentelemetry/resources');
       
       this.tracingSdk = new NodeSDK({
         resource: new Resource({
