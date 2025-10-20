@@ -10,10 +10,24 @@ const router = express.Router();
 // Get configuration
 const config = getConfigService().load();
 
-// Environment-aware redirect URI fallback
+// Environment-aware redirect URI fallback with proper Vercel support
 const getDefaultRedirectUri = () => {
   if (process.env.NODE_ENV === 'production') {
-    return `https://${process.env.DOMAIN || 'primosphere.studio'}/auth/callback`;
+    // Check for Vercel-specific variables first
+    if (process.env.VERCEL_URL) {
+      return `https://${process.env.VERCEL_URL}/auth/callback`;
+    }
+    // Check for custom frontend URL
+    if (process.env.FRONTEND_URL) {
+      const url = new URL(process.env.FRONTEND_URL);
+      return `${url.origin}/auth/callback`;
+    }
+    // Fall back to DOMAIN if specified
+    if (process.env.DOMAIN) {
+      return `https://${process.env.DOMAIN}/auth/callback`;
+    }
+    // Default production fallback
+    return 'https://spotify-echo-eight.vercel.app/auth/callback';
   }
   return `http://localhost:${config.server.port}/auth/callback`;
 };
