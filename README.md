@@ -429,6 +429,69 @@ export BROWSER=wslview  # If you have wslu installed
 - ✅ Always run `npm install` and `npm start` from within WSL terminal (not Windows Command Prompt)
 - ✅ Access the app via `http://localhost:3000` from your Windows browser
 
+#### Native Windows Setup (PowerShell)
+
+For native Windows development without WSL, we provide PowerShell scripts for a smooth experience:
+
+**1. Prerequisites**
+- Node.js 18+ from [nodejs.org](https://nodejs.org/)
+- Git for Windows from [git-scm.com](https://git-scm.com/download/win)
+- (Optional) Docker Desktop for Windows from [docker.com](https://www.docker.com/products/docker-desktop)
+
+**2. Quick Setup with PowerShell**
+```powershell
+# Clone repository
+git clone https://github.com/primoscope/Spotify-echo.git
+cd Spotify-echo
+
+# Run automated setup script
+.\scripts\windows\setup.ps1
+```
+
+**3. Configure Environment**
+```powershell
+# Edit .env file with your configuration
+notepad .env
+```
+
+**4. Run the Application**
+```powershell
+# Using PowerShell script
+.\scripts\windows\run.ps1
+
+# Or using npm directly
+npm start
+```
+
+**5. Run Tests**
+```powershell
+# Smoke tests
+.\scripts\windows\test.ps1 -Type smoke
+
+# All E2E tests
+.\scripts\windows\test.ps1 -Type e2e
+
+# All tests
+.\scripts\windows\test.ps1 -Type all
+```
+
+**6. Docker on Windows**
+```powershell
+# Build image
+.\scripts\windows\docker.ps1 -Action build
+
+# Run container
+.\scripts\windows\docker.ps1 -Action run
+
+# View logs
+.\scripts\windows\docker.ps1 -Action logs
+
+# Stop container
+.\scripts\windows\docker.ps1 -Action stop
+```
+
+📖 **Full Windows Documentation**: See [docs/WINDOWS_SETUP.md](docs/WINDOWS_SETUP.md) for comprehensive Windows setup, troubleshooting, and best practices.
+
 ### 🐳 Docker Installation
 
 You can run EchoTune AI using Docker for a containerized setup:

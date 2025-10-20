@@ -1,0 +1,241 @@
+---
+name: Docker Build & E2E Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  docker-build-and-test:
+    name: Docker Build + Health + E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Load environment from .env (if present)
+        id: load-env
+        run: |
+          if [ -f .env ]; then
+            echo "✅ .env file found - loading variables (secrets will not be printed)"
+            # Load env vars without printing them
+            set -a
+            source .env
+            set +a
+            echo "ENV_LOADED=true" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️  .env file not found - skipping env load"
+            echo "ENV_LOADED=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build Docker image
+        run: |
+          COMMIT_SHA=$(git rev-parse --short HEAD)
+          BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          echo "🔨 Building Docker image..."
+          echo "  Commit SHA: $COMMIT_SHA"
+          echo "  Build Time: $BUILD_TIME"
+          
+          docker build \
+            --build-arg BUILD_SHA="$COMMIT_SHA" \
+            --build-arg BUILD_TIME="$BUILD_TIME" \
+            -t spotify-echo:ci \
+            .
+          
+          echo "✅ Docker image built successfully"
+
+      - name: Start Docker container
+        run: |
+          echo "🚀 Starting Docker container..."
+          
+          # Start container with .env if available, otherwise without
+          if [ -f .env ]; then
+            echo "📋 Using .env file for container environment"
+            docker run -d \
+              --name spotify-echo-ci \
+              --env-file .env \
+              -p 3000:3000 \
+              spotify-echo:ci
+          else
+            echo "⚠️  Starting container without .env file"
+            docker run -d \
+              --name spotify-echo-ci \
+              -p 3000:3000 \
+              spotify-echo:ci
+          fi
+          
+          echo "✅ Container started"
+
+      - name: Wait for health check
+        timeout-minutes: 2
+        run: |
+          echo "⏳ Waiting for /healthz endpoint to respond..."
+          echo "  Timeout: 120 seconds"
+          
+          MAX_ATTEMPTS=24
+          ATTEMPT=0
+          
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            ATTEMPT=$((ATTEMPT + 1))
+            echo "  Attempt $ATTEMPT/$MAX_ATTEMPTS..."
+            
+            if curl -f -s http://127.0.0.1:3000/healthz > /dev/null 2>&1; then
+              echo "✅ Health check passed!"
+              
+              # Verify health check response
+              HEALTH_RESPONSE=$(curl -s http://127.0.0.1:3000/healthz)
+              echo "Health response: $HEALTH_RESPONSE"
+              
+              # Verify JSON structure
+              if echo "$HEALTH_RESPONSE" | jq -e '.ok == true' > /dev/null 2>&1; then
+                echo "✅ Health check response is valid"
+                exit 0
+              else
+                echo "⚠️  Health check response is invalid"
+              fi
+            fi
+            
+            sleep 5
+          done
+          
+          echo "❌ Health check failed after 120 seconds"
+          echo "Container logs:"
+          docker logs spotify-echo-ci
+          exit 1
+
+      - name: Verify all health endpoints
+        run: |
+          echo "🔍 Verifying all health endpoints..."
+          
+          # Test /healthz
+          echo "  Testing /healthz..."
+          curl -f http://127.0.0.1:3000/healthz | jq '.'
+          
+          # Test /health
+          echo "  Testing /health..."
+          curl -f http://127.0.0.1:3000/health | jq '.'
+          
+          # Test /health/simple
+          echo "  Testing /health/simple..."
+          curl -f http://127.0.0.1:3000/health/simple | jq '.'
+          
+          echo "✅ All health endpoints verified"
+
+      - name: Install Playwright browsers
+        run: |
+          echo "🌐 Installing Playwright browsers and dependencies..."
+          npm run playwright:install
+          echo "✅ Playwright browsers installed"
+
+      - name: Run Playwright smoke tests
+        run: |
+          echo "🧪 Running Playwright smoke tests against http://127.0.0.1:3000"
+          echo "  Running smoke test suite only..."
+          
+          # Run only the smoke tests against the running container
+          npm run test:e2e:smoke
+          
+          echo "✅ Smoke tests passed"
+
+      - name: Stop container on success
+        if: success()
+        run: |
+          echo "🛑 Stopping container..."
+          docker stop spotify-echo-ci
+          docker rm spotify-echo-ci
+          echo "✅ Container stopped and removed"
+
+      - name: Print container logs on failure
+        if: failure()
+        run: |
+          echo "📋 Container logs:"
+          docker logs spotify-echo-ci || echo "Could not retrieve logs"
+
+      - name: Stop container on failure
+        if: failure()
+        run: |
+          echo "🛑 Stopping container after failure..."
+          docker stop spotify-echo-ci || true
+          docker rm spotify-echo-ci || true
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts
+          path: |
+            BROWSERSCREENSHOT-TESTING/
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+
+  windows-compatibility:
+    name: Windows Scripts Validation
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Test Windows setup script
+        shell: pwsh
+        run: |
+          Write-Host "Testing Windows setup script..."
+          Get-Content scripts/windows/setup.ps1 | Select-Object -First 10
+          Write-Host "✅ Setup script exists and is readable"
+
+      - name: Test Windows run script
+        shell: pwsh
+        run: |
+          Write-Host "Testing Windows run script..."
+          Get-Content scripts/windows/run.ps1 | Select-Object -First 10
+          Write-Host "✅ Run script exists and is readable"
+
+      - name: Test Windows test script
+        shell: pwsh
+        run: |
+          Write-Host "Testing Windows test script..."
+          Get-Content scripts/windows/test.ps1 | Select-Object -First 10
+          Write-Host "✅ Test script exists and is readable"
+
+      - name: Verify line endings
+        shell: pwsh
+        run: |
+          Write-Host "Verifying .gitattributes exists..."
+          if (Test-Path .gitattributes) {
+            Write-Host "✅ .gitattributes file exists"
+            Get-Content .gitattributes | Select-Object -First 5
+          } else {
+            Write-Host "❌ .gitattributes file not found"
+            exit 1
+          }
+
+      - name: Test npm install on Windows
+        run: npm ci
+
+      - name: Test cross-env availability
+        run: |
+          npm ls cross-env
+          Write-Host "✅ cross-env is available"
+        shell: pwsh

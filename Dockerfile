@@ -62,9 +62,25 @@ ENV NODE_ENV=production \
     BUILD_SHA=${BUILD_SHA} \
     BUILD_TIME=${BUILD_TIME}
 
-# Install curl/wget, runtime libs for native modules, Chromium for Puppeteer, and dumb-init
-RUN apk add --no-cache curl wget libstdc++ chromium dumb-init
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+# Install curl/wget, runtime libs for native modules, Chromium for headless browser automation, and dumb-init
+# Include all Chromium dependencies for Playwright compatibility
+RUN apk add --no-cache \
+    curl \
+    wget \
+    dumb-init \
+    libstdc++ \
+    chromium \
+    chromium-chromedriver \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    font-noto-emoji
+
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
+    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 \
+    PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 # Create non-root user
 RUN addgroup -S nodeapp && adduser -S nodeapp -G nodeapp
@@ -79,8 +95,9 @@ COPY --from=build /app/package.json ./package.json
 # Expose app port (configurable via PORT)
 EXPOSE 3000
 
-# Healthcheck using /health endpoint
-HEALTHCHECK --interval=30s --timeout=5s --retries=5 CMD wget -qO- http://localhost:${PORT:-3000}/health || exit 1
+# Healthcheck using /healthz endpoint (prefer 127.0.0.1 over localhost for better compatibility)
+HEALTHCHECK --interval=30s --timeout=5s --retries=5 \
+    CMD wget -qO- http://127.0.0.1:${PORT:-3000}/healthz || exit 1
 
 # Run server with dumb-init as PID 1 for proper signal handling
 USER nodeapp
