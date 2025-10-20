@@ -30,6 +30,10 @@ class AdvancedAPMService extends EventEmitter {
   constructor(options = {}) {
     super();
     
+    // Check logging level - only log verbose messages if LOG_LEVEL is debug or trace
+    const logLevel = (process.env.LOG_LEVEL || 'info').toLowerCase();
+    this.enableVerboseLogging = logLevel === 'debug' || logLevel === 'trace';
+    
     this.config = {
       enabled: options.enabled !== false,
       environment: options.environment || 'production',
@@ -695,15 +699,21 @@ class AdvancedAPMService extends EventEmitter {
    */
   setupEventListeners() {
     this.on('alertTriggered', (alert) => {
-      console.log(`🚨 APM Alert: ${alert.message}`);
+      if (this.enableVerboseLogging) {
+        console.log(`🚨 APM Alert: ${alert.message}`);
+      }
     });
     
     this.on('anomalyDetected', (anomaly) => {
-      console.log(`⚠️ APM Anomaly: ${anomaly.message}`);
+      if (this.enableVerboseLogging) {
+        console.log(`⚠️ APM Anomaly: ${anomaly.message}`);
+      }
     });
     
     this.on('recommendationsGenerated', (recommendations) => {
-      console.log(`💡 APM Recommendations: ${recommendations.length} new recommendations`);
+      if (this.enableVerboseLogging) {
+        console.log(`💡 APM Recommendations: ${recommendations.length} new recommendations`);
+      }
     });
   }
   

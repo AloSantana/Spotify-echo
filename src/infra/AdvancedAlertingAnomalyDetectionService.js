@@ -28,6 +28,10 @@ class AdvancedAlertingAnomalyDetectionService extends EventEmitter {
   constructor(options = {}) {
     super();
     
+    // Check logging level - only log verbose messages if LOG_LEVEL is debug or trace
+    const logLevel = (process.env.LOG_LEVEL || 'info').toLowerCase();
+    this.enableVerboseLogging = logLevel === 'debug' || logLevel === 'trace';
+    
     this.config = {
       enabled: options.enabled !== false,
       environment: options.environment || 'production',
@@ -1150,7 +1154,9 @@ class AdvancedAlertingAnomalyDetectionService extends EventEmitter {
     
     this.emit('incidentCreated', incident);
     
-    console.log(`🚨 Incident created: ${incident.title} (${incident.severity})`);
+    if (this.enableVerboseLogging) {
+      console.log(`🚨 Incident created: ${incident.title} (${incident.severity})`);
+    }
   }
   
   /**
@@ -1283,11 +1289,15 @@ class AdvancedAlertingAnomalyDetectionService extends EventEmitter {
    */
   setupEventListeners() {
     this.on('anomalyDetected', (anomaly) => {
-      console.log(`🔍 Anomaly detected: ${anomaly.type} in ${anomaly.sourceId}`);
+      if (this.enableVerboseLogging) {
+        console.log(`🔍 Anomaly detected: ${anomaly.type} in ${anomaly.sourceId}`);
+      }
     });
     
     this.on('incidentCreated', (incident) => {
-      console.log(`🚨 Incident created: ${incident.title}`);
+      if (this.enableVerboseLogging) {
+        console.log(`🚨 Incident created: ${incident.title}`);
+      }
     });
   }
   
