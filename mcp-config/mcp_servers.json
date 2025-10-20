@@ -152,6 +152,20 @@
             "Advanced caching with Redis support",
             "Comprehensive research capabilities"
           ]
+        },
+        "screenshot_fast": {
+          "name": "Fast Screenshot MCP Server",
+          "command": "npx",
+          "args": ["-y", "mcp-screenshot-website-fast"],
+          "capabilities": ["website_screenshot", "visual_capture", "ai_agent_workflow"],
+          "description": "Fast website screenshot capture optimized for AI coding agents and automation workflows",
+          "features": [
+            "Fast screenshot capture",
+            "Optimized for AI agents",
+            "Simple npx installation",
+            "No configuration required"
+          ],
+          "repository": "https://github.com/just-every/mcp-screenshot-website-fast"
         }
       }
     }
