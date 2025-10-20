@@ -1,1 +1,99 @@
-{"actionable_tasks": [], "error": "'content'", "fallback": true}
+{
+  "actionable_tasks": [
+    {
+      "id": "task_1",
+      "title": "Implement Circuit Breaker Pattern for Provider Failover",
+      "description": "Add a circuit breaker mechanism to the backend provider switching logic to automatically failover when a provider is unhealthy. This improves reliability and resilience for multi-provider LLM support.",
+      "priority": "high",
+      "estimated_time": "60-90 minutes",
+      "files_to_modify": [
+        "src/api/providers.js",
+        "src/api/utils/circuitBreaker.js",
+        "src/chat/pipeline.js"
+      ],
+      "implementation_steps": [
+        "Design a simple circuit breaker class or utility (open/closed/half-open states, error threshold, reset timeout).",
+        "Integrate circuit breaker checks into provider request logic in src/api/providers.js.",
+        "Log state transitions and trigger failover to alternate providers when threshold is exceeded.",
+        "Add basic unit tests for circuit breaker behavior."
+      ],
+      "complexity_score": 7
+    },
+    {
+      "id": "task_2",
+      "title": "Add Request Correlation IDs for End-to-End Tracing",
+      "description": "Attach a unique correlation ID to each incoming request and propagate it through backend pipelines for improved observability and debugging.",
+      "priority": "medium",
+      "estimated_time": "30-45 minutes",
+      "files_to_modify": [
+        "src/api/middleware/requestLogger.js",
+        "src/chat/pipeline.js",
+        "src/api/routes/*"
+      ],
+      "implementation_steps": [
+        "Generate a UUID for each incoming request in middleware.",
+        "Attach correlation ID to request context and logs.",
+        "Ensure correlation ID is included in responses and error logs for traceability."
+      ],
+      "complexity_score": 5
+    },
+    {
+      "id": "task_3",
+      "title": "Expand Automated Test Coverage for Provider Switching",
+      "description": "Increase the number of automated tests for provider switching and telemetry endpoints to ensure reliability and catch regressions.",
+      "priority": "medium",
+      "estimated_time": "45-60 minutes",
+      "files_to_modify": [
+        "src/api/providers.test.js",
+        "src/api/telemetry.test.js"
+      ],
+      "implementation_steps": [
+        "Review existing tests for provider switching and telemetry.",
+        "Add new test cases for edge scenarios (failover, latency spikes, error handling).",
+        "Run tests and verify coverage improvements."
+      ],
+      "complexity_score": 6
+    },
+    {
+      "id": "task_4",
+      "title": "Frontend: Complete Spotify Authentication Interface",
+      "description": "Finish the Spotify OAuth login and token management UI to enable users to connect their Spotify accounts for music discovery features.",
+      "priority": "high",
+      "estimated_time": "60-90 minutes",
+      "files_to_modify": [
+        "src/frontend/components/SpotifyAuth.js",
+        "src/frontend/pages/Login.js"
+      ],
+      "implementation_steps": [
+        "Implement OAuth flow UI (login button, redirect, token storage).",
+        "Handle success/error states and display appropriate messages.",
+        "Test with a real Spotify account to verify end-to-end flow."
+      ],
+      "complexity_score": 7
+    },
+    {
+      "id": "task_5",
+      "title": "Add MongoDB Compound Indexes for Analytics Queries",
+      "description": "Create compound indexes on MongoDB collections used for analytics to optimize query performance and reduce latency.",
+      "priority": "medium",
+      "estimated_time": "30-45 minutes",
+      "files_to_modify": [
+        "src/db/analytics.js",
+        "src/db/migrations/compoundIndexes.js"
+      ],
+      "implementation_steps": [
+        "Identify high-frequency analytics queries and relevant fields.",
+        "Define compound indexes in migration scripts.",
+        "Apply indexes and benchmark query performance improvements."
+      ],
+      "complexity_score": 5
+    }
+  ],
+  "next_research_topics": [
+    "Best practices for circuit breaker implementation in Node.js",
+    "Correlation ID propagation in distributed systems",
+    "Optimizing MongoDB indexes for analytics workloads",
+    "Spotify OAuth integration patterns for React frontends"
+  ],
+  "completion_percentage": 75
+}

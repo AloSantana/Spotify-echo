@@ -1,7 +1,7 @@
 
 # Task: Implement Circuit Breaker Pattern for Provider Failover
-# Description: Add a circuit breaker mechanism to the backend provider selection logic to automatically failover to a healthy provider when the current one is unresponsive or error-prone. This increases system reliability and is research-derived from the Perplexity sweep.
-# Files to modify: ['src/providers/providerManager.js', 'src/providers/circuitBreaker.js', 'src/api/routes/providers.js']
+# Description: Add a circuit breaker mechanism to the backend provider switching logic to automatically failover when a provider is unhealthy. This improves reliability and resilience for multi-provider LLM support.
+# Files to modify: ['src/api/providers.js', 'src/api/utils/circuitBreaker.js', 'src/chat/pipeline.js']
 
 print("Implementing: Implement Circuit Breaker Pattern for Provider Failover")
 

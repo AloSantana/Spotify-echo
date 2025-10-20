@@ -1,9 +1,9 @@
 
-# Task: Expand Automated Test Coverage for MCP Endpoints
-# Description: Increase automated test coverage for MCP endpoints and provider health logic using Jest, focusing on edge cases and error handling.
-# Files to modify: ['tests/mcpEndpoints.test.js', 'src/providers/providerManager.js']
+# Task: Expand Automated Test Coverage for Provider Switching
+# Description: Increase the number of automated tests for provider switching and telemetry endpoints to ensure reliability and catch regressions.
+# Files to modify: ['src/api/providers.test.js', 'src/api/telemetry.test.js']
 
-print("Implementing: Expand Automated Test Coverage for MCP Endpoints")
+print("Implementing: Expand Automated Test Coverage for Provider Switching")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
