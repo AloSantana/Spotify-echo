@@ -621,8 +621,16 @@ If you see **"No active device found"**:
 - Check Spotify Developer Dashboard for correct Client ID
 
 **"Invalid redirect URI"**  
-- Verify redirect URI in Spotify app settings exactly matches: `http://localhost:3000/auth/callback`
-- Check for trailing slashes or protocol mismatches
+- Verify redirect URI in Spotify app settings exactly matches the one shown by `npm run auth:url`
+- For local development: `http://localhost:3000/auth/callback` (or your custom PORT)
+- For production: Set `SPOTIFY_REDIRECT_URI` in `.env` to match your deployed domain
+- Check for trailing slashes or protocol mismatches (http vs https)
+- **Important**: The redirect URI must be added to your Spotify Developer Dashboard:
+  1. Go to https://developer.spotify.com/dashboard
+  2. Select your app
+  3. Click "Edit Settings"
+  4. Add the exact redirect URI to "Redirect URIs" section
+  5. Click "Save"
 
 **"Invalid client" during OAuth**
 - Double-check Client ID and Client Secret are correct
@@ -636,6 +644,20 @@ If you see **"No active device found"**:
 - Tokens automatically refresh when expiring
 - Check server logs for refresh errors
 - May need to re-authorize if refresh token expires
+
+**"Cannot find module" errors on startup**
+- Run `npm install` to ensure all dependencies are installed
+- If issue persists, try `rm -rf node_modules package-lock.json && npm install`
+- Key runtime dependencies required:
+  - `@google/generative-ai` for Gemini AI integration
+  - `mongodb` for database connectivity
+  - OpenTelemetry packages for observability
+  - See `package.json` for complete list
+
+**OpenTelemetry warnings**
+- If you see "OpenTelemetry modules not available" - run `npm install`
+- These warnings are informational and won't prevent startup
+- Full tracing requires all OpenTelemetry packages installed
 
 #### Health Checks
 

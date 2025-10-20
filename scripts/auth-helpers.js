@@ -12,7 +12,7 @@ require('dotenv').config();
 
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI || 'http://localhost:3000/auth/callback';
+const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI || `http://localhost:${process.env.PORT || 3000}/auth/callback`;
 
 // Generate PKCE challenge for testing
 function generatePKCEChallenge() {
@@ -66,6 +66,14 @@ function generateAuthUrl() {
   console.log('3. Log in to Spotify and grant permissions');
   console.log('4. Copy the authorization code from the callback URL');
   console.log('5. Use: npm run auth:exchange -- --code=<your-code>');
+  console.log('');
+  console.log(`🔑 Redirect URI: ${SPOTIFY_REDIRECT_URI}`);
+  console.log('⚠️  IMPORTANT: This redirect URI must be added to your Spotify Developer Dashboard:');
+  console.log('   1. Go to https://developer.spotify.com/dashboard');
+  console.log('   2. Select your app');
+  console.log('   3. Click "Edit Settings"');
+  console.log(`   4. Add "${SPOTIFY_REDIRECT_URI}" to Redirect URIs`);
+  console.log('   5. Click "Save"');
   console.log('');
   console.log(`🔑 State: ${state}`);
   console.log(`🔑 Code Challenge: ${code_challenge}`);
