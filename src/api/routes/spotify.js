@@ -20,15 +20,12 @@ const spotifyService = new SpotifyAudioFeaturesService();
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 
-// Environment-aware redirect URI
-const getRedirectUri = () => {
-  if (process.env.NODE_ENV === 'production') {
-    return process.env.SPOTIFY_REDIRECT_URI || `https://${process.env.DOMAIN}/auth/callback`;
-  }
-  return (
-    process.env.SPOTIFY_REDIRECT_URI || `http://localhost:${process.env.PORT || 3000}/auth/callback`
-  );
-};
+// Use SPOTIFY_REDIRECT_URI directly - no fallback computation
+const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI;
+
+if (!SPOTIFY_REDIRECT_URI) {
+  console.error('[SPOTIFY] SPOTIFY_REDIRECT_URI not configured - OAuth will fail');
+}
 
 // Rate limiting for Spotify endpoints
 const spotifyRateLimit = createRateLimit({
@@ -112,7 +109,7 @@ router.get('/auth/login', authRateLimit, async (req, res) => {
         response_type: 'code',
         client_id: SPOTIFY_CLIENT_ID,
         scope,
-        redirect_uri: getRedirectUri(),
+        redirect_uri: SPOTIFY_REDIRECT_URI,
         state,
         code_challenge: pkce.code_challenge,
         code_challenge_method: pkce.code_challenge_method,
@@ -206,7 +203,7 @@ router.get('/auth/callback', authRateLimit, async (req, res) => {
         new URLSearchParams({
           grant_type: 'authorization_code',
           code,
-          redirect_uri: getRedirectUri(),
+          redirect_uri: SPOTIFY_REDIRECT_URI,
           client_id: SPOTIFY_CLIENT_ID,
           code_verifier: authData.code_verifier,
         }),

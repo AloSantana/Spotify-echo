@@ -14,7 +14,6 @@ export const useDatabase = () => {
 export function DatabaseProvider({ children }) {
   const [connectionStatus, setConnectionStatus] = useState({
     mongodb: { connected: false, status: 'unknown' },
-    supabase: { connected: false, status: 'unknown' },
     sqlite: { connected: false, status: 'unknown' },
   });
   const [activeDatabases, setActiveDatabases] = useState([]);
