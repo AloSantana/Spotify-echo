@@ -203,6 +203,10 @@ app.use('/internal/health', healthRoute);
 app.use('/internal/metrics', metricsRoute);
 app.use('/internal/ready', readyRoute);
 
+// Register modernized health check endpoints (lib/health)
+const { registerHealthRoutes } = require('../lib/health');
+registerHealthRoutes(app);
+
 // Demo routes (only enabled with ENABLE_DEMO_ROUTES=1)
 if (process.env.ENABLE_DEMO_ROUTES === '1') {
   const playlistGenerateRoute = require('./routes/internal/demo/playlist-generate');
