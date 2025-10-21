@@ -3,7 +3,7 @@
     {
       "id": "task_1",
       "title": "Implement Circuit Breaker Pattern for Provider Failover",
-      "description": "Add a circuit breaker mechanism to the backend provider selection logic to automatically failover to alternate LLM providers when the primary provider is unhealthy or experiencing high error rates.",
+      "description": "Add a circuit breaker mechanism to the backend provider selection logic to automatically failover to alternate LLM providers when error rates or latency thresholds are exceeded.",
       "priority": "high",
       "estimated_time": "60-90 minutes",
       "files_to_modify": [
@@ -12,17 +12,17 @@
         "src/api/routes/providers.js"
       ],
       "implementation_steps": [
-        "Create a new module (circuitBreaker.js) implementing the circuit breaker logic (open/half-open/closed states, error thresholds, reset timers).",
-        "Integrate the circuit breaker into providerManager.js so that each provider instance is wrapped and monitored.",
-        "Update provider selection logic in routes/providers.js to respect circuit breaker state when routing requests.",
-        "Add basic unit tests to verify failover and recovery behavior."
+        "Create a new module (circuitBreaker.js) implementing the circuit breaker logic (open/half-open/closed states, error/latency thresholds).",
+        "Integrate the circuit breaker into providerManager.js to wrap provider calls.",
+        "Update providers.js API endpoints to use the new failover logic.",
+        "Add unit tests for failover scenarios."
       ],
       "complexity_score": 7
     },
     {
       "id": "task_2",
       "title": "Add Request Correlation IDs for End-to-End Tracing",
-      "description": "Attach a unique correlation ID to each incoming API request and propagate it through backend services for improved traceability and debugging.",
+      "description": "Attach a unique correlation ID to each incoming request and propagate it through backend services for improved traceability and debugging.",
       "priority": "medium",
       "estimated_time": "30-45 minutes",
       "files_to_modify": [
@@ -31,10 +31,10 @@
         "src/utils/tracing.js"
       ],
       "implementation_steps": [
-        "Install a UUID library if not present.",
-        "Update requestLogger middleware to generate and attach a correlation ID to req.headers and logs.",
-        "Ensure all outgoing requests to providers include the correlation ID in headers.",
-        "Update logs and error handlers to include the correlation ID for traceability."
+        "Update requestLogger.js middleware to generate and attach a correlation ID to each request (e.g., using uuid).",
+        "Ensure correlation ID is included in logs and passed to downstream service calls.",
+        "Update tracing.js utilities to support correlation ID propagation.",
+        "Test with sample requests and verify logs."
       ],
       "complexity_score": 5
     },
@@ -50,9 +50,9 @@
       ],
       "implementation_steps": [
         "Identify untested code paths in provider switching and chat pipeline modules.",
-        "Write additional Jest tests to cover edge cases (e.g., provider failover, context persistence).",
-        "Run tests and ensure all new cases pass.",
-        "Update coverage reports."
+        "Write new Jest test cases to cover edge cases and error handling.",
+        "Run tests and ensure all pass.",
+        "Update coverage report."
       ],
       "complexity_score": 6
     },
@@ -67,17 +67,17 @@
         "docker-compose.yml"
       ],
       "implementation_steps": [
-        "Refactor Dockerfile to separate build and runtime stages (e.g., install dependencies, build app, copy to minimal runtime image).",
+        "Refactor Dockerfile to separate build and runtime stages.",
+        "Move dependencies and build artifacts to appropriate stages.",
         "Test local build and run to verify functionality.",
-        "Update docker-compose.yml if needed to use the new image structure.",
-        "Document the changes in README or deployment notes."
+        "Update docker-compose.yml if necessary."
       ],
       "complexity_score": 5
     },
     {
       "id": "task_5",
       "title": "Implement MongoDB TTL Index for Telemetry Data Rotation",
-      "description": "Add a TTL (Time-To-Live) index to the MongoDB telemetry collection to automatically expire old telemetry documents and manage storage growth.",
+      "description": "Add a TTL (Time-To-Live) index to the MongoDB telemetry collection to automatically expire old telemetry documents and manage storage.",
       "priority": "low",
       "estimated_time": "30-45 minutes",
       "files_to_modify": [
@@ -86,15 +86,15 @@
       ],
       "implementation_steps": [
         "Update initIndexes.js to create a TTL index on the telemetry collection (e.g., expireAfterSeconds: 604800 for 7 days).",
-        "Test index creation and verify that old documents are purged as expected.",
-        "Document the TTL policy in code comments and developer docs."
+        "Test index creation and document expiration locally.",
+        "Document the change in the developer README."
       ],
       "complexity_score": 4
     }
   ],
   "next_research_topics": [
     "Best practices for OpenTelemetry distributed tracing integration in Node.js",
-    "Memory profiling with clinic.js for Node.js applications",
+    "Efficient memory profiling with clinic.js for Node.js applications",
     "Advanced analytics dashboard UX patterns for music discovery platforms"
   ],
   "completion_percentage": 75
