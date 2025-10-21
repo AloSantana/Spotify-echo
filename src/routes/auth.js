@@ -1,40 +1,20 @@
 const express = require('express');
 const crypto = require('crypto');
 const { URLSearchParams } = require('url');
-const { getConfigService } = require('../config/ConfigurationService');
 const { generatePKCEChallenge, generateNonce } = require('../utils/auth-helpers');
 const { getRedisManager } = require('../utils/redis');
 
 const router = express.Router();
 
-// Get configuration
-const config = getConfigService().load();
-
-// Environment-aware redirect URI fallback with proper Vercel support
-const getDefaultRedirectUri = () => {
-  if (process.env.NODE_ENV === 'production') {
-    // Check for Vercel-specific variables first
-    if (process.env.VERCEL_URL) {
-      return `https://${process.env.VERCEL_URL}/auth/callback`;
-    }
-    // Check for custom frontend URL
-    if (process.env.FRONTEND_URL) {
-      const url = new URL(process.env.FRONTEND_URL);
-      return `${url.origin}/auth/callback`;
-    }
-    // Fall back to DOMAIN if specified
-    if (process.env.DOMAIN) {
-      return `https://${process.env.DOMAIN}/auth/callback`;
-    }
-    // Default production fallback
-    return 'https://spotify-echo-eight.vercel.app/auth/callback';
-  }
-  return `http://localhost:${config.server.port}/auth/callback`;
-};
-
+// Load Spotify credentials directly from environment (dotenv already loaded by server.js)
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI || getDefaultRedirectUri();
+const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI;
+
+// Validate configuration at startup
+if (!SPOTIFY_REDIRECT_URI) {
+  console.warn('[AUTH] SPOTIFY_REDIRECT_URI not configured - OAuth will fail');
+}
 
 /**
  * Spotify authentication initiation
