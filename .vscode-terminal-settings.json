@@ -1,0 +1,43 @@
+{
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.profiles.linux": {
+    "bash": {
+      "path": "/bin/bash",
+      "args": ["-l", "-i"],
+      "icon": "terminal-bash",
+      "overrideName": true,
+      "env": {
+        "SHELL": "/bin/bash",
+        "TERM": "xterm-256color",
+        "COLORTERM": "truecolor",
+        "CLINE_SHELL_INTEGRATION": "1"
+      }
+    }
+  },
+  "terminal.integrated.enableMultiLinePasteWarning": false,
+  "terminal.integrated.copyOnSelection": true,
+  "terminal.integrated.cursorStyle": "line",
+  "terminal.integrated.cursorBlinking": true,
+  "terminal.integrated.fontFamily": "monospace",
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.lineHeight": 1.2,
+  "terminal.integrated.rendererType": "canvas",
+  "terminal.integrated.smoothScrolling": true,
+  "terminal.integrated.shellIntegration.enabled": true,
+  "terminal.integrated.shellIntegration.history": 500,
+  "terminal.integrated.shellIntegration.decorationsEnabled": "auto",
+  "terminal.integrated.environmentChangesIndicator": "on",
+  "terminal.integrated.environmentChangesRecommended": true,
+  "terminal.integrated.allowChords": true,
+  "terminal.integrated.commandsToSkipShell": [
+    "-workbench.action.toggleSidebarVisibility",
+    "-workbench.action.quickOpen"
+  ],
+  "terminal.integrated.tabs.enabled": true,
+  "terminal.integrated.tabs.hideCondition": "singleGroup",
+  "terminal.integrated.tabs.description": "terminal.integrated.tabs.description.sequence",
+  "terminal.integrated.altClickMovesCursor": false,
+  "[log]": {
+    "editor.fontSize": 12
+  }
+}

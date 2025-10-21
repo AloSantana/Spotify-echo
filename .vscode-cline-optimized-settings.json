@@ -1,0 +1,52 @@
+{
+  "// ===== TERMINAL INTEGRATION SETTINGS =====": {},
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.profiles.linux": {
+    "bash": {
+      "path": "/bin/bash",
+      "args": ["-l", "-i"],
+      "icon": "terminal-bash",
+      "overrideName": true,
+      "env": {
+        "SHELL": "/bin/bash",
+        "TERM": "xterm-256color",
+        "COLORTERM": "truecolor",
+        "CLINE_SHELL_INTEGRATION": "1"
+      }
+    }
+  },
+  "// ===== SHELL INTEGRATION =====": {},
+  "terminal.integrated.shellIntegration.enabled": true,
+  "terminal.integrated.shellIntegration.decorationsEnabled": "auto",
+  "terminal.integrated.shellIntegration.history": 500,
+  "terminal.integrated.environmentChangesIndicator": "on",
+  "terminal.integrated.environmentChangesRecommended": true,
+  "// ===== TERMINAL APPEARANCE =====": {},
+  "terminal.integrated.tabs.enabled": true,
+  "terminal.integrated.tabs.hideCondition": "singleGroup",
+  "terminal.integrated.tabs.description": "terminal.integrated.tabs.description.sequence",
+  "terminal.integrated.copyOnSelection": true,
+  "terminal.integrated.cursorStyle": "line",
+  "terminal.integrated.cursorBlinking": true,
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.fontFamily": "monospace",
+  "terminal.integrated.lineHeight": 1.2,
+  "// ===== PERFORMANCE =====": {},
+  "terminal.integrated.rendererType": "canvas",
+  "terminal.integrated.smoothScrolling": true,
+  "terminal.integrated.fastScrollSensitivity": 5,
+  "// ===== INPUT & EDITING =====": {},
+  "terminal.integrated.altClickMovesCursor": false,
+  "terminal.integrated.allowChords": true,
+  "terminal.integrated.commandsToSkipShell": [
+    "-workbench.action.toggleSidebarVisibility",
+    "-workbench.action.quickOpen"
+  ],
+  "terminal.integrated.enableMultiLinePasteWarning": false,
+  "// ===== SCROLL & BUFFER =====": {},
+  "terminal.integrated.scrollback": 10000,
+  "terminal.integrated.scrollSensitivity": 1,
+  "// ===== CLINE-SPECIFIC OPTIMIZATIONS =====": {},
+  "terminal.integrated.enablePersistentSessions": true,
+  "terminal.integrated.inheritEnv": true
+}
