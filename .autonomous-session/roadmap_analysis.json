@@ -2,100 +2,128 @@
   "actionable_tasks": [
     {
       "id": "task_1",
-      "title": "Implement Circuit Breaker Pattern for Provider Failover",
-      "description": "Add a circuit breaker mechanism to the backend provider selection logic to automatically failover to alternate LLM providers when error rates or latency thresholds are exceeded.",
+      "title": "Add MongoDB Compound Indexes for Analytics Queries",
+      "description": "Implement compound indexes on MongoDB collections used for analytics to improve query performance. This is a research-derived task from the Perplexity sweep and does not require external dependencies.",
       "priority": "high",
-      "estimated_time": "60-90 minutes",
+      "estimated_time": "1-2 hours",
       "files_to_modify": [
-        "src/providers/providerManager.js",
-        "src/providers/circuitBreaker.js",
-        "src/api/routes/providers.js"
+        "src/analytics.js",
+        "src/insights.js"
       ],
       "implementation_steps": [
-        "Create a new module (circuitBreaker.js) implementing the circuit breaker logic (open/half-open/closed states, error/latency thresholds).",
-        "Integrate the circuit breaker into providerManager.js to wrap provider calls.",
-        "Update providers.js API endpoints to use the new failover logic.",
-        "Add unit tests for failover scenarios."
+        "Identify the most frequent and slow analytics queries in the codebase.",
+        "Design compound indexes in MongoDB to cover these query patterns.",
+        "Add index creation logic to the application startup or migration scripts.",
+        "Test query performance before and after index creation."
       ],
-      "complexity_score": 7
+      "complexity_score": 6
     },
     {
       "id": "task_2",
-      "title": "Add Request Correlation IDs for End-to-End Tracing",
-      "description": "Attach a unique correlation ID to each incoming request and propagate it through backend services for improved traceability and debugging.",
-      "priority": "medium",
-      "estimated_time": "30-45 minutes",
+      "title": "Implement TTL Indexes for Telemetry Data Rotation",
+      "description": "Add TTL (Time-To-Live) indexes to MongoDB collections storing telemetry data to automatically expire old records, reducing storage overhead and improving query performance.",
+      "priority": "high",
+      "estimated_time": "30-60 minutes",
       "files_to_modify": [
-        "src/api/middleware/requestLogger.js",
-        "src/api/routes/*",
-        "src/utils/tracing.js"
+        "src/analytics.js"
       ],
       "implementation_steps": [
-        "Update requestLogger.js middleware to generate and attach a correlation ID to each request (e.g., using uuid).",
-        "Ensure correlation ID is included in logs and passed to downstream service calls.",
-        "Update tracing.js utilities to support correlation ID propagation.",
-        "Test with sample requests and verify logs."
+        "Identify collections storing telemetry/analytics data.",
+        "Add TTL index creation logic (e.g., db.collection.createIndex({ createdAt: 1 }, { expireAfterSeconds: 2592000 })).",
+        "Test data expiration behavior."
       ],
       "complexity_score": 5
     },
     {
       "id": "task_3",
-      "title": "Expand Automated Test Coverage",
-      "description": "Increase automated test coverage for critical backend modules, focusing on provider switching and chat pipeline logic.",
+      "title": "Add Response Streaming for Large Analytics Datasets",
+      "description": "Modify analytics endpoints to stream large result sets instead of loading everything into memory at once, improving scalability and reducing memory usage.",
       "priority": "medium",
-      "estimated_time": "60-90 minutes",
+      "estimated_time": "1-2 hours",
       "files_to_modify": [
-        "tests/providers.test.js",
-        "tests/chatPipeline.test.js"
+        "src/analytics.js",
+        "src/insights.js"
       ],
       "implementation_steps": [
-        "Identify untested code paths in provider switching and chat pipeline modules.",
-        "Write new Jest test cases to cover edge cases and error handling.",
-        "Run tests and ensure all pass.",
-        "Update coverage report."
+        "Identify endpoints returning large datasets.",
+        "Refactor these endpoints to use MongoDB cursor streaming or Node.js stream APIs.",
+        "Update frontend to handle streamed responses if necessary.",
+        "Test with large datasets to verify memory and performance improvements."
       ],
-      "complexity_score": 6
+      "complexity_score": 7
     },
     {
       "id": "task_4",
-      "title": "Optimize Dockerfile for Multi-Stage Builds",
-      "description": "Refactor the existing Dockerfile(s) to use multi-stage builds, reducing final image size and improving build caching for faster CI/CD.",
+      "title": "Add Prometheus Metrics Export for Alerting",
+      "description": "Integrate Prometheus client library to expose backend metrics (e.g., request counts, error rates, latency) for monitoring and alerting.",
       "priority": "medium",
-      "estimated_time": "45-60 minutes",
+      "estimated_time": "1-2 hours",
       "files_to_modify": [
-        "Dockerfile",
-        "docker-compose.yml"
+        "src/api/routes/performance.js",
+        "src/middleware/metrics.js"
       ],
       "implementation_steps": [
-        "Refactor Dockerfile to separate build and runtime stages.",
-        "Move dependencies and build artifacts to appropriate stages.",
-        "Test local build and run to verify functionality.",
-        "Update docker-compose.yml if necessary."
+        "Add Prometheus client library to the project.",
+        "Instrument key endpoints and services to collect metrics.",
+        "Expose a `/metrics` endpoint for Prometheus scraping.",
+        "Test metric collection and visualization in a monitoring dashboard."
+      ],
+      "complexity_score": 7
+    },
+    {
+      "id": "task_5",
+      "title": "Complete Frontend Spotify Authentication Interface",
+      "description": "Finish the UI for Spotify OAuth authentication, ensuring a smooth user onboarding experience.",
+      "priority": "medium",
+      "estimated_time": "1-2 hours",
+      "files_to_modify": [
+        "src/frontend/components/Auth/SpotifyAuth.js"
+      ],
+      "implementation_steps": [
+        "Review existing OAuth flow and identify missing UI elements.",
+        "Implement remaining UI components (e.g., login button, error states, loading indicators).",
+        "Test the authentication flow end-to-end."
       ],
       "complexity_score": 5
     },
     {
-      "id": "task_5",
-      "title": "Implement MongoDB TTL Index for Telemetry Data Rotation",
-      "description": "Add a TTL (Time-To-Live) index to the MongoDB telemetry collection to automatically expire old telemetry documents and manage storage.",
+      "id": "task_6",
+      "title": "Add Memory Profiling with clinic.js",
+      "description": "Integrate clinic.js for memory profiling during development and testing to identify and fix memory leaks.",
       "priority": "low",
-      "estimated_time": "30-45 minutes",
+      "estimated_time": "1 hour",
       "files_to_modify": [
-        "src/db/telemetry.js",
-        "src/db/initIndexes.js"
+        "package.json"
       ],
       "implementation_steps": [
-        "Update initIndexes.js to create a TTL index on the telemetry collection (e.g., expireAfterSeconds: 604800 for 7 days).",
-        "Test index creation and document expiration locally.",
-        "Document the change in the developer README."
+        "Add clinic.js as a dev dependency.",
+        "Create npm scripts to run memory profiling (e.g., 'profile:memory').",
+        "Document usage in the developer guide."
+      ],
+      "complexity_score": 4
+    },
+    {
+      "id": "task_7",
+      "title": "Add sonar-project.properties and npm Scripts for SonarQube",
+      "description": "Configure SonarQube static analysis by adding a sonar-project.properties file and npm scripts for lint/test/typecheck/scan:sonar.",
+      "priority": "low",
+      "estimated_time": "30-60 minutes",
+      "files_to_modify": [
+        "sonar-project.properties",
+        "package.json"
+      ],
+      "implementation_steps": [
+        "Create sonar-project.properties with project metadata.",
+        "Add npm scripts for SonarQube analysis (e.g., 'scan:sonar').",
+        "Test the SonarQube scan locally."
       ],
       "complexity_score": 4
     }
   ],
   "next_research_topics": [
-    "Best practices for OpenTelemetry distributed tracing integration in Node.js",
-    "Efficient memory profiling with clinic.js for Node.js applications",
-    "Advanced analytics dashboard UX patterns for music discovery platforms"
+    "Circuit breaker pattern implementation for LLM provider failover",
+    "OpenTelemetry distributed tracing integration",
+    "TypeScript migration strategy for high-change modules"
   ],
   "completion_percentage": 75
 }

@@ -1,9 +1,9 @@
 
-# Task: Implement Circuit Breaker Pattern for Provider Failover
-# Description: Add a circuit breaker mechanism to the backend provider selection logic to automatically failover to alternate LLM providers when error rates or latency thresholds are exceeded.
-# Files to modify: ['src/providers/providerManager.js', 'src/providers/circuitBreaker.js', 'src/api/routes/providers.js']
+# Task: Add MongoDB Compound Indexes for Analytics Queries
+# Description: Implement compound indexes on MongoDB collections used for analytics to improve query performance. This is a research-derived task from the Perplexity sweep and does not require external dependencies.
+# Files to modify: ['src/analytics.js', 'src/insights.js']
 
-print("Implementing: Implement Circuit Breaker Pattern for Provider Failover")
+print("Implementing: Add MongoDB Compound Indexes for Analytics Queries")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
