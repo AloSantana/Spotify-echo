@@ -1,5 +1,13 @@
-// React is needed for JSX
+/**
+ * LLM Context - Modernized with new API infrastructure
+ * 
+ * Uses the centralized API client for HTTP operations
+ * Maintains EventSource for streaming functionality
+ * Includes proper loading states and error handling
+ */
+
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import apiClient from '../lib/api-client.js';
 
 const LLMContext = createContext();
 
@@ -20,11 +28,37 @@ export function LLMProvider({ children }) {
     azure: { name: 'Azure OpenAI', status: 'unknown', available: false },
     openrouter: { name: 'OpenRouter', status: 'unknown', available: false },
   });
-  const [loading, setLoading] = useState(false);
+  
+  // Loading states for each operation
+  const [loading, setLoading] = useState({
+    refreshProviders: false,
+    switchProvider: false,
+    sendMessage: false,
+    healthCheck: false,
+  });
+  
+  // Error states
+  const [errors, setErrors] = useState({
+    refreshProviders: null,
+    switchProvider: null,
+    sendMessage: null,
+    healthCheck: null,
+  });
 
-  useEffect(() => {
-    refreshProviders();
-  }, [refreshProviders]); // Add refreshProviders dependency
+  // Set loading state helper
+  const setOperationLoading = useCallback((operation, isLoading) => {
+    setLoading(prev => ({ ...prev, [operation]: isLoading }));
+  }, []);
+
+  // Set error state helper
+  const setOperationError = useCallback((operation, error) => {
+    setErrors(prev => ({ ...prev, [operation]: error }));
+  }, []);
+
+  // Clear specific error
+  const clearError = useCallback((operation) => {
+    setErrors(prev => ({ ...prev, [operation]: null }));
+  }, []);
 
   const mapProvidersFromUnified = (list) => {
     const updated = { ...providers };
@@ -43,37 +77,36 @@ export function LLMProvider({ children }) {
   };
 
   const refreshProviders = useCallback(async () => {
-    setLoading(true);
+    setOperationLoading('refreshProviders', true);
+    clearError('refreshProviders');
+    
     try {
-      // Try unified providers endpoint first
+      // Try unified providers endpoint first using apiClient
       let updatedProviders = null;
       try {
-        const res = await fetch('/api/providers');
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && Array.isArray(data.providers)) {
-            updatedProviders = mapProvidersFromUnified(data.providers);
-          }
+        const data = await apiClient.get('/api/providers');
+        if (data.success && Array.isArray(data.providers)) {
+          updatedProviders = mapProvidersFromUnified(data.providers);
         }
-      } catch {}
+      } catch (unifiedError) {
+        console.log('Unified endpoint not available, trying fallback');
+      }
 
       if (!updatedProviders) {
         // Fallback to chat providers endpoint
-        const response = await fetch('/api/chat/providers');
-        const data = await response.json();
+        const data = await apiClient.get('/api/chat/providers');
         if (data.success && Array.isArray(data.providers)) {
-          const copy = { ...providers };
+          updatedProviders = { ...providers };
           for (const p of data.providers) {
             const key = p.id;
-            if (!copy[key]) continue;
-            copy[key] = {
-              ...copy[key],
+            if (!updatedProviders[key]) continue;
+            updatedProviders[key] = {
+              ...updatedProviders[key],
               status: p.status,
               available: p.available,
               model: p.model,
             };
           }
-          updatedProviders = copy;
         }
       }
 
@@ -81,22 +114,33 @@ export function LLMProvider({ children }) {
         setProviders(updatedProviders);
         // Auto-select best available provider - prioritize Gemini first
         const providerPriority = ['gemini', 'openai', 'openrouter', 'mock'];
-        let selectedProvider = currentProvider;
-
-        if (!updatedProviders[currentProvider]?.available) {
-          selectedProvider =
-            providerPriority.find((key) => updatedProviders[key]?.available) || 'mock';
-        }
-        setCurrentProvider(selectedProvider);
+        
+        setCurrentProvider(current => {
+          if (!updatedProviders[current]?.available) {
+            return providerPriority.find((key) => updatedProviders[key]?.available) || 'mock';
+          }
+          return current;
+        });
       }
     } catch (error) {
       console.error('Failed to refresh providers:', error);
-      // Fallback to mock provider
+      
+      setOperationError('refreshProviders', {
+        message: 'Failed to refresh LLM providers',
+        details: error.message,
+        code: error.code || 'PROVIDER_REFRESH_FAILED'
+      });
+      
+      // Fallback to mock provider on error
       setCurrentProvider('mock');
     } finally {
-      setLoading(false);
+      setOperationLoading('refreshProviders', false);
     }
-  }, [providers, currentProvider]);
+  }, [setOperationLoading, setOperationError, clearError]); // Fixed dependencies
+
+  useEffect(() => {
+    refreshProviders();
+  }, []); // Only run on mount
 
   const switchProvider = async (providerId) => {
     if (!providers[providerId]?.available) {
@@ -104,32 +148,28 @@ export function LLMProvider({ children }) {
       return false;
     }
 
-    setLoading(true);
+    setOperationLoading('switchProvider', true);
+    clearError('switchProvider');
+
     try {
-      // Try unified switch endpoint first
-      const unified = await fetch('/api/providers/switch', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ provider: providerId }),
-      });
-      if (unified.ok) {
-        setCurrentProvider(providerId);
-        return true;
+      // Try unified switch endpoint first using apiClient
+      try {
+        const data = await apiClient.post('/api/providers/switch', { provider: providerId });
+        if (data.success) {
+          setCurrentProvider(providerId);
+          return true;
+        }
+      } catch (unifiedError) {
+        console.log('Unified switch endpoint not available, trying fallback');
       }
-    } catch {}
 
-    try {
       // Fallback: test provider via chat test endpoint
-      const response = await fetch('/api/chat/test', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: 'Hello',
-          provider: providerId,
-        }),
+      const data = await apiClient.post('/api/chat/test', {
+        message: 'Hello',
+        provider: providerId,
       });
 
-      if (response.ok) {
+      if (data.success || data.response) {
         setCurrentProvider(providerId);
         return true;
       } else {
@@ -137,9 +177,16 @@ export function LLMProvider({ children }) {
       }
     } catch (error) {
       console.error('Provider switch error:', error);
+      
+      setOperationError('switchProvider', {
+        message: `Failed to switch to ${providerId}`,
+        details: error.message,
+        code: error.code || 'PROVIDER_SWITCH_FAILED'
+      });
+      
       return false;
     } finally {
-      setLoading(false);
+      setOperationLoading('switchProvider', false);
     }
   };
 
@@ -155,21 +202,30 @@ export function LLMProvider({ children }) {
   // Poll provider health periodically
   useEffect(() => {
     const pollHealth = async () => {
+      setOperationLoading('healthCheck', true);
+      
       try {
-        const response = await fetch('/api/chat/providers/health');
-        if (response.ok) {
-          const data = await response.json();
+        const data = await apiClient.get('/api/chat/providers/health');
+        if (data.success || data.providers) {
           setProviderHealth(data.providers || {});
         }
       } catch (error) {
         console.error('Failed to poll provider health:', error);
+        
+        setOperationError('healthCheck', {
+          message: 'Health check failed',
+          details: error.message,
+          code: error.code || 'HEALTH_CHECK_FAILED'
+        });
+      } finally {
+        setOperationLoading('healthCheck', false);
       }
     };
 
     pollHealth(); // Initial poll
     const interval = setInterval(pollHealth, 30000); // Poll every 30 seconds
     return () => clearInterval(interval);
-  }, []);
+  }, [setOperationLoading, setOperationError]);
 
   const sendStreamingMessage = async (message, context = {}, onDelta, onComplete) => {
     if (!message.trim()) return null;
@@ -321,17 +377,16 @@ export function LLMProvider({ children }) {
       throw new Error(`Provider ${providerId} is not available`);
     }
 
+    setOperationLoading('switchProvider', true);
+    clearError('switchProvider');
+
     try {
-      const response = await fetch('/api/chat/providers/switch', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ provider: providerId, model }),
+      const data = await apiClient.post('/api/chat/providers/switch', { 
+        provider: providerId, 
+        model 
       });
 
-      if (response.ok) {
-        const data = await response.json();
+      if (data.success) {
         setCurrentProvider(providerId);
         
         // Update provider model if specified
@@ -351,12 +406,24 @@ export function LLMProvider({ children }) {
       }
     } catch (error) {
       console.error('Provider switch error:', error);
+      
+      setOperationError('switchProvider', {
+        message: `Failed to switch to ${providerId}`,
+        details: error.message,
+        code: error.code || 'PROVIDER_SWITCH_ENHANCED_FAILED'
+      });
+      
       throw error;
+    } finally {
+      setOperationLoading('switchProvider', false);
     }
   };
 
   const sendMessage = async (message, context = {}) => {
     if (!message.trim()) return null;
+
+    setOperationLoading('sendMessage', true);
+    clearError('sendMessage');
 
     try {
       const endpoint = context.isDemo ? '/api/chat/test' : '/api/chat';
@@ -367,17 +434,9 @@ export function LLMProvider({ children }) {
         ...context,
       };
 
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
+      const data = await apiClient.post(endpoint, requestBody);
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (data.success || data.response) {
         return {
           success: true,
           response: data.response || data.message,
@@ -389,38 +448,44 @@ export function LLMProvider({ children }) {
         // If provider fails, try fallback to mock
         if (currentProvider !== 'mock') {
           console.warn(`Provider ${currentProvider} failed, falling back to mock`);
-          const fallbackResponse = await fetch('/api/chat/test', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
+          
+          try {
+            const fallbackData = await apiClient.post('/api/chat/test', {
               message: message.trim(),
               provider: 'mock',
-            }),
-          });
+            });
 
-          if (fallbackResponse.ok) {
-            const fallbackData = await fallbackResponse.json();
-            setCurrentProvider('mock');
-            return {
-              success: true,
-              response: fallbackData.response,
-              provider: 'mock',
-              fallback: true,
-            };
+            if (fallbackData.success || fallbackData.response) {
+              setCurrentProvider('mock');
+              return {
+                success: true,
+                response: fallbackData.response,
+                provider: 'mock',
+                fallback: true,
+              };
+            }
+          } catch (fallbackError) {
+            console.error('Fallback to mock failed:', fallbackError);
           }
         }
 
-        return {
-          success: false,
-          error: data.message || 'Unknown error occurred',
-        };
+        throw new Error(data.message || 'Message send failed');
       }
     } catch (error) {
       console.error('Message send error:', error);
+      
+      setOperationError('sendMessage', {
+        message: 'Failed to send message',
+        details: error.message,
+        code: error.code || 'MESSAGE_SEND_FAILED'
+      });
+      
       return {
         success: false,
-        error: 'Connection error. Please check your internet connection.',
+        error: error.message || 'Connection error. Please check your internet connection.',
       };
+    } finally {
+      setOperationLoading('sendMessage', false);
     }
   };
 
@@ -432,20 +497,54 @@ export function LLMProvider({ children }) {
     return providers[providerId]?.available || false;
   };
 
+  // Helper to check if any operation is loading
+  const isLoading = useCallback((operation) => {
+    if (operation) {
+      return loading[operation] || false;
+    }
+    // Return true if any operation is loading
+    return Object.values(loading).some(Boolean);
+  }, [loading]);
+
+  // Get error for specific operation
+  const getError = useCallback((operation) => {
+    return errors[operation] || null;
+  }, [errors]);
+
+  // Clear all errors
+  const clearAllErrors = useCallback(() => {
+    setErrors({
+      refreshProviders: null,
+      switchProvider: null,
+      sendMessage: null,
+      healthCheck: null,
+    });
+  }, []);
+
   const value = {
+    // State
     currentProvider,
     providers,
     providerHealth,
     streamingState,
     loading,
+    errors,
+    
+    // Provider operations
     refreshProviders,
     switchProvider,
     switchProviderEnhanced,
     sendMessage,
     sendStreamingMessage,
     abortStream,
+    
+    // Helper functions
     getProviderStatus,
     isProviderAvailable,
+    isLoading,
+    getError,
+    clearError,
+    clearAllErrors,
   };
 
   return <LLMContext.Provider value={value}>{children}</LLMContext.Provider>;
