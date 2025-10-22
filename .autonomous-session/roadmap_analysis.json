@@ -2,131 +2,102 @@
   "actionable_tasks": [
     {
       "id": "task_1",
-      "title": "Add MongoDB Compound Indexes for Analytics Queries",
-      "description": "Create compound indexes in MongoDB to optimize analytics queries, as identified in the Perplexity research sweep. This will improve dashboard performance for frequently accessed data patterns.",
+      "title": "Implement Circuit Breaker Pattern for Provider Failover",
+      "description": "Add a circuit breaker mechanism to the backend provider selection logic to automatically failover to alternate LLM providers when error rates or latency exceed thresholds. This improves reliability and user experience during provider outages.",
       "priority": "high",
-      "estimated_time": "30-60 minutes",
+      "estimated_time": "60-90 minutes",
       "files_to_modify": [
-        "src/analytics.js",
-        "src/insights.js"
+        "src/providers/providerManager.js",
+        "src/providers/circuitBreaker.js",
+        "src/api/routes/providers.js"
       ],
       "implementation_steps": [
-        "Identify the most common query patterns in analytics.js and insights.js endpoints.",
-        "Define and create compound indexes in MongoDB for these patterns.",
-        "Test query performance before and after index creation.",
-        "Document the new indexes in the project configuration."
+        "Create a new module (circuitBreaker.js) implementing the circuit breaker logic (open/half-open/closed states, error/latency thresholds).",
+        "Integrate the circuit breaker into providerManager.js so that requests are routed to alternate providers when the primary is 'open'.",
+        "Update providers.js API endpoints to expose circuit breaker status for monitoring.",
+        "Add unit tests for failover scenarios."
+      ],
+      "complexity_score": 7
+    },
+    {
+      "id": "task_2",
+      "title": "Add Request Correlation IDs for End-to-End Tracing",
+      "description": "Attach unique correlation IDs to each incoming API request and propagate them through backend services for improved observability and debugging.",
+      "priority": "medium",
+      "estimated_time": "30-45 minutes",
+      "files_to_modify": [
+        "src/api/middleware/requestLogger.js",
+        "src/api/routes/*",
+        "src/utils/tracing.js"
+      ],
+      "implementation_steps": [
+        "Implement middleware to generate and attach a correlation ID to each request (e.g., using UUID).",
+        "Ensure the correlation ID is included in logs and passed to downstream services.",
+        "Update logging statements to include the correlation ID.",
+        "Test with sample requests to verify traceability."
       ],
       "complexity_score": 5
     },
     {
-      "id": "task_2",
-      "title": "Implement TTL Indexes for Telemetry Data Rotation",
-      "description": "Set up TTL (Time-To-Live) indexes in MongoDB to automatically expire old telemetry data, reducing storage overhead and maintaining performance.",
-      "priority": "high",
-      "estimated_time": "30-60 minutes",
-      "files_to_modify": [
-        "src/analytics.js"
-      ],
-      "implementation_steps": [
-        "Identify telemetry collections that accumulate over time.",
-        "Add TTL indexes to these collections with an appropriate expiration period.",
-        "Verify that old data is automatically removed.",
-        "Update documentation to reflect the new data retention policy."
-      ],
-      "complexity_score": 4
-    },
-    {
       "id": "task_3",
-      "title": "Add Response Streaming for Large Analytics Datasets",
-      "description": "Modify analytics endpoints to stream large datasets instead of loading them entirely into memory, improving scalability and reducing memory usage.",
-      "priority": "medium",
+      "title": "Expand Automated Test Coverage",
+      "description": "Increase the number of automated tests for core backend modules, focusing on recent changes and high-traffic endpoints to improve reliability and catch regressions early.",
+      "priority": "high",
       "estimated_time": "60-90 minutes",
       "files_to_modify": [
-        "src/analytics.js",
-        "src/insights.js"
+        "tests/api/providers.test.js",
+        "tests/api/chat.test.js",
+        "tests/api/musicDiscovery.test.js"
       ],
       "implementation_steps": [
-        "Identify endpoints returning large datasets.",
-        "Refactor these endpoints to use MongoDB's streaming cursors.",
-        "Update frontend code to handle streamed responses if necessary.",
-        "Test with large datasets to confirm memory and performance improvements."
+        "Identify endpoints and modules with low test coverage using coverage reports.",
+        "Write new unit and integration tests for uncovered logic, especially for provider switching and chat context features.",
+        "Run the test suite and verify all tests pass.",
+        "Update documentation with new test cases."
       ],
       "complexity_score": 6
     },
     {
       "id": "task_4",
-      "title": "Integrate Prometheus Metrics Export for Alerting",
-      "description": "Add Prometheus metrics export to backend services for real-time monitoring and alerting on system health and performance.",
+      "title": "Optimize Dockerfile for Multi-Stage Builds",
+      "description": "Refactor the existing Dockerfile to use multi-stage builds, reducing final image size and improving build caching for faster deployments.",
       "priority": "medium",
-      "estimated_time": "60-90 minutes",
+      "estimated_time": "45-60 minutes",
       "files_to_modify": [
-        "src/analytics.js",
-        "src/insights.js"
+        "Dockerfile",
+        "docker-compose.yml"
       ],
       "implementation_steps": [
-        "Install and configure the Prometheus client library for Node.js.",
-        "Instrument key endpoints and system metrics (e.g., request count, latency, error rate).",
-        "Expose a /metrics endpoint for Prometheus scraping.",
-        "Document the new monitoring setup."
-      ],
-      "complexity_score": 7
-    },
-    {
-      "id": "task_5",
-      "title": "Complete Spotify Authentication Interface",
-      "description": "Finish the frontend UI for Spotify OAuth authentication, ensuring a seamless user onboarding experience.",
-      "priority": "medium",
-      "estimated_time": "60-90 minutes",
-      "files_to_modify": [
-        "src/frontend/auth/SpotifyAuth.js"
-      ],
-      "implementation_steps": [
-        "Review existing authentication flow and identify missing UI elements.",
-        "Implement remaining UI components (e.g., login button, error handling, loading states).",
-        "Test the complete flow end-to-end.",
-        "Update documentation for the authentication process."
+        "Update Dockerfile to separate build and runtime stages (e.g., install dependencies, build app, copy to minimal runtime image).",
+        "Test the new Docker build locally and verify the image size reduction.",
+        "Update docker-compose.yml if necessary to use the optimized image.",
+        "Document the changes in the README."
       ],
       "complexity_score": 5
     },
     {
-      "id": "task_6",
-      "title": "Add npm Scripts for Lint/Test/Typecheck/Scan",
-      "description": "Add standardized npm scripts to package.json for linting, testing, type checking, and Sonar scanning to streamline developer workflows.",
+      "id": "task_5",
+      "title": "Implement MongoDB TTL Index for Telemetry Data Rotation",
+      "description": "Add a TTL (Time-To-Live) index to the MongoDB telemetry collection to automatically expire old telemetry documents, reducing storage usage and maintaining performance.",
       "priority": "medium",
-      "estimated_time": "30-60 minutes",
+      "estimated_time": "30-45 minutes",
       "files_to_modify": [
-        "package.json"
+        "src/db/telemetry.js",
+        "src/db/initIndexes.js"
       ],
       "implementation_steps": [
-        "Add scripts: 'lint', 'test', 'typecheck', 'scan:sonar'.",
-        "Configure each script to run the appropriate tool (ESLint, Jest, TypeScript, SonarScanner).",
-        "Test each script locally.",
-        "Update README with usage instructions."
-      ],
-      "complexity_score": 3
-    },
-    {
-      "id": "task_7",
-      "title": "Fix Roadmap Auto-Refresh Workflow Push Permissions",
-      "description": "Resolve CLI Agent permissions for the auto-refresh workflow to ensure ROADMAP_AUTO.md updates are pushed to the repository.",
-      "priority": "low",
-      "estimated_time": "30-60 minutes",
-      "files_to_modify": [
-        ".github/workflows/roadmap-refresh.yml"
-      ],
-      "implementation_steps": [
-        "Review GitHub Actions workflow for the auto-refresh job.",
-        "Ensure the workflow has write permissions to the repository.",
-        "Test the workflow end-to-end to confirm successful pushes.",
-        "Document the fix in the project configuration."
+        "Update the telemetry schema to include a timestamp field (if not present).",
+        "Add code to create a TTL index on the timestamp field (e.g., expire after 30 days).",
+        "Test by inserting sample telemetry data and verifying automatic expiration.",
+        "Document the TTL policy in the developer docs."
       ],
       "complexity_score": 4
     }
   ],
   "next_research_topics": [
-    "Circuit breaker pattern implementation for LLM provider failover",
-    "OpenTelemetry distributed tracing integration",
-    "Memory profiling with clinic.js"
+    "Best practices for OpenTelemetry distributed tracing integration in Node.js",
+    "Memory profiling with clinic.js for Node.js applications",
+    "Advanced analytics dashboard UX patterns for music discovery platforms"
   ],
   "completion_percentage": 75
 }

@@ -1,9 +1,9 @@
 
-# Task: Add MongoDB Compound Indexes for Analytics Queries
-# Description: Create compound indexes in MongoDB to optimize analytics queries, as identified in the Perplexity research sweep. This will improve dashboard performance for frequently accessed data patterns.
-# Files to modify: ['src/analytics.js', 'src/insights.js']
+# Task: Implement Circuit Breaker Pattern for Provider Failover
+# Description: Add a circuit breaker mechanism to the backend provider selection logic to automatically failover to alternate LLM providers when error rates or latency exceed thresholds. This improves reliability and user experience during provider outages.
+# Files to modify: ['src/providers/providerManager.js', 'src/providers/circuitBreaker.js', 'src/api/routes/providers.js']
 
-print("Implementing: Add MongoDB Compound Indexes for Analytics Queries")
+print("Implementing: Implement Circuit Breaker Pattern for Provider Failover")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
