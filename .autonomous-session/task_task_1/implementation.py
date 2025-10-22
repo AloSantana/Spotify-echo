@@ -1,6 +1,6 @@
 
 # Task: Add MongoDB Compound Indexes for Analytics Queries
-# Description: Implement compound indexes on MongoDB collections used for analytics to improve query performance. This is a research-derived task from the Perplexity sweep and does not require external dependencies.
+# Description: Create compound indexes in MongoDB to optimize analytics queries, as identified in the Perplexity research sweep. This will improve dashboard performance for frequently accessed data patterns.
 # Files to modify: ['src/analytics.js', 'src/insights.js']
 
 print("Implementing: Add MongoDB Compound Indexes for Analytics Queries")

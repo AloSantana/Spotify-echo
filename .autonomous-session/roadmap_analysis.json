@@ -3,119 +3,122 @@
     {
       "id": "task_1",
       "title": "Add MongoDB Compound Indexes for Analytics Queries",
-      "description": "Implement compound indexes on MongoDB collections used for analytics to improve query performance. This is a research-derived task from the Perplexity sweep and does not require external dependencies.",
+      "description": "Create compound indexes in MongoDB to optimize analytics queries, as identified in the Perplexity research sweep. This will improve dashboard performance for frequently accessed data patterns.",
       "priority": "high",
-      "estimated_time": "1-2 hours",
+      "estimated_time": "30-60 minutes",
       "files_to_modify": [
         "src/analytics.js",
         "src/insights.js"
       ],
       "implementation_steps": [
-        "Identify the most frequent and slow analytics queries in the codebase.",
-        "Design compound indexes in MongoDB to cover these query patterns.",
-        "Add index creation logic to the application startup or migration scripts.",
-        "Test query performance before and after index creation."
+        "Identify the most common query patterns in analytics.js and insights.js endpoints.",
+        "Define and create compound indexes in MongoDB for these patterns.",
+        "Test query performance before and after index creation.",
+        "Document the new indexes in the project configuration."
       ],
-      "complexity_score": 6
+      "complexity_score": 5
     },
     {
       "id": "task_2",
       "title": "Implement TTL Indexes for Telemetry Data Rotation",
-      "description": "Add TTL (Time-To-Live) indexes to MongoDB collections storing telemetry data to automatically expire old records, reducing storage overhead and improving query performance.",
+      "description": "Set up TTL (Time-To-Live) indexes in MongoDB to automatically expire old telemetry data, reducing storage overhead and maintaining performance.",
       "priority": "high",
       "estimated_time": "30-60 minutes",
       "files_to_modify": [
         "src/analytics.js"
       ],
       "implementation_steps": [
-        "Identify collections storing telemetry/analytics data.",
-        "Add TTL index creation logic (e.g., db.collection.createIndex({ createdAt: 1 }, { expireAfterSeconds: 2592000 })).",
-        "Test data expiration behavior."
+        "Identify telemetry collections that accumulate over time.",
+        "Add TTL indexes to these collections with an appropriate expiration period.",
+        "Verify that old data is automatically removed.",
+        "Update documentation to reflect the new data retention policy."
       ],
-      "complexity_score": 5
+      "complexity_score": 4
     },
     {
       "id": "task_3",
       "title": "Add Response Streaming for Large Analytics Datasets",
-      "description": "Modify analytics endpoints to stream large result sets instead of loading everything into memory at once, improving scalability and reducing memory usage.",
+      "description": "Modify analytics endpoints to stream large datasets instead of loading them entirely into memory, improving scalability and reducing memory usage.",
       "priority": "medium",
-      "estimated_time": "1-2 hours",
+      "estimated_time": "60-90 minutes",
       "files_to_modify": [
         "src/analytics.js",
         "src/insights.js"
       ],
       "implementation_steps": [
         "Identify endpoints returning large datasets.",
-        "Refactor these endpoints to use MongoDB cursor streaming or Node.js stream APIs.",
-        "Update frontend to handle streamed responses if necessary.",
-        "Test with large datasets to verify memory and performance improvements."
+        "Refactor these endpoints to use MongoDB's streaming cursors.",
+        "Update frontend code to handle streamed responses if necessary.",
+        "Test with large datasets to confirm memory and performance improvements."
       ],
-      "complexity_score": 7
+      "complexity_score": 6
     },
     {
       "id": "task_4",
-      "title": "Add Prometheus Metrics Export for Alerting",
-      "description": "Integrate Prometheus client library to expose backend metrics (e.g., request counts, error rates, latency) for monitoring and alerting.",
+      "title": "Integrate Prometheus Metrics Export for Alerting",
+      "description": "Add Prometheus metrics export to backend services for real-time monitoring and alerting on system health and performance.",
       "priority": "medium",
-      "estimated_time": "1-2 hours",
+      "estimated_time": "60-90 minutes",
       "files_to_modify": [
-        "src/api/routes/performance.js",
-        "src/middleware/metrics.js"
+        "src/analytics.js",
+        "src/insights.js"
       ],
       "implementation_steps": [
-        "Add Prometheus client library to the project.",
-        "Instrument key endpoints and services to collect metrics.",
-        "Expose a `/metrics` endpoint for Prometheus scraping.",
-        "Test metric collection and visualization in a monitoring dashboard."
+        "Install and configure the Prometheus client library for Node.js.",
+        "Instrument key endpoints and system metrics (e.g., request count, latency, error rate).",
+        "Expose a /metrics endpoint for Prometheus scraping.",
+        "Document the new monitoring setup."
       ],
       "complexity_score": 7
     },
     {
       "id": "task_5",
-      "title": "Complete Frontend Spotify Authentication Interface",
-      "description": "Finish the UI for Spotify OAuth authentication, ensuring a smooth user onboarding experience.",
+      "title": "Complete Spotify Authentication Interface",
+      "description": "Finish the frontend UI for Spotify OAuth authentication, ensuring a seamless user onboarding experience.",
       "priority": "medium",
-      "estimated_time": "1-2 hours",
+      "estimated_time": "60-90 minutes",
       "files_to_modify": [
-        "src/frontend/components/Auth/SpotifyAuth.js"
+        "src/frontend/auth/SpotifyAuth.js"
       ],
       "implementation_steps": [
-        "Review existing OAuth flow and identify missing UI elements.",
-        "Implement remaining UI components (e.g., login button, error states, loading indicators).",
-        "Test the authentication flow end-to-end."
+        "Review existing authentication flow and identify missing UI elements.",
+        "Implement remaining UI components (e.g., login button, error handling, loading states).",
+        "Test the complete flow end-to-end.",
+        "Update documentation for the authentication process."
       ],
       "complexity_score": 5
     },
     {
       "id": "task_6",
-      "title": "Add Memory Profiling with clinic.js",
-      "description": "Integrate clinic.js for memory profiling during development and testing to identify and fix memory leaks.",
-      "priority": "low",
-      "estimated_time": "1 hour",
+      "title": "Add npm Scripts for Lint/Test/Typecheck/Scan",
+      "description": "Add standardized npm scripts to package.json for linting, testing, type checking, and Sonar scanning to streamline developer workflows.",
+      "priority": "medium",
+      "estimated_time": "30-60 minutes",
       "files_to_modify": [
         "package.json"
       ],
       "implementation_steps": [
-        "Add clinic.js as a dev dependency.",
-        "Create npm scripts to run memory profiling (e.g., 'profile:memory').",
-        "Document usage in the developer guide."
+        "Add scripts: 'lint', 'test', 'typecheck', 'scan:sonar'.",
+        "Configure each script to run the appropriate tool (ESLint, Jest, TypeScript, SonarScanner).",
+        "Test each script locally.",
+        "Update README with usage instructions."
       ],
-      "complexity_score": 4
+      "complexity_score": 3
     },
     {
       "id": "task_7",
-      "title": "Add sonar-project.properties and npm Scripts for SonarQube",
-      "description": "Configure SonarQube static analysis by adding a sonar-project.properties file and npm scripts for lint/test/typecheck/scan:sonar.",
+      "title": "Fix Roadmap Auto-Refresh Workflow Push Permissions",
+      "description": "Resolve CLI Agent permissions for the auto-refresh workflow to ensure ROADMAP_AUTO.md updates are pushed to the repository.",
       "priority": "low",
       "estimated_time": "30-60 minutes",
       "files_to_modify": [
-        "sonar-project.properties",
-        "package.json"
+        ".github/workflows/roadmap-refresh.yml"
       ],
       "implementation_steps": [
-        "Create sonar-project.properties with project metadata.",
-        "Add npm scripts for SonarQube analysis (e.g., 'scan:sonar').",
-        "Test the SonarQube scan locally."
+        "Review GitHub Actions workflow for the auto-refresh job.",
+        "Ensure the workflow has write permissions to the repository.",
+        "Test the workflow end-to-end to confirm successful pushes.",
+        "Document the fix in the project configuration."
       ],
       "complexity_score": 4
     }
@@ -123,7 +126,7 @@
   "next_research_topics": [
     "Circuit breaker pattern implementation for LLM provider failover",
     "OpenTelemetry distributed tracing integration",
-    "TypeScript migration strategy for high-change modules"
+    "Memory profiling with clinic.js"
   ],
   "completion_percentage": 75
 }

@@ -5,20 +5,20 @@
       "task_id": "task_1",
       "title": "Add MongoDB Compound Indexes for Analytics Queries",
       "status": "attempted",
-      "complexity": 6
+      "complexity": 5
     },
     {
       "task_id": "task_2",
       "title": "Implement TTL Indexes for Telemetry Data Rotation",
       "status": "attempted",
-      "complexity": 5
+      "complexity": 4
     },
     {
       "task_id": "task_3",
       "title": "Add Response Streaming for Large Analytics Datasets",
       "status": "attempted",
-      "complexity": 7
+      "complexity": 6
     }
   ],
-  "timestamp": "Tue Oct 21 12:47:12 UTC 2025"
+  "timestamp": "Wed Oct 22 01:45:20 UTC 2025"
 }
