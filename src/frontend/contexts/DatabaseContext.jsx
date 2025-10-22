@@ -1,5 +1,12 @@
-// React is needed for JSX
-import { createContext, useContext, useState, useEffect } from 'react';
+/**
+ * Database Context - Modernized with new API infrastructure
+ * 
+ * Uses the centralized API client for all database operations
+ * Includes proper loading states and error handling
+ */
+
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import apiClient from '../lib/api-client.js';
 
 const DatabaseContext = createContext();
 
@@ -12,154 +19,321 @@ export const useDatabase = () => {
 };
 
 export function DatabaseProvider({ children }) {
+  // Connection status state
   const [connectionStatus, setConnectionStatus] = useState({
     mongodb: { connected: false, status: 'unknown' },
     sqlite: { connected: false, status: 'unknown' },
   });
   const [activeDatabases, setActiveDatabases] = useState([]);
   const [fallbackMode, setFallbackMode] = useState(false);
+  
+  // Loading states for each operation
+  const [loading, setLoading] = useState({
+    checkConnection: false,
+    initFallback: false,
+    saveUser: false,
+    saveHistory: false,
+    getRecommendations: false,
+    getAnalytics: false,
+  });
+  
+  // Error states
+  const [errors, setErrors] = useState({
+    checkConnection: null,
+    initFallback: null,
+    saveUser: null,
+    saveHistory: null,
+    getRecommendations: null,
+    getAnalytics: null,
+  });
 
-  useEffect(() => {
-    checkDatabaseConnections();
+  // Clear specific error
+  const clearError = useCallback((operation) => {
+    setErrors(prev => ({ ...prev, [operation]: null }));
   }, []);
 
-  const checkDatabaseConnections = async () => {
+  // Set loading state helper
+  const setOperationLoading = useCallback((operation, isLoading) => {
+    setLoading(prev => ({ ...prev, [operation]: isLoading }));
+  }, []);
+
+  // Set error state helper
+  const setOperationError = useCallback((operation, error) => {
+    setErrors(prev => ({ ...prev, [operation]: error }));
+  }, []);
+
+  // Check database connections
+  const checkDatabaseConnections = useCallback(async () => {
+    setOperationLoading('checkConnection', true);
+    clearError('checkConnection');
+
     try {
-      const response = await fetch('/api/database/status');
-      const data = await response.json();
+      const data = await apiClient.get('/api/database/status');
 
       if (data.success) {
         setConnectionStatus(data.connections);
         setActiveDatabases(data.active);
         setFallbackMode(data.fallbackMode);
+        return data;
       }
+      
+      // If success is false, handle as error
+      throw new Error(data.error || 'Failed to check database status');
     } catch (error) {
       console.error('Database status check failed:', error);
+      
+      // Set error for UI display
+      setOperationError('checkConnection', {
+        message: 'Unable to check database status',
+        details: error.message,
+        code: error.code || 'DB_CHECK_FAILED'
+      });
+      
       // Assume fallback mode if check fails
       setFallbackMode(true);
-      setConnectionStatus((prev) => ({
+      setConnectionStatus(prev => ({
         ...prev,
         sqlite: { connected: true, status: 'fallback' },
       }));
       setActiveDatabases(['sqlite']);
+      
+      return { success: false, error: error.message };
+    } finally {
+      setOperationLoading('checkConnection', false);
     }
-  };
+  }, [clearError, setOperationLoading, setOperationError]);
 
-  const initializeFallbackDatabase = async () => {
+  // Initialize on mount
+  useEffect(() => {
+    checkDatabaseConnections();
+  }, [checkDatabaseConnections]);
+
+  // Initialize fallback database
+  const initializeFallbackDatabase = useCallback(async () => {
+    setOperationLoading('initFallback', true);
+    clearError('initFallback');
+
     try {
-      const response = await fetch('/api/database/init-fallback', {
-        method: 'POST',
-      });
-
-      const data = await response.json();
+      const data = await apiClient.post('/api/database/init-fallback', {});
 
       if (data.success) {
         setFallbackMode(true);
-        setConnectionStatus((prev) => ({
+        setConnectionStatus(prev => ({
           ...prev,
           sqlite: { connected: true, status: 'active' },
         }));
         setActiveDatabases(['sqlite']);
-        return true;
+        return { success: true, data };
       }
 
-      return false;
+      throw new Error(data.error || 'Failed to initialize fallback database');
     } catch (error) {
       console.error('Fallback database initialization failed:', error);
-      return false;
-    }
-  };
-
-  const saveUserData = async (userData) => {
-    try {
-      const response = await fetch('/api/database/user', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
+      
+      setOperationError('initFallback', {
+        message: 'Failed to initialize fallback database',
+        details: error.message,
+        code: error.code || 'FALLBACK_INIT_FAILED'
       });
+      
+      return { success: false, error: error.message };
+    } finally {
+      setOperationLoading('initFallback', false);
+    }
+  }, [clearError, setOperationLoading, setOperationError]);
 
-      return await response.json();
+  // Save user data
+  const saveUserData = useCallback(async (userData) => {
+    setOperationLoading('saveUser', true);
+    clearError('saveUser');
+
+    try {
+      const data = await apiClient.post('/api/database/user', userData);
+      
+      if (data.success) {
+        return { success: true, data };
+      }
+      
+      throw new Error(data.error || 'Failed to save user data');
     } catch (error) {
       console.error('Save user data failed:', error);
-      return { success: false, error: error.message };
-    }
-  };
-
-  const saveListeningHistory = async (historyData) => {
-    try {
-      const response = await fetch('/api/database/listening-history', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(historyData),
+      
+      setOperationError('saveUser', {
+        message: 'Failed to save user data',
+        details: error.message,
+        code: error.code || 'USER_SAVE_FAILED'
       });
+      
+      return { success: false, error: error.message };
+    } finally {
+      setOperationLoading('saveUser', false);
+    }
+  }, [clearError, setOperationLoading, setOperationError]);
 
-      return await response.json();
+  // Save listening history
+  const saveListeningHistory = useCallback(async (historyData) => {
+    setOperationLoading('saveHistory', true);
+    clearError('saveHistory');
+
+    try {
+      const data = await apiClient.post('/api/database/listening-history', historyData);
+      
+      if (data.success) {
+        return { success: true, data };
+      }
+      
+      throw new Error(data.error || 'Failed to save listening history');
     } catch (error) {
       console.error('Save listening history failed:', error);
+      
+      setOperationError('saveHistory', {
+        message: 'Failed to save listening history',
+        details: error.message,
+        code: error.code || 'HISTORY_SAVE_FAILED'
+      });
+      
       return { success: false, error: error.message };
+    } finally {
+      setOperationLoading('saveHistory', false);
     }
-  };
+  }, [clearError, setOperationLoading, setOperationError]);
 
-  const getRecommendations = async (userId, options = {}) => {
+  // Get recommendations
+  const getRecommendations = useCallback(async (userId, options = {}) => {
+    setOperationLoading('getRecommendations', true);
+    clearError('getRecommendations');
+
     try {
       const queryParams = new URLSearchParams({
         userId,
         ...options,
       });
 
-      const response = await fetch(`/api/database/recommendations?${queryParams}`);
-      return await response.json();
+      const data = await apiClient.get(`/api/database/recommendations?${queryParams}`);
+      
+      if (data.success) {
+        return { success: true, data };
+      }
+      
+      throw new Error(data.error || 'Failed to get recommendations');
     } catch (error) {
       console.error('Get recommendations failed:', error);
-      return { success: false, error: error.message };
+      
+      setOperationError('getRecommendations', {
+        message: 'Failed to get recommendations',
+        details: error.message,
+        code: error.code || 'RECOMMENDATIONS_FAILED'
+      });
+      
+      return { success: false, error: error.message, recommendations: [] };
+    } finally {
+      setOperationLoading('getRecommendations', false);
     }
-  };
+  }, [clearError, setOperationLoading, setOperationError]);
 
-  const getAnalytics = async (userId, options = {}) => {
+  // Get analytics
+  const getAnalytics = useCallback(async (userId, options = {}) => {
+    setOperationLoading('getAnalytics', true);
+    clearError('getAnalytics');
+
     try {
       const queryParams = new URLSearchParams({
         userId,
         ...options,
       });
 
-      const response = await fetch(`/api/database/analytics?${queryParams}`);
-      return await response.json();
+      const data = await apiClient.get(`/api/database/analytics?${queryParams}`);
+      
+      if (data.success) {
+        return { success: true, data };
+      }
+      
+      throw new Error(data.error || 'Failed to get analytics');
     } catch (error) {
       console.error('Get analytics failed:', error);
-      return { success: false, error: error.message };
+      
+      setOperationError('getAnalytics', {
+        message: 'Failed to get analytics data',
+        details: error.message,
+        code: error.code || 'ANALYTICS_FAILED'
+      });
+      
+      return { success: false, error: error.message, analytics: null };
+    } finally {
+      setOperationLoading('getAnalytics', false);
     }
-  };
+  }, [clearError, setOperationLoading, setOperationError]);
 
-  const isConnected = (database) => {
+  // Helper functions
+  const isConnected = useCallback((database) => {
     return connectionStatus[database]?.connected || false;
-  };
+  }, [connectionStatus]);
 
-  const hasActiveDatabase = () => {
+  const hasActiveDatabase = useCallback(() => {
     return activeDatabases.length > 0;
-  };
+  }, [activeDatabases]);
 
-  const getActiveDatabase = () => {
+  const getActiveDatabase = useCallback(() => {
     return activeDatabases[0] || null;
-  };
+  }, [activeDatabases]);
+
+  // Check if any operation is loading
+  const isLoading = useCallback((operation) => {
+    if (operation) {
+      return loading[operation] || false;
+    }
+    // Return true if any operation is loading
+    return Object.values(loading).some(Boolean);
+  }, [loading]);
+
+  // Get error for specific operation
+  const getError = useCallback((operation) => {
+    return errors[operation] || null;
+  }, [errors]);
+
+  // Clear all errors
+  const clearAllErrors = useCallback(() => {
+    setErrors({
+      checkConnection: null,
+      initFallback: null,
+      saveUser: null,
+      saveHistory: null,
+      getRecommendations: null,
+      getAnalytics: null,
+    });
+  }, []);
 
   const value = {
+    // State
     connectionStatus,
     activeDatabases,
     fallbackMode,
+    loading,
+    errors,
+    
+    // Database operations
     checkDatabaseConnections,
     initializeFallbackDatabase,
     saveUserData,
     saveListeningHistory,
     getRecommendations,
     getAnalytics,
+    
+    // Helper functions
     isConnected,
     hasActiveDatabase,
     getActiveDatabase,
+    isLoading,
+    getError,
+    clearError,
+    clearAllErrors,
   };
 
   return <DatabaseContext.Provider value={value}>{children}</DatabaseContext.Provider>;
 }
+
+// Export everything for easy access
+export default {
+  DatabaseProvider,
+  useDatabase,
+};

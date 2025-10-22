@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Profiler } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './auth/AuthContext';
+import { AuthProvider } from '../contexts/AuthContext';
 import { SocketProvider } from './realtime/SocketContext';
 import { SpotifyPlayerProvider } from './player/SpotifyPlayerContext';
 import Header from './layout/Header';
@@ -13,6 +13,12 @@ import EnhancedAdvancedSettings from './EnhancedAdvancedSettings';
 import ComprehensiveSettingsPanel from './ComprehensiveSettingsPanel';
 import EnhancedSpotifyChatInterface from './EnhancedSpotifyChatInterface';
 import './App.css';
+import { ToastProvider } from '../contexts/ToastContext';
+import { DatabaseProvider } from '../contexts/DatabaseContext';
+import { GlobalLoadingProvider } from './GlobalLoadingIndicator';
+import ErrorBoundary from './ErrorBoundary';
+import ToastContainer from './ToastContainer';
+import { onRenderCallback } from '../lib/performance-profiler';
 
 /**
  * Main EchoTune AI Application Component
@@ -76,28 +82,38 @@ function App() {
 
   return (
     <Router>
-      <AuthProvider>
-        <SocketProvider>
-          <SpotifyPlayerProvider>
-            <div className="app">
-              <Header />
-
-              <main className="main-content">
-                <Routes>
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/chat" element={<EnhancedSpotifyChatInterface />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/playlists" element={<PlaylistManager />} />
-                  <Route path="/profile" element={<UserProfile />} />
-                  <Route path="/settings" element={<ComprehensiveSettingsPanel />} />
-                  <Route path="/settings/advanced" element={<EnhancedAdvancedSettings />} />
-                  <Route path="/chat/basic" element={<ChatInterface />} />
-                </Routes>
-              </main>
-            </div>
-          </SpotifyPlayerProvider>
-        </SocketProvider>
-      </AuthProvider>
+      <Profiler id="App" onRender={onRenderCallback}>
+        <AuthProvider>
+          <ToastProvider>
+            <GlobalLoadingProvider>
+              <DatabaseProvider>
+                <SocketProvider>
+                  <SpotifyPlayerProvider>
+                    <ErrorBoundary>
+                      <div className="app">
+                        <Header />
+                        <ToastContainer />
+                        <main className="main-content">
+                          <Routes>
+                            <Route path="/" element={<LandingPage />} />
+                            <Route path="/chat" element={<EnhancedSpotifyChatInterface />} />
+                            <Route path="/dashboard" element={<Dashboard />} />
+                            <Route path="/playlists" element={<PlaylistManager />} />
+                            <Route path="/profile" element={<UserProfile />} />
+                            <Route path="/settings" element={<ComprehensiveSettingsPanel />} />
+                            <Route path="/settings/advanced" element={<EnhancedAdvancedSettings />} />
+                            <Route path="/chat/basic" element={<ChatInterface />} />
+                          </Routes>
+                        </main>
+                      </div>
+                    </ErrorBoundary>
+                  </SpotifyPlayerProvider>
+                </SocketProvider>
+              </DatabaseProvider>
+            </GlobalLoadingProvider>
+          </ToastProvider>
+        </AuthProvider>
+      </Profiler>
     </Router>
   );
 }

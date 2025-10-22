@@ -121,6 +121,7 @@
     "node-fetch": "^2.7.0",
     "nodemon": "^3.0.1",
     "pino-pretty": "^11.0.0",
+    "react-devtools-profiler": "^0.0.0",
     "start-server-and-test": "^2.0.3",
     "wait-on": "^7.2.0"
   }

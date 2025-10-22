@@ -6,7 +6,7 @@
  * - Playlist management
  * - Playback controls
  * - User library operations
- * - Automatic rate limiting (7-second delay)
+ * - Automatic rate limiting to prevent API abuse
  * 
  * @module frontend/lib/hooks/useSpotify
  */
@@ -17,9 +17,9 @@ import apiClient from '../api-client';
 
 /**
  * Minimum delay between Spotify API requests (in ms)
- * User requirement: 7 seconds between requests
+ * Standard rate limiting to prevent API abuse
  */
-const SPOTIFY_REQUEST_DELAY = 7000;
+const SPOTIFY_REQUEST_DELAY = 100; // 100ms between requests for normal rate limiting
 
 /**
  * Rate limiter for Spotify requests
