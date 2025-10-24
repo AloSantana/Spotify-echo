@@ -1,0 +1,103 @@
+{
+  "name": "Comet Browser Automation Workflow",
+  "description": "Comprehensive browser testing and validation using Comet browser with MCP integration",
+  "version": "1.0.0",
+  "trigger": {
+    "manual": true,
+    "on_file_change": [
+      "src/frontend/**/*.jsx",
+      "src/frontend/**/*.js",
+      "public/**/*.html",
+      "src/styles/**/*.css"
+    ],
+    "on_pr": true
+  },
+  "yolo": true,
+  "settings": {
+    "max_duration": "20m",
+    "parallel_execution": true,
+    "auto_screenshot": true,
+    "performance_monitoring": true
+  },
+  "steps": [
+    {
+      "name": "Initialize MCP Servers",
+      "type": "mcp_call",
+      "server": "browser-automation",
+      "method": "initialize",
+      "params": {
+        "browser": "comet",
+        "config": {
+          "headless": false,
+          "viewport": { "width": 1920, "height": 1080 },
+          "timeout": 30000
+        }
+      }
+    },
+    {
+      "name": "Start Application",
+      "type": "command",
+      "command": "npm run start",
+      "background": true,
+      "wait_for": "http://localhost:3000/healthz"
+    },
+    {
+      "name": "Run Basic Navigation Tests",
+      "type": "script",
+      "script": "scripts/comet-navigation-tests.js",
+      "timeout": "5m"
+    },
+    {
+      "name": "Test Music Player Functionality",
+      "type": "script",
+      "script": "scripts/comet-music-player-tests.js",
+      "timeout": "7m"
+    },
+    {
+      "name": "Validate Recommendation Engine",
+      "type": "mcp_call",
+      "server": "perplexity-ask",
+      "method": "research",
+      "params": {
+        "query": "validate music recommendation UI patterns and best practices"
+      }
+    },
+    {
+      "name": "Performance Testing",
+      "type": "script",
+      "script": "scripts/comet-performance-tests.js",
+      "timeout": "5m"
+    },
+    {
+      "name": "Accessibility Validation",
+      "type": "script",
+      "script": "scripts/comet-a11y-tests.js",
+      "timeout": "3m"
+    },
+    {
+      "name": "Generate Test Report",
+      "type": "mcp_call",
+      "server": "analytics",
+      "method": "generateReport",
+      "params": {
+        "testType": "comet-browser",
+        "includeScreenshots": true,
+        "includePerformanceMetrics": true
+      }
+    }
+  ],
+  "error_handling": {
+    "screenshot_on_failure": true,
+    "continue_on_error": false,
+    "retry_count": 2,
+    "cleanup_commands": [
+      "pkill -f 'npm run start'",
+      "npm run comet:cleanup"
+    ]
+  },
+  "success_criteria": {
+    "min_test_pass_rate": 90,
+    "max_load_time": 3000,
+    "accessibility_score": 85
+  }
+}
