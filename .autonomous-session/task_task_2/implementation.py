@@ -1,7 +1,7 @@
 
 # Task: Add Request Correlation IDs for End-to-End Tracing
-# Description: Attach unique correlation IDs to each incoming API request and propagate them through backend services for improved observability and debugging.
-# Files to modify: ['src/api/middleware/requestLogger.js', 'src/api/routes/*', 'src/utils/tracing.js']
+# Description: Attach a unique correlation ID to each incoming request and propagate it through backend services for improved traceability and debugging.
+# Files to modify: ['src/api/middleware/requestLogger.js', 'src/api/routes/*', 'src/utils/correlationId.js']
 
 print("Implementing: Add Request Correlation IDs for End-to-End Tracing")
 

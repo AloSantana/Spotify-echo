@@ -1,7 +1,7 @@
 
 # Task: Expand Automated Test Coverage
-# Description: Increase the number of automated tests for core backend modules, focusing on recent changes and high-traffic endpoints to improve reliability and catch regressions early.
-# Files to modify: ['tests/api/providers.test.js', 'tests/api/chat.test.js', 'tests/api/musicDiscovery.test.js']
+# Description: Increase automated test coverage for critical backend modules, focusing on provider switching and chat pipeline logic.
+# Files to modify: ['tests/providers.test.js', 'tests/chatPipeline.test.js']
 
 print("Implementing: Expand Automated Test Coverage")
 
