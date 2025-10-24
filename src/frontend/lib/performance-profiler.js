@@ -1,16 +1,6 @@
-// src/frontend/lib/performance-profiler.js
-
 /**
- * A simple in-memory profiler to collect React component render data.
- * This is designed to be used with the React Profiler component.
- */
-
-let profilingData = [];
-let isProfiling = false;
-
-/**
- * The onRender callback for the React Profiler.
- * This function is called by React whenever a component within the profiled tree commits an update.
+ * React Profiler onRender callback function.
+ * Logs performance data to the console for analysis.
  *
  * @param {string} id - The "id" prop of the Profiler tree that has just committed.
  * @param {'mount' | 'update'} phase - Identifies if the tree has just been mounted or re-rendered.
@@ -18,9 +8,9 @@ let isProfiling = false;
  * @param {number} baseDuration - Estimated time to render the entire subtree without memoization.
  * @param {number} startTime - When React began rendering this update.
  * @param {number} commitTime - When React committed this update.
- * @param {Set<string>} interactions - The set of interactions that were being tracked when this update was scheduled.
+ * @param {Set<object>} interactions - The set of interactions belonging to this update.
  */
-export function onRenderCallback(
+export const onRenderCallback = (
   id,
   phase,
   actualDuration,
@@ -28,58 +18,21 @@ export function onRenderCallback(
   startTime,
   commitTime,
   interactions
-) {
-  if (isProfiling) {
-    profilingData.push({
-      id,
-      phase,
-      actualDuration,
-      baseDuration,
-      startTime,
-      commitTime,
-      interactions,
-    });
-  }
-}
-
-/**
- * Starts the profiling session.
- */
-export function startProfiling() {
-  profilingData = [];
-  isProfiling = true;
-  console.log('React performance profiling started.');
-}
-
-/**
- * Stops the profiling session.
- */
-export function stopProfiling() {
-  isProfiling = false;
-  console.log('React performance profiling stopped.');
-}
-
-/**
- * Returns the captured profiling data.
- * @returns {Array} The array of captured render data.
- */
-export function getProfilingData() {
-  return profilingData;
-}
-
-/**
- * Clears all captured profiling data.
- */
-export function clearProfilingData() {
-  profilingData = [];
-}
-
-// Expose controls on the window object for easy access from automation scripts
-if (process.env.NODE_ENV === 'development') {
-  window.__PERFORMANCE_PROFILER__ = {
-    startProfiling,
-    stopProfiling,
-    getProfilingData,
-    clearProfilingData,
+) => {
+  const performanceData = {
+    profilerId: id,
+    phase,
+    actualDuration: `${actualDuration.toFixed(2)}ms`,
+    baseDuration: `${baseDuration.toFixed(2)}ms`,
+    startTime: `${startTime.toFixed(2)}ms`,
+    commitTime: `${commitTime.toFixed(2)}ms`,
+    interactions: Array.from(interactions),
   };
-}
+
+  // Log performance data to the console for analysis
+  console.group(`Profiler [${id}]`);
+  console.log(`Phase: ${phase}`);
+  console.log(`Actual duration: ${performanceData.actualDuration}`);
+  console.log(`Base duration: ${performanceData.baseDuration}`);
+  console.groupEnd();
+};

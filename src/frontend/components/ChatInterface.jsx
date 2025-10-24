@@ -1,5 +1,4 @@
-// React is needed for JSX
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLLM } from '../contexts/LLMContext';
 import { useDatabase } from '../contexts/DatabaseContext';
@@ -15,7 +14,7 @@ import '../styles/ModernChatInterface.css';
  * Modern React-based Chat Interface
  * Sleek, minimalistic design with enhanced UX
  */
-function ChatInterface() {
+const ChatInterface = React.memo(() => {
   const { user } = useAuth();
   const { currentProvider, providers, sendMessage } = useLLM();
   const { hasActiveDatabase, fallbackMode } = useDatabase();
@@ -263,6 +262,6 @@ ${Object.values(providers)
       </div>
     </div>
   );
-}
+});
 
 export default ChatInterface;

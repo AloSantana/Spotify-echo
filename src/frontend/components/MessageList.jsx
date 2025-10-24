@@ -1,6 +1,6 @@
-// React is needed for JSX
+import React from 'react';
 
-function MessageList({ messages, isTyping, currentProvider }) {
+const MessageList = React.memo(({ messages, isTyping, currentProvider }) => {
   const formatMessage = (content) => {
     return content
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -38,9 +38,9 @@ function MessageList({ messages, isTyping, currentProvider }) {
       {isTyping && <TypingIndicator provider={currentProvider} />}
     </div>
   );
-}
+});
 
-function TypingIndicator({ provider }) {
+const TypingIndicator = React.memo(({ provider }) => {
   return (
     <div className="typing-indicator" id="typing-indicator">
       EchoTune is thinking
@@ -52,6 +52,6 @@ function TypingIndicator({ provider }) {
       {provider && <span className="typing-provider">via {provider}</span>}
     </div>
   );
-}
+});
 
 export default MessageList;
