@@ -83,7 +83,18 @@
     "e2e:full": "npm run e2e:chat-rec",
     "test:realdata": "npm run test -- tests/recommendation/integration/realData.test.js",
     "mcp:deploy:browserbase": "cd mcp-servers/browserbase && npm run deploy",
-    "mcp:logs": "cd mcp-servers && npm run logs"
+    "mcp:logs": "cd mcp-servers && npm run logs",
+    "comet:test": "node scripts/comet-browser-automation.js",
+    "comet:test:headless": "cross-env COMET_HEADLESS=true node scripts/comet-browser-automation.js",
+    "comet:test:record": "cross-env COMET_RECORDING=true node scripts/comet-browser-automation.js",
+    "comet:test:performance": "cross-env PERFORMANCE_MONITORING=true node scripts/comet-browser-automation.js",
+    "comet:test:accessibility": "cross-env A11Y_TESTING=true node scripts/comet-browser-automation.js",
+    "comet:test:full": "npm run comet:test && npm run comet:test:performance && npm run comet:test:accessibility",
+    "comet:cleanup": "rm -rf test-screenshots/* test-recordings/* test-reports/comet-*",
+    "automation:full": "npm run mcp:health:enhanced && npm run comet:test:full && npm run validate:live",
+    "automation:quick": "npm run comet:test:headless && npm run test:e2e:smoke",
+    "yolo:enable": "echo 'YOLO mode enhanced - check .cursor/rules/yolo.md for configuration'",
+    "yolo:test": "cross-env YOLO_MODE=true npm run automation:quick"
   },
   "keywords": [
     "music",
@@ -92,7 +103,10 @@
     "recommendations",
     "analytics",
     "machine-learning",
-    "conversational-ai"
+    "conversational-ai",
+    "browser-automation",
+    "comet",
+    "mcp-integration"
   ],
   "author": "",
   "license": "ISC",
