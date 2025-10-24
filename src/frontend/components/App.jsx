@@ -1,5 +1,8 @@
-import { useState, useEffect, Profiler, lazy, Suspense } from 'react';
+import { Profiler, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AppProvider, useAppState } from '../contexts/AppContext';
+import { DebugProvider } from '../contexts/DebugContext';
+import AppInitializer from './AppInitializer';
 import { AuthProvider } from '../contexts/AuthContext';
 import { UserPreferencesProvider } from '../contexts/UserPreferencesContext';
 import { SocketProvider } from './realtime/SocketContext';
@@ -24,49 +27,13 @@ import { DatabaseProvider } from '../contexts/DatabaseContext';
 import { GlobalLoadingProvider } from './GlobalLoadingIndicator';
 import ErrorBoundary from './ErrorBoundary';
 import ToastContainer from './ToastContainer';
+import DebugOverlay from './DebugOverlay';
 import { onRenderCallback } from '../lib/performance-profiler';
 
-/**
- * Main EchoTune AI Application Component
- *
- * Provides context providers for:
- * - Authentication (Spotify OAuth)
- * - Real-time communication (Socket.IO)
- * - Music player (Spotify Web Player SDK)
- *
- * Handles routing for different application views
- */
-function App() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+function AppContent() {
+  const { isInitializing, globalError } = useAppState();
 
-  useEffect(() => {
-    // Initialize application
-    const initializeApp = async () => {
-      try {
-        // Check authentication status
-        const _authStatus = localStorage.getItem('echotune_user');
-
-        // Initialize health check
-        const healthResponse = await fetch('/health');
-        const healthData = await healthResponse.json();
-
-        if (healthData.status === 'error') {
-          throw new Error('Application health check failed');
-        }
-
-        setIsLoading(false);
-      } catch (err) {
-        console.error('App initialization error:', err);
-        setError(err.message);
-        setIsLoading(false);
-      }
-    };
-
-    initializeApp();
-  }, []);
-
-  if (isLoading) {
+  if (isInitializing) {
     return (
       <div className="loading-screen">
         <div className="loading-spinner"></div>
@@ -76,55 +43,68 @@ function App() {
     );
   }
 
-  if (error) {
+  if (globalError) {
     return (
       <div className="error-screen">
         <h2>⚠️ Application Error</h2>
-        <p>{error}</p>
+        <p>{globalError}</p>
         <button onClick={() => window.location.reload()}>🔄 Retry</button>
       </div>
     );
   }
 
   return (
+    <div className="app">
+      <Header />
+      <ToastContainer />
+      {process.env.NODE_ENV === 'development' && <DebugOverlay />}
+      <main className="main-content">
+        <Suspense fallback={<SkeletonLoader />}>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/chat" element={<EnhancedSpotifyChatInterface />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/playlists" element={<PlaylistManager />} />
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/settings/advanced" element={<EnhancedAdvancedSettings />} />
+            <Route path="/chat/basic" element={<ChatInterface />} />
+            <Route path="/callback" element={<AuthCallback />} />
+            <Route path="/songs" element={<SongsPage />} />
+          </Routes>
+        </Suspense>
+      </main>
+    </div>
+  );
+}
+
+function App() {
+  return (
     <Router>
       <Profiler id="App" onRender={onRenderCallback}>
-        <AuthProvider>
-          <UserPreferencesProvider>
-            <ToastProvider>
-              <GlobalLoadingProvider>
-                <DatabaseProvider>
-                  <SocketProvider>
-                    <SpotifyPlayerProvider>
-                      <ErrorBoundary>
-                        <div className="app">
-                          <Header />
-                          <ToastContainer />
-                          <main className="main-content">
-                            <Suspense fallback={<SkeletonLoader />}>
-                              <Routes>
-                                <Route path="/" element={<LandingPage />} />
-                                <Route path="/chat" element={<EnhancedSpotifyChatInterface />} />
-                                <Route path="/dashboard" element={<Dashboard />} />
-                                <Route path="/playlists" element={<PlaylistManager />} />
-                                <Route path="/profile" element={<UserProfile />} />
-                                <Route path="/settings" element={<Settings />} />
-                                <Route path="/settings/advanced" element={<EnhancedAdvancedSettings />} />
-                                <Route path="/chat/basic" element={<ChatInterface />} />
-                                <Route path="/callback" element={<AuthCallback />} />
-                                <Route path="/songs" element={<SongsPage />} />
-                              </Routes>
-                            </Suspense>
-                          </main>
-                        </div>
-                      </ErrorBoundary>
-                    </SpotifyPlayerProvider>
-                  </SocketProvider>
-                </DatabaseProvider>
-              </GlobalLoadingProvider>
-            </ToastProvider>
-          </UserPreferencesProvider>
-        </AuthProvider>
+        <ErrorBoundary>
+          <AppProvider>
+            <DebugProvider>
+              <AppInitializer>
+                <AuthProvider>
+                <UserPreferencesProvider>
+                  <ToastProvider>
+                    <GlobalLoadingProvider>
+                      <DatabaseProvider>
+                        <SocketProvider>
+                          <SpotifyPlayerProvider>
+                            <AppContent />
+                          </SpotifyPlayerProvider>
+                        </SocketProvider>
+                      </DatabaseProvider>
+                    </GlobalLoadingProvider>
+                  </ToastProvider>
+                </UserPreferencesProvider>
+                </AuthProvider>
+              </AppInitializer>
+            </DebugProvider>
+          </AppProvider>
+        </ErrorBoundary>
       </Profiler>
     </Router>
   );
