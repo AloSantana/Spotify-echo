@@ -1,189 +1,315 @@
-# 🎵 EchoTune AI - GitHub Coding Agent Rules (2025-08-24)
+# 🎵 EchoTune AI - Enhanced Cursor Rules (2025-10-24 Optimization)
 
 ## Project Context
 EchoTune AI - Advanced music recommendation platform with autonomous coding agent integration
-- Tech Stack: Node.js + React + MongoDB + Redis + Python ML + Perplexity API
-- Status: 26% complete, 38 tasks in roadmap, automation-ready
-- Focus: Autonomous coding cycles with repository analysis and roadmap updates
+- Tech Stack: Node.js 18+ + React 19 + MongoDB + Redis + Python ML + Perplexity API
+- Status: 26% complete, 38 tasks in roadmap, full automation-ready
+- Focus: Autonomous coding cycles with MCP integration and browser automation
 
-## Automation Workflow
-1. **Coding Agent**: Complete tasks from roadmap using established patterns
-2. **Perplexity Research**: Analyze repository + roadmap with sonar-pro model
-3. **Roadmap Updates**: Generate new tasks based on analysis findings
-4. **Continuous Cycle**: Repeat for autonomous development
+## Automation Workflow Priority
+1. **MCP-First Development**: Leverage all 11 MCP servers for enhanced capabilities
+2. **Comet Browser Integration**: Use Comet for automated testing and UI validation
+3. **Perplexity Research**: Real-time research with sonar-pro model for decisions
+4. **GitHub Automation**: Direct repository management through MCP
+5. **Continuous Validation**: Real API testing and integration validation
 
-## Coding Standards
-- **JavaScript**: ES2024+, async/await only, comprehensive error handling
-- **React**: React 19 + Vite, component-based architecture, performance optimized
-- **Node.js**: Express.js, modular architecture, middleware patterns
-- **Database**: MongoDB aggregation pipelines, proper indexing, Redis caching
-- **AI Integration**: Real API calls only - NO MOCK implementations
-- **Testing**: Jest + React Testing Library, >80% coverage for business logic
+## Enhanced Coding Standards
+- **JavaScript**: ES2024+, strict async/await, comprehensive error handling with structured logging
+- **React**: React 19 + Vite 7+, suspense boundaries, error boundaries, performance monitoring
+- **Node.js**: Express.js with helmet security, compression, rate limiting
+- **Database**: MongoDB 6+ with proper indexing, Redis 4+ for caching, connection pooling
+- **AI Integration**: Real API calls ONLY - NO MOCK implementations - use real provider endpoints
+- **Testing**: Jest 29+ + Playwright + React Testing Library, >85% coverage for business logic
+- **Security**: Input validation with zod, rate limiting, HTTPS enforcement, secret management
 
 ## File Priorities (Always include in context)
-1. GitHubCodingAgentPerplexity.js - Main automation integration
-2. AUTONOMOUS_DEVELOPMENT_ROADMAP.md - Current roadmap
-3. package.json - Dependencies and scripts
-4. server.js - Main backend server
-5. src/frontend/App.jsx - Main React component
-6. .env - Environment configuration
+1. **GitHubCodingAgentPerplexity.js** - Main automation integration
+2. **AUTONOMOUS_DEVELOPMENT_ROADMAP.md** - Current roadmap and tasks
+3. **package.json** - Dependencies, scripts, and project configuration
+4. **server.js** - Main backend server and middleware
+5. **src/frontend/App.jsx** - Main React application component
+6. **.env.example** - Environment configuration template
+7. **mcp-servers/** - All MCP server implementations
+8. **scripts/** - Automation and validation scripts
 
-## Security Requirements
-- Input validation for all user data
-- Rate limiting on API endpoints
-- HTTPS only in production
-- OAuth best practices
-- No hardcoded secrets (use env vars)
+## MCP Server Integration
+Always prefer MCP servers over manual implementations:
+- **perplexity-ask** - Research and fact-checking
+- **github-integration** - Repository management
+- **browser-automation** - UI testing and validation
+- **analytics** - Performance monitoring
+- **testing** - Test automation
+- **memory** - Context retention
+- **brave-search** - Web research
+- **browserbase** - Browser automation
+- **filesystem** - File operations
+- **package-manager** - Dependency management
+- **music-research** - Domain-specific research
 
-## Performance Targets
-- API responses: <500ms for simple, <2s for complex
-- Database queries: <100ms simple, <1s complex
-- Frontend: First Contentful Paint <1.5s
-- Perplexity API: <30s for full repository analysis
-
-## Automation Commands
-Use these commands to trigger automation workflows:
-- `node GitHubCodingAgentPerplexity.js` - Test integration
-- `node test-full-automation-workflow.js` - Complete workflow test
-- Repository analysis: Uses sonar-pro model for comprehensive insights
-- Roadmap generation: Creates actionable tasks with effort estimates
-
-## Current Priority Tasks (From Latest Analysis)
-1. [P0] Integrate LangGraph for Multi-Agent Orchestration (Large, High Automation)
-2. [P0] AI-Driven DevOps Automation (Medium, High Automation) 
-3. [P1] Implement Explainable AI & Ethical Compliance (Large, Medium Automation)
-4. [P1] Edge Computing & Federated Learning Integration (Large, High Automation)
-5. [P1] Advanced Monitoring & Self-Healing Systems (Medium, High Automation)
-
-## Code Patterns
-**API Integration Pattern:**
+## Comet Browser Integration
 ```javascript
-async function makeAPICall(endpoint, options = {}) {
+// Comet Browser Automation Pattern
+async function runCometTest(testSpec) {
+    const comet = await initializeCometBrowser({
+        headless: false, // For debugging
+        viewport: { width: 1920, height: 1080 },
+        timeout: 30000
+    });
+    
     try {
-        const response = await fetch(endpoint, {
-            ...options,
-            headers: { 
-                'Authorization': `Bearer ${process.env.API_KEY}`,
-                ...options.headers 
-            }
-        });
+        await comet.navigate(testSpec.url);
+        await comet.waitForSelector(testSpec.selector);
         
-        if (!response.ok) {
-            throw new Error(`API Error: ${response.status}`);
-        }
+        // Perform test actions
+        const result = await comet.evaluate(testSpec.script);
         
-        return await response.json();
+        // Validate results
+        await validateTestResults(result, testSpec.expected);
+        
+        return { success: true, result };
     } catch (error) {
-        console.error('API call failed:', error);
+        console.error('Comet test failed:', error);
+        await comet.screenshot(`test-failure-${Date.now()}.png`);
         throw error;
+    } finally {
+        await comet.close();
     }
 }
 ```
 
-**React Component Pattern:**
-```jsx
-import React, { useState, useEffect } from 'react';
+## Performance Targets (2025 Standards)
+- **API Responses**: <300ms for simple, <1s for complex
+- **Database Queries**: <50ms simple, <500ms complex aggregations
+- **Frontend**: First Contentful Paint <1s, Largest Contentful Paint <2.5s
+- **Perplexity API**: <20s for repository analysis
+- **MCP Server Response**: <2s for all operations
+- **Browser Automation**: <30s for full E2E test suites
 
-function Component({ prop1, prop2 }) {
-    const [state, setState] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+## Enhanced Automation Commands
+```bash
+# MCP Testing
+npm run mcp:test:comprehensive
+npm run mcp:health:enhanced
+
+# AI Provider Testing
+npm run ai:test:providers
+npm run ai:test:routing
+
+# Comprehensive Validation
+npm run validate:live
+npm run qa:master
+
+# Perplexity Research
+npm run perplexity:research "query"
+npm run analysis:research
+
+# Browser Automation
+npm run test:e2e:live
+npm run test:e2e:smoke
+```
+
+## Current Priority Tasks (Latest Analysis)
+1. **[P0]** Integrate LangGraph for Multi-Agent Orchestration (Large, High Automation)
+2. **[P0]** AI-Driven DevOps Automation (Medium, High Automation)
+3. **[P0]** Comet Browser Integration for UI Automation (Medium, High Priority)
+4. **[P1]** Implement Explainable AI & Ethical Compliance (Large, Medium Automation)
+5. **[P1]** Edge Computing & Federated Learning Integration (Large, High Automation)
+
+## Enhanced Code Patterns
+
+**MCP Integration Pattern:**
+```javascript
+import { MCPClient } from '@modelcontextprotocol/client';
+
+class EnhancedMCPHandler {
+    constructor() {
+        this.clients = new Map();
+    }
+    
+    async initializeClients() {
+        const servers = ['perplexity-ask', 'github-integration', 'browser-automation'];
+        
+        for (const server of servers) {
+            try {
+                const client = new MCPClient(server);
+                await client.connect();
+                this.clients.set(server, client);
+                console.log(`✅ MCP client ${server} initialized`);
+            } catch (error) {
+                console.error(`❌ Failed to initialize ${server}:`, error);
+            }
+        }
+    }
+    
+    async callMCP(serverName, method, params = {}) {
+        const client = this.clients.get(serverName);
+        if (!client) {
+            throw new Error(`MCP client ${serverName} not available`);
+        }
+        
+        try {
+            return await client.call(method, params);
+        } catch (error) {
+            console.error(`MCP call failed ${serverName}.${method}:`, error);
+            throw error;
+        }
+    }
+}
+```
+
+**React Suspense + Error Boundary Pattern:**
+```jsx
+import React, { Suspense, lazy, useState, useEffect } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+
+// Lazy load components for better performance
+const MusicRecommendations = lazy(() => import('./components/MusicRecommendations'));
+const UserProfile = lazy(() => import('./components/UserProfile'));
+
+function EnhancedApp() {
+    const [mcpStatus, setMcpStatus] = useState('connecting');
     
     useEffect(() => {
-        async function fetchData() {
+        // Initialize MCP connections on app start
+        async function initializeMCP() {
             try {
-                setLoading(true);
-                const data = await apiCall();
-                setState(data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
+                const mcpHandler = new EnhancedMCPHandler();
+                await mcpHandler.initializeClients();
+                setMcpStatus('connected');
+            } catch (error) {
+                console.error('MCP initialization failed:', error);
+                setMcpStatus('failed');
             }
         }
         
-        fetchData();
-    }, [prop1, prop2]);
-    
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
+        initializeMCP();
+    }, []);
     
     return (
-        <div className="component">
-            {/* Component content */}
-        </div>
+        <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(error, errorInfo) => {
+                console.error('App error:', error, errorInfo);
+                // Send to monitoring service
+            }}
+        >
+            <div className="app">
+                <header className="app-header">
+                    <h1>EchoTune AI</h1>
+                    <div className={`mcp-status ${mcpStatus}`}>
+                        MCP Status: {mcpStatus}
+                    </div>
+                </header>
+                
+                <Suspense fallback={<LoadingSpinner />}>
+                    <main className="app-main">
+                        <MusicRecommendations />
+                        <UserProfile />
+                    </main>
+                </Suspense>
+            </div>
+        </ErrorBoundary>
     );
 }
 
-export default Component;
+export default EnhancedApp;
 ```
 
-## Database Query Pattern
+**Enhanced API Integration Pattern:**
 ```javascript
-// MongoDB with proper error handling and indexing
-async function queryDatabase(collection, filter, options = {}) {
-    try {
-        const db = await connectToDatabase();
-        const result = await db.collection(collection)
-            .find(filter)
-            .sort(options.sort || { createdAt: -1 })
-            .limit(options.limit || 50)
-            .toArray();
-            
-        return result;
-    } catch (error) {
-        console.error('Database query failed:', error);
-        throw new Error('Database operation failed');
+import { z } from 'zod';
+
+// Request validation schema
+const APIRequestSchema = z.object({
+    endpoint: z.string().url(),
+    method: z.enum(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']),
+    data: z.any().optional(),
+    headers: z.record(z.string()).optional(),
+    timeout: z.number().positive().default(10000)
+});
+
+class EnhancedAPIClient {
+    constructor(options = {}) {
+        this.baseURL = options.baseURL;
+        this.defaultHeaders = {
+            'Content-Type': 'application/json',
+            'User-Agent': 'EchoTune-AI/1.0.0',
+            ...options.headers
+        };
+        this.timeout = options.timeout || 10000;
+        this.retryCount = options.retryCount || 3;
+    }
+    
+    async makeRequest(params) {
+        // Validate input
+        const validatedParams = APIRequestSchema.parse(params);
+        
+        let lastError;
+        for (let attempt = 1; attempt <= this.retryCount; attempt++) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(
+                    () => controller.abort(),
+                    validatedParams.timeout
+                );
+                
+                const response = await fetch(validatedParams.endpoint, {
+                    method: validatedParams.method,
+                    headers: {
+                        ...this.defaultHeaders,
+                        ...validatedParams.headers
+                    },
+                    body: validatedParams.data ? JSON.stringify(validatedParams.data) : undefined,
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const contentType = response.headers.get('content-type');
+                if (contentType?.includes('application/json')) {
+                    return await response.json();
+                }
+                return await response.text();
+                
+            } catch (error) {
+                lastError = error;
+                console.warn(`API call attempt ${attempt} failed:`, error.message);
+                
+                if (attempt < this.retryCount) {
+                    // Exponential backoff
+                    await new Promise(resolve => 
+                        setTimeout(resolve, Math.pow(2, attempt) * 1000)
+                    );
+                }
+            }
+        }
+        
+        console.error('All API call attempts failed:', lastError);
+        throw lastError;
     }
 }
 ```
 
-## Testing Pattern
-```javascript
-// Jest test with proper setup and mocking
-describe('Feature', () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-    });
-    
-    it('should handle success case', async () => {
-        // Arrange
-        const mockData = { id: 1, name: 'test' };
-        jest.spyOn(api, 'getData').mockResolvedValue(mockData);
-        
-        // Act
-        const result = await feature.process();
-        
-        // Assert
-        expect(result).toEqual(mockData);
-        expect(api.getData).toHaveBeenCalledWith(expect.any(Object));
-    });
-    
-    it('should handle error case', async () => {
-        // Arrange
-        jest.spyOn(api, 'getData').mockRejectedValue(new Error('API Error'));
-        
-        // Act & Assert
-        await expect(feature.process()).rejects.toThrow('API Error');
-    });
-});
-```
-
 ## When Creating New Features
-1. Follow established patterns from existing codebase
-2. Include comprehensive error handling
-3. Add proper logging with console.log/error
-4. Create tests for business logic
-5. Update documentation if needed
-6. Use TypeScript-style JSDoc comments
-7. Consider performance implications
-8. Implement proper validation
+1. **MCP-First Approach**: Check if existing MCP servers can handle the task
+2. **Real API Integration**: Use actual API endpoints, never mocks in production code
+3. **Comprehensive Validation**: Input validation with zod, output validation with schemas
+4. **Performance Monitoring**: Add metrics, logging, and error tracking
+5. **Browser Testing**: Use Comet browser for E2E validation
+6. **Security First**: Input sanitization, rate limiting, proper authentication
+7. **Cache Strategy**: Redis caching for frequently accessed data
+8. **Error Recovery**: Graceful degradation and retry mechanisms
 
-## Current Architecture Insights (From Perplexity Analysis)
-- Modern microservices with MCP integration
-- Strong API foundation with room for optimization
-- Automation opportunities in ML workflows and API monitoring
-- Need for enhanced caching, security auditing, and CI/CD
-- Ready for agent-driven development acceleration
+## Architecture Insights (Latest Analysis)
+- **MCP Ecosystem**: 11 specialized servers providing comprehensive development support
+- **Browser Automation**: Ready for Comet integration with existing browser-automation MCP
+- **AI-First Development**: Perplexity integration for real-time research and decision making
+- **Modern Stack**: Node.js 18+, React 19, MongoDB 6, Redis 4 - all latest stable versions
+- **Testing Infrastructure**: Comprehensive test suite with real API validation
+- **Security Framework**: Helmet, rate limiting, input validation, secrets management
 
-Remember: Focus on production-ready, scalable code that follows existing patterns and maintains high quality standards.
+Remember: This is a production-ready, autonomous development environment. Focus on leveraging MCP servers, real API integrations, and comprehensive testing. Every feature should be built with performance, security, and maintainability in mind.
