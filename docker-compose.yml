@@ -1,76 +1,32 @@
-version: '3.9'
-
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        BUILD_SHA: ${BUILD_SHA:-dev}
-        BUILD_TIME: ${BUILD_TIME:-2025-01-01T00:00:00Z}
-    image: echotune-ai:latest
-    container_name: echotune-app
-    restart: unless-stopped
-    env_file:
-      - .env
-    environment:
-      NODE_ENV: production
-      PORT: ${PORT:-3000}
-      # Derived URLs commonly needed
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:${PORT:-3000}}
-      # Internal service URLs for app
-      REDIS_URL: ${REDIS_URL:-redis://:${REDIS_PASSWORD:-echotune_redis_pass}@redis:6379}
-      # Puppeteer configuration
-      PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium-browser
-      PUPPETEER_SKIP_DOWNLOAD: "true"
-      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+        BUILD_SHA: ${BUILD_SHA:-local}
+        BUILD_TIME: ${BUILD_TIME:-now}
+    image: spotify-echo:local
+    container_name: spotify-echo-app
     ports:
       - "${PORT:-3000}:3000"
-    depends_on:
-      - redis
-      # Uncomment to run local MongoDB
-      # - mongo
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      JWT_SECRET: ${JWT_SECRET:-dev-secret}
+      SESSION_SECRET: ${SESSION_SECRET:-dev-session}
+      ENABLE_MOCK_PROVIDER: ${ENABLE_MOCK_PROVIDER:-true}
+      DISABLE_REALTIME: ${DISABLE_REALTIME:-true}
+      ENABLE_TRACING: ${ENABLE_TRACING:-false}
+      ENABLE_AGENTOPS: ${ENABLE_AGENTOPS:-false}
+      PUPPETEER_SKIP_DOWNLOAD: "true"
+      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+    volumes:
+      - ./.env:/app/.env:ro
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/healthz"]
       interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    networks:
-      - echonet
-
-  mongo:
-    image: mongo:7
-    container_name: echotune-mongo
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE:-echotune_production}
-    volumes:
-      - mongo_data:/data/db
-    ports:
-      - "${MONGO_PORT:-27017}:27017"
-    networks:
-      - echonet
-
-  redis:
-    image: redis:7-alpine
-    container_name: echotune-redis
-    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:-echotune_redis_pass}"]
-    restart: unless-stopped
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-echotune_redis_pass}", "ping"]
-      interval: 30s
       timeout: 5s
       retries: 5
-    networks:
-      - echonet
-
-networks:
-  echonet:
-    driver: bridge
-
-volumes:
-  mongo_data:
-    driver: local
+    command: ["node", "server.js"]
