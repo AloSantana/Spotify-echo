@@ -4,9 +4,10 @@
  * Provides global toast notifications for the application
  * Supports success, error, warning, and info messages
  * Auto-dismisses with manual close option
+ * Optimized with split context pattern to minimize re-renders.
  */
 
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo } from 'react';
 
 // Toast types
 export const TOAST_TYPES = {
@@ -56,14 +57,27 @@ const TOAST_COLORS = {
   },
 };
 
-const ToastContext = createContext();
+const ToastStateContext = createContext();
+const ToastActionsContext = createContext();
 
-export const useToast = () => {
-  const context = useContext(ToastContext);
+export const useToastState = () => {
+  const context = useContext(ToastStateContext);
   if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
+    throw new Error('useToastState must be used within a ToastProvider');
   }
   return context;
+};
+
+export const useToastActions = () => {
+  const context = useContext(ToastActionsContext);
+  if (!context) {
+    throw new Error('useToastActions must be used within a ToastProvider');
+  }
+  return context;
+};
+
+export const useToast = () => {
+  return { ...useToastState(), ...useToastActions() };
 };
 
 export function ToastProvider({ children }) {
@@ -135,13 +149,16 @@ export function ToastProvider({ children }) {
     });
 
     // Find the toast and reset its timer
-    const toast = toasts.find(t => t.id === id);
-    if (toast && toast.autoDismiss && !toast.persistent) {
-      setTimeout(() => {
-        removeToast(id);
-      }, toast.duration);
-    }
-  }, [toasts, removeToast]);
+    setToasts(currentToasts => {
+      const toast = currentToasts.find(t => t.id === id);
+      if (toast && toast.autoDismiss && !toast.persistent) {
+        setTimeout(() => {
+          removeToast(id);
+        }, toast.duration);
+      }
+      return currentToasts;
+    });
+  }, [removeToast]);
 
   // Convenience methods for different toast types
   const success = useCallback((message, options) => {
@@ -177,43 +194,45 @@ export function ToastProvider({ children }) {
     return addToast(message, TOAST_TYPES.SUCCESS);
   }, [addToast]);
 
-  const value = {
-    // State
+  const stateValue = useMemo(() => ({
     toasts,
     pausedToasts,
-    
-    // Core methods
+    TOAST_TYPES,
+    TOAST_ICONS,
+    TOAST_COLORS,
+  }), [toasts, pausedToasts]);
+
+  const actionsValue = useMemo(() => ({
     addToast,
     removeToast,
     clearAllToasts,
     pauseToast,
     resumeToast,
-    
-    // Convenience methods
     success,
     error,
     warning,
     info,
-    
-    // API helpers
     showApiError,
     showApiSuccess,
-    
-    // Constants
-    TOAST_TYPES,
-    TOAST_ICONS,
-    TOAST_COLORS,
-  };
+  }), [
+    addToast,
+    removeToast,
+    clearAllToasts,
+    pauseToast,
+    resumeToast,
+    success,
+    error,
+    warning,
+    info,
+    showApiError,
+    showApiSuccess,
+  ]);
 
-  return <ToastContext.Provider value={value}>{children}</ToastContext.Provider>;
+  return (
+    <ToastStateContext.Provider value={stateValue}>
+      <ToastActionsContext.Provider value={actionsValue}>
+        {children}
+      </ToastActionsContext.Provider>
+    </ToastStateContext.Provider>
+  );
 }
-
-// Export everything for easy access
-export default {
-  ToastProvider,
-  useToast,
-  TOAST_TYPES,
-  TOAST_ICONS,
-  TOAST_COLORS,
-  TOAST_DURATIONS,
-};

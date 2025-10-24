@@ -4,19 +4,33 @@
  * Uses the centralized API client for HTTP operations
  * Maintains EventSource for streaming functionality
  * Includes proper loading states and error handling
+ * Optimized with split context pattern to minimize re-renders.
  */
 
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import apiClient from '../lib/api-client.js';
 
-const LLMContext = createContext();
+const LLMStateContext = createContext();
+const LLMActionsContext = createContext();
 
-export const useLLM = () => {
-  const context = useContext(LLMContext);
+export const useLLMState = () => {
+  const context = useContext(LLMStateContext);
   if (!context) {
-    throw new Error('useLLM must be used within an LLMProvider');
+    throw new Error('useLLMState must be used within an LLMProvider');
   }
   return context;
+};
+
+export const useLLMActions = () => {
+  const context = useContext(LLMActionsContext);
+  if (!context) {
+    throw new Error('useLLMActions must be used within an LLMProvider');
+  }
+  return context;
+};
+
+export const useLLM = () => {
+  return { ...useLLMState(), ...useLLMActions() };
 };
 
 export function LLMProvider({ children }) {
@@ -521,31 +535,65 @@ export function LLMProvider({ children }) {
     });
   }, []);
 
-  const value = {
-    // State
-    currentProvider,
-    providers,
-    providerHealth,
-    streamingState,
-    loading,
-    errors,
-    
-    // Provider operations
+  const stateValue = useMemo(() => {
+    const getProviderStatus = (providerId) => {
+      return providers[providerId]?.status || 'unknown';
+    };
+
+    const isProviderAvailable = (providerId) => {
+      return providers[providerId]?.available || false;
+    };
+
+    const isLoading = (operation) => {
+      if (operation) {
+        return loading[operation] || false;
+      }
+      return Object.values(loading).some(Boolean);
+    };
+
+    const getError = (operation) => {
+      return errors[operation] || null;
+    };
+
+    return {
+      currentProvider,
+      providers,
+      providerHealth,
+      streamingState,
+      loading,
+      errors,
+      getProviderStatus,
+      isProviderAvailable,
+      isLoading,
+      getError,
+    };
+  }, [currentProvider, providers, providerHealth, streamingState, loading, errors]);
+
+  const actionsValue = useMemo(() => ({
     refreshProviders,
     switchProvider,
     switchProviderEnhanced,
     sendMessage,
     sendStreamingMessage,
     abortStream,
-    
-    // Helper functions
-    getProviderStatus,
-    isProviderAvailable,
-    isLoading,
-    getError,
     clearError,
     clearAllErrors,
-  };
+  }), [
+    refreshProviders,
+    switchProvider,
+    switchProviderEnhanced,
+    sendMessage,
+    sendStreamingMessage,
+    abortStream,
+    clearError,
+    clearAllErrors,
+  ]);
 
-  return <LLMContext.Provider value={value}>{children}</LLMContext.Provider>;
+  return (
+    <LLMStateContext.Provider value={stateValue}>
+      <LLMActionsContext.Provider value={actionsValue}>
+        {children}
+      </LLMActionsContext.Provider>
+    </LLMStateContext.Provider>
+  );
 }

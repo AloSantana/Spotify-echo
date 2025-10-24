@@ -1,12 +1,11 @@
-// React is needed for JSX
-
+import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 /**
  * Header Component
  * Navigation and user information
  */
-function Header() {
+const Header = React.memo(() => {
   const { user, login, logout } = useAuth();
 
   return (
@@ -59,6 +58,6 @@ function Header() {
       </div>
     </header>
   );
-}
+});
 
 export default Header;

@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './styles/index.css';
+import { ProfiledApp } from '../../../scripts/profile-react-performance.jsx';
 
 // Performance monitoring (defer heavy work)
 if (process.env.NODE_ENV === 'production') {
@@ -91,11 +92,14 @@ class ErrorBoundary extends React.Component {
 
 // Initialize the React application
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+const AppToRender = process.env.NODE_ENV === 'development' ? ProfiledApp : App;
+
 root.render(
   React.createElement(
     React.StrictMode,
     null,
-    React.createElement(ErrorBoundary, null, React.createElement(App))
+    React.createElement(ErrorBoundary, null, React.createElement(AppToRender))
   )
 );
 

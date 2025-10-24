@@ -3,19 +3,33 @@
  * 
  * Uses the centralized API client for all database operations
  * Includes proper loading states and error handling
+ * Optimized with split context pattern to minimize re-renders.
  */
 
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import apiClient from '../lib/api-client.js';
 
-const DatabaseContext = createContext();
+const DatabaseStateContext = createContext();
+const DatabaseActionsContext = createContext();
 
-export const useDatabase = () => {
-  const context = useContext(DatabaseContext);
+export const useDatabaseState = () => {
+  const context = useContext(DatabaseStateContext);
   if (!context) {
-    throw new Error('useDatabase must be used within a DatabaseProvider');
+    throw new Error('useDatabaseState must be used within a DatabaseProvider');
   }
   return context;
+};
+
+export const useDatabaseActions = () => {
+  const context = useContext(DatabaseActionsContext);
+  if (!context) {
+    throw new Error('useDatabaseActions must be used within a DatabaseProvider');
+  }
+  return context;
+};
+
+export const useDatabase = () => {
+  return { ...useDatabaseState(), ...useDatabaseActions() };
 };
 
 export function DatabaseProvider({ children }) {
@@ -303,37 +317,69 @@ export function DatabaseProvider({ children }) {
     });
   }, []);
 
-  const value = {
-    // State
-    connectionStatus,
-    activeDatabases,
-    fallbackMode,
-    loading,
-    errors,
-    
-    // Database operations
+  const stateValue = useMemo(() => {
+    const isConnected = (database) => {
+      return connectionStatus[database]?.connected || false;
+    };
+
+    const hasActiveDatabase = () => {
+      return activeDatabases.length > 0;
+    };
+
+    const getActiveDatabase = () => {
+      return activeDatabases[0] || null;
+    };
+
+    const isLoading = (operation) => {
+      if (operation) {
+        return loading[operation] || false;
+      }
+      return Object.values(loading).some(Boolean);
+    };
+
+    const getError = (operation) => {
+      return errors[operation] || null;
+    };
+
+    return {
+      connectionStatus,
+      activeDatabases,
+      fallbackMode,
+      loading,
+      errors,
+      isConnected,
+      hasActiveDatabase,
+      getActiveDatabase,
+      isLoading,
+      getError,
+    };
+  }, [connectionStatus, activeDatabases, fallbackMode, loading, errors]);
+
+  const actionsValue = useMemo(() => ({
     checkDatabaseConnections,
     initializeFallbackDatabase,
     saveUserData,
     saveListeningHistory,
     getRecommendations,
     getAnalytics,
-    
-    // Helper functions
-    isConnected,
-    hasActiveDatabase,
-    getActiveDatabase,
-    isLoading,
-    getError,
     clearError,
     clearAllErrors,
-  };
+  }), [
+    checkDatabaseConnections,
+    initializeFallbackDatabase,
+    saveUserData,
+    saveListeningHistory,
+    getRecommendations,
+    getAnalytics,
+    clearError,
+    clearAllErrors,
+  ]);
 
-  return <DatabaseContext.Provider value={value}>{children}</DatabaseContext.Provider>;
+  return (
+    <DatabaseStateContext.Provider value={stateValue}>
+      <DatabaseActionsContext.Provider value={actionsValue}>
+        {children}
+      </DatabaseActionsContext.Provider>
+    </DatabaseStateContext.Provider>
+  );
 }
-
-// Export everything for easy access
-export default {
-  DatabaseProvider,
-  useDatabase,
-};

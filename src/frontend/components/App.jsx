@@ -1,17 +1,23 @@
-import { useState, useEffect, Profiler } from 'react';
+import { useState, useEffect, Profiler, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '../contexts/AuthContext';
+import { UserPreferencesProvider } from '../contexts/UserPreferencesContext';
 import { SocketProvider } from './realtime/SocketContext';
 import { SpotifyPlayerProvider } from './player/SpotifyPlayerContext';
 import Header from './layout/Header';
-import ChatInterface from './chat/ChatInterface';
-import Dashboard from './dashboard/Dashboard';
-import PlaylistManager from './playlists/PlaylistManager';
-import UserProfile from './profile/UserProfile';
-import LandingPage from './pages/LandingPage';
-import EnhancedAdvancedSettings from './EnhancedAdvancedSettings';
-import ComprehensiveSettingsPanel from './ComprehensiveSettingsPanel';
-import EnhancedSpotifyChatInterface from './EnhancedSpotifyChatInterface';
+import SkeletonLoader from './SkeletonLoader';
+
+const Dashboard = lazy(() => import('../routes/Dashboard'));
+const PlaylistManager = lazy(() => import('../routes/PlaylistsPage'));
+const UserProfile = lazy(() => import('../routes/UserProfile'));
+const Settings = lazy(() => import('../routes/Settings'));
+const AuthCallback = lazy(() => import('../routes/AuthCallback'));
+const SongsPage = lazy(() => import('../routes/SongsPage'));
+const LandingPage = lazy(() => import('../routes/LandingPage'));
+const EnhancedAdvancedSettings = lazy(() => import('../routes/EnhancedAdvancedSettings'));
+const EnhancedSpotifyChatInterface = lazy(() => import('../routes/EnhancedSpotifyChatInterface'));
+const ChatInterface = lazy(() => import('./chat/ChatInterface'));
+
 import './App.css';
 import { ToastProvider } from '../contexts/ToastContext';
 import { DatabaseProvider } from '../contexts/DatabaseContext';
@@ -84,34 +90,40 @@ function App() {
     <Router>
       <Profiler id="App" onRender={onRenderCallback}>
         <AuthProvider>
-          <ToastProvider>
-            <GlobalLoadingProvider>
-              <DatabaseProvider>
-                <SocketProvider>
-                  <SpotifyPlayerProvider>
-                    <ErrorBoundary>
-                      <div className="app">
-                        <Header />
-                        <ToastContainer />
-                        <main className="main-content">
-                          <Routes>
-                            <Route path="/" element={<LandingPage />} />
-                            <Route path="/chat" element={<EnhancedSpotifyChatInterface />} />
-                            <Route path="/dashboard" element={<Dashboard />} />
-                            <Route path="/playlists" element={<PlaylistManager />} />
-                            <Route path="/profile" element={<UserProfile />} />
-                            <Route path="/settings" element={<ComprehensiveSettingsPanel />} />
-                            <Route path="/settings/advanced" element={<EnhancedAdvancedSettings />} />
-                            <Route path="/chat/basic" element={<ChatInterface />} />
-                          </Routes>
-                        </main>
-                      </div>
-                    </ErrorBoundary>
-                  </SpotifyPlayerProvider>
-                </SocketProvider>
-              </DatabaseProvider>
-            </GlobalLoadingProvider>
-          </ToastProvider>
+          <UserPreferencesProvider>
+            <ToastProvider>
+              <GlobalLoadingProvider>
+                <DatabaseProvider>
+                  <SocketProvider>
+                    <SpotifyPlayerProvider>
+                      <ErrorBoundary>
+                        <div className="app">
+                          <Header />
+                          <ToastContainer />
+                          <main className="main-content">
+                            <Suspense fallback={<SkeletonLoader />}>
+                              <Routes>
+                                <Route path="/" element={<LandingPage />} />
+                                <Route path="/chat" element={<EnhancedSpotifyChatInterface />} />
+                                <Route path="/dashboard" element={<Dashboard />} />
+                                <Route path="/playlists" element={<PlaylistManager />} />
+                                <Route path="/profile" element={<UserProfile />} />
+                                <Route path="/settings" element={<Settings />} />
+                                <Route path="/settings/advanced" element={<EnhancedAdvancedSettings />} />
+                                <Route path="/chat/basic" element={<ChatInterface />} />
+                                <Route path="/callback" element={<AuthCallback />} />
+                                <Route path="/songs" element={<SongsPage />} />
+                              </Routes>
+                            </Suspense>
+                          </main>
+                        </div>
+                      </ErrorBoundary>
+                    </SpotifyPlayerProvider>
+                  </SocketProvider>
+                </DatabaseProvider>
+              </GlobalLoadingProvider>
+            </ToastProvider>
+          </UserPreferencesProvider>
         </AuthProvider>
       </Profiler>
     </Router>

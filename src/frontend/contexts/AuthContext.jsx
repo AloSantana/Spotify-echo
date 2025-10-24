@@ -3,19 +3,33 @@
  * 
  * Uses the centralized API client for all authentication operations
  * Includes proper loading states and error handling
+ * Optimized with split context pattern to minimize re-renders.
  */
 
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import apiClient from '../lib/api-client.js';
 
-const AuthContext = createContext();
+const AuthStateContext = createContext();
+const AuthActionsContext = createContext();
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
+export const useAuthState = () => {
+  const context = useContext(AuthStateContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useAuthState must be used within an AuthProvider');
   }
   return context;
+};
+
+export const useAuthActions = () => {
+  const context = useContext(AuthActionsContext);
+  if (!context) {
+    throw new Error('useAuthActions must be used within an AuthProvider');
+  }
+  return context;
+};
+
+export const useAuth = () => {
+  return { ...useAuthState(), ...useAuthActions() };
 };
 
 export function AuthProvider({ children }) {
@@ -53,6 +67,17 @@ export function AuthProvider({ children }) {
   // Clear specific error
   const clearError = useCallback((operation) => {
     setErrors(prev => ({ ...prev, [operation]: null }));
+  }, []);
+
+  // Clear all auth data
+  const clearAuth = useCallback(() => {
+    setUser(null);
+    setAccessToken(null);
+    setRefreshToken(null);
+    localStorage.removeItem('echotune_user');
+    localStorage.removeItem('echotune_token');
+    localStorage.removeItem('echotune_refresh_token');
+    apiClient.setAuthToken(null);
   }, []);
 
   // Check authentication status
@@ -121,18 +146,7 @@ export function AuthProvider({ children }) {
       setOperationLoading('initial', false);
       setOperationLoading('checkStatus', false);
     }
-  }, [setOperationLoading, setOperationError, clearError]);
-
-  // Clear all auth data
-  const clearAuth = useCallback(() => {
-    setUser(null);
-    setAccessToken(null);
-    setRefreshToken(null);
-    localStorage.removeItem('echotune_user');
-    localStorage.removeItem('echotune_token');
-    localStorage.removeItem('echotune_refresh_token');
-    apiClient.setAuthToken(null);
-  }, []);
+  }, [setOperationLoading, setOperationError, clearAuth]);
 
   // Initialize on mount
   useEffect(() => {
@@ -239,23 +253,6 @@ export function AuthProvider({ children }) {
     }
   }, [refreshToken, setOperationLoading, setOperationError, clearError, clearAuth]);
 
-  // Helper functions
-  const isAuthenticated = useCallback(() => {
-    return !!user && !!accessToken;
-  }, [user, accessToken]);
-
-  const isLoading = useCallback((operation) => {
-    if (operation) {
-      return loading[operation] || false;
-    }
-    // Return true if any operation is loading
-    return Object.values(loading).some(Boolean);
-  }, [loading]);
-
-  const getError = useCallback((operation) => {
-    return errors[operation] || null;
-  }, [errors]);
-
   const clearAllErrors = useCallback(() => {
     setErrors({
       login: null,
@@ -265,33 +262,53 @@ export function AuthProvider({ children }) {
     });
   }, []);
 
-  const value = {
-    // State
-    user,
-    accessToken,
-    refreshToken,
-    loading,
-    errors,
-    
-    // Auth operations
+  const stateValue = useMemo(() => {
+    const isAuthenticated = !!user && !!accessToken;
+
+    const isLoading = (operation) => {
+      if (operation) {
+        return loading[operation] || false;
+      }
+      return Object.values(loading).some(Boolean);
+    };
+
+    const getError = (operation) => {
+      return errors[operation] || null;
+    };
+
+    return {
+      user,
+      accessToken,
+      refreshToken,
+      loading,
+      errors,
+      isAuthenticated,
+      isLoading,
+      getError,
+    };
+  }, [user, accessToken, refreshToken, loading, errors]);
+
+  const actionsValue = useMemo(() => ({
     login,
     logout,
     checkAuthStatus,
     refreshAccessToken,
-    
-    // Helper functions
-    isAuthenticated,
-    isLoading,
-    getError,
     clearError,
     clearAllErrors,
-  };
+  }), [
+    login,
+    logout,
+    checkAuthStatus,
+    refreshAccessToken,
+    clearError,
+    clearAllErrors
+  ]);
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthStateContext.Provider value={stateValue}>
+      <AuthActionsContext.Provider value={actionsValue}>
+        {children}
+      </AuthActionsContext.Provider>
+    </AuthStateContext.Provider>
+  );
 }
-
-// Export everything for easy access
-export default {
-  AuthProvider,
-  useAuth,
-};
