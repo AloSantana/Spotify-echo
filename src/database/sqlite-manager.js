@@ -541,7 +541,8 @@ class SQLiteManager {
           VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
 
-        for (const record of localFileDb.listeningHistory.slice(0, 1000)) { // Limit to 1000 for performance
+        // Import ALL listening history - no limits
+        for (const record of localFileDb.listeningHistory) {
           try {
             await this.runQuery(insertQuery, [
               'default_user',
