@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  # Main application service for testing
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_SHA: ${BUILD_SHA:-test}
+        BUILD_TIME: ${BUILD_TIME:-now}
+    image: spotify-echo:test
+    container_name: spotify-echo-test-app
+    ports:
+      - "3000:3000"
+      - "8080:8080"
+    environment:
+      NODE_ENV: test
+      PORT: 3000
+      # Database
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/echotune_test}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      # JWT & Session
+      JWT_SECRET: ${JWT_SECRET:-test-jwt-secret}
+      SESSION_SECRET: ${SESSION_SECRET:-test-session-secret}
+      # Spotify (using real .env values)
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+      SPOTIFY_REDIRECT_URI: ${SPOTIFY_REDIRECT_URI:-http://localhost:3000/callback}
+      # AI Providers (optional for testing)
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      # Testing flags
+      ENABLE_MOCK_PROVIDER: "false"
+      DISABLE_REALTIME: "false"
+      PUPPETEER_SKIP_DOWNLOAD: "true"
+      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+    volumes:
+      - ./data:/app/data
+      - test-screenshots:/app/test-screenshots
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health/simple"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - test-network
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: spotify-echo-test-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - test-network
+
+  # E2E test runner service
+  e2e-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    image: spotify-echo:e2e-tests
+    container_name: spotify-echo-e2e-runner
+    environment:
+      BASE_URL: http://app:3000
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "0"
+      # Pass through Spotify credentials for OAuth tests
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+      SPOTIFY_REDIRECT_URI: ${SPOTIFY_REDIRECT_URI:-http://localhost:3000/callback}
+    volumes:
+      - ./tests:/app/tests
+      - ./playwright.config.mjs:/app/playwright.config.mjs
+      - test-screenshots:/app/test-screenshots
+      - test-reports:/app/playwright-report
+    depends_on:
+      app:
+        condition: service_healthy
+    command: ["npx", "playwright", "test", "--project=desktop-chromium"]
+    networks:
+      - test-network
+
+volumes:
+  test-screenshots:
+  test-reports:
+
+networks:
+  test-network:
+    driver: bridge
