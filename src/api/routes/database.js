@@ -1,11 +1,41 @@
 const express = require('express');
 const router = express.Router();
 const databaseManager = require('../../database/database-manager');
+const dbService = require('../../database/database-service');
 
 /**
  * Database API Routes
  * Provides endpoints for database operations and status monitoring
+ * Seamless integration for frontend database access
  */
+
+// Rate limiting middleware for database operations
+const rateLimit = (max = 100, windowMs = 60000) => {
+  const requests = new Map();
+  return (req, res, next) => {
+    const userId = req.user?.id || req.ip;
+    const now = Date.now();
+    const userRequests = requests.get(userId) || [];
+    
+    // Clean old requests
+    const recentRequests = userRequests.filter(time => now - time < windowMs);
+    
+    if (recentRequests.length >= max) {
+      return res.status(429).json({
+        success: false,
+        error: 'Too many requests',
+        message: `Rate limit exceeded. Maximum ${max} requests per ${windowMs/1000} seconds.`
+      });
+    }
+    
+    recentRequests.push(now);
+    requests.set(userId, recentRequests);
+    next();
+  };
+};
+
+// Apply rate limiting
+router.use(rateLimit(100, 60000)); // 100 requests per minute
 
 /**
  * Get database connection status
@@ -16,8 +46,10 @@ router.get('/status', async (req, res) => {
 
     res.json({
       success: true,
-      ...healthStatus,
-      timestamp: new Date().toISOString(),
+      data: {
+        ...healthStatus,
+        timestamp: new Date().toISOString()
+      }
     });
   } catch (error) {
     console.error('Database status check error:', error);
@@ -25,6 +57,232 @@ router.get('/status', async (req, res) => {
       success: false,
       error: 'Failed to check database status',
       details: error.message,
+    });
+  }
+});
+
+/**
+ * Get database info and statistics
+ */
+router.get('/info', async (req, res) => {
+  try {
+    const info = await dbService.getInfo();
+
+    res.json({
+      success: true,
+      data: info
+    });
+  } catch (error) {
+    console.error('Database info error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get database info',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Get list of available collections
+ */
+router.get('/collections', async (req, res) => {
+  try {
+    const db = dbService.getDatabase();
+    const collections = ['listening_history', 'tracks', 'users', 'recommendations', 'playlists', 'user_settings'];
+    
+    // Get counts for each collection
+    const collectionsInfo = await Promise.all(
+      collections.map(async (name) => {
+        try {
+          const count = await dbService.count(name);
+          return { name, count, available: true };
+        } catch (error) {
+          return { name, count: 0, available: false };
+        }
+      })
+    );
+
+    res.json({
+      success: true,
+      data: collectionsInfo
+    });
+  } catch (error) {
+    console.error('Get collections error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get collections',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Get collection data (paginated)
+ */
+router.get('/collections/:name', async (req, res) => {
+  try {
+    const { name } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = Math.min(parseInt(req.query.limit) || 20, 100); // Max 100 per page
+    const skip = (page - 1) * limit;
+
+    // Parse sort parameter
+    let sort = { _id: 1 };
+    if (req.query.sort) {
+      try {
+        sort = JSON.parse(req.query.sort);
+      } catch (e) {
+        // Invalid sort, use default
+      }
+    }
+
+    // Parse filter parameter
+    let query = {};
+    if (req.query.filter) {
+      try {
+        query = JSON.parse(req.query.filter);
+      } catch (e) {
+        // Invalid filter, use empty query
+      }
+    }
+
+    const [documents, total] = await Promise.all([
+      dbService.find(name, query, { skip, limit, sort }),
+      dbService.count(name, query)
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        documents,
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit)
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Get collection data error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get collection data',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Query a specific collection (find)
+ */
+router.post('/collections/:name/find', async (req, res) => {
+  try {
+    const { name } = req.params;
+    const { query = {}, options = {} } = req.body;
+
+    // Limit max results
+    if (!options.limit || options.limit > 1000) {
+      options.limit = 1000;
+    }
+
+    const documents = await dbService.find(name, query, options);
+
+    res.json({
+      success: true,
+      data: documents
+    });
+  } catch (error) {
+    console.error('Query collection error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to query collection',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Execute aggregation pipeline on a collection
+ */
+router.post('/collections/:name/aggregate', async (req, res) => {
+  try {
+    const { name } = req.params;
+    const { pipeline } = req.body;
+
+    if (!Array.isArray(pipeline)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Pipeline must be an array'
+      });
+    }
+
+    const results = await dbService.aggregate(name, pipeline);
+
+    res.json({
+      success: true,
+      data: results
+    });
+  } catch (error) {
+    console.error('Aggregation error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to execute aggregation',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Get personalized recommendations
+ */
+router.post('/recommendations', async (req, res) => {
+  try {
+    const userId = req.user?.id || 'default_user';
+    const options = req.body;
+
+    const recommendations = await dbService.getRecommendations(userId, options);
+
+    res.json({
+      success: true,
+      data: recommendations
+    });
+  } catch (error) {
+    console.error('Get recommendations error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get recommendations',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Search tracks
+ */
+router.post('/search/tracks', async (req, res) => {
+  try {
+    const { query, filters, limit } = req.body;
+
+    if (!query) {
+      return res.status(400).json({
+        success: false,
+        error: 'Search query is required'
+      });
+    }
+
+    const tracks = await dbService.searchTracks(query, { filters, limit });
+
+    res.json({
+      success: true,
+      data: tracks
+    });
+  } catch (error) {
+    console.error('Search tracks error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to search tracks',
+      details: error.message
     });
   }
 });
