@@ -49,8 +49,15 @@ class SQLiteManager {
         }
       );
 
+      // Enable performance optimizations
+      await this.optimizeDatabase();
+
       // Create tables
       await this.createTables();
+      
+      // Create indexes for better query performance
+      await this.createIndexes();
+      
       this.initialized = true;
 
       return true;
@@ -59,6 +66,78 @@ class SQLiteManager {
       this.connected = false;
       return false;
     }
+  }
+
+  /**
+   * Optimize database with SQLite pragmas for better performance
+   */
+  async optimizeDatabase() {
+    const optimizations = [
+      'PRAGMA journal_mode = WAL',  // Write-Ahead Logging for better concurrency
+      'PRAGMA synchronous = NORMAL',  // Balance safety and speed
+      'PRAGMA cache_size = -64000',  // 64MB cache
+      'PRAGMA temp_store = MEMORY',  // Use memory for temp tables
+      'PRAGMA mmap_size = 30000000000',  // Memory-mapped I/O
+      'PRAGMA page_size = 4096',  // Optimal page size
+      'PRAGMA auto_vacuum = INCREMENTAL',  // Prevent file bloat
+    ];
+
+    for (const pragma of optimizations) {
+      try {
+        await this.runQuery(pragma);
+      } catch (error) {
+        console.warn(`SQLite pragma warning: ${pragma}`, error.message);
+      }
+    }
+    
+    console.log('✅ SQLite performance optimizations applied');
+  }
+
+  /**
+   * Create database indexes for better query performance
+   */
+  async createIndexes() {
+    const indexes = [
+      // User indexes
+      'CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)',
+      
+      // Listening history indexes
+      'CREATE INDEX IF NOT EXISTS idx_listening_user ON listening_history(user_id)',
+      'CREATE INDEX IF NOT EXISTS idx_listening_track ON listening_history(track_id)',
+      'CREATE INDEX IF NOT EXISTS idx_listening_date ON listening_history(played_at DESC)',
+      'CREATE INDEX IF NOT EXISTS idx_listening_artist ON listening_history(artist_name)',
+      'CREATE INDEX IF NOT EXISTS idx_listening_user_date ON listening_history(user_id, played_at DESC)',
+      
+      // Recommendations indexes
+      'CREATE INDEX IF NOT EXISTS idx_recommendations_user ON recommendations(user_id)',
+      'CREATE INDEX IF NOT EXISTS idx_recommendations_score ON recommendations(score DESC)',
+      'CREATE INDEX IF NOT EXISTS idx_recommendations_date ON recommendations(created_at DESC)',
+      'CREATE INDEX IF NOT EXISTS idx_recommendations_user_score ON recommendations(user_id, score DESC)',
+      
+      // Playlists indexes
+      'CREATE INDEX IF NOT EXISTS idx_playlists_user ON playlists(user_id)',
+      'CREATE INDEX IF NOT EXISTS idx_playlists_spotify ON playlists(spotify_id)',
+      
+      // Analytics indexes
+      'CREATE INDEX IF NOT EXISTS idx_analytics_user ON analytics(user_id)',
+      'CREATE INDEX IF NOT EXISTS idx_analytics_type ON analytics(metric_type)',
+      'CREATE INDEX IF NOT EXISTS idx_analytics_date ON analytics(created_at DESC)',
+      
+      // Chat history indexes
+      'CREATE INDEX IF NOT EXISTS idx_chat_session ON chat_history(session_id)',
+      'CREATE INDEX IF NOT EXISTS idx_chat_user ON chat_history(user_id)',
+      'CREATE INDEX IF NOT EXISTS idx_chat_timestamp ON chat_history(timestamp DESC)',
+    ];
+
+    for (const index of indexes) {
+      try {
+        await this.runQuery(index);
+      } catch (error) {
+        console.warn(`SQLite index warning: ${index}`, error.message);
+      }
+    }
+    
+    console.log('✅ SQLite indexes created for optimal query performance');
   }
 
   /**
@@ -432,6 +511,96 @@ class SQLiteManager {
         status: 'error',
         error: error.message,
       };
+    }
+  }
+
+  /**
+   * Bulk import data from Local File Database
+   * This optimizes performance by loading CSV data into SQLite
+   */
+  async importFromLocalFileDB(localFileDb) {
+    if (!localFileDb || !localFileDb.initialized) {
+      console.warn('Local File Database not initialized, skipping import');
+      return { success: false, imported: 0 };
+    }
+
+    try {
+      console.log('📥 Starting bulk import from Local File Database to SQLite...');
+      let imported = 0;
+
+      // Begin transaction for better performance
+      await this.runQuery('BEGIN TRANSACTION');
+
+      // Import listening history
+      if (localFileDb.listeningHistory && localFileDb.listeningHistory.length > 0) {
+        console.log(`📊 Importing ${localFileDb.listeningHistory.length} listening history records...`);
+        
+        const insertQuery = `
+          INSERT OR IGNORE INTO listening_history 
+          (user_id, track_id, track_name, artist_name, album_name, played_at, duration_ms)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        for (const record of localFileDb.listeningHistory.slice(0, 1000)) { // Limit to 1000 for performance
+          try {
+            await this.runQuery(insertQuery, [
+              'default_user',
+              record.spotify_track_uri || `track_${imported}`,
+              record.master_metadata_track_name || 'Unknown',
+              record.master_metadata_album_artist_name || 'Unknown',
+              record.master_metadata_album_album_name || null,
+              record.ts || new Date().toISOString(),
+              parseInt(record.ms_played) || 0
+            ]);
+            imported++;
+          } catch (err) {
+            // Skip duplicates
+            if (!err.message.includes('UNIQUE')) {
+              console.warn('Import record error:', err.message);
+            }
+          }
+        }
+      }
+
+      // Commit transaction
+      await this.runQuery('COMMIT');
+
+      console.log(`✅ Successfully imported ${imported} records into SQLite`);
+      
+      // Optimize database after bulk import
+      await this.runQuery('VACUUM');
+      await this.runQuery('ANALYZE');
+      
+      return { success: true, imported };
+    } catch (error) {
+      await this.runQuery('ROLLBACK');
+      console.error('Bulk import error:', error);
+      return { success: false, error: error.message, imported: 0 };
+    }
+  }
+
+  /**
+   * Get database statistics
+   */
+  async getStats() {
+    try {
+      const tables = ['users', 'listening_history', 'recommendations', 'playlists', 'analytics', 'chat_history'];
+      const stats = {};
+
+      for (const table of tables) {
+        const result = await this.getQuery(`SELECT COUNT(*) as count FROM ${table}`);
+        stats[table] = result.count || 0;
+      }
+
+      // Get database file size
+      if (fs.existsSync(this.dbPath)) {
+        const fileStats = fs.statSync(this.dbPath);
+        stats.database_size_mb = (fileStats.size / (1024 * 1024)).toFixed(2);
+      }
+
+      return { success: true, stats };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
   }
 

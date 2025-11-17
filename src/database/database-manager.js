@@ -58,6 +58,19 @@ class DatabaseManager {
       console.log(`📦 Database running in fallback mode (${this.activeDatabases.join(', ')})`);
     }
 
+    // Import data from local file DB into SQLite for better performance
+    if (this.sqlite && this.localFileDb) {
+      try {
+        console.log('🔄 Importing Local File Database data into SQLite for optimized queries...');
+        const importResult = await this.sqlite.importFromLocalFileDB(this.localFileDb);
+        if (importResult.success) {
+          console.log(`✅ Imported ${importResult.imported} records into SQLite`);
+        }
+      } catch (error) {
+        console.warn('⚠️ Data import warning:', error.message);
+      }
+    }
+
     this.initialized = true;
     console.log('✅ Database manager initialized');
     console.log(`📊 Active databases: ${this.activeDatabases.join(', ')}`);
