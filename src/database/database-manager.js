@@ -138,6 +138,38 @@ class DatabaseManager {
   }
 
   /**
+   * Get MongoDB-compatible database instance (works with all database types)
+   * Returns the best available database with MongoDB-like API
+   */
+  getDatabase(databaseName = null) {
+    const dbName = databaseName || process.env.MONGODB_DATABASE || 'echotune';
+    
+    // Try MongoDB first
+    if (this.mongodb) {
+      return this.mongodb.db(dbName);
+    }
+    
+    // Try local file database (has MongoDB-compatible API)
+    if (this.localFileDb && this.localFileDb.initialized) {
+      return this.localFileDb.db(dbName);
+    }
+    
+    // Fallback: create a mock database object
+    console.warn('⚠️  No database available, returning mock database');
+    return {
+      collection: () => ({
+        find: () => ({ toArray: async () => [] }),
+        findOne: async () => null,
+        insertOne: async () => ({ insertedId: null }),
+        insertMany: async () => ({ insertedIds: [] }),
+        updateOne: async () => ({ modifiedCount: 0 }),
+        deleteOne: async () => ({ deletedCount: 0 }),
+        countDocuments: async () => 0
+      })
+    };
+  }
+
+  /**
    * Save user data to available databases
    */
   async saveUser(userData) {
