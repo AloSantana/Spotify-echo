@@ -1,14 +1,17 @@
 const { MongoClient } = require('mongodb');
 const SQLiteManager = require('./sqlite-manager');
+const LocalFileDatabase = require('./local-file-database');
 
 /**
  * Database Abstraction Layer
  * Provides unified interface for multiple database types with fallback support
+ * Priority: MongoDB > SQLite > Local File Database (CSV/JSON)
  */
 class DatabaseManager {
   constructor() {
     this.mongodb = null;
     this.sqlite = null;
+    this.localFileDb = null;
     this.activeDatabases = [];
     this.fallbackMode = false;
     this.initialized = false;
@@ -36,10 +39,23 @@ class DatabaseManager {
       console.error('SQLite initialization failed:', error);
     }
 
+    // Initialize Local File Database as final fallback
+    if (this.activeDatabases.length === 0) {
+      console.log('📁 Attempting Local File Database fallback...');
+      try {
+        await this.initializeLocalFileDatabase();
+      } catch (error) {
+        console.error('Local File Database initialization failed:', error.message);
+      }
+    }
+
     // Set fallback mode if no primary databases are available
-    if (this.activeDatabases.length === 0 || (!this.mongodb && this.sqlite)) {
+    if (this.activeDatabases.length === 0) {
       this.fallbackMode = true;
-      console.log('📦 Database running in fallback mode (SQLite only)');
+      console.log('⚠️  No databases available!');
+    } else if (!this.mongodb) {
+      this.fallbackMode = true;
+      console.log(`📦 Database running in fallback mode (${this.activeDatabases.join(', ')})`);
     }
 
     this.initialized = true;
@@ -95,6 +111,28 @@ class DatabaseManager {
     } catch (error) {
       console.error('❌ SQLite initialization failed:', error.message);
       this.sqlite = null;
+      return false;
+    }
+  }
+
+  /**
+   * Initialize Local File Database (CSV/JSON files)
+   */
+  async initializeLocalFileDatabase() {
+    try {
+      this.localFileDb = new LocalFileDatabase();
+      const success = await this.localFileDb.initialize();
+
+      if (success) {
+        this.activeDatabases.push('local-files');
+        console.log('✅ Local File Database ready (using CSV/JSON data)');
+        return true;
+      } else {
+        throw new Error('Local File Database initialization failed');
+      }
+    } catch (error) {
+      console.error('❌ Local File Database initialization failed:', error.message);
+      this.localFileDb = null;
       return false;
     }
   }
@@ -215,7 +253,141 @@ class DatabaseManager {
       }
     }
 
+    // Fallback to Local File Database
+    if (this.localFileDb) {
+      try {
+        // Get a random track from listening history as seed
+        const history = await this.localFileDb.queryListeningHistory({}, { limit: 1 });
+        if (history.data.length > 0) {
+          const seedTrack = history.data[0].spotify_track_uri;
+          const recommendations = await this.localFileDb.getRecommendations(seedTrack, limit);
+          return { success: true, recommendations, source: 'local-files' };
+        }
+      } catch (error) {
+        console.error('Local File Database get recommendations error:', error);
+      }
+    }
+
     return { success: false, error: 'No available database for recommendations' };
+  }
+
+  /**
+   * Query listening history with local file database support
+   */
+  async queryListeningHistory(filters = {}, options = {}) {
+    // Try MongoDB first
+    if (this.mongodb) {
+      try {
+        const db = this.mongodb.db(process.env.MONGODB_DATABASE || 'spotify_analytics');
+        const collection = db.collection('listening_history');
+        
+        const query = {};
+        if (filters.userId) query.userId = filters.userId;
+        if (filters.trackName) query.trackName = new RegExp(filters.trackName, 'i');
+        if (filters.artistName) query.artistName = new RegExp(filters.artistName, 'i');
+        
+        const results = await collection
+          .find(query)
+          .limit(options.limit || 100)
+          .skip(options.skip || 0)
+          .toArray();
+        
+        return { success: true, data: results, source: 'mongodb' };
+      } catch (error) {
+        console.error('MongoDB query error:', error);
+      }
+    }
+
+    // Fallback to SQLite
+    if (this.sqlite) {
+      try {
+        const result = await this.sqlite.queryListeningHistory(filters, options);
+        if (result.success) {
+          return { ...result, source: 'sqlite' };
+        }
+      } catch (error) {
+        console.error('SQLite query error:', error);
+      }
+    }
+
+    // Fallback to Local File Database
+    if (this.localFileDb) {
+      try {
+        const result = await this.localFileDb.queryListeningHistory(filters, options);
+        return { success: true, ...result, source: 'local-files' };
+      } catch (error) {
+        console.error('Local File Database query error:', error);
+      }
+    }
+
+    return { success: false, error: 'No available database' };
+  }
+
+  /**
+   * Search tracks across all available databases
+   */
+  async searchTracks(query, limit = 20) {
+    // Try MongoDB first
+    if (this.mongodb) {
+      try {
+        const db = this.mongodb.db(process.env.MONGODB_DATABASE || 'spotify_analytics');
+        const collection = db.collection('tracks');
+        
+        const results = await collection
+          .find({
+            $or: [
+              { trackName: new RegExp(query, 'i') },
+              { artistName: new RegExp(query, 'i') }
+            ]
+          })
+          .limit(limit)
+          .toArray();
+        
+        return { success: true, tracks: results, source: 'mongodb' };
+      } catch (error) {
+        console.error('MongoDB search error:', error);
+      }
+    }
+
+    // Fallback to Local File Database
+    if (this.localFileDb) {
+      try {
+        const results = await this.localFileDb.searchTracks(query, limit);
+        return { success: true, tracks: results, source: 'local-files' };
+      } catch (error) {
+        console.error('Local File Database search error:', error);
+      }
+    }
+
+    return { success: false, error: 'No available database' };
+  }
+
+  /**
+   * Get database statistics
+   */
+  async getStats() {
+    // Try MongoDB first
+    if (this.mongodb) {
+      try {
+        const db = this.mongodb.db(process.env.MONGODB_DATABASE || 'spotify_analytics');
+        const stats = await db.stats();
+        return { success: true, stats, source: 'mongodb' };
+      } catch (error) {
+        console.error('MongoDB stats error:', error);
+      }
+    }
+
+    // Fallback to Local File Database
+    if (this.localFileDb) {
+      try {
+        const stats = await this.localFileDb.getStats();
+        return { success: true, stats, source: 'local-files' };
+      } catch (error) {
+        console.error('Local File Database stats error:', error);
+      }
+    }
+
+    return { success: false, error: 'No available database' };
   }
 
   /**
@@ -330,6 +502,10 @@ class DatabaseManager {
 
     if (this.sqlite) {
       this.sqlite.close();
+    }
+
+    if (this.localFileDb) {
+      promises.push(this.localFileDb.close());
     }
 
     await Promise.all(promises);
