@@ -1,0 +1,225 @@
+// EchoTune AI - Prisma Schema
+// PostgreSQL database schema for chat, user preferences, and application state
+// Coexists with MongoDB for listening history and analytics
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+// ============================================================================
+// USER MANAGEMENT
+// ============================================================================
+
+model User {
+  id                String      @id @default(uuid())
+  spotifyId         String?     @unique
+  email             String?     @unique
+  displayName       String?
+  profileImage      String?
+  isPremium         Boolean     @default(false)
+  country           String?
+  
+  // Timestamps
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  lastLoginAt       DateTime?
+  
+  // Relations
+  preferences       UserPreferences?
+  chatSessions      ChatSession[]
+  chatMessages      ChatMessage[]
+  playlists         Playlist[]
+  
+  @@index([spotifyId])
+  @@index([email])
+  @@map("users")
+}
+
+// ============================================================================
+// USER PREFERENCES & SETTINGS
+// ============================================================================
+
+model UserPreferences {
+  id                      String    @id @default(uuid())
+  userId                  String    @unique
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // AI Provider Preferences
+  preferredLLMProvider    String    @default("gemini")
+  enabledProviders        String[]  @default(["gemini", "openai", "mock"])
+  
+  // Music Preferences
+  preferredGenres         String[]  @default([])
+  preferredArtists        String[]  @default([])
+  energyPreference        Float?    @default(0.5)
+  valencePreference       Float?    @default(0.5)
+  danceabilityPreference  Float?    @default(0.5)
+  
+  // Recommendation Settings
+  discoveryMode           String    @default("balanced")
+  explicitContent         Boolean   @default(true)
+  
+  // Chat Settings
+  chatHistoryEnabled      Boolean   @default(true)
+  streamingEnabled        Boolean   @default(true)
+  contextRetention        Int       @default(10)
+  
+  // UI Preferences
+  theme                   String    @default("dark")
+  defaultView             String    @default("chat")
+  
+  // Timestamps
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  
+  @@map("user_preferences")
+}
+
+// ============================================================================
+// CHAT SYSTEM
+// ============================================================================
+
+model ChatSession {
+  id                String        @id @default(uuid())
+  userId            String?
+  user              User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  title             String?
+  provider          String        @default("gemini")
+  model             String?
+  isActive          Boolean       @default(true)
+  messageCount      Int           @default(0)
+  systemPrompt      String?       @db.Text
+  contextSummary    String?       @db.Text
+  
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  lastMessageAt     DateTime?
+  
+  messages          ChatMessage[]
+  
+  @@index([userId])
+  @@index([isActive])
+  @@index([createdAt])
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id                String      @id @default(uuid())
+  sessionId         String
+  session           ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  userId            String?
+  user              User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  role              String
+  content           String      @db.Text
+  provider          String?
+  model             String?
+  tokensUsed        Int?
+  latencyMs         Int?
+  spotifyCommand    String?
+  spotifyTrackId    String?
+  spotifyPlaylistId String?
+  recommendedTracks Json?
+  
+  createdAt         DateTime    @default(now())
+  
+  @@index([sessionId])
+  @@index([userId])
+  @@index([role])
+  @@index([createdAt])
+  @@map("chat_messages")
+}
+
+// ============================================================================
+// PLAYLIST MANAGEMENT
+// ============================================================================
+
+model Playlist {
+  id                String      @id @default(uuid())
+  userId            String
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  spotifyId         String?     @unique
+  name              String
+  description       String?     @db.Text
+  isPublic          Boolean     @default(false)
+  generatedByAI     Boolean     @default(false)
+  generationPrompt  String?     @db.Text
+  generatedWith     String?
+  tags              String[]    @default([])
+  mood              String?
+  targetEnergy      Float?
+  targetDuration    Int?
+  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  lastSyncedAt      DateTime?
+  
+  @@index([userId])
+  @@index([spotifyId])
+  @@index([generatedByAI])
+  @@map("playlists")
+}
+
+// ============================================================================
+// SYSTEM CONFIGURATION
+// ============================================================================
+
+model SystemConfig {
+  id                String      @id @default(uuid())
+  key               String      @unique
+  value             Json
+  category          String
+  description       String?     @db.Text
+  isPublic          Boolean     @default(false)
+  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  
+  @@index([category])
+  @@map("system_config")
+}
+
+model ProviderHealth {
+  id                String      @id @default(uuid())
+  provider          String      @unique
+  isAvailable       Boolean     @default(true)
+  lastCheckAt       DateTime    @default(now())
+  responseTimeMs    Int?
+  errorCount        Int         @default(0)
+  lastError         String?     @db.Text
+  lastErrorAt       DateTime?
+  requestCount      Int         @default(0)
+  successCount      Int         @default(0)
+  failureCount      Int         @default(0)
+  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  
+  @@map("provider_health")
+}
+
+model FeatureFlag {
+  id                String      @id @default(uuid())
+  key               String      @unique
+  name              String
+  description       String?     @db.Text
+  enabled           Boolean     @default(false)
+  rolloutPercentage Int         @default(0)
+  targetUsers       String[]    @default([])
+  targetGroups      String[]    @default([])
+  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  enabledAt         DateTime?
+  
+  @@map("feature_flags")
+}
