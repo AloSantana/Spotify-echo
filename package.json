@@ -166,6 +166,7 @@
     "react": "^19.2.0",
     "react-devtools-profiler": "^0.0.0",
     "react-dom": "^19.2.0",
+    "sqlite3": "^5.1.7",
     "start-server-and-test": "^2.0.3",
     "vite": "^7.1.11",
     "vite-plugin-compression": "^0.5.1",

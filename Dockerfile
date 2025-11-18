@@ -3,7 +3,7 @@
 # ------------------------------
 # 1) Base builder for Node deps
 # ------------------------------
-FROM node:20.20.0-alpine AS base
+FROM node:20-alpine AS base
 WORKDIR /app
 ENV CI=true
 # Install system deps needed for builds (native modules)
@@ -53,7 +53,7 @@ RUN (npm run build || echo "Skipping build: no build script or noop") && mkdir -
 # ------------------------------
 # 4) Runtime image (small)
 # ------------------------------
-FROM node:20.20.0-alpine AS runtime
+FROM node:20-alpine AS runtime
 WORKDIR /app
 ARG BUILD_SHA="unknown"
 ARG BUILD_TIME="unknown"
