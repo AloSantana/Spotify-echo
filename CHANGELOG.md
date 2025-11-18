@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Repository Housekeeping - 2025-11-18
+
+#### Removed
+- **Repository Cleanup**: Removed 250+ obsolete files and directories to reduce clutter and maintenance overhead
+  - Removed `document-backups-20250820-212427/` directory (41 backup files)
+  - Removed `new-docs/` directory (superseded MCP documentation)
+  - Removed 145+ obsolete markdown documentation files:
+    - Legacy comprehensive reports and phase completion summaries
+    - Unreferenced implementation/validation/test reports
+    - Duplicate guides and setup documentation
+    - Obsolete roadmap, perplexity, and integration docs
+    - Session progress and PR summary reports
+  - Removed 30+ JSON artifacts (generated reports, test results, validation outputs)
+  - Removed 20+ unreferenced test scripts and standalone validation files
+  - Removed PDF/Word document duplicates (5 files)
+  - Removed backup files (README-backup.md, etc.)
+
+**Impact**: No functional changes. All removed files were either:
+- Not referenced in code, workflows, or active documentation
+- Legacy experiment/test reports that should be generated on demand
+- Duplicates of content now in the `docs/` directory
+- Backup directories with timestamps
+
+**Result**: Root directory reduced from 227 markdown files to ~50, making the repository cleaner and easier to navigate.
+
 ### Phase 2: UI Framework Modernization (In Progress)
 
 #### Added - 2025-11-18
