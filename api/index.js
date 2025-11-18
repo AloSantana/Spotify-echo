@@ -3,7 +3,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
-const serverless = require('serverless-http');
+// Serverless-http available for future serverless deployment
+// const serverless = require('serverless-http');
 
 // Import routes
 const spotifyRoutes = require('../src/api/routes/spotify');

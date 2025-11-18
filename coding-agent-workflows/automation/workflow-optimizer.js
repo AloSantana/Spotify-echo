@@ -11,8 +11,9 @@
  * - Team usage patterns
  */
 
-const fs = require('fs').promises;
-const path = require('path');
+// fs and path may be needed for future file-based optimization processing
+// const fs = require('fs').promises;
+// const path = require('path');
 
 class WorkflowOptimizer {
   constructor() {
