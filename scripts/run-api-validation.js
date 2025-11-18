@@ -73,7 +73,7 @@ async function runValidation() {
     const failed = results.filter(r => !r.passed).length;
     const criticalFailures = results.filter(r => !r.passed && r.critical).length;
     
-    console.log(`\n📊 API Validation Results:`);
+    console.log('\n📊 API Validation Results:');
     console.log(`   ✅ Passed: ${passed}/${results.length}`);
     console.log(`   ❌ Failed: ${failed}/${results.length}`);
     console.log(`   🔴 Critical Failures: ${criticalFailures}`);

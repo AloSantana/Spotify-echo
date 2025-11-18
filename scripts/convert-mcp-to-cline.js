@@ -140,12 +140,12 @@ function convertVSCodeToCline(vscodeConfig) {
  */
 function formatServerForDisplay(server) {
   const lines = [];
-  lines.push(`  type: stdio`);
+  lines.push('  type: stdio');
   lines.push(`  command: ${server.command}`);
   lines.push(`  args: [${server.args.map((a) => `"${a}"`).join(', ')}]`);
 
   if (server.env && Object.keys(server.env).length > 0) {
-    lines.push(`  env:`);
+    lines.push('  env:');
     for (const [key, value] of Object.entries(server.env)) {
       lines.push(`    ${key}: "${value}"`);
     }
@@ -231,7 +231,7 @@ async function main() {
 
     // Save configuration
     fs.writeFileSync(outputFile, JSON.stringify(clineConfig, null, 2), 'utf8');
-    console.log(`✅ Configuration saved to:`);
+    console.log('✅ Configuration saved to:');
     console.log(`   ${outputFile}\n`);
 
     // Display conversion log

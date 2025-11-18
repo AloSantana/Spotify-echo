@@ -539,16 +539,16 @@ class AWSBedrockClaudeTester {
   generateMarkdownReport() {
     const ma = this.results.tests.modelAvailability;
     
-    let md = `# AWS Bedrock Claude 4.5 Sonnet Test Report\n\n`;
+    let md = '# AWS Bedrock Claude 4.5 Sonnet Test Report\n\n';
     md += `**Date**: ${this.results.timestamp}\n`;
     md += `**Overall Status**: ${this.results.overall.toUpperCase()}\n\n`;
 
-    md += `## Configuration\n\n`;
+    md += '## Configuration\n\n';
     md += `- **AWS Region**: ${this.awsRegion}\n`;
     md += `- **AWS Access Key**: ${this.awsAccessKeyId.substring(0, 8)}...\n`;
     md += `- **Models Tested**: ${this.modelIds.length}\n\n`;
 
-    md += `## Test Summary\n\n`;
+    md += '## Test Summary\n\n';
     const successfulTests = Object.values(this.results.tests).filter(t => t.status === 'success').length;
     const totalTests = Object.keys(this.results.tests).length;
     md += `- **Total Tests**: ${totalTests}\n`;
@@ -556,45 +556,45 @@ class AWSBedrockClaudeTester {
     md += `- **Failed**: ${totalTests - successfulTests}\n\n`;
 
     if (ma) {
-      md += `## Model Availability\n\n`;
+      md += '## Model Availability\n\n';
       md += `**Available**: ${ma.totalAvailable}/${ma.totalTested}\n\n`;
       
       if (ma.workingModel) {
         md += `**Primary Working Model**: \`${ma.workingModel}\`\n\n`;
       }
 
-      md += `### Detailed Model Status\n\n`;
-      md += `| Model ID | Status | Details |\n`;
-      md += `|----------|--------|----------|\n`;
+      md += '### Detailed Model Status\n\n';
+      md += '| Model ID | Status | Details |\n';
+      md += '|----------|--------|----------|\n';
       
       for (const model of ma.availableModels) {
         const status = model.available ? '✅ Available' : '❌ Unavailable';
         const details = model.available ? `Latency: ${model.latency}ms` : model.error;
         md += `| \`${model.modelId}\` | ${status} | ${details} |\n`;
       }
-      md += `\n`;
+      md += '\n';
     }
 
     if (this.results.errors.length > 0) {
-      md += `## Errors\n\n`;
+      md += '## Errors\n\n';
       this.results.errors.forEach((err, idx) => {
         md += `${idx + 1}. **${err.test}**: ${err.error}\n`;
       });
-      md += `\n`;
+      md += '\n';
     }
 
     if (this.results.recommendations.length > 0) {
-      md += `## Recommendations\n\n`;
+      md += '## Recommendations\n\n';
       this.results.recommendations.forEach((rec, idx) => {
         md += `${idx + 1}. ${rec}\n`;
       });
-      md += `\n`;
+      md += '\n';
     }
 
-    md += `## Detailed Test Results\n\n`;
-    md += `\`\`\`json\n`;
+    md += '## Detailed Test Results\n\n';
+    md += '```json\n';
     md += JSON.stringify(this.results.tests, null, 2);
-    md += `\n\`\`\`\n`;
+    md += '\n```\n';
 
     return md;
   }

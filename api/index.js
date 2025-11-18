@@ -92,7 +92,8 @@ app.use('/api/*', (req, res) => {
 });
 
 // Error handling middleware
-app.use((error, req, res, next) => {
+// eslint-disable-next-line no-unused-vars
+app.use((error, req, res, _next) => {
   console.error('API Error:', error);
   
   if (error.name === 'ValidationError') {

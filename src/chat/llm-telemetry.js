@@ -452,8 +452,10 @@ class LLMTelemetry {
 
   /**
    * Get provider metrics with calculated statistics
+   * @deprecated Use getProviderMetrics for raw metrics or calculate stats separately
+   * This was a duplicate method name that caused issues
    */
-  async getProviderMetrics(providerId) {
+  async getProviderStatistics(providerId) {
     const providerInfo = this.providers.get(providerId);
     if (!providerInfo || !providerInfo.metrics.length) {
       return {

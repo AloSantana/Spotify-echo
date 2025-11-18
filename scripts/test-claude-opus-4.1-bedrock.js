@@ -102,7 +102,7 @@ class ClaudeOpus41BedrockTest {
       this.log('✅ Provider Initialization: Successfully initialized');
       this.log(`   - Region: ${provider.config.region}`);
       this.log(`   - Models Loaded: ${availableModels.length}`);
-      this.log(`   - Claude Opus 4.1: Available`);
+      this.log('   - Claude Opus 4.1: Available');
       this.log(`   - Caching Enabled: ${provider.config.enableCaching}`);
       
       this.results.providerInit = { 
@@ -247,7 +247,7 @@ class ClaudeOpus41BedrockTest {
 
       await provider.initialize();
 
-      const codingTask = `Write a simple JavaScript function that takes an array of music tracks with properties: name, artist, genre, energy_level (0-1), and returns the top 3 tracks sorted by energy level. Include JSDoc comments.`;
+      const codingTask = 'Write a simple JavaScript function that takes an array of music tracks with properties: name, artist, genre, energy_level (0-1), and returns the top 3 tracks sorted by energy level. Include JSDoc comments.';
 
       const result = await provider.predict('claude-3-opus', codingTask, {
         maxTokens: 500,

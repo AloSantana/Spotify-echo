@@ -213,7 +213,7 @@ class BedrockBillingVerifier {
             if (totalInvocations > 0) {
                 console.log(`   ✅ Average Latency: ${avgLatency.toFixed(2)}ms`);
             } else {
-                console.log(`   ℹ️  No invocations found in time range (this is normal if validation hasn't run yet)`);
+                console.log('   ℹ️  No invocations found in time range (this is normal if validation hasn\'t run yet)');
             }
             
             return totalInvocations > 0;
@@ -264,8 +264,8 @@ class BedrockBillingVerifier {
             const filepath = path.join(reportsDir, 'bedrock-metrics.json');
             await fs.writeFile(filepath, JSON.stringify(this.metrics, null, 2));
             
-            console.log(`   ✅ Report saved: reports/bedrock-metrics.json`);
-            console.log(`\n📊 Metrics Summary:`);
+            console.log('   ✅ Report saved: reports/bedrock-metrics.json');
+            console.log('\n📊 Metrics Summary:');
             console.log(`   Total Invocations Found: ${this.metrics.summary.totalInvocations}`);
             console.log(`   Models with Metrics: ${this.metrics.summary.modelsWithMetrics}`);
             console.log(`   Models with Errors: ${this.metrics.summary.modelsWithErrors}`);

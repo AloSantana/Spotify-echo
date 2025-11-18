@@ -867,15 +867,15 @@ class ComprehensiveBedrockTestHarness {
    * Generate Markdown report
    */
   generateMarkdownReport() {
-    let md = `# AWS Bedrock Comprehensive Model Test Report\n\n`;
+    let md = '# AWS Bedrock Comprehensive Model Test Report\n\n';
     md += `**Generated**: ${new Date().toISOString()}\n`;
     md += `**Region**: ${this.options.region}\n`;
     md += `**Test Duration**: ${this.results.metadata.testDuration}ms\n`;
     md += `**Config Version**: ${this.results.metadata.configVersion}\n\n`;
 
-    md += `## Summary\n\n`;
-    md += `| Metric | Count |\n`;
-    md += `|--------|-------|\n`;
+    md += '## Summary\n\n';
+    md += '| Metric | Count |\n';
+    md += '|--------|-------|\n';
     md += `| Total Models | ${Object.keys(this.config.modelRegistry).length} |\n`;
     md += `| Tested | ${this.results.summary.testedModels} |\n`;
     md += `| Skipped | ${this.results.summary.skippedModels} |\n`;
@@ -883,9 +883,9 @@ class ComprehensiveBedrockTestHarness {
     md += `| ❌ Failed | ${this.results.summary.failedModels} |\n\n`;
 
     if (this.results.summary.successfulModels > 0) {
-      md += `## ✅ Working Models\n\n`;
-      md += `| Model | Provider | Family | Latency | Tokens | Streaming |\n`;
-      md += `|-------|----------|--------|---------|--------|----------|\n`;
+      md += '## ✅ Working Models\n\n';
+      md += '| Model | Provider | Family | Latency | Tokens | Streaming |\n';
+      md += '|-------|----------|--------|---------|--------|----------|\n';
       
       for (const [modelId, result] of Object.entries(this.results.modelResults)) {
         if (result.overall === 'success') {
@@ -894,13 +894,13 @@ class ComprehensiveBedrockTestHarness {
           md += `| ${result.displayName} | ${result.provider} | ${result.family} | ${basic.latency}ms | ${basic.tokenUsage?.total || 'N/A'} | ${streaming?.success ? '✓' : '✗'} |\n`;
         }
       }
-      md += `\n`;
+      md += '\n';
     }
 
     if (this.results.summary.failedModels > 0) {
-      md += `## ❌ Failed Models\n\n`;
-      md += `| Model | Error | HTTP Status | Category |\n`;
-      md += `|-------|-------|-------------|----------|\n`;
+      md += '## ❌ Failed Models\n\n';
+      md += '| Model | Error | HTTP Status | Category |\n';
+      md += '|-------|-------|-------------|----------|\n';
       
       for (const [modelId, result] of Object.entries(this.results.modelResults)) {
         if (result.overall === 'failed') {
@@ -908,21 +908,21 @@ class ComprehensiveBedrockTestHarness {
           md += `| ${result.displayName} | ${basic.error} | ${basic.errorCode || 'N/A'} | ${basic.errorDetails?.category || 'unknown'} |\n`;
         }
       }
-      md += `\n`;
+      md += '\n';
     }
 
     if (this.results.recommendations.length > 0) {
-      md += `## 💡 Recommendations\n\n`;
+      md += '## 💡 Recommendations\n\n';
       for (const rec of this.results.recommendations) {
         md += `### ${rec.priority.toUpperCase()}: ${rec.message}\n\n`;
         rec.actions.forEach((action, idx) => {
           md += `${idx + 1}. ${action}\n`;
         });
-        md += `\n`;
+        md += '\n';
       }
     }
 
-    md += `## Detailed Results\n\n`;
+    md += '## Detailed Results\n\n';
     md += `\`\`\`json\n${JSON.stringify(this.results.modelResults, null, 2)}\n\`\`\`\n`;
 
     return md;

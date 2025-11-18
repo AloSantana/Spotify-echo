@@ -1,4 +1,4 @@
-f/**
+f;/**
  * Error Boundary Component
  * 
  * Features:

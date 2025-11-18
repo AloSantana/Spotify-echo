@@ -134,7 +134,7 @@ class EnhancedPerplexityAPI {
      * Enhanced API request with cost optimization
      */
     async makeRequest(prompt, options = {}) {
-        const requestOptions = this.optimizeRequest(prompt, _options);
+        const requestOptions = this.optimizeRequest(prompt, options);
         const model = this.models[requestOptions.modelKey] || this.models.sonar;
         
         // Cost check before making request

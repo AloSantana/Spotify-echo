@@ -472,12 +472,12 @@ class ComprehensiveQAAutomation {
         const { phases, summary, screenshots } = this.results;
         const duration = (summary.duration / 1000).toFixed(2);
 
-        let md = `# 🧪 Comprehensive QA Automation Report\n\n`;
+        let md = '# 🧪 Comprehensive QA Automation Report\n\n';
         md += `**Run ID:** ${this.runId}\n`;
         md += `**Timestamp:** ${this.results.timestamp}\n`;
         md += `**Duration:** ${duration}s\n\n`;
 
-        md += `## 📊 Summary\n\n`;
+        md += '## 📊 Summary\n\n';
         md += `- **Total Tests:** ${summary.totalTests}\n`;
         md += `- **Passed:** ${summary.passed} ✅\n`;
         md += `- **Failed:** ${summary.failed} ❌\n`;
@@ -485,14 +485,14 @@ class ComprehensiveQAAutomation {
         md += `- **Errors:** ${summary.errors.length}\n\n`;
 
         if (summary.errors.length > 0) {
-            md += `### ❌ Errors\n\n`;
+            md += '### ❌ Errors\n\n';
             summary.errors.forEach((error, i) => {
                 md += `${i + 1}. ${error}\n`;
             });
-            md += `\n`;
+            md += '\n';
         }
 
-        md += `## 📋 Phase Results\n\n`;
+        md += '## 📋 Phase Results\n\n';
 
         // Phase 1: Installation
         md += `### Phase 1: Installation & Smoke Tests - ${phases.installation.status.toUpperCase()}\n\n`;
@@ -502,7 +502,7 @@ class ComprehensiveQAAutomation {
         } else {
             md += `- **Docker Build:** ${phases.installation.docker.success ? '✅ PASS' : '❌ FAIL'}\n`;
         }
-        md += `\n`;
+        md += '\n';
 
         // Phase 2: Test Suites
         md += `### Phase 2: Test Suites - ${phases.testSuites.status.toUpperCase()}\n\n`;
@@ -513,7 +513,7 @@ class ComprehensiveQAAutomation {
                 md += `- **${key}:** ${test.success ? '✅ PASS' : '❌ FAIL'}\n`;
             }
         });
-        md += `\n`;
+        md += '\n';
 
         // Phase 3: UI Automation
         md += `### Phase 3: UI/UX Automation - ${phases.uiAutomation.status.toUpperCase()}\n\n`;
@@ -521,7 +521,7 @@ class ComprehensiveQAAutomation {
         md += `- **Screenshots Captured:** ${screenshots.length}\n\n`;
 
         if (screenshots.length > 0) {
-            md += `#### 📸 Screenshots\n\n`;
+            md += '#### 📸 Screenshots\n\n';
             screenshots.slice(0, 10).forEach((screenshot, i) => {
                 const basename = path.basename(screenshot);
                 md += `${i + 1}. \`${basename}\`\n`;
@@ -529,7 +529,7 @@ class ComprehensiveQAAutomation {
             if (screenshots.length > 10) {
                 md += `\n... and ${screenshots.length - 10} more screenshots\n`;
             }
-            md += `\n`;
+            md += '\n';
         }
 
         // Phase 4: API Validation
@@ -541,7 +541,7 @@ class ComprehensiveQAAutomation {
                 const endpoint = phases.apiValidation.endpoints[name];
                 md += `- **${name}:** ${endpoint.success ? '✅ PASS' : '❌ FAIL'} (${endpoint.statusCode || 'error'})\n`;
             });
-            md += `\n`;
+            md += '\n';
         }
 
         // Phase 5: Authentication
@@ -551,31 +551,31 @@ class ComprehensiveQAAutomation {
         } else {
             md += `- **Spotify Auth:** ${phases.authentication.spotify.success ? '✅ PASS' : '⚠️ PARTIAL'}\n`;
         }
-        md += `\n`;
+        md += '\n';
 
         // Recommendations
-        md += `## 🎯 Recommendations\n\n`;
+        md += '## 🎯 Recommendations\n\n';
         if (summary.errors.length === 0 && summary.failed === 0) {
-            md += `✅ **All tests passed!** The application is ready for production deployment.\n\n`;
-            md += `### Next Steps:\n`;
-            md += `1. Review screenshots for visual regression\n`;
-            md += `2. Deploy to staging environment\n`;
-            md += `3. Run full integration tests in staging\n`;
-            md += `4. Proceed with production deployment\n`;
+            md += '✅ **All tests passed!** The application is ready for production deployment.\n\n';
+            md += '### Next Steps:\n';
+            md += '1. Review screenshots for visual regression\n';
+            md += '2. Deploy to staging environment\n';
+            md += '3. Run full integration tests in staging\n';
+            md += '4. Proceed with production deployment\n';
         } else {
-            md += `⚠️ **Issues detected** - Please address the following before production deployment:\n\n`;
+            md += '⚠️ **Issues detected** - Please address the following before production deployment:\n\n';
             summary.errors.forEach((error, i) => {
                 md += `${i + 1}. ${error}\n`;
             });
-            md += `\n`;
-            md += `### Action Items:\n`;
-            md += `1. Fix failing tests and errors\n`;
-            md += `2. Re-run QA automation\n`;
-            md += `3. Validate fixes in all environments\n`;
+            md += '\n';
+            md += '### Action Items:\n';
+            md += '1. Fix failing tests and errors\n';
+            md += '2. Re-run QA automation\n';
+            md += '3. Validate fixes in all environments\n';
         }
 
-        md += `\n---\n\n`;
-        md += `*Generated by EchoTune AI Comprehensive QA Automation System*\n`;
+        md += '\n---\n\n';
+        md += '*Generated by EchoTune AI Comprehensive QA Automation System*\n';
         md += `*Report Location: \`${this.outputDir}\`*\n`;
 
         return md;

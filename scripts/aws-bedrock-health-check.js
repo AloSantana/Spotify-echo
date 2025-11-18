@@ -192,7 +192,7 @@ class BedrockHealthCheck {
       // Use inference profile ARN if required
       if (model.requiresInferenceProfile && model.inferenceProfileArn) {
         commandParams.modelId = model.inferenceProfileArn;
-        console.log(`   Using inference profile ARN`);
+        console.log('   Using inference profile ARN');
       }
 
       const startTime = Date.now();
@@ -204,7 +204,7 @@ class BedrockHealthCheck {
       const responseBody = JSON.parse(new TextDecoder().decode(response.body));
       const responseText = responseBody.content?.[0]?.text || '';
 
-      console.log(`   ✅ Model invocation successful`);
+      console.log('   ✅ Model invocation successful');
       console.log(`   Latency: ${latency}ms`);
       console.log(`   Response length: ${responseText.length} characters`);
       

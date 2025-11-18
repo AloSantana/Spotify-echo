@@ -225,7 +225,7 @@ async function main() {
 
     console.log('\n📊 Discovery Summary:');
     console.log(`   Total Endpoints: ${inventory.totalEndpoints}`);
-    console.log(`   By Method:`, inventory.byMethod);
+    console.log('   By Method:', inventory.byMethod);
     console.log(`   Auth Required: ${inventory.authRequired}`);
     console.log(`   With Validation: ${inventory.withValidation}\n`);
 
