@@ -367,12 +367,14 @@ PORT=3000
 
 ### Installation & Launch
 
+> **⚠️ Important**: Before running `npm start`, you must first run `npm install` to install all required dependencies including `dotenv`, `express`, and other packages. Skipping this step will result in "Cannot find module" errors.
+
 ```bash
 # Clone repository
 git clone https://github.com/primoscope/Spotify-echo.git
 cd Spotify-echo
 
-# Install dependencies
+# Install dependencies (REQUIRED - run this first!)
 npm install
 
 # Optional: Setup PostgreSQL (recommended) ✨ NEW
@@ -688,10 +690,12 @@ If you see **"No active device found"**:
 - Check server logs for refresh errors
 - May need to re-authorize if refresh token expires
 
-**"Cannot find module" errors on startup**
-- Run `npm install` to ensure all dependencies are installed
+**"Cannot find module 'dotenv'" or other module errors on startup**
+- **First time setup**: Run `npm install` to install all dependencies
+- **After updating**: Run `npm install` to install new dependencies
 - If issue persists, try `rm -rf node_modules package-lock.json && npm install`
 - Key runtime dependencies required:
+  - `dotenv` for environment variable management (required for startup)
   - `@google/generative-ai` for Gemini AI integration
   - `mongodb` for database connectivity
   - OpenTelemetry packages for observability
