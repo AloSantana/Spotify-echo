@@ -291,7 +291,9 @@ sequenceDiagram
 
 ### Prerequisites
 
-- **Node.js** 20.x or higher
+> **⚠️ Important**: Node.js 18 or higher is **required**. Older versions (12.x, 14.x, 16.x) will fail with syntax errors during installation.
+
+- **Node.js** 18.x or higher (20.x recommended - see `.nvmrc`)
 - **MongoDB** (Atlas recommended) or use embedded SQLite
 - **PostgreSQL** (optional but recommended for chat & preferences) ✨ NEW
 - **Spotify Developer Account** + **Premium Account** (for playback control)
@@ -367,12 +369,14 @@ PORT=3000
 
 ### Installation & Launch
 
+> **⚠️ Important**: Before running `npm start`, you must first run `npm install` to install all required dependencies including `dotenv`, `express`, and other packages. Skipping this step will result in "Cannot find module" errors.
+
 ```bash
 # Clone repository
 git clone https://github.com/primoscope/Spotify-echo.git
 cd Spotify-echo
 
-# Install dependencies
+# Install dependencies (REQUIRED - run this first!)
 npm install
 
 # Optional: Setup PostgreSQL (recommended) ✨ NEW
@@ -688,14 +692,25 @@ If you see **"No active device found"**:
 - Check server logs for refresh errors
 - May need to re-authorize if refresh token expires
 
-**"Cannot find module" errors on startup**
-- Run `npm install` to ensure all dependencies are installed
+**"Cannot find module 'dotenv'" or other module errors on startup**
+- **First time setup**: Run `npm install` to install all dependencies
+- **After updating**: Run `npm install` to install new dependencies
 - If issue persists, try `rm -rf node_modules package-lock.json && npm install`
 - Key runtime dependencies required:
+  - `dotenv` for environment variable management (required for startup)
   - `@google/generative-ai` for Gemini AI integration
   - `mongodb` for database connectivity
   - OpenTelemetry packages for observability
   - See `package.json` for complete list
+
+**"SyntaxError: Unexpected token '='" during npm install**
+- **Cause**: Your Node.js version is too old (likely 12.x, 14.x, or 16.x)
+- **Fix**: Upgrade to Node.js 18 or higher (20.x recommended)
+- **How to upgrade**:
+  - Using nvm: `nvm install 20 && nvm use 20`
+  - Or download from https://nodejs.org/
+- The project uses modern JavaScript syntax (ES2021+) that requires Node.js 18+
+- After upgrading, run `npm install` again
 
 **OpenTelemetry warnings**
 - If you see "OpenTelemetry modules not available" - run `npm install`
