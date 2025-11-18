@@ -1,8 +1,12 @@
 const express = require('express');
 const EchoTuneChatbot = require('../../chat/chatbot');
 const { requireAuth, createRateLimit } = require('../middleware');
+const SpotifyChatIntegration = require('../../chat/spotify-integration');
 
 const router = express.Router();
+
+// Initialize Spotify chat integration
+const spotifyIntegration = new SpotifyChatIntegration();
 
 // Initialize chatbot with configuration
 const chatbotConfig = {
@@ -169,6 +173,39 @@ router.post('/message', requireAuth, chatRateLimit, async (req, res) => {
       });
     }
 
+    // Check if user has Spotify access token (from session or user object)
+    const spotifyAccessToken = req.user?.spotifyAccessToken || req.session?.spotifyAccessToken;
+
+    // If Spotify token available, check for Spotify commands
+    if (spotifyAccessToken) {
+      try {
+        const spotifyResult = await spotifyIntegration.processMessage(message, spotifyAccessToken);
+        
+        if (spotifyResult.isSpotifyCommand) {
+          // This is a Spotify command - return Spotify result with AI context
+          const aiContext = await chatbotInstance.sendMessage(sessionId, message, {
+            provider,
+            model,
+            temperature,
+            maxTokens,
+          });
+
+          return res.json({
+            success: true,
+            response: spotifyResult.result.message || aiContext.response,
+            spotifyAction: spotifyResult.result,
+            spotifyCommand: spotifyResult.command,
+            recommendations: spotifyResult.result.tracks || spotifyResult.result.recommendations || aiContext.recommendations,
+            intent: { ...aiContext.intent, isSpotifyCommand: true },
+          });
+        }
+      } catch (spotifyError) {
+        console.warn('Spotify command processing failed:', spotifyError.message);
+        // Continue with regular chat if Spotify fails
+      }
+    }
+
+    // Regular chat message (no Spotify command or no token)
     const response = await chatbotInstance.sendMessage(sessionId, message, {
       provider,
       model,
@@ -1148,5 +1185,48 @@ function getTimeDescription(timeOfDay) {
   if (hour >= 17 && hour < 22) return 'evening';
   return 'late night';
 }
+
+/**
+ * Execute Spotify command directly
+ * POST /api/chat/spotify-command
+ */
+router.post('/spotify-command', requireAuth, chatRateLimit, async (req, res) => {
+  try {
+    const { command } = req.body;
+
+    if (!command) {
+      return res.status(400).json({
+        error: 'Missing required field',
+        message: 'command is required',
+      });
+    }
+
+    // Get Spotify access token
+    const spotifyAccessToken = req.user?.spotifyAccessToken || req.session?.spotifyAccessToken;
+
+    if (!spotifyAccessToken) {
+      return res.status(401).json({
+        error: 'Spotify not connected',
+        message: 'Please connect your Spotify account to use playback commands',
+      });
+    }
+
+    // Process Spotify command
+    const result = await spotifyIntegration.processMessage(command, spotifyAccessToken);
+
+    res.json({
+      success: true,
+      command: result.command,
+      result: result.result,
+      isSpotifyCommand: result.isSpotifyCommand,
+    });
+  } catch (error) {
+    console.error('Error executing Spotify command:', error);
+    res.status(500).json({
+      error: 'Failed to execute Spotify command',
+      message: error.message,
+    });
+  }
+});
 
 module.exports = router;

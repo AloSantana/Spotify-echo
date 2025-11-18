@@ -1366,4 +1366,48 @@ router.get('/playback', requireAuth, spotifyRateLimit, async (req, res) => {
   }
 });
 
+/**
+ * GET /api/spotify/now-playing
+ * Get currently playing track (formatted for Now Playing Widget)
+ */
+router.get('/now-playing', requireAuth, spotifyRateLimit, async (req, res) => {
+  try {
+    const PlaybackController = require('../../spotify/playback-controller');
+    const controller = new PlaybackController(req.user.spotifyTokens.access_token);
+    
+    const nowPlaying = await controller.getNowPlaying();
+
+    if (nowPlaying.error) {
+      return res.json({
+        success: false,
+        error: nowPlaying.error,
+        message: nowPlaying.error === 'No active device' 
+          ? 'No active Spotify device found. Please open Spotify on a device.'
+          : 'Unable to get playback information',
+      });
+    }
+
+    res.json({
+      success: true,
+      ...nowPlaying,
+    });
+  } catch (error) {
+    console.error('Get now playing error:', error);
+    
+    if (error.message.includes('Premium')) {
+      return res.status(403).json({
+        success: false,
+        error: 'premium_required',
+        message: 'Spotify Premium is required for playback control',
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get now playing',
+      message: error.message,
+    });
+  }
+});
+
 module.exports = router;
