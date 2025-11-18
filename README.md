@@ -291,7 +291,9 @@ sequenceDiagram
 
 ### Prerequisites
 
-- **Node.js** 20.x or higher
+> **⚠️ Important**: Node.js 18 or higher is **required**. Older versions (12.x, 14.x, 16.x) will fail with syntax errors during installation.
+
+- **Node.js** 18.x or higher (20.x recommended - see `.nvmrc`)
 - **MongoDB** (Atlas recommended) or use embedded SQLite
 - **PostgreSQL** (optional but recommended for chat & preferences) ✨ NEW
 - **Spotify Developer Account** + **Premium Account** (for playback control)
@@ -700,6 +702,15 @@ If you see **"No active device found"**:
   - `mongodb` for database connectivity
   - OpenTelemetry packages for observability
   - See `package.json` for complete list
+
+**"SyntaxError: Unexpected token '='" during npm install**
+- **Cause**: Your Node.js version is too old (likely 12.x, 14.x, or 16.x)
+- **Fix**: Upgrade to Node.js 18 or higher (20.x recommended)
+- **How to upgrade**:
+  - Using nvm: `nvm install 20 && nvm use 20`
+  - Or download from https://nodejs.org/
+- The project uses modern JavaScript syntax (ES2021+) that requires Node.js 18+
+- After upgrading, run `npm install` again
 
 **OpenTelemetry warnings**
 - If you see "OpenTelemetry modules not available" - run `npm install`
