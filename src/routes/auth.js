@@ -39,7 +39,10 @@ router.get('/spotify', async (req, res) => {
       'user-read-recently-played',
       'user-top-read',
       'user-library-read',
-      'user-library-modify'
+      'user-library-modify',
+      'user-read-playback-state',
+      'user-modify-playback-state',
+      'streaming'
     ].join(' ');
 
     // Store PKCE challenge and state in Redis/session store  
