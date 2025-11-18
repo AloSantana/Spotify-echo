@@ -375,7 +375,7 @@ class BedrockIntegrationTests {
         // We expect a validation error
         if (error.message.includes('validation') || 
             error.$metadata?.httpStatusCode === 400) {
-          console.log(`   ✅ PASSED (Properly handled validation error)`);
+          console.log('   ✅ PASSED (Properly handled validation error)');
           
           this.results.tests.push({
             name: testName,

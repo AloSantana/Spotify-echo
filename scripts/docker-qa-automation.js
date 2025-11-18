@@ -213,29 +213,29 @@ class DockerQA {
         this.log(`📄 Docker QA report saved: ${reportPath}`);
 
         // Generate markdown
-        let md = `# 🐳 Docker Environment QA Report\n\n`;
+        let md = '# 🐳 Docker Environment QA Report\n\n';
         md += `**Timestamp:** ${this.results.timestamp}\n\n`;
-        md += `## Summary\n\n`;
+        md += '## Summary\n\n';
         md += `- Docker Available: ${this.results.dockerAvailable ? '✅' : '❌'}\n`;
         md += `- Build Success: ${this.results.buildSuccess ? '✅' : '❌'}\n`;
         md += `- Compose Valid: ${this.results.composeSuccess ? '✅' : '❌'}\n\n`;
 
         if (this.results.containerHealth) {
-            md += `## Container Health\n\n`;
+            md += '## Container Health\n\n';
             Object.entries(this.results.containerHealth).forEach(([key, value]) => {
                 md += `- ${key}: ${value ? '✅' : '❌'}\n`;
             });
-            md += `\n`;
+            md += '\n';
         }
 
         if (this.results.smokeTests) {
-            md += `## Smoke Tests\n\n`;
+            md += '## Smoke Tests\n\n';
             if (this.results.smokeTests.criticalFiles) {
-                md += `### Critical Files\n\n`;
+                md += '### Critical Files\n\n';
                 Object.entries(this.results.smokeTests.criticalFiles).forEach(([file, exists]) => {
                     md += `- ${file}: ${exists ? '✅' : '❌'}\n`;
                 });
-                md += `\n`;
+                md += '\n';
             }
         }
 

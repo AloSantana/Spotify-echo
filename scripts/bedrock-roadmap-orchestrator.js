@@ -287,7 +287,7 @@ class BedrockRoadmapOrchestrator {
         (this.metrics.modelUsage[modelAlias].avgLatency * (this.metrics.modelUsage[modelAlias].calls - 1) + executionTime) / 
         this.metrics.modelUsage[modelAlias].calls;
       
-      console.log(`\n✅ Task completed successfully`);
+      console.log('\n✅ Task completed successfully');
       console.log(`⏱️  Execution time: ${executionTime}ms`);
       console.log(`💰 Cost: $${cost.totalCost.toFixed(6)}`);
       console.log(`📊 Tokens: ${result.usage?.input_tokens || 0} input, ${result.usage?.output_tokens || 0} output`);
@@ -597,7 +597,7 @@ ${this.generateCostRecommendations(summary)}
       if (mostExpensive[1].calls > 1) {
         recommendations.push(
           `1. **${mostExpensive[0]}** was the most expensive model ($${mostExpensive[1].cost.toFixed(6)}). ` +
-          `Consider using lighter models for simpler tasks.`
+          'Consider using lighter models for simpler tasks.'
         );
       }
     }
@@ -606,7 +606,7 @@ ${this.generateCostRecommendations(summary)}
     if (summary.retryStatistics.retriedCalls > summary.retryStatistics.totalCalls * 0.1) {
       recommendations.push(
         `2. High retry rate detected (${summary.retryStatistics.retriedCalls}/${summary.retryStatistics.totalCalls}). ` +
-        `Investigate potential throttling or connection issues.`
+        'Investigate potential throttling or connection issues.'
       );
     }
     
@@ -615,7 +615,7 @@ ${this.generateCostRecommendations(summary)}
     if (avgTokensPerTask > 10000) {
       recommendations.push(
         `3. Average ${avgTokensPerTask.toFixed(0)} tokens per task. ` +
-        `Consider breaking down complex tasks into smaller subtasks.`
+        'Consider breaking down complex tasks into smaller subtasks.'
       );
     }
     

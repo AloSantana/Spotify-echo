@@ -446,7 +446,7 @@ class CometTestRunner {
             await fs.writeFile(filepath, JSON.stringify(report, null, 2));
             console.log(`📄 Report saved: ${filepath}`);
         } catch (error) {
-            console.warn(`Warning: Could not save report:`, error.message);
+            console.warn('Warning: Could not save report:', error.message);
         }
     }
     

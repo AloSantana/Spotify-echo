@@ -332,7 +332,7 @@ async function main() {
     console.log(`⏭️ Skipped: ${tester.summary.skipped}`);
     console.log('═'.repeat(70));
 
-    console.log(`\n✅ Reports saved:`);
+    console.log('\n✅ Reports saved:');
     console.log(`   JSON: ${jsonPath}`);
 
     // Exit code

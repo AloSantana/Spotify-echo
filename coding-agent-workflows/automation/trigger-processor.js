@@ -14,8 +14,9 @@
  * - Performance tracking and learning
  */
 
-const fs = require('fs').promises;
-const path = require('path');
+// fs and path may be needed for future file-based trigger processing
+// const fs = require('fs').promises;
+// const path = require('path');
 
 class TriggerProcessor {
   constructor() {

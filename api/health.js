@@ -2,7 +2,8 @@
  * Vercel serverless function for health check endpoint
  * Extracts health check logic from existing system routes
  */
-const { ENV } = require('../src/config/env');
+// ENV is available but not needed for this simple health check
+// const { ENV } = require('../src/config/env');
 
 module.exports = (req, res) => {
   res.status(200).json({

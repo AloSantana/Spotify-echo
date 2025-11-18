@@ -238,7 +238,7 @@ export const EmptySearchResults = ({ searchQuery, onClearSearch }) => (
     icon="search"
     title="No Results Found"
     description={searchQuery ? `No results found for "${searchQuery}". Try different keywords or browse our recommendations.` : 'Enter a search query to find music, playlists, and more.'}
-    actionLabel={searchQuery ? "Clear Search" : "Browse Music"}
+    actionLabel={searchQuery ? 'Clear Search' : 'Browse Music'}
     onAction={onClearSearch || (() => window.location.href = '/discovery')}
     variant="compact"
   />
@@ -271,7 +271,7 @@ export const ErrorState = ({ error, onRetry }) => (
   <EmptyState
     icon="error"
     title="Oops! Something Went Wrong"
-    description={error || "We encountered an error while loading this content. Please try again."}
+    description={error || 'We encountered an error while loading this content. Please try again.'}
     actionLabel="Try Again"
     onAction={onRetry}
     secondaryActionLabel="Go Home"

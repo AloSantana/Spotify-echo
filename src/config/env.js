@@ -2,7 +2,17 @@
  * Centralized environment variable loading & validation.
  * Uses a lightweight custom validator to avoid extra deps. Replace with 'env-var' if preferred.
  */
-require('dotenv').config();
+try {
+  require('dotenv').config();
+} catch (error) {
+  if (error.code === 'MODULE_NOT_FOUND') {
+    console.error('\n❌ Error: dotenv module not found!');
+    console.error('📦 Please run: npm install');
+    console.error('   This will install all required dependencies.\n');
+    process.exit(1);
+  }
+  throw error;
+}
 
 const schema = {
   // Core infrastructure

@@ -76,7 +76,7 @@ export const lightTheme = createTheme({
   },
   
   typography: {
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontFamily: '\'Inter\', -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif',
     h1: {
       fontSize: '2.5rem',
       fontWeight: 700,
@@ -205,7 +205,7 @@ export const darkTheme = createTheme({
   },
   
   typography: {
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontFamily: '\'Inter\', -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif',
     h1: {
       fontSize: '2.5rem',
       fontWeight: 700,

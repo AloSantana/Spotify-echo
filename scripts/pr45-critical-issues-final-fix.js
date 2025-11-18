@@ -51,7 +51,7 @@ class PR45CriticalIssuesFixer {
         let gitignoreContent = fs.readFileSync(gitignorePath, 'utf8');
         
         if (!gitignoreContent.includes('BROWSERSCREENSHOT-TESTING/')) {
-            gitignoreContent += `\n# Screenshot testing directories\nBROWSERSCREENSHOT-TESTING/\nartifacts/screenshots/\nvisual-baseline/\n`;
+            gitignoreContent += '\n# Screenshot testing directories\nBROWSERSCREENSHOT-TESTING/\nartifacts/screenshots/\nvisual-baseline/\n';
             fs.writeFileSync(gitignorePath, gitignoreContent);
             this.log('Updated .gitignore with BROWSERSCREENSHOT-TESTING', 'fix');
         }

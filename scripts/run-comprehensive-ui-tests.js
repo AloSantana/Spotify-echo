@@ -350,7 +350,7 @@ class ComprehensiveUITestOrchestrator {
     fs.writeFileSync(jsonPath, JSON.stringify(report, null, 2));
     
     // Write Markdown report
-    const mdPath = path.join(this.reportDir, `UI_TEST_REPORT.md`);
+    const mdPath = path.join(this.reportDir, 'UI_TEST_REPORT.md');
     fs.writeFileSync(mdPath, this.generateMarkdownReport(report));
     
     this.log(`Report generated: ${jsonPath}`, 'INFO');

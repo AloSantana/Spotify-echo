@@ -45,7 +45,7 @@ class APIValidationReportGenerator {
         md += `**Generated:** ${new Date().toISOString()}\n\n`;
         
         if (this.results) {
-            md += `**Test Results:**\n`;
+            md += '**Test Results:**\n';
             md += `- Total Endpoints Tested: ${this.results.summary.total}\n`;
             md += `- ✅ Passed: ${this.results.summary.passed}\n`;
             md += `- ❌ Failed: ${this.results.summary.failed}\n`;
@@ -54,7 +54,7 @@ class APIValidationReportGenerator {
         }
 
         if (this.inventory) {
-            md += `**Endpoint Inventory:**\n`;
+            md += '**Endpoint Inventory:**\n';
             md += `- Total Discovered: ${this.inventory.summary.total}\n`;
             md += `- Require Authentication: ${this.inventory.summary.authRequired}\n`;
             md += `- With Validation: ${this.inventory.summary.withValidation}\n\n`;

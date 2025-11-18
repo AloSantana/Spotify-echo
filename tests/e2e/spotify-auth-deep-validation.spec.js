@@ -84,7 +84,7 @@ test.describe('Spotify Authentication - Deep Validation', () => {
             expect(location).toContain('redirect_uri');
             expect(location).toContain('scope');
             
-            console.log(`✓ OAuth URL has required parameters`);
+            console.log('✓ OAuth URL has required parameters');
           }
         } else {
           console.log(`⚠️  Auth endpoint returned ${response.status()} - may require different test approach`);
@@ -123,9 +123,9 @@ test.describe('Spotify Authentication - Deep Validation', () => {
                            process.env.SPOTIFY_CLIENT_ID;
       
       if (envConfigured) {
-        console.log(`✓ Spotify environment variables configured`);
+        console.log('✓ Spotify environment variables configured');
       } else {
-        console.log(`⚠️  Spotify environment variables not configured`);
+        console.log('⚠️  Spotify environment variables not configured');
       }
       
       await page.screenshot({ 
@@ -175,7 +175,7 @@ test.describe('Spotify Authentication - Deep Validation', () => {
         
         // Should have some way to authenticate
         if (!foundAuth) {
-          console.log(`⚠️  No obvious authentication UI found`);
+          console.log('⚠️  No obvious authentication UI found');
         }
       });
     });
@@ -226,7 +226,7 @@ test.describe('Spotify Authentication - Deep Validation', () => {
         expect(tokens.refreshToken).toBeTruthy();
         expect(tokens.authenticated).toBe('true');
         
-        console.log(`✓ Mock authentication tokens stored`);
+        console.log('✓ Mock authentication tokens stored');
         console.log(`✓ Access token: ${tokens.accessToken?.substring(0, 20)}...`);
       });
     });
@@ -260,7 +260,7 @@ test.describe('Spotify Authentication - Deep Validation', () => {
         const bodyText = await page.textContent('body');
         expect(bodyText.length).toBeGreaterThan(0);
         
-        console.log(`✓ Application handles expired token gracefully`);
+        console.log('✓ Application handles expired token gracefully');
       });
     });
   });
@@ -286,7 +286,7 @@ test.describe('Spotify Authentication - Deep Validation', () => {
         'user-read-recently-played'
       ];
       
-      console.log(`✓ Required Spotify Scopes for EchoTune AI:`);
+      console.log('✓ Required Spotify Scopes for EchoTune AI:');
       requiredScopes.forEach(scope => console.log(`  - ${scope}`));
       
       await page.screenshot({ 
@@ -308,7 +308,7 @@ test.describe('Spotify Authentication - Deep Validation', () => {
         return state;
       });
       
-      console.log(`✓ CSRF state token can be generated`);
+      console.log('✓ CSRF state token can be generated');
       
       await page.screenshot({ 
         path: path.join(SCREENSHOT_BASE, 'auth-08-csrf-protection.png'),
@@ -376,7 +376,7 @@ test.describe('Spotify Authentication - Deep Validation', () => {
         }
         
         if (!foundLogout) {
-          console.log(`⚠️  No obvious logout UI found`);
+          console.log('⚠️  No obvious logout UI found');
         }
         
         await page.screenshot({ 
@@ -393,11 +393,11 @@ test.describe('Spotify Authentication - Deep Validation', () => {
       await page.goto('/');
       
       // Document token refresh strategy
-      console.log(`✓ Token Refresh Strategy:`);
-      console.log(`  - Store refresh token in localStorage`);
-      console.log(`  - Monitor token expiration`);
-      console.log(`  - Automatically refresh before expiry`);
-      console.log(`  - Handle refresh failures gracefully`);
+      console.log('✓ Token Refresh Strategy:');
+      console.log('  - Store refresh token in localStorage');
+      console.log('  - Monitor token expiration');
+      console.log('  - Automatically refresh before expiry');
+      console.log('  - Handle refresh failures gracefully');
       
       await page.screenshot({ 
         path: path.join(SCREENSHOT_BASE, 'auth-11-token-refresh-strategy.png'),

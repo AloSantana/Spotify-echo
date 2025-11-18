@@ -37,8 +37,8 @@ function assertModule(name) {
         require.resolve(name);
     } catch (e) {
         console.error(`❌ [INSTALL_FAILURE] Required module '${name}' not found.`);
-        console.error(`   This indicates the npm install phase likely failed.`);
-        console.error(`   Please check the workflow logs for dependency installation errors.`);
+        console.error('   This indicates the npm install phase likely failed.');
+        console.error('   Please check the workflow logs for dependency installation errors.');
         process.exit(10);
     }
 }
@@ -179,7 +179,7 @@ function checkDistinctRequestIds(results) {
     const uniqueIds = new Set(requestIds);
     
     if (requestIds.length !== uniqueIds.size) {
-        console.warn(`   ⚠️  WARNING: Duplicate request IDs detected! This may indicate mocked data.`);
+        console.warn('   ⚠️  WARNING: Duplicate request IDs detected! This may indicate mocked data.');
         return false;
     }
     
@@ -237,7 +237,7 @@ async function saveInvocationLog(invocationData) {
         // Detect placeholder strings (anti-mock safeguard)
         const content = JSON.stringify(invocationData);
         if (content.includes('[DEMO]') || content.includes('[PLACEHOLDER]') || content.includes('[MOCK]')) {
-            console.warn(`   ⚠️  WARNING: Placeholder strings detected in invocation data!`);
+            console.warn('   ⚠️  WARNING: Placeholder strings detected in invocation data!');
             invocationData.hasPlaceholders = true;
         }
     } catch (error) {
@@ -276,7 +276,7 @@ async function testModel(provider, modelConfig) {
             await sleep(VALIDATION_CONFIG.retryDelay * attempt); // Exponential backoff
         }
         
-        console.log(`   📋 Request Details:`);
+        console.log('   📋 Request Details:');
         console.log(`      Model ID: ${actualModelId}`);
         console.log(`      Requires Inference Profile: ${requiresInferenceProfile}`);
         if (requiresInferenceProfile && inferenceProfileArn) {
@@ -295,20 +295,20 @@ async function testModel(provider, modelConfig) {
             const latency = Date.now() - startTime;
             
             console.log(`✅ Response received in ${latency}ms`);
-            console.log(`   📋 Response Details:`);
+            console.log('   📋 Response Details:');
             console.log(`      Response Timestamp: ${responseTimestamp}`);
-            console.log(`      HTTP Status: 200 (Success)`);
+            console.log('      HTTP Status: 200 (Success)');
             console.log(`      Model Used: ${result.modelId || actualModelId}`);
             console.log(`      Response: "${result.text.substring(0, 150)}..."`);
             console.log(`      Cached: ${result.cached}`);
-            console.log(`   📊 Token Usage:`);
+            console.log('   📊 Token Usage:');
             console.log(`      Input Tokens: ${result.usage.input_tokens}`);
             console.log(`      Output Tokens: ${result.usage.output_tokens}`);
             console.log(`      Total Tokens: ${result.usage.input_tokens + result.usage.output_tokens}`);
             
             // Calculate cost
             const cost = calculateCost(modelConfig.key, result.usage);
-            console.log(`   💰 Cost Breakdown:`);
+            console.log('   💰 Cost Breakdown:');
             console.log(`      Input: ${cost.breakdown.inputTokens} tokens × $${cost.breakdown.inputCostPer1K}/1K = $${cost.inputCost.toFixed(6)}`);
             console.log(`      Output: ${cost.breakdown.outputTokens} tokens × $${cost.breakdown.outputCostPer1K}/1K = $${cost.outputCost.toFixed(6)}`);
             console.log(`      Total: $${cost.totalCost.toFixed(6)} USD`);
@@ -344,14 +344,14 @@ async function testModel(provider, modelConfig) {
             // In strict mode, fail if validations don't pass
             if (STRICT_MODE) {
                 if (!invocationData.validations.requestIdValid) {
-                    console.error(`   ❌ STRICT MODE: Request ID validation failed`);
+                    console.error('   ❌ STRICT MODE: Request ID validation failed');
                     throw new Error('Request ID appears to be a placeholder');
                 }
                 if (!invocationData.validations.latencyValid) {
-                    console.error(`   ❌ STRICT MODE: Latency validation failed`);
+                    console.error('   ❌ STRICT MODE: Latency validation failed');
                 }
                 if (!invocationData.validations.hasRealTokens) {
-                    console.error(`   ❌ STRICT MODE: Token counts are zero or missing`);
+                    console.error('   ❌ STRICT MODE: Token counts are zero or missing');
                     throw new Error('No real tokens detected');
                 }
             }
@@ -385,7 +385,7 @@ async function testModel(provider, modelConfig) {
         
         // If not rate limited or final attempt, log error
         console.error(`❌ Failed to test ${modelConfig.displayName} (attempt ${attempt}/${VALIDATION_CONFIG.retryAttempts})`);
-        console.error(`   📋 Error Details:`);
+        console.error('   📋 Error Details:');
         console.error(`      Error: ${error.message}`);
         console.error(`      Response Timestamp: ${responseTimestamp}`);
         console.error(`      HTTP Status: ${error.$metadata?.httpStatusCode || 'Unknown'}`);
@@ -492,7 +492,7 @@ function generateReport() {
             console.log(`   ${type}: ${count}`);
         }
     }
-    console.log(`   Provider: AWS Bedrock (provider=bedrock)`);
+    console.log('   Provider: AWS Bedrock (provider=bedrock)');
     
     console.log('\n🤖 Models Tested:');
     validationResults.models.forEach(model => {
@@ -501,7 +501,7 @@ function generateReport() {
             console.log(`      Model ID: ${model.actualModelId}`);
             if (model.requiresInferenceProfile) {
                 console.log(`      Inference Profile ARN: ${model.inferenceProfileArn}`);
-                console.log(`      Cross-Region Access: Enabled`);
+                console.log('      Cross-Region Access: Enabled');
             }
             console.log(`      Region: ${model.region}`);
             console.log(`      Latency: ${model.latency}ms`);
@@ -558,9 +558,9 @@ function generateReport() {
     validationResults.models.forEach(model => {
         if (model.success) {
             console.log(`\n   # ${model.displayName}`);
-            console.log(`   aws cloudwatch get-metric-statistics \\`);
-            console.log(`     --namespace AWS/Bedrock \\`);
-            console.log(`     --metric-name InvocationCount \\`);
+            console.log('   aws cloudwatch get-metric-statistics \\');
+            console.log('     --namespace AWS/Bedrock \\');
+            console.log('     --metric-name InvocationCount \\');
             if (model.requiresInferenceProfile && model.inferenceProfileArn) {
                 console.log(`     --dimensions Name=InferenceProfileId,Value=${model.inferenceProfileArn.split('/').pop()} \\`);
             } else {
@@ -568,8 +568,8 @@ function generateReport() {
             }
             console.log(`     --start-time ${new Date(model.requestTimestamp).toISOString()} \\`);
             console.log(`     --end-time ${new Date(model.responseTimestamp).toISOString()} \\`);
-            console.log(`     --period 60 \\`);
-            console.log(`     --statistics Sum`);
+            console.log('     --period 60 \\');
+            console.log('     --statistics Sum');
         }
     });
     
@@ -610,7 +610,7 @@ function generateMarkdownReport() {
     let md = '# AWS Bedrock Live Validation Report\n\n';
     md += `**Generated:** ${validationResults.timestamp}\n\n`;
     md += `**Region:** ${validationResults.region}\n\n`;
-    md += `**Provider:** AWS Bedrock (provider=bedrock)\n\n`;
+    md += '**Provider:** AWS Bedrock (provider=bedrock)\n\n';
     
     md += '## Models Tested\n\n';
     validationResults.models.forEach(model => {
@@ -619,7 +619,7 @@ function generateMarkdownReport() {
             md += `- **Model ID:** \`${model.actualModelId}\`\n`;
             if (model.requiresInferenceProfile) {
                 md += `- **Inference Profile ARN:** \`${model.inferenceProfileArn}\`\n`;
-                md += `- **Cross-Region Access:** Enabled\n`;
+                md += '- **Cross-Region Access:** Enabled\n';
             }
             md += `- **Region:** ${model.region}\n`;
             md += `- **Latency:** ${model.latency}ms\n`;
@@ -636,7 +636,7 @@ function generateMarkdownReport() {
         }
     });
     
-    md += `## Cost Summary\n\n`;
+    md += '## Cost Summary\n\n';
     md += `**Total Cost:** $${validationResults.totalCost.toFixed(6)} USD\n\n`;
     
     md += '## CloudWatch Verification Commands\n\n';
@@ -644,9 +644,9 @@ function generateMarkdownReport() {
     validationResults.models.forEach(model => {
         if (model.success) {
             md += `# ${model.displayName}\n`;
-            md += `aws cloudwatch get-metric-statistics \\\n`;
-            md += `  --namespace AWS/Bedrock \\\n`;
-            md += `  --metric-name InvocationCount \\\n`;
+            md += 'aws cloudwatch get-metric-statistics \\\n';
+            md += '  --namespace AWS/Bedrock \\\n';
+            md += '  --metric-name InvocationCount \\\n';
             if (model.requiresInferenceProfile && model.inferenceProfileArn) {
                 md += `  --dimensions Name=InferenceProfileId,Value=${model.inferenceProfileArn.split('/').pop()} \\\n`;
             } else {
@@ -654,8 +654,8 @@ function generateMarkdownReport() {
             }
             md += `  --start-time ${new Date(model.requestTimestamp).toISOString()} \\\n`;
             md += `  --end-time ${new Date(model.responseTimestamp).toISOString()} \\\n`;
-            md += `  --period 60 \\\n`;
-            md += `  --statistics Sum\n\n`;
+            md += '  --period 60 \\\n';
+            md += '  --statistics Sum\n\n';
         }
     });
     md += '```\n\n';
@@ -812,7 +812,7 @@ async function saveSummaryReport() {
         const filepath = path.join(reportsDir, 'bedrock-invocation-summary.json');
         await fs.writeFile(filepath, JSON.stringify(validationResults, null, 2));
         
-        console.log(`\n📄 Summary report saved: reports/bedrock-invocation-summary.json`);
+        console.log('\n📄 Summary report saved: reports/bedrock-invocation-summary.json');
     } catch (error) {
         console.error(`❌ Failed to save summary report: ${error.message}`);
     }

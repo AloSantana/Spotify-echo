@@ -96,7 +96,7 @@ class QASetupValidator {
                 this.check(
                     `NPM Script: ${scriptName}`,
                     packageJson.scripts && packageJson.scripts[scriptName],
-                    `Script missing in package.json`
+                    'Script missing in package.json'
                 );
             });
         } else {

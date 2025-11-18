@@ -331,7 +331,7 @@ export function useSpotifyLibrary() {
 
   const saveTrack = useCallback(async (trackId) => {
     return rateLimiter.throttle(async () => {
-      const response = await apiClient.put(`/api/spotify/me/tracks`, {
+      const response = await apiClient.put('/api/spotify/me/tracks', {
         ids: [trackId]
       });
       
@@ -346,7 +346,7 @@ export function useSpotifyLibrary() {
 
   const removeTrack = useCallback(async (trackId) => {
     return rateLimiter.throttle(async () => {
-      const response = await apiClient.delete(`/api/spotify/me/tracks`, {
+      const response = await apiClient.delete('/api/spotify/me/tracks', {
         body: { ids: [trackId] }
       });
       
@@ -361,7 +361,7 @@ export function useSpotifyLibrary() {
 
   const saveAlbum = useCallback(async (albumId) => {
     return rateLimiter.throttle(async () => {
-      const response = await apiClient.put(`/api/spotify/me/albums`, {
+      const response = await apiClient.put('/api/spotify/me/albums', {
         ids: [albumId]
       });
       
@@ -376,7 +376,7 @@ export function useSpotifyLibrary() {
 
   const removeAlbum = useCallback(async (albumId) => {
     return rateLimiter.throttle(async () => {
-      const response = await apiClient.delete(`/api/spotify/me/albums`, {
+      const response = await apiClient.delete('/api/spotify/me/albums', {
         body: { ids: [albumId] }
       });
       

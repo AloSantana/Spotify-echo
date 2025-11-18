@@ -219,7 +219,7 @@ async function captureComprehensiveScreenshots() {
     JSON.stringify(report, null, 2)
   );
   
-  console.log(`\\n📊 Screenshot Capture Complete`);
+  console.log('\\n📊 Screenshot Capture Complete');
   console.log(`✨ Captured ${screenshots.length} screenshots`);
   console.log(`📁 Saved to: ${outputDir}`);
   

@@ -274,7 +274,7 @@ Please provide:
         // Demo 1: Generate Code
         console.log('📝 Demo 1: Generate Code');
         console.log('═'.repeat(80));
-        await this.generateCode(`Create a JavaScript function that validates music track metadata including artist name, track title, duration, and genre. The function should return validation errors if any.`);
+        await this.generateCode('Create a JavaScript function that validates music track metadata including artist name, track title, duration, and genre. The function should return validation errors if any.');
 
         // Demo 2: Explain Code
         console.log('\n📝 Demo 2: Explain Code');

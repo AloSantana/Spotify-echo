@@ -77,7 +77,7 @@ class LocalFileDatabase {
       console.log(`📊 Loaded ${this.listeningHistory.length} listening history records`);
       console.log(`🎵 Loaded ${this.trackFeatures.size} track features`);
       console.log(`👥 Loaded ${this.userInteractions.length} user interactions`);
-      console.log(`💾 MongoDB-compatible collections initialized`);
+      console.log('💾 MongoDB-compatible collections initialized');
       
       return true;
     } catch (error) {
@@ -393,7 +393,7 @@ class LocalFileDatabase {
       this.nextIds.tracks = this.collections.tracks.length + 1;
       this.nextIds.users = 2;
       
-      console.log(`💾 Collections populated:`);
+      console.log('💾 Collections populated:');
       console.log(`   - listening_history: ${this.collections.listening_history.length} records`);
       console.log(`   - tracks: ${this.collections.tracks.length} records`);
       console.log(`   - users: ${this.collections.users.length} records`);

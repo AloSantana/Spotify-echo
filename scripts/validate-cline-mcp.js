@@ -283,12 +283,12 @@ function displayResults(configPath, result) {
       }
 
       if (status.errors.length > 0) {
-        console.log(`   Errors:`);
+        console.log('   Errors:');
         status.errors.forEach((e) => console.log(`     • ${e}`));
       }
 
       if (status.warnings.length > 0) {
-        console.log(`   Warnings:`);
+        console.log('   Warnings:');
         status.warnings.forEach((w) => console.log(`     • ${w}`));
       }
     }

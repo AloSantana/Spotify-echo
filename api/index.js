@@ -3,7 +3,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
-const serverless = require('serverless-http');
+// Serverless-http available for future serverless deployment
+// const serverless = require('serverless-http');
 
 // Import routes
 const spotifyRoutes = require('../src/api/routes/spotify');
@@ -92,7 +93,8 @@ app.use('/api/*', (req, res) => {
 });
 
 // Error handling middleware
-app.use((error, req, res, next) => {
+// eslint-disable-next-line no-unused-vars
+app.use((error, req, res, _next) => {
   console.error('API Error:', error);
   
   if (error.name === 'ValidationError') {

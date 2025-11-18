@@ -242,7 +242,7 @@ class WorkflowConfigurationManager extends EventEmitter {
     /**
      * Extract parameters from issue content
      */
-    extractParametersFromIssue({ title, body, labels }) {
+    extractParametersFromIssue({ title, body: _body, labels }) {
         const parameters = {};
         
         // Extract from title
@@ -545,7 +545,7 @@ class WorkflowConfigurationManager extends EventEmitter {
     /**
      * Queue task when at capacity
      */
-    async queueTask(taskData) {
+    async queueTask(_taskData) {
         // Implementation for task queueing
         console.log('Task queued for later execution');
         return null;

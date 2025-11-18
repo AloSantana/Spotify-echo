@@ -103,7 +103,7 @@ class PreflightCheck {
                     if (model.inferenceProfileArn) {
                         this.log(`    Inference Profile ARN: ${model.inferenceProfileArn.substring(0, 60)}...`, 'success');
                     } else {
-                        this.log(`    Inference Profile ARN: Missing!`, 'error');
+                        this.log('    Inference Profile ARN: Missing!', 'error');
                         this.errors.push(`${modelKey} requires inference profile but ARN is missing`);
                         allModelsPresent = false;
                     }

@@ -553,14 +553,14 @@ const ChatFirstInterface = ({ sessionId: propSessionId, className }) => {
                 label="Suggest examples"
                 size="small"
                 variant="outlined"
-                onClick={() => setInputMessage("What are some popular energetic rock songs?")}
+                onClick={() => setInputMessage('What are some popular energetic rock songs?')}
               />
               <Chip
                 icon={<MusicNote />}
                 label="Create playlist"
                 size="small"
                 variant="outlined"
-                onClick={() => setInputMessage("Create a 30-minute workout playlist")}
+                onClick={() => setInputMessage('Create a 30-minute workout playlist')}
               />
             </Stack>
           </Paper>
@@ -614,7 +614,7 @@ const ChatFirstInterface = ({ sessionId: propSessionId, className }) => {
                     <SkipPrevious />
                   </IconButton>
                 </Tooltip>
-                <Tooltip title={nowPlaying.is_playing ? "Pause" : "Play"}>
+                <Tooltip title={nowPlaying.is_playing ? 'Pause' : 'Play'}>
                   <IconButton onClick={handlePlayPause} color="primary" size="large">
                     {nowPlaying.is_playing ? <Pause /> : <PlayArrow />}
                   </IconButton>
