@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './styles/index.css';
-import { ProfiledApp } from '../../../scripts/profile-react-performance.jsx';
+import { ProfiledApp } from '../../scripts/profile-react-performance.jsx';
 
 // Performance monitoring (defer heavy work)
 if (process.env.NODE_ENV === 'production') {

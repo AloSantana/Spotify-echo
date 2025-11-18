@@ -45,8 +45,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   CheckCircle as CheckCircleIcon,
   Error as ErrorIcon,
-  Warning as WarningIcon
-} from '@mui/icons-material';
+  Warning as WarningIcon,
   MusicNote,
   Analytics,
   CloudCircle,
@@ -58,7 +57,7 @@ import {
   VisibilityOff,
   Edit,
   Delete,
-  Add,
+  Add
 } from '@mui/icons-material';
 
 /**

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useLLM } from '../contexts/LLMContext';
 import { useDatabase } from '../contexts/DatabaseContext';
-import LoadingState from './LoadingState';
-import ErrorFallback from './ErrorFallback';
-import './Settings.css';
+import LoadingState from '../components/LoadingState';
+import ErrorFallback from '../components/ErrorFallback';
+import '../components/Settings.css';
 
 /**
  * Comprehensive Settings Component

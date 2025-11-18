@@ -26,7 +26,7 @@ const TOAST_DURATIONS = {
 };
 
 // Toast icons
-const TOAST_ICONS = {
+export const TOAST_ICONS = {
   [TOAST_TYPES.SUCCESS]: '✅',
   [TOAST_TYPES.ERROR]: '❌',
   [TOAST_TYPES.WARNING]: '⚠️',
@@ -34,7 +34,7 @@ const TOAST_ICONS = {
 };
 
 // Toast colors (for inline styles, can be replaced with CSS classes)
-const TOAST_COLORS = {
+export const TOAST_COLORS = {
   [TOAST_TYPES.SUCCESS]: {
     background: '#10b981',
     text: '#ffffff',
