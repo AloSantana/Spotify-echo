@@ -1,39 +1,70 @@
 # Design System Documentation
 
-**@ai-generated AWS Bedrock Claude Sonnet 4.5 (anthropic.claude-sonnet-4-20250514-v1:0)**  
-**@region us-east-1**  
-**@purpose Comprehensive design system documentation**
+**Updated:** 2025-11-18  
+**Framework:** Material-UI v5  
+**Phase:** 2 - UI Framework Modernization
 
 ## Overview
 
-The EchoTune AI Design System provides a comprehensive set of accessible, performant, and beautiful components built with React and modern web standards.
+The EchoTune AI Design System provides a comprehensive set of accessible, performant, and beautiful components built with React, Material-UI v5, and modern web standards. The system maintains the Spotify-inspired aesthetic while ensuring consistency and accessibility across the entire application.
 
 ### Key Principles
 
 1. **Accessibility First**: WCAG 2.1 AA compliance throughout
-2. **Performance**: Optimized for speed and efficiency
-3. **Consistency**: Unified design language across the application
-4. **Flexibility**: Customizable and extensible components
-5. **Developer Experience**: Well-documented with TypeScript support
+2. **Performance**: Optimized for speed and efficiency with code splitting and lazy loading
+3. **Consistency**: Unified design language across all components via centralized theme
+4. **Spotify-Inspired**: Green accent colors (#1db954) and dark-first design
+5. **Developer Experience**: Well-documented Material-UI components with prop validation
+
+### Technology Stack
+
+- **UI Framework**: Material-UI (MUI) v5.x
+- **Styling**: Emotion (CSS-in-JS) via MUI
+- **Icons**: Material Icons (@mui/icons-material)
+- **Theme**: Custom MUI theme with dark/light mode support
+- **Typography**: Inter font family (Google Fonts)
 
 ## Design Tokens
 
-Design tokens are the visual design atoms of the design system. They define colors, typography, spacing, and other visual properties.
+Design tokens are centrally defined in `src/frontend/theme/muiTheme.js` and applied consistently across all Material-UI components.
 
 ### Colors
 
-#### Primary Colors
-- Primary 500: `#0ea5e9` (Main brand color)
-- Primary 600: `#0284c7` (Hover state)
-- Primary 700: `#0369a1` (Active state)
+#### Brand Colors (Spotify-Inspired)
 
-All color combinations meet WCAG AA contrast ratio requirements (4.5:1 minimum).
+**Primary - Spotify Green**
+- Main: `#1db954` (Spotify brand green)
+- Light: `#1ed760` (Hover state)
+- Dark: `#1aa34a` (Active state)
+- Contrast Text: `#ffffff`
+
+**Secondary - Dark Backgrounds**
+- Main: `#191414` (Spotify dark background)
+- Light: `#1a1a1a` (Card/Paper background)
+- Dark: `#121212` (Page background)
+- Contrast Text: `#ffffff`
+
+All color combinations meet WCAG 2.1 AA contrast ratio requirements (4.5:1 minimum for normal text, 3:1 for large text).
 
 #### Semantic Colors
-- Success: `#10b981` (Positive actions, success states)
-- Warning: `#f59e0b` (Caution, important information)
-- Error: `#ef4444` (Errors, destructive actions)
-- Info: `#3b82f6` (Informational content)
+- **Success**: `#1db954` (Matches primary - positive actions)
+- **Warning**: `#f39c12` (Caution, important information)
+- **Error**: `#e22134` (Errors, destructive actions)
+- **Info**: `#3498db` (Informational content)
+
+#### Theme-Specific Colors
+
+**Dark Mode** (Default)
+- Background Default: `#121212`
+- Background Paper: `#1a1a1a`
+- Text Primary: `#ffffff`
+- Text Secondary: `#b3b3b3`
+
+**Light Mode**
+- Background Default: `#ffffff`
+- Background Paper: `#f5f5f5`
+- Text Primary: `#121212`
+- Text Secondary: `#5e5e5e`
 
 ### Typography
 
@@ -393,10 +424,53 @@ const sessionData = bedrockTracker.exportSessionData();
 - iOS Safari: Latest 2 versions
 - Android Chrome: Latest 2 versions
 
+## New Components (Phase 2)
+
+### EmptyState Component
+
+A reusable component for displaying empty states with consistent styling and UX patterns.
+
+**Location**: `src/frontend/components/EmptyState.jsx`
+
+**Features**:
+- Predefined icon library for common scenarios
+- Three size variants: `compact`, `default`, `large`
+- Optional primary and secondary action buttons
+- Responsive design (mobile-first)
+- WCAG 2.1 AA compliant
+- Smooth animations and transitions
+
+**Usage Example**:
+```jsx
+import EmptyState from './components/EmptyState';
+
+<EmptyState
+  icon="playlist"
+  title="No playlists yet"
+  description="Create your first playlist to get started"
+  actionLabel="Create Playlist"
+  onAction={handleCreatePlaylist}
+  variant="default"
+/>
+```
+
+**Predefined Variants**:
+- `EmptyPlaylists` - For empty playlist views
+- `EmptySearchResults` - For search with no results
+- `EmptyLibrary` - For empty music libraries
+- `EmptyRecommendations` - For recommendation failures
+- `ErrorState` - For error scenarios
+
+**Icon Options**:
+- `music`, `playlist`, `playlists`, `search`, `library`, `album`, `empty`, `error`
+- Custom icons supported via `customIcon` prop
+
 ## Resources
 
 - [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
 - [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/)
+- [Material-UI Documentation](https://mui.com/)
+- [Material Design Guidelines](https://m3.material.io/)
 - [Web Vitals](https://web.dev/vitals/)
 - [React Documentation](https://react.dev/)
 
@@ -404,16 +478,17 @@ const sessionData = bedrockTracker.exportSessionData();
 
 When adding new components:
 1. Follow accessibility guidelines (WCAG 2.1 AA)
-2. Include comprehensive tests (80%+ coverage)
-3. Add JSDoc documentation
-4. Include usage examples
-5. Test keyboard navigation
-6. Verify screen reader compatibility
-7. Measure performance impact
-8. Include Bedrock attribution comments
+2. Use Material-UI components when possible
+3. Include comprehensive tests (80%+ coverage)
+4. Add JSDoc/PropTypes documentation
+5. Include usage examples
+6. Test keyboard navigation
+7. Verify screen reader compatibility
+8. Measure performance impact
+9. Follow the centralized theme system
 
 ---
 
-**Last Updated**: 2025-01-15  
-**Generated By**: AWS Bedrock Claude Sonnet 4.5  
-**Version**: 1.0.0
+**Last Updated**: 2025-11-18  
+**Framework**: Material-UI v5  
+**Version**: 2.0.0 (Phase 2)

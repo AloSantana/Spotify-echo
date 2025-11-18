@@ -7,7 +7,7 @@ import { AuthProvider } from '../contexts/AuthContext';
 import { UserPreferencesProvider } from '../contexts/UserPreferencesContext';
 import { SocketProvider } from './realtime/SocketContext';
 import { SpotifyPlayerProvider } from './player/SpotifyPlayerContext';
-import Header from './layout/Header';
+import Header from './Header';
 import SkeletonLoader from './SkeletonLoader';
 
 const Dashboard = lazy(() => import('../routes/Dashboard'));
@@ -21,7 +21,7 @@ const EnhancedAdvancedSettings = lazy(() => import('../routes/EnhancedAdvancedSe
 const EnhancedSpotifyChatInterface = lazy(() => import('../routes/EnhancedSpotifyChatInterface'));
 const ChatInterface = lazy(() => import('./chat/ChatInterface'));
 
-import './App.css';
+import '../styles/App.css';
 import { ToastProvider } from '../contexts/ToastContext';
 import { DatabaseProvider } from '../contexts/DatabaseContext';
 import { GlobalLoadingProvider } from './GlobalLoadingIndicator';
