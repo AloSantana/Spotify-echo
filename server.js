@@ -16,7 +16,18 @@ if (process.env.ENABLE_TRACING !== 'false') {
 }
 
 // Load environment variables first
-require('dotenv').config();
+try {
+  require('dotenv').config();
+} catch (error) {
+  if (error.code === 'MODULE_NOT_FOUND') {
+    console.error('\n❌ Error: dotenv module not found!');
+    console.error('📦 Please run: npm install');
+    console.error('   This will install all required dependencies.\n');
+    console.error('💡 See SETUP.md for detailed setup instructions.\n');
+    process.exit(1);
+  }
+  throw error;
+}
 
 // Initialize AgentOps with feature flag
 let agentops = null;

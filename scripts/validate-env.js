@@ -3,6 +3,17 @@
  * Enhanced environment validation with severity levels
  * Supports --warn-only flag for production deployment
  */
+
+// Check for required dependencies early
+try {
+  require.resolve('dotenv');
+} catch (error) {
+  console.error('\n❌ Error: Required dependencies not installed!');
+  console.error('📦 Please run: npm install');
+  console.error('   This will install all required dependencies including dotenv.\n');
+  process.exit(1);
+}
+
 const { ENV, schema, validate } = require('../src/config/env');
 
 // Parse command line arguments
