@@ -51,9 +51,9 @@ function generateCloudWatchQueries(report) {
         console.log(`# ${model.displayName}`);
         console.log('# Invocation Count Metric');
         console.log('```bash');
-        console.log(`aws cloudwatch get-metric-statistics \\`);
-        console.log(`  --namespace AWS/Bedrock \\`);
-        console.log(`  --metric-name InvocationCount \\`);
+        console.log('aws cloudwatch get-metric-statistics \\');
+        console.log('  --namespace AWS/Bedrock \\');
+        console.log('  --metric-name InvocationCount \\');
         
         if (model.requiresInferenceProfile && model.inferenceProfileArn) {
             const profileId = model.inferenceProfileArn.split('/').pop();
@@ -71,17 +71,17 @@ function generateCloudWatchQueries(report) {
         
         console.log(`  --start-time ${startTime.toISOString()} \\`);
         console.log(`  --end-time ${endTime.toISOString()} \\`);
-        console.log(`  --period 300 \\`);
-        console.log(`  --statistics Sum \\`);
+        console.log('  --period 300 \\');
+        console.log('  --statistics Sum \\');
         console.log(`  --region ${report.region}`);
         console.log('```');
         console.log('');
         
         console.log('# Token Usage Metric');
         console.log('```bash');
-        console.log(`aws cloudwatch get-metric-statistics \\`);
-        console.log(`  --namespace AWS/Bedrock \\`);
-        console.log(`  --metric-name InputTokens \\`);
+        console.log('aws cloudwatch get-metric-statistics \\');
+        console.log('  --namespace AWS/Bedrock \\');
+        console.log('  --metric-name InputTokens \\');
         
         if (model.requiresInferenceProfile && model.inferenceProfileArn) {
             const profileId = model.inferenceProfileArn.split('/').pop();
@@ -92,14 +92,14 @@ function generateCloudWatchQueries(report) {
         
         console.log(`  --start-time ${startTime.toISOString()} \\`);
         console.log(`  --end-time ${endTime.toISOString()} \\`);
-        console.log(`  --period 300 \\`);
-        console.log(`  --statistics Sum \\`);
+        console.log('  --period 300 \\');
+        console.log('  --statistics Sum \\');
         console.log(`  --region ${report.region}`);
         console.log('```');
         console.log('');
         
         console.log('Expected Results:');
-        console.log(`  - Invocation Count: >= 1`);
+        console.log('  - Invocation Count: >= 1');
         console.log(`  - Input Tokens: >= ${model.usage.input_tokens}`);
         console.log(`  - Output Tokens: >= ${model.usage.output_tokens}`);
         console.log('');
@@ -134,21 +134,21 @@ function generateCostExplorerQueries(report) {
     
     console.log('## Using AWS CLI:');
     console.log('```bash');
-    console.log(`aws ce get-cost-and-usage \\`);
+    console.log('aws ce get-cost-and-usage \\');
     console.log(`  --time-period Start=${formatDate(startDate)},End=${formatDate(endDate)} \\`);
-    console.log(`  --granularity DAILY \\`);
-    console.log(`  --metrics "BlendedCost" "UsageQuantity" \\`);
-    console.log(`  --filter file://bedrock-filter.json \\`);
-    console.log(`  --group-by Type=DIMENSION,Key=USAGE_TYPE`);
+    console.log('  --granularity DAILY \\');
+    console.log('  --metrics "BlendedCost" "UsageQuantity" \\');
+    console.log('  --filter file://bedrock-filter.json \\');
+    console.log('  --group-by Type=DIMENSION,Key=USAGE_TYPE');
     console.log('```');
     console.log('');
     
     console.log('## Filter file (bedrock-filter.json):');
     console.log('```json');
     console.log(JSON.stringify({
-        "Dimensions": {
-            "Key": "SERVICE",
-            "Values": ["Amazon Bedrock"]
+        'Dimensions': {
+            'Key': 'SERVICE',
+            'Values': ['Amazon Bedrock']
         }
     }, null, 2));
     console.log('```');
@@ -200,8 +200,8 @@ function generateCloudWatchLogsQueries(report) {
         
         console.log(`# ${model.displayName}`);
         console.log('```bash');
-        console.log(`aws logs filter-log-events \\`);
-        console.log(`  --log-group-name /aws/bedrock/modelinvocations \\`);
+        console.log('aws logs filter-log-events \\');
+        console.log('  --log-group-name /aws/bedrock/modelinvocations \\');
         console.log(`  --start-time $(date -d "${model.requestTimestamp}" +%s)000 \\`);
         console.log(`  --end-time $(date -d "${model.responseTimestamp}" +%s)000 \\`);
         
@@ -212,7 +212,7 @@ function generateCloudWatchLogsQueries(report) {
         }
         
         console.log(`  --region ${report.region} \\`);
-        console.log(`  --limit 10`);
+        console.log('  --limit 10');
         console.log('```');
         console.log('');
     });
@@ -228,7 +228,7 @@ function generateSummaryDocument(report) {
     
     console.log(`**Validation Timestamp:** ${report.timestamp}`);
     console.log(`**Region:** ${report.region}`);
-    console.log(`**Provider:** AWS Bedrock (provider=bedrock)`);
+    console.log('**Provider:** AWS Bedrock (provider=bedrock)');
     console.log('');
     
     console.log('## Models Validated:');
@@ -239,7 +239,7 @@ function generateSummaryDocument(report) {
             console.log(`   - Model ID: \`${model.actualModelId}\``);
             if (model.requiresInferenceProfile) {
                 console.log(`   - Inference Profile ARN: \`${model.inferenceProfileArn}\``);
-                console.log(`   - Cross-Region: Enabled`);
+                console.log('   - Cross-Region: Enabled');
             }
             console.log(`   - Latency: ${model.latency}ms`);
             console.log(`   - Tokens: ${model.usage.input_tokens} input + ${model.usage.output_tokens} output`);

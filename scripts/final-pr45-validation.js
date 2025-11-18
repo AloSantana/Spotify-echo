@@ -123,10 +123,10 @@ class FinalPR45Summary {
             const envResult = execSync('node scripts/env-validate-strict.js', { 
                 env: {
                     ...process.env,
-                    MONGODB_URI: "mongodb+srv://copilot:DapperMan77@cluster0.ofnyuy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
-                    SPOTIFY_CLIENT_ID: "dcc2df507bde447c93a0199358ca219d",
-                    SPOTIFY_CLIENT_SECRET: "128089720b414d1e8233290d94fb38a0",
-                    JWT_SECRET: "fb66bf34fc84939cc49bf532a573169ee05c70e4f628d1d8b940cab82d5c030f"
+                    MONGODB_URI: 'mongodb+srv://copilot:DapperMan77@cluster0.ofnyuy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+                    SPOTIFY_CLIENT_ID: 'dcc2df507bde447c93a0199358ca219d',
+                    SPOTIFY_CLIENT_SECRET: '128089720b414d1e8233290d94fb38a0',
+                    JWT_SECRET: 'fb66bf34fc84939cc49bf532a573169ee05c70e4f628d1d8b940cab82d5c030f'
                 },
                 encoding: 'utf8'
             });

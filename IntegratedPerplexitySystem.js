@@ -7,7 +7,6 @@
 
 const EnhancedPerplexityAPI = require('./EnhancedPerplexityAPI');
 const PerplexityCostOptimizer = require('./PerplexityCostOptimizer');
-const fs = require('fs').promises;
 
 class IntegratedPerplexitySystem {
     constructor(options = {}) {

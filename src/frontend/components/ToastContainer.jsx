@@ -63,7 +63,7 @@ function Toast({ toast, onClose, onPause, onResume }) {
               padding: '4px 8px',
               backgroundColor: 'rgba(255, 255, 255, 0.2)',
               color: colors.text,
-              border: `1px solid rgba(255, 255, 255, 0.3)`,
+              border: '1px solid rgba(255, 255, 255, 0.3)',
               borderRadius: '3px',
               fontSize: '12px',
               cursor: 'pointer',

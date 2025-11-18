@@ -27,7 +27,7 @@ function assertModule(name) {
         require.resolve(name);
     } catch (e) {
         console.error(`❌ [INSTALL_FAILURE] Required module '${name}' not found.`);
-        console.error(`   This indicates the npm install phase likely failed.`);
+        console.error('   This indicates the npm install phase likely failed.');
         process.exit(10);
     }
 }

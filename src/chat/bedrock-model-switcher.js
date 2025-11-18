@@ -198,13 +198,13 @@ class BedrockModelSwitcher {
         if (response.model) {
             // Model switch response
             let output = response.message + '\n\n';
-            output += `**Model Details:**\n`;
+            output += '**Model Details:**\n';
             output += `- Display Name: ${response.model.displayName}\n`;
             output += `- Model ID: ${response.model.modelId}\n`;
             output += `- Region: ${response.region}\n`;
             output += `- Capabilities: ${response.model.capabilities.join(', ')}\n`;
             output += `- Description: ${response.model.description}\n`;
-            output += `\n**Pricing:**\n`;
+            output += '\n**Pricing:**\n';
             output += `- Input: ${response.model.pricing.input}\n`;
             output += `- Output: ${response.model.pricing.output}\n`;
             return output;

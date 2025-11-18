@@ -275,7 +275,7 @@ class BedrockInferenceProvider extends EventEmitter {
         // Log model invocation details
         console.log(`🔄 Invoking model: ${effectiveModelId}`);
         if (modelConfig?.requiresInferenceProfile) {
-            console.log(`   Using inference profile ARN for cross-region access`);
+            console.log('   Using inference profile ARN for cross-region access');
         }
         
         // Create command

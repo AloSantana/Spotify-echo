@@ -103,7 +103,7 @@ class AliasResolver {
         }
         throw new Error(
           `Legacy alias cycle detected: ${loop.join(' -> ')}. ` +
-          `Please fix the 'legacyMappings' in bedrock-aliases.json`
+          'Please fix the \'legacyMappings\' in bedrock-aliases.json'
         );
       }
       

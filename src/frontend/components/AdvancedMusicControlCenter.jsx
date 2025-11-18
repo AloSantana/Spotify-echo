@@ -291,7 +291,7 @@ const AdvancedMusicControlCenter = ({
 
       {/* Main Controls */}
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2, mb: 3 }}>
-        <Tooltip title={isShuffled ? "Disable shuffle" : "Enable shuffle"}>
+        <Tooltip title={isShuffled ? 'Disable shuffle' : 'Enable shuffle'}>
           <IconButton
             onClick={handleShuffleToggle}
             color={isShuffled ? 'primary' : 'default'}

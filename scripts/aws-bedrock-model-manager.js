@@ -213,7 +213,7 @@ class BedrockModelManager {
     console.log(`✓ Now using ${model.displayName}`);
     console.log(`  Model ID: ${model.modelId}`);
     console.log(`  Region: ${process.env.AWS_REGION || 'us-east-1'}`);
-    console.log(`  All subsequent completions will use this model.`);
+    console.log('  All subsequent completions will use this model.');
     console.log('');
 
     return {

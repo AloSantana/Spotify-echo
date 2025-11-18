@@ -157,11 +157,11 @@ class BedrockErrorHandler {
     }
     
     if (errorDetails.retryable) {
-      message += `Retryable: Yes\n`;
+      message += 'Retryable: Yes\n';
     }
     
     if (errorDetails.actionable.length > 0) {
-      message += `\n💡 Recommended Actions:\n`;
+      message += '\n💡 Recommended Actions:\n';
       errorDetails.actionable.forEach((action, idx) => {
         message += `  ${idx + 1}. ${action}\n`;
       });
