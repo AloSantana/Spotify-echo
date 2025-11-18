@@ -16,6 +16,7 @@ const AdvancedMusicControlCenter = lazy(() => import('./components/AdvancedMusic
 const EnhancedMusicDiscoveryDashboard = lazy(() => import('./components/EnhancedMusicDiscoveryDashboard'));
 const AdvancedAnalyticsVisualizationDashboard = lazy(() => import('./components/AdvancedAnalyticsVisualizationDashboard'));
 const ModernChatInterface = lazy(() => import('./components/ModernChatInterface'));
+const ChatFirstInterface = lazy(() => import('./components/ChatFirstInterface'));
 const AdvancedPlaylistManagement = lazy(() => import('./components/AdvancedPlaylistManagement'));
 const InsightsDashboard = lazy(() => import('./components/InsightsDashboard'));
 const SongsPage = lazy(() => import('./components/SongsPage'));
@@ -50,7 +51,7 @@ import './styles/App.css';
 
 // Prefetch maps to warm lazy chunks on hover
 const prefetchers = {
-  chat: () => import('./components/EnhancedChatInterface'),
+  chat: () => import('./components/ChatFirstInterface'),
   recommendations: () => import('./components/ExplainableRecommendations'),
   playlist: () => import('./components/PlaylistBuilder'),
   playlists: () => import('./components/PlaylistsPage'),
@@ -533,13 +534,8 @@ function MainApplication({ initialTab = 'chat' }) {
                   </Box>
                 }
               >
-                <ModernChatInterface
+                <ChatFirstInterface
                   sessionId={sessionId}
-                  onSendMessage={handleSendChatMessage}
-                  onPlayTrack={onPlayTrack}
-                  onLikeTrack={onLikeTrack}
-                  onShareTrack={onShareTrack}
-                  loading={false}
                 />
               </AuthGuard>
             </Container>

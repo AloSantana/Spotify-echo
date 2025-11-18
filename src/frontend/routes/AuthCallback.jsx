@@ -24,9 +24,10 @@ function AuthCallback() {
       // Refresh auth status to get user data
       await checkAuthStatus();
 
-      // Redirect to home page
-      window.location.href = '/?auth=success';
+      // Redirect to chat page (chat-first design)
+      window.location.href = '/chat?auth=success';
     } else {
+      // On error, go back to login
       window.location.href = '/';
     }
   }, [checkAuthStatus]);

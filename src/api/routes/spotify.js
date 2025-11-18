@@ -295,13 +295,9 @@ router.get('/auth/callback', authRateLimit, async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days for refresh token
     });
 
-    res.json({
-      success: true,
-      user: userData,
-      access_token: accessTokenJWT,
-      expires_in: 3600,
-      message: 'Authentication successful',
-    });
+    // Redirect to chat page (chat-first design) instead of returning JSON
+    // The React app will pick up the authentication from cookies
+    res.redirect('/chat?auth=success');
   } catch (error) {
     console.error('OAuth callback error:', error.response?.data || error.message);
     

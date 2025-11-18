@@ -2,11 +2,18 @@ const express = require('express');
 const EchoTuneChatbot = require('../../chat/chatbot');
 const { requireAuth, createRateLimit } = require('../middleware');
 const SpotifyChatIntegration = require('../../chat/spotify-integration');
+const { getChatPersistenceService } = require('../../services/ChatPersistenceService');
 
 const router = express.Router();
 
-// Initialize Spotify chat integration
+// Initialize services
 const spotifyIntegration = new SpotifyChatIntegration();
+const persistenceService = getChatPersistenceService();
+
+// Initialize persistence service
+(async () => {
+  await persistenceService.initialize();
+})();
 
 // Initialize chatbot with configuration
 const chatbotConfig = {
@@ -72,17 +79,34 @@ const chatRateLimit = createRateLimit({
 router.post('/start', requireAuth, chatRateLimit, async (req, res) => {
   try {
     const chatbotInstance = await initializeChatbot();
-    const { sessionId, provider, model } = req.body;
+    const { sessionId, provider, model, systemPrompt } = req.body;
 
-    const session = await chatbotInstance.startConversation(req.userId, {
+    // Create or get session from PostgreSQL
+    const dbSession = await persistenceService.getOrCreateSession(req.userId, {
       sessionId,
-      provider,
-      model,
+      provider: provider || chatbotConfig.defaultProvider,
+      model: model || chatbotConfig.defaultModel,
+      systemPrompt
     });
+
+    // Initialize chatbot session
+    const session = await chatbotInstance.startConversation(req.userId, {
+      sessionId: dbSession.id,
+      provider: dbSession.provider,
+      model: dbSession.model,
+    });
+
+    // Load chat history if session exists
+    const history = await persistenceService.getSessionHistory(dbSession.id, { limit: 50 });
 
     res.json({
       success: true,
-      session,
+      session: {
+        ...session,
+        id: dbSession.id,
+        messageCount: dbSession.messageCount,
+        history: history
+      },
       message: 'Conversation started successfully',
     });
   } catch (error) {
@@ -173,8 +197,23 @@ router.post('/message', requireAuth, chatRateLimit, async (req, res) => {
       });
     }
 
+    const startTime = Date.now();
+
+    // Save user message to database
+    await persistenceService.saveMessage(sessionId, {
+      userId: req.userId,
+      role: 'user',
+      content: message,
+      provider,
+      model
+    });
+
     // Check if user has Spotify access token (from session or user object)
     const spotifyAccessToken = req.user?.spotifyAccessToken || req.session?.spotifyAccessToken;
+
+    let finalResponse;
+    let spotifyAction = null;
+    let spotifyCommand = null;
 
     // If Spotify token available, check for Spotify commands
     if (spotifyAccessToken) {
@@ -182,7 +221,10 @@ router.post('/message', requireAuth, chatRateLimit, async (req, res) => {
         const spotifyResult = await spotifyIntegration.processMessage(message, spotifyAccessToken);
         
         if (spotifyResult.isSpotifyCommand) {
-          // This is a Spotify command - return Spotify result with AI context
+          spotifyAction = spotifyResult.result;
+          spotifyCommand = spotifyResult.command;
+          
+          // This is a Spotify command - get AI context
           const aiContext = await chatbotInstance.sendMessage(sessionId, message, {
             provider,
             model,
@@ -190,14 +232,14 @@ router.post('/message', requireAuth, chatRateLimit, async (req, res) => {
             maxTokens,
           });
 
-          return res.json({
-            success: true,
+          finalResponse = {
+            ...aiContext,
             response: spotifyResult.result.message || aiContext.response,
-            spotifyAction: spotifyResult.result,
-            spotifyCommand: spotifyResult.command,
+            spotifyAction,
+            spotifyCommand,
             recommendations: spotifyResult.result.tracks || spotifyResult.result.recommendations || aiContext.recommendations,
             intent: { ...aiContext.intent, isSpotifyCommand: true },
-          });
+          };
         }
       } catch (spotifyError) {
         console.warn('Spotify command processing failed:', spotifyError.message);
@@ -205,17 +247,37 @@ router.post('/message', requireAuth, chatRateLimit, async (req, res) => {
       }
     }
 
-    // Regular chat message (no Spotify command or no token)
-    const response = await chatbotInstance.sendMessage(sessionId, message, {
-      provider,
-      model,
-      temperature,
-      maxTokens,
+    // Regular chat message if no Spotify command
+    if (!finalResponse) {
+      finalResponse = await chatbotInstance.sendMessage(sessionId, message, {
+        provider,
+        model,
+        temperature,
+        maxTokens,
+      });
+    }
+
+    const latencyMs = Date.now() - startTime;
+
+    // Save assistant response to database
+    await persistenceService.saveMessage(sessionId, {
+      userId: req.userId,
+      role: 'assistant',
+      content: finalResponse.response,
+      provider: provider || chatbotConfig.defaultProvider,
+      model: model || chatbotConfig.defaultModel,
+      tokensUsed: finalResponse.tokensUsed,
+      latencyMs,
+      spotifyCommand,
+      spotifyTrackId: spotifyAction?.trackId,
+      spotifyPlaylistId: spotifyAction?.playlistId,
+      recommendedTracks: finalResponse.recommendations
     });
 
     res.json({
       success: true,
-      ...response,
+      ...finalResponse,
+      latencyMs
     });
   } catch (error) {
     console.error('Error sending message:', error);
@@ -1225,6 +1287,153 @@ router.post('/spotify-command', requireAuth, chatRateLimit, async (req, res) => 
     res.status(500).json({
       error: 'Failed to execute Spotify command',
       message: error.message,
+    });
+  }
+});
+
+/**
+ * Get chat history for a session
+ * GET /api/chat/history/:sessionId
+ */
+router.get('/history/:sessionId', requireAuth, chatRateLimit, async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { limit, offset } = req.query;
+
+    const history = await persistenceService.getSessionHistory(sessionId, {
+      limit: parseInt(limit) || 50,
+      offset: parseInt(offset) || 0
+    });
+
+    res.json({
+      success: true,
+      sessionId,
+      messages: history,
+      count: history.length
+    });
+  } catch (error) {
+    console.error('Error getting chat history:', error);
+    res.status(500).json({
+      error: 'Failed to get chat history',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * Get user's chat sessions
+ * GET /api/chat/sessions
+ */
+router.get('/sessions', requireAuth, chatRateLimit, async (req, res) => {
+  try {
+    const { limit, includeInactive } = req.query;
+
+    const sessions = await persistenceService.getUserSessions(req.userId, {
+      limit: parseInt(limit) || 20,
+      includeInactive: includeInactive === 'true'
+    });
+
+    res.json({
+      success: true,
+      sessions,
+      count: sessions.length
+    });
+  } catch (error) {
+    console.error('Error getting user sessions:', error);
+    res.status(500).json({
+      error: 'Failed to get user sessions',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * Update session metadata
+ * PATCH /api/chat/session/:sessionId
+ */
+router.patch('/session/:sessionId', requireAuth, chatRateLimit, async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const updates = req.body;
+
+    const session = await persistenceService.updateSession(sessionId, updates);
+
+    res.json({
+      success: true,
+      session
+    });
+  } catch (error) {
+    console.error('Error updating session:', error);
+    res.status(500).json({
+      error: 'Failed to update session',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * Delete a chat session
+ * DELETE /api/chat/session/:sessionId
+ */
+router.delete('/session/:sessionId', requireAuth, chatRateLimit, async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+
+    await persistenceService.deleteSession(sessionId);
+
+    res.json({
+      success: true,
+      message: 'Session deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting session:', error);
+    res.status(500).json({
+      error: 'Failed to delete session',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * Get user preferences
+ * GET /api/chat/preferences
+ */
+router.get('/preferences', requireAuth, chatRateLimit, async (req, res) => {
+  try {
+    const preferences = await persistenceService.getUserPreferences(req.userId);
+
+    res.json({
+      success: true,
+      preferences
+    });
+  } catch (error) {
+    console.error('Error getting preferences:', error);
+    res.status(500).json({
+      error: 'Failed to get preferences',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * Update user preferences
+ * PATCH /api/chat/preferences
+ */
+router.patch('/preferences', requireAuth, chatRateLimit, async (req, res) => {
+  try {
+    const updates = req.body;
+    
+    const preferences = await persistenceService.updateUserPreferences(req.userId, updates);
+
+    res.json({
+      success: true,
+      preferences
+    });
+  } catch (error) {
+    console.error('Error updating preferences:', error);
+    res.status(500).json({
+      error: 'Failed to update preferences',
+      message: error.message
     });
   }
 });
