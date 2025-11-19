@@ -712,6 +712,48 @@ cp .env.example .env
 npm run validate:env
 ```
 
+#### Setup Script Issues
+
+**Problem:** Getting "command not found" when trying to run setup scripts
+
+**Common Issues:**
+
+1. **Running PowerShell script from bash/WSL:**
+   ```bash
+   # ❌ WRONG - Trying to run PowerShell script from bash
+   .\scripts\windows\setup.ps1
+   # Error: .scriptswindowssetup.ps1: command not found
+   ```
+   
+   **Solution:** Use the correct script for your environment:
+   ```bash
+   # ✅ For Linux/WSL (bash):
+   ./install-ubuntu.sh
+   
+   # ✅ For Windows PowerShell:
+   # Open PowerShell and run:
+   .\scripts\windows\setup.ps1
+   ```
+
+2. **Script not executable:**
+   ```bash
+   # If script isn't executable
+   chmod +x install-ubuntu.sh
+   ./install-ubuntu.sh
+   ```
+
+3. **Using npm install (simplest approach):**
+   ```bash
+   # Skip all setup scripts - just use npm directly
+   npm install
+   npm start
+   ```
+
+**Platform-Specific Setup Entrypoints:**
+- **Linux/Ubuntu/WSL:** `./install-ubuntu.sh` or just `npm install`
+- **Windows PowerShell:** `.\scripts\windows\setup.ps1` or just `npm install`
+- **macOS:** `npm install` (uses same script as Linux if needed)
+
 #### Still Having Issues?
 
 1. Check existing [GitHub Issues](https://github.com/primoscope/Spotify-echo/issues)
@@ -1122,6 +1164,8 @@ For more details, see [Comprehensive Test Guide](docs/COMPREHENSIVE_TEST_GUIDE.m
 ### Core Documentation
 - **[📖 Main Documentation](docs/README.md)** - Comprehensive documentation index
 - **[🚀 Quick Start Guide](docs/QUICK_START.md)** - Get started in 5 minutes
+- **[🛠️ Setup Entrypoints](SETUP-ENTRYPOINTS.md)** - Platform-specific setup commands reference
+- **[📝 Setup Guide](SETUP.md)** - Detailed installation instructions and troubleshooting
 - **[🏗️ Architecture Guide](docs/ARCHITECTURE.md)** - System architecture and design
 - **[📊 Data Model](docs/DATA_MODEL.md)** - Database schemas and structures
 - **[🔧 API Documentation](docs/API_DOCUMENTATION.md)** - Complete API reference
