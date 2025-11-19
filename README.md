@@ -1164,6 +1164,8 @@ For more details, see [Comprehensive Test Guide](docs/COMPREHENSIVE_TEST_GUIDE.m
 ### Core Documentation
 - **[📖 Main Documentation](docs/README.md)** - Comprehensive documentation index
 - **[🚀 Quick Start Guide](docs/QUICK_START.md)** - Get started in 5 minutes
+- **[🛠️ Setup Entrypoints](SETUP-ENTRYPOINTS.md)** - Platform-specific setup commands reference
+- **[📝 Setup Guide](SETUP.md)** - Detailed installation instructions and troubleshooting
 - **[🏗️ Architecture Guide](docs/ARCHITECTURE.md)** - System architecture and design
 - **[📊 Data Model](docs/DATA_MODEL.md)** - Database schemas and structures
 - **[🔧 API Documentation](docs/API_DOCUMENTATION.md)** - Complete API reference
