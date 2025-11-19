@@ -40,11 +40,31 @@ This project follows the [Contributor Covenant Code of Conduct](https://www.cont
 
 ### Prerequisites
 
-- **Node.js 20+** and npm
+#### Required Software Versions
+
+- **Node.js** 
+  - **Minimum:** 18.0.0 (EOL: April 2025)
+  - **Recommended:** 20.x LTS (Active LTS)
+  - **Supported:** 18.x, 20.x, 22.x
+  - Check version: `node --version`
+  - Install via [nvm](https://github.com/nvm-sh/nvm): `nvm install 20 && nvm use 20`
+  
+- **npm**
+  - **Minimum:** 8.0.0
+  - **Recommended:** 10.x (included with Node 20+)
+  - Check version: `npm --version`
+
 - **Python 3.8+** and pip
 - **Git** for version control
 - **MongoDB** (local or Atlas account)
 - **Spotify Developer Account** for API access
+
+#### Version Validation
+
+The repository includes automatic version checking:
+- ✅ On `npm install`, the preinstall script validates your Node.js version
+- ✅ If your version is too old, you'll get a clear error message with upgrade instructions
+- ✅ The `.nvmrc` file specifies the recommended Node version (20.19.5)
 
 ### Installation
 
@@ -105,6 +125,92 @@ npm run mcp-server
 
 # Run Python ML scripts
 python scripts/recommendation_engine.py
+```
+
+### Troubleshooting Installation Issues
+
+#### Node.js Version Errors
+
+**Problem:** Error message about incompatible Node.js version
+```
+❌ Node.js Version Error
+Current version:  Node.js 12.22.9
+Required version: Node.js 18.0.0 or higher
+```
+
+**Solution:**
+```bash
+# Using nvm (recommended)
+nvm install 20
+nvm use 20
+nvm alias default 20
+
+# Verify installation
+node --version  # Should show v20.x.x
+npm --version   # Should show 10.x.x or higher
+```
+
+#### npm install Fails
+
+**Problem:** `npm install` fails with EBADENGINE or similar errors
+
+**Solution:**
+```bash
+# 1. Clean npm cache
+npm cache clean --force
+
+# 2. Remove node_modules and lock file
+rm -rf node_modules package-lock.json
+
+# 3. Verify Node/npm versions
+node --version  # Must be >=18.0.0
+npm --version   # Must be >=8.0.0
+
+# 4. Use npm ci for clean install (recommended for CI/CD)
+npm ci
+
+# 5. Or regular install
+npm install
+```
+
+#### Deprecated Dependency Warnings
+
+**Problem:** Seeing warnings about deprecated packages (e.g., inflight, rimraf@3, glob@7)
+
+**Solution:** These are warnings from transitive dependencies and do NOT prevent installation or operation. They can be safely ignored. The maintainers will update these in future releases.
+
+#### Git Dependency Issues
+
+**Problem:** Errors related to git-based dependencies or prepare scripts
+
+**Solution:** This project does NOT use git-based dependencies. If you encounter such errors:
+1. Ensure you're using a supported Node version (18+)
+2. Check that you're not using an old fork or branch
+3. Clear npm cache: `npm cache clean --force`
+4. Try `npm ci` instead of `npm install`
+
+#### MCP Server Dependencies
+
+**Problem:** Errors related to `@browserbasehq/mcp-server-browserbase` or other MCP servers
+
+**Solution:** MCP servers are optional and use `npx` for on-demand installation:
+- They are NOT installed during `npm install`
+- They are only downloaded when you explicitly start them
+- If you don't need MCP features, you can ignore related warnings
+- To disable: Set `SKIP_MCP_SERVERS=true` in your `.env`
+
+#### Docker Build Issues
+
+**Problem:** Docker build fails or uses wrong Node version
+
+**Solution:**
+```bash
+# The Dockerfile uses Node 20-alpine by default
+# Rebuild with no cache to ensure fresh base image
+docker build --no-cache -t echotune-ai:latest .
+
+# Or use docker-compose
+docker-compose up --build
 ```
 
 ## 🎯 Contributing Guidelines

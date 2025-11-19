@@ -4,7 +4,8 @@
   "description": "EchoTune AI - Sophisticated music recommendation system with AI-powered discovery",
   "main": "server.js",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   },
   "scripts": {
     "preinstall": "node scripts/check-node-version.js",
