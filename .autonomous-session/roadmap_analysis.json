@@ -1,1 +1,147 @@
-{"actionable_tasks": [], "error": "Expecting ',' delimiter: line 308 column 6 (char 15269)", "fallback": true}
+{
+  "actionable_tasks": [
+    {
+      "id": "task_1",
+      "title": "Implement Circuit Breaker for Provider Failover",
+      "description": "Add circuit breaker logic to the backend chat pipeline to handle provider failures gracefully and switch to backup providers automatically.",
+      "priority": "high",
+      "estimated_time": "30-60 minutes",
+      "files_to_modify": [
+        "src/chat/providerFailover.js",
+        "src/chat/chatPipeline.js"
+      ],
+      "implementation_steps": [
+        "Research and select a lightweight circuit breaker library (e.g., opossum).",
+        "Integrate the circuit breaker into the chat pipeline for each LLM provider.",
+        "Configure failover logic to switch to a secondary provider on failure.",
+        "Add debug logging for failover events."
+      ],
+      "complexity_score": 7
+    },
+    {
+      "id": "task_2",
+      "title": "Add Request Correlation IDs for End-to-End Tracing",
+      "description": "Attach a unique correlation ID to each request in the backend chat pipeline for easier tracing and debugging.",
+      "priority": "high",
+      "estimated_time": "30-60 minutes",
+      "files_to_modify": [
+        "src/chat/chatPipeline.js",
+        "src/middleware/correlationId.js"
+      ],
+      "implementation_steps": [
+        "Create a middleware to generate and attach a correlation ID to each request.",
+        "Pass the correlation ID through all backend services and log it with each operation.",
+        "Ensure the ID is returned in API responses for frontend debugging."
+      ],
+      "complexity_score": 6
+    },
+    {
+      "id": "task_3",
+      "title": "Implement Backend Chat Pipeline for User Context",
+      "description": "Enhance the backend chat pipeline to attach user context (mood/history/preferences) and persist conversation summaries.",
+      "priority": "high",
+      "estimated_time": "30-60 minutes",
+      "files_to_modify": [
+        "src/chat/chatPipeline.js",
+        "src/db/conversationSummary.js"
+      ],
+      "implementation_steps": [
+        "Modify the chat pipeline to accept and attach user context.",
+        "Store conversation summaries in the database.",
+        "Ensure context is persisted and retrieved for future sessions."
+      ],
+      "complexity_score": 7
+    },
+    {
+      "id": "task_4",
+      "title": "Implement MongoDB Compound Indexes for Analytics Queries",
+      "description": "Create compound indexes in MongoDB to optimize analytics queries for faster response times.",
+      "priority": "medium",
+      "estimated_time": "30-60 minutes",
+      "files_to_modify": [
+        "src/db/analytics.js",
+        "src/db/indexes.js"
+      ],
+      "implementation_steps": [
+        "Identify the most frequently queried fields in analytics.",
+        "Create compound indexes for these fields in MongoDB.",
+        "Test query performance before and after index creation."
+      ],
+      "complexity_score": 6
+    },
+    {
+      "id": "task_5",
+      "title": "Implement TTL Indexes for Telemetry Data Rotation",
+      "description": "Set up TTL indexes in MongoDB to automatically rotate and delete old telemetry data.",
+      "priority": "medium",
+      "estimated_time": "30-60 minutes",
+      "files_to_modify": [
+        "src/db/telemetry.js",
+        "src/db/indexes.js"
+      ],
+      "implementation_steps": [
+        "Determine the retention period for telemetry data.",
+        "Create TTL indexes in MongoDB for telemetry collections.",
+        "Test data rotation and deletion."
+      ],
+      "complexity_score": 6
+    },
+    {
+      "id": "task_6",
+      "title": "Implement Response Streaming for Large Datasets",
+      "description": "Enable response streaming in the backend to handle large datasets efficiently and improve user experience.",
+      "priority": "medium",
+      "estimated_time": "30-60 minutes",
+      "files_to_modify": [
+        "src/api/analytics.js",
+        "src/api/streaming.js"
+      ],
+      "implementation_steps": [
+        "Modify API endpoints to support streaming responses.",
+        "Test streaming with large datasets to ensure performance improvements."
+      ],
+      "complexity_score": 7
+    },
+    {
+      "id": "task_7",
+      "title": "Implement Prometheus Metrics Export for Alerting",
+      "description": "Add Prometheus metrics export to the backend for real-time alerting and monitoring.",
+      "priority": "medium",
+      "estimated_time": "30-60 minutes",
+      "files_to_modify": [
+        "src/metrics/prometheus.js",
+        "src/api/metrics.js"
+      ],
+      "implementation_steps": [
+        "Integrate a Prometheus client library.",
+        "Expose key metrics via a dedicated endpoint.",
+        "Configure Prometheus to scrape metrics from the endpoint."
+      ],
+      "complexity_score": 7
+    },
+    {
+      "id": "task_8",
+      "title": "Implement Backend Settings for Provider Configs and DB Ops",
+      "description": "Enhance backend settings to validate and apply provider configurations and database operations.",
+      "priority": "medium",
+      "estimated_time": "30-60 minutes",
+      "files_to_modify": [
+        "src/settings.js",
+        "src/db/admin.js"
+      ],
+      "implementation_steps": [
+        "Add validation logic for provider configurations.",
+        "Implement functions to apply configurations and perform database operations.",
+        "Ensure settings are persisted and can be updated dynamically."
+      ],
+      "complexity_score": 7
+    }
+  ],
+  "next_research_topics": [
+    "Circuit breaker patterns for microservices",
+    "Best practices for request correlation and tracing",
+    "MongoDB indexing strategies for analytics",
+    "Prometheus metrics and alerting best practices"
+  ],
+  "completion_percentage": 75
+}

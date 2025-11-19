@@ -1,9 +1,9 @@
 
-# Task: Implement Circuit Breaker Pattern for Provider Failover
-# Description: Add a circuit breaker mechanism to the backend provider selection logic to automatically failover to alternate LLM providers when error rates or latency exceed thresholds.
-# Files to modify: ['src/providers/providerManager.js', 'src/providers/circuitBreaker.js', 'src/api/routes/providers.js']
+# Task: Implement Circuit Breaker for Provider Failover
+# Description: Add circuit breaker logic to the backend chat pipeline to handle provider failures gracefully and switch to backup providers automatically.
+# Files to modify: ['src/chat/providerFailover.js', 'src/chat/chatPipeline.js']
 
-print("Implementing: Implement Circuit Breaker Pattern for Provider Failover")
+print("Implementing: Implement Circuit Breaker for Provider Failover")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

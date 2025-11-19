@@ -1,9 +1,9 @@
 
-# Task: Expand Automated Test Coverage
-# Description: Increase automated test coverage for critical backend modules, focusing on provider switching and chat pipeline logic.
-# Files to modify: ['tests/providers.test.js', 'tests/chatPipeline.test.js']
+# Task: Implement Backend Chat Pipeline for User Context
+# Description: Enhance the backend chat pipeline to attach user context (mood/history/preferences) and persist conversation summaries.
+# Files to modify: ['src/chat/chatPipeline.js', 'src/db/conversationSummary.js']
 
-print("Implementing: Expand Automated Test Coverage")
+print("Implementing: Implement Backend Chat Pipeline for User Context")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

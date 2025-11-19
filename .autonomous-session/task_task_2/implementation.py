@@ -1,7 +1,7 @@
 
 # Task: Add Request Correlation IDs for End-to-End Tracing
-# Description: Attach a unique correlation ID to each incoming request and propagate it through backend services for improved traceability and debugging.
-# Files to modify: ['src/api/middleware/requestLogger.js', 'src/api/routes/*', 'src/utils/correlationId.js']
+# Description: Attach a unique correlation ID to each request in the backend chat pipeline for easier tracing and debugging.
+# Files to modify: ['src/chat/chatPipeline.js', 'src/middleware/correlationId.js']
 
 print("Implementing: Add Request Correlation IDs for End-to-End Tracing")
 
