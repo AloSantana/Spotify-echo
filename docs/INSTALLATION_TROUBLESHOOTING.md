@@ -4,6 +4,7 @@ This guide helps resolve common installation and setup issues for EchoTune AI.
 
 ## 📋 Table of Contents
 
+- [Platform-Specific Setup](#platform-specific-setup)
 - [Quick Diagnostics](#quick-diagnostics)
 - [Node.js Version Issues](#nodejs-version-issues)
 - [npm Installation Failures](#npm-installation-failures)
@@ -13,6 +14,148 @@ This guide helps resolve common installation and setup issues for EchoTune AI.
 - [MCP Server Issues](#mcp-server-issues)
 - [Environment Configuration](#environment-configuration)
 - [Getting Help](#getting-help)
+
+## 🖥️ Platform-Specific Setup
+
+### Ubuntu Linux
+
+**Optimized installation for Ubuntu 20.04, 22.04, and 24.04:**
+
+```bash
+# Update package manager
+sudo apt update && sudo apt upgrade -y
+
+# Install build essentials (required for native modules)
+sudo apt install -y build-essential python3 python3-pip git curl
+
+# Install Node.js 20 LTS via NodeSource
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Verify installation
+node --version  # Should show v20.x.x
+npm --version   # Should show 10.x.x
+
+# Install MongoDB (optional)
+wget -qO - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+sudo apt update
+sudo apt install -y mongodb-org
+
+# Install PostgreSQL (optional)
+sudo apt install -y postgresql postgresql-contrib
+
+# Clone and setup EchoTune AI
+git clone https://github.com/primoscope/Spotify-echo.git
+cd Spotify-echo
+npm install
+```
+
+### Windows 11 with WSL2 (Recommended)
+
+**Optimized for Windows 11 + WSL2 + Ubuntu:**
+
+```powershell
+# In PowerShell (Administrator)
+# Install WSL2 with Ubuntu
+wsl --install -d Ubuntu-22.04
+wsl --set-default-version 2
+
+# Restart Windows, then open Ubuntu terminal
+```
+
+```bash
+# Inside WSL Ubuntu terminal
+# Update system
+sudo apt update && sudo apt upgrade -y
+
+# Install prerequisites
+sudo apt install -y build-essential python3 git curl
+
+# Install Node.js 20 via nvm (recommended for WSL)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source ~/.bashrc
+nvm install 20
+nvm use 20
+nvm alias default 20
+
+# Clone repository in WSL filesystem (NOT /mnt/c/)
+cd ~
+mkdir -p projects
+cd projects
+git clone https://github.com/primoscope/Spotify-echo.git
+cd Spotify-echo
+
+# Configure Git for line endings
+git config core.autocrlf false
+git config core.eol lf
+
+# Install dependencies
+npm install
+
+# Access from Windows browser at http://localhost:3000
+```
+
+**WSL-Specific Optimizations:**
+
+```bash
+# Add to ~/.bashrc for better performance
+export NODE_OPTIONS="--max-old-space-size=4096"
+export NPM_CONFIG_CACHE="$HOME/.npm-cache"
+
+# Disable Windows Defender scanning in WSL (improves npm install speed)
+# In PowerShell (Administrator):
+# Add-MpPreference -ExclusionProcess "/mnt/c/Windows/System32/wsl.exe"
+```
+
+### Native Windows 11 (Without WSL)
+
+**For Windows 11 native development:**
+
+```powershell
+# Download and install Node.js 20 LTS from nodejs.org
+# https://nodejs.org/en/download/
+
+# Verify installation
+node --version
+npm --version
+
+# Install Git for Windows
+# https://git-scm.com/download/win
+
+# Clone repository
+git clone https://github.com/primoscope/Spotify-echo.git
+cd Spotify-echo
+
+# Configure npm for Windows
+npm config set script-shell "C:\\Program Files\\Git\\bin\\bash.exe"
+
+# Install dependencies
+npm install
+```
+
+### Generic Linux (Fedora, Arch, etc.)
+
+**For other Linux distributions:**
+
+```bash
+# Fedora
+sudo dnf install -y nodejs npm git gcc-c++ make python3
+
+# Arch Linux
+sudo pacman -S nodejs npm git base-devel python
+
+# openSUSE
+sudo zypper install nodejs npm git gcc-c++ make python3
+
+# Verify and install Node 20 if needed
+node --version
+# If version < 20, use nvm:
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source ~/.bashrc
+nvm install 20
+nvm use 20
+```
 
 ## 🩺 Quick Diagnostics
 
@@ -432,6 +575,217 @@ npm install dotenv
 
 # Test loading
 node -e "require('dotenv').config(); console.log(process.env.SPOTIFY_CLIENT_ID)"
+```
+
+## 🖥️ Platform-Specific Troubleshooting
+
+### Ubuntu/Linux Issues
+
+#### Problem: Permission Denied Errors
+
+**Error:** `EACCES: permission denied, mkdir '/usr/local/lib/node_modules'`
+
+**Solution:**
+
+```bash
+# Fix npm permissions (recommended - avoid sudo)
+mkdir -p ~/.npm-global
+npm config set prefix '~/.npm-global'
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+
+# Now install packages without sudo
+npm install -g npm@latest
+```
+
+#### Problem: Native Module Build Failures
+
+**Error:** `node-gyp rebuild` fails or `make: command not found`
+
+**Solution:**
+
+```bash
+# Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install -y build-essential python3 python3-pip
+
+# Fedora
+sudo dnf install gcc gcc-c++ make python3
+
+# Arch
+sudo pacman -S base-devel python
+
+# Then reinstall
+npm ci
+```
+
+### Windows 11 WSL Issues
+
+#### Problem: Slow npm install in WSL
+
+**Cause:** Repository stored in Windows filesystem (`/mnt/c/`)
+
+**Solution:**
+
+```bash
+# WRONG - Slow (Windows filesystem)
+cd /mnt/c/Users/YourName/Projects/Spotify-echo
+
+# CORRECT - Fast (WSL Linux filesystem)
+cd ~/projects/Spotify-echo
+
+# If repo is in wrong location, move it:
+mv /mnt/c/Users/YourName/Projects/Spotify-echo ~/projects/
+cd ~/projects/Spotify-echo
+npm ci  # Much faster now!
+```
+
+#### Problem: File Watching Doesn't Work
+
+**Symptoms:** `nodemon` or `npm run dev` doesn't reload on file changes
+
+**Solution:**
+
+```bash
+# Increase inotify watchers
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+
+# Verify
+cat /proc/sys/fs/inotify/max_user_watches
+```
+
+#### Problem: Line Ending Issues (CRLF vs LF)
+
+**Error:** `unexpected token` or script execution failures
+
+**Solution:**
+
+```bash
+# Configure Git for WSL
+git config --global core.autocrlf false
+git config --global core.eol lf
+
+# Fix existing files
+dos2unix setup-wsl.sh  # If you have dos2unix
+# OR
+sed -i 's/\r$//' setup-wsl.sh  # Using sed
+
+# Re-clone repository with correct settings
+cd ~/projects
+rm -rf Spotify-echo
+git clone https://github.com/primoscope/Spotify-echo.git
+cd Spotify-echo
+npm install
+```
+
+#### Problem: Port Already in Use
+
+**Error:** `EADDRINUSE: address already in use :::3000`
+
+**Solution:**
+
+```bash
+# Find process using port 3000
+lsof -ti:3000
+
+# Kill the process
+kill -9 $(lsof -ti:3000)
+
+# Or use fuser (if available)
+fuser -k 3000/tcp
+```
+
+#### Problem: Cannot Access localhost from Windows
+
+**Symptoms:** Can't open `http://localhost:3000` in Windows browser
+
+**Solution:**
+
+```bash
+# Check WSL IP address
+ip addr show eth0 | grep inet
+
+# Use WSL IP instead
+# Example: http://172.20.10.5:3000
+
+# Or configure WSL networking (Windows 11 22H2+)
+# Add to ~/.wslconfig in Windows:
+[wsl2]
+networkingMode=mirrored
+```
+
+### Native Windows Issues
+
+#### Problem: Script Execution Policy
+
+**Error:** `cannot be loaded because running scripts is disabled`
+
+**Solution:**
+
+```powershell
+# Run PowerShell as Administrator
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Verify
+Get-ExecutionPolicy
+```
+
+#### Problem: Long Path Issues
+
+**Error:** `ENAMETOOLONG` or paths over 260 characters
+
+**Solution:**
+
+```powershell
+# Enable long paths (Windows 10+)
+# Run PowerShell as Administrator
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
+  -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+
+# Or via Group Policy:
+# gpedit.msc → Computer Configuration → Administrative Templates 
+# → System → Filesystem → Enable Win32 long paths
+```
+
+#### Problem: Symlink Creation Failures
+
+**Error:** `EPERM: operation not permitted, symlink`
+
+**Solution:**
+
+```powershell
+# Enable Developer Mode (Windows 10+)
+# Settings → Update & Security → For developers → Developer mode ON
+
+# Or run terminal as Administrator
+```
+
+### Docker Platform Issues
+
+#### Problem: Docker Build Fails on ARM (M1/M2 Mac)
+
+**Solution:**
+
+```bash
+# Build for linux/amd64 explicitly
+docker build --platform linux/amd64 -t echotune-ai:latest .
+
+# Or in docker-compose.yml, add:
+# platform: linux/amd64
+```
+
+#### Problem: Docker on WSL2 Performance
+
+**Solution:**
+
+```bash
+# Store Dockerfile and project in WSL filesystem
+# NOT in /mnt/c/
+
+# Optimize Docker Desktop settings:
+# - Enable WSL 2 integration
+# - Limit resources: Memory 4GB, CPUs 2-4
 ```
 
 ## 🆘 Getting Help

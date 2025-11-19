@@ -68,7 +68,13 @@ The repository includes automatic version checking:
 
 ### Installation
 
+#### Ubuntu/Linux
+
 ```bash
+# Install build dependencies first
+sudo apt-get update
+sudo apt-get install -y build-essential python3 python3-pip git curl
+
 # Clone your fork
 git clone https://github.com/YOUR_USERNAME/Spotify-echo.git
 cd Spotify-echo
@@ -77,13 +83,78 @@ cd Spotify-echo
 npm install
 
 # Install Python dependencies
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 
 # Copy environment template
 cp .env.example .env
 
 # Configure your environment variables
-# Add your Spotify API credentials and other settings
+# Edit .env with your Spotify API credentials
+```
+
+#### Windows 11 with WSL2 (Recommended)
+
+```bash
+# Inside WSL Ubuntu terminal
+# IMPORTANT: Clone in WSL filesystem, NOT /mnt/c/
+cd ~
+mkdir -p projects
+cd projects
+
+# Clone your fork
+git clone https://github.com/YOUR_USERNAME/Spotify-echo.git
+cd Spotify-echo
+
+# Configure Git for line endings
+git config core.autocrlf false
+git config core.eol lf
+
+# Install dependencies
+npm install
+pip3 install -r requirements.txt
+
+# Copy environment template
+cp .env.example .env
+
+# Access application from Windows browser at http://localhost:3000
+```
+
+#### Native Windows
+
+```powershell
+# In PowerShell or Git Bash
+# Clone your fork
+git clone https://github.com/YOUR_USERNAME/Spotify-echo.git
+cd Spotify-echo
+
+# Configure npm script shell
+npm config set script-shell "C:\\Program Files\\Git\\bin\\bash.exe"
+
+# Install dependencies
+npm install
+pip install -r requirements.txt
+
+# Copy environment template
+copy .env.example .env
+
+# Edit .env with your credentials
+```
+
+#### macOS
+
+```bash
+# Clone your fork
+git clone https://github.com/YOUR_USERNAME/Spotify-echo.git
+cd Spotify-echo
+
+# Install dependencies
+npm install
+pip3 install -r requirements.txt
+
+# Copy environment template
+cp .env.example .env
+
+# Configure your environment variables
 ```
 
 ### Environment Configuration

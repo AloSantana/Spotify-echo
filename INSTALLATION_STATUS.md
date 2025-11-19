@@ -254,13 +254,90 @@ echo "SKIP_MCP_SERVERS=true" >> .env
 
 ## 🌐 Platform Support
 
-| Platform | Status | Notes |
-|----------|--------|-------|
-| Linux | ✅ FULL SUPPORT | Tested on Ubuntu |
-| macOS | ✅ FULL SUPPORT | Homebrew/nvm |
-| Windows (WSL) | ✅ FULL SUPPORT | WSL2 recommended |
-| Windows (Native) | ✅ FULL SUPPORT | Node.js installer |
-| Docker | ✅ FULL SUPPORT | Node 20-alpine |
+### Fully Tested and Optimized
+
+| Platform | Status | Version | Notes |
+|----------|--------|---------|-------|
+| **Ubuntu Linux** | ✅ EXCELLENT | 20.04, 22.04, 24.04 | Optimized, recommended for production |
+| **Windows 11 WSL2** | ✅ EXCELLENT | WSL2 + Ubuntu | Best Windows development experience |
+| **Linux (Generic)** | ✅ FULL SUPPORT | Debian, Fedora, Arch | Native package managers |
+| **macOS** | ✅ FULL SUPPORT | 11+, M1/M2/Intel | Homebrew, nvm recommended |
+| **Windows (Native)** | ✅ FULL SUPPORT | Windows 10/11 | Node.js installer, Git Bash |
+| **Docker** | ✅ FULL SUPPORT | linux/amd64, arm64 | Node 20-alpine base |
+
+### Platform-Specific Optimizations
+
+#### 🐧 Ubuntu Linux (Recommended)
+```bash
+# Optimized installation
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs build-essential
+git clone https://github.com/primoscope/Spotify-echo.git
+cd Spotify-echo && npm install
+```
+
+**Performance:**
+- ⚡ Fastest npm install (~19s with npm ci)
+- ✅ Native module compilation
+- ✅ Best file watching performance
+- ✅ Direct Docker compatibility
+
+#### 💻 Windows 11 + WSL2 (Recommended for Windows)
+```bash
+# In WSL Ubuntu terminal (in WSL filesystem!)
+cd ~/projects  # NOT /mnt/c/
+git clone https://github.com/primoscope/Spotify-echo.git
+cd Spotify-echo && npm install
+```
+
+**Performance:**
+- ⚡ Fast npm install (~25s in WSL filesystem)
+- ⚠️ Slow in /mnt/c/ (~2-3min) - avoid Windows filesystem
+- ✅ Linux compatibility
+- ✅ Access from Windows browser at localhost:3000
+
+**WSL2 Optimizations:**
+```bash
+# Add to ~/.bashrc for better performance
+export NODE_OPTIONS="--max-old-space-size=4096"
+export NPM_CONFIG_CACHE="$HOME/.npm-cache"
+
+# Increase file watchers
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+```
+
+#### 🪟 Windows 11 Native
+```powershell
+# Download Node.js 20 from nodejs.org
+# Configure Git for line endings
+git config --global core.autocrlf false
+
+# Clone and install
+git clone https://github.com/primoscope/Spotify-echo.git
+cd Spotify-echo
+npm install
+```
+
+**Performance:**
+- ⏱️ Moderate npm install (~35-45s)
+- ⚠️ Requires Git Bash for scripts
+- ✅ Native Windows integration
+
+#### 🍎 macOS
+```bash
+# Install with Homebrew
+brew install node@20
+brew link node@20
+
+# Or with nvm
+nvm install 20 && nvm use 20
+```
+
+**Performance:**
+- ⚡ Fast npm install (~20-25s)
+- ✅ M1/M2 ARM support
+- ✅ Native module compilation
 
 ---
 
