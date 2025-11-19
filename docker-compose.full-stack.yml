@@ -1,0 +1,125 @@
+# Full Stack Docker Compose for EchoTune AI Development
+# Includes MongoDB, PostgreSQL, Redis, and the application
+# Usage: docker-compose -f docker-compose.full-stack.yml up
+
+version: '3.8'
+
+services:
+  # MongoDB (Primary database for listening history & analytics)
+  mongodb:
+    image: mongo:7
+    container_name: echotune-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USER:-echotune}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:-echotune_dev}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE:-echotune}
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - echotune-network
+
+  # PostgreSQL (Chat, user preferences, and state)
+  postgres:
+    image: postgres:16-alpine
+    container_name: echotune-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-echotune}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-echotune_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-echotune}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U echotune"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - echotune-network
+
+  # Redis (Caching)
+  redis:
+    image: redis:7-alpine
+    container_name: echotune-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass ${REDIS_PASSWORD:-echotune_redis}
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "--pass", "${REDIS_PASSWORD:-echotune_redis}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - echotune-network
+
+  # EchoTune AI Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_SHA: ${BUILD_SHA:-local-dev}
+        BUILD_TIME: ${BUILD_TIME:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}
+    container_name: echotune-app
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3000
+      
+      # Database connections
+      MONGODB_URI: mongodb://${MONGODB_ROOT_USER:-echotune}:${MONGODB_ROOT_PASSWORD:-echotune_dev}@mongodb:27017/${MONGODB_DATABASE:-echotune}?authSource=admin
+      POSTGRES_URL: postgresql://${POSTGRES_USER:-echotune}:${POSTGRES_PASSWORD:-echotune_dev}@postgres:5432/${POSTGRES_DB:-echotune}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-echotune_redis}@redis:6379
+      
+      # Security
+      SESSION_SECRET: ${SESSION_SECRET:-dev_session_secret_change_in_production}
+      JWT_SECRET: ${JWT_SECRET:-dev_jwt_secret_change_in_production}
+      
+      # Features
+      ENABLE_MOCK_PROVIDER: ${ENABLE_MOCK_PROVIDER:-true}
+      BYPASS_AUTH: ${BYPASS_AUTH:-false}
+      
+    env_file:
+      - .env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    networks:
+      - echotune-network
+
+networks:
+  echotune-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local

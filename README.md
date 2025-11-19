@@ -11,7 +11,7 @@
 [![Spotify API](https://img.shields.io/badge/Spotify-API%20Ready-1DB954.svg)](https://developer.spotify.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[🚀 Quick Start](#-quick-start) • [📖 Documentation](#-documentation) • [🤖 AI Platform](docs/AI_PLATFORM.md) • [🧠 Coding Agent](docs/CODING_AGENT.md) • [🗺️ Roadmap](docs/ROADMAP.md)
+[🚀 Quick Start](#-quick-start) • [🛠️ Dev Guide](docs/DEVELOPMENT.md) • [📖 Documentation](#-documentation) • [🤖 AI Platform](docs/AI_PLATFORM.md) • [🗺️ Roadmap](docs/ROADMAP.md)
 
 </div>
 
@@ -291,13 +291,16 @@ sequenceDiagram
 
 ### Prerequisites
 
-> **⚠️ Important**: Node.js 18 or higher is **required**. Older versions (12.x, 14.x, 16.x) will fail with syntax errors during installation due to modern JavaScript syntax (ES2021+ features including nullish coalescing and optional chaining).
+> **⚠️ Important**: Node.js **20.x LTS** is the recommended and tested version. While Node 18.x is the minimum requirement, Node 20.x provides better compatibility with all dependencies (Prisma 6.x, Vite 7.x, React 19, Playwright 1.56+).
 
 **Required:**
-- **Node.js** 18.x or higher (20.x or 22.x recommended - see `.nvmrc`)
-  - Tested on: Node.js 18.0+, 20.x, 22.x
-  - Required for: Prisma, ESLint 9, modern JavaScript features
-- **npm** 8.x or higher (comes with Node.js 18+)
+- **Node.js 20.x LTS** (recommended - see `.nvmrc`)
+  - Minimum: Node.js 18.0+
+  - Tested on: Node.js 20.19.5
+  - Required for: Prisma 6.x, Vite 7.x, ESLint 9, modern JavaScript features
+  - Check version: `node --version`
+  - Install with nvm: `nvm install 20 && nvm use 20`
+- **npm** 8.x or higher (comes with Node.js 20+)
 - **MongoDB** (Atlas recommended) or use embedded SQLite
 - **Spotify Developer Account** + **Premium Account** (for playback control)
 
