@@ -389,6 +389,12 @@ cd Spotify-echo
 # Install dependencies (REQUIRED - run this first!)
 npm install
 
+# That's it! npm install handles everything automatically.
+# Optional helper scripts available if needed:
+#   ./install-guide.sh - Check what dependencies you need
+#   ./install-ubuntu.sh - Automated Ubuntu/WSL setup
+#   ./test-npm-install.sh - Test npm install before running
+
 # Generate Prisma Client (REQUIRED if using PostgreSQL) ✨ NEW
 # Note: Run this after setting up your .env file with POSTGRES_URL and DATABASE_URL
 # This command generates the Prisma Client for database operations
@@ -553,6 +559,169 @@ npm start
 ```
 
 📖 **Full Windows Documentation**: See [docs/WINDOWS_SETUP.md](docs/WINDOWS_SETUP.md) for comprehensive Windows setup, troubleshooting, and best practices.
+
+### 🔧 Troubleshooting Installation
+
+#### Node.js Version Issues
+
+**Problem:** Installation fails with engine compatibility errors
+
+```
+npm ERR! engine Unsupported engine
+npm ERR! Required: { node: '>=18.0.0' }
+npm ERR! Actual:   { node: 'v12.22.9', npm: '8.5.1' }
+```
+
+**Solution:**
+1. **Upgrade to a supported Node.js version:**
+   ```bash
+   # Using nvm (recommended)
+   nvm install 20
+   nvm use 20
+   nvm alias default 20
+   
+   # Verify installation
+   node --version  # Should show v20.x.x
+   npm --version   # Should show 10.x.x or higher
+   ```
+
+2. **Check `.nvmrc` for recommended version:**
+   ```bash
+   # Use the project's recommended version
+   nvm use
+   # or
+   nvm install
+   ```
+
+3. **If you don't have nvm:**
+   - Download Node.js 20.x LTS from [nodejs.org](https://nodejs.org/)
+   - Or use package managers:
+     - Ubuntu/Debian: `sudo apt update && sudo apt install nodejs npm`
+     - macOS: `brew install node@20`
+     - Windows: Download from [nodejs.org](https://nodejs.org/)
+
+#### Clean Install After Errors
+
+**Problem:** Installation partially completed but has errors
+
+**Solution:**
+```bash
+# 1. Clean everything
+npm cache clean --force
+rm -rf node_modules package-lock.json
+
+# 2. Verify Node version
+node --version  # Must be >=18.0.0
+
+# 3. Clean install (recommended for CI/CD)
+npm ci
+
+# Or regular install
+npm install
+```
+
+#### Deprecated Dependency Warnings
+
+**Problem:** Seeing warnings about deprecated packages
+
+```
+npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+```
+
+**Solution:** These are **warnings** from transitive dependencies and do **NOT** prevent installation or operation. They can be safely ignored. The maintainers will update these in future releases. Your installation will complete successfully despite these warnings.
+
+#### MCP Server Dependencies
+
+**Problem:** Errors or warnings about MCP servers during installation
+
+**Solution:** 
+- MCP servers (like `@browserbasehq/mcp-server-browserbase`) are **optional** features
+- They use `npx` for on-demand installation and are NOT installed during `npm install`
+- They are only downloaded when explicitly started
+- To disable MCP features: Add `SKIP_MCP_SERVERS=true` to your `.env` file
+- See [MCP_SERVERS_INTEGRATION_GUIDE.md](MCP_SERVERS_INTEGRATION_GUIDE.md) for details
+
+#### Database Connection Issues
+
+**Problem:** Application starts but can't connect to MongoDB or PostgreSQL
+
+**Solution:**
+```bash
+# MongoDB
+# 1. Check MongoDB is running
+mongosh --eval "db.adminCommand('ping')"
+
+# 2. Verify connection string in .env
+# MONGODB_URI=mongodb://localhost:27017/echotune
+# OR
+# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/echotune
+
+# PostgreSQL (optional)
+# 1. Check PostgreSQL is running
+pg_isready
+
+# 2. Verify connection string in .env
+# POSTGRES_URL=postgresql://localhost:5432/echotune_ai
+```
+
+#### Docker Build Issues
+
+**Problem:** Docker build fails or uses wrong Node version
+
+**Solution:**
+```bash
+# The Dockerfile uses Node 20-alpine by default
+# 1. Rebuild with no cache
+docker build --no-cache -t echotune-ai:latest .
+
+# 2. Or use docker-compose
+docker compose up --build --force-recreate
+
+# 3. Check Docker base image
+docker run --rm node:20-alpine node --version
+```
+
+#### Common Runtime Errors
+
+**Problem:** "Cannot find module 'dotenv'" or similar errors
+
+**Solution:**
+```bash
+# You skipped npm install - run it now
+npm install
+
+# Then start the application
+npm start
+```
+
+**Problem:** "Missing environment variable" errors
+
+**Solution:**
+```bash
+# 1. Copy example environment file
+cp .env.example .env
+
+# 2. Edit .env with your credentials
+# At minimum, you need:
+# - SPOTIFY_CLIENT_ID
+# - SPOTIFY_CLIENT_SECRET
+# - MONGODB_URI
+
+# 3. Validate environment
+npm run validate:env
+```
+
+#### Still Having Issues?
+
+1. Check existing [GitHub Issues](https://github.com/primoscope/Spotify-echo/issues)
+2. Review [CONTRIBUTING.md](CONTRIBUTING.md) for detailed troubleshooting
+3. Open a new issue with:
+   - Node version: `node --version`
+   - npm version: `npm --version`
+   - Operating system
+   - Full error message
+   - Steps to reproduce
 
 ### 🐳 Docker Installation
 
