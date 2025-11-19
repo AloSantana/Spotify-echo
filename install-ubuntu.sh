@@ -174,11 +174,41 @@ log_success "Essential build tools installed"
 log_step "Step 3/8: Installing Node.js 20.x LTS"
 
 NODE_VERSION=$(node -v 2>/dev/null || echo "none")
-if [[ "$NODE_VERSION" == "none" ]] || [[ ! "$NODE_VERSION" =~ ^v20\. ]]; then
-    log_info "Installing Node.js 20.x via NodeSource..."
+
+# Check if we have an existing Node version and if it's compatible
+if [[ "$NODE_VERSION" != "none" ]]; then
+    # Extract major version
+    NODE_MAJOR=$(echo "$NODE_VERSION" | sed 's/v//' | cut -d. -f1)
     
-    # Remove old Node.js if exists
-    sudo apt remove -y nodejs npm > /dev/null 2>&1 || true
+    if [[ "$NODE_MAJOR" -ge 18 ]]; then
+        log_success "Node.js $NODE_VERSION already installed (compatible)"
+        NPM_VERSION=$(npm -v)
+        log_success "npm $NPM_VERSION installed"
+        log_info "Skipping Node.js installation (already have compatible version)"
+    elif [[ "$NODE_MAJOR" -lt 18 ]]; then
+        log_warning "Found Node.js $NODE_VERSION (requires >=18.0.0)"
+        log_info "Upgrading to Node.js 20.x via NodeSource..."
+        
+        # Remove old Node.js
+        sudo apt remove -y nodejs npm > /dev/null 2>&1 || true
+        
+        # Add NodeSource repository
+        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - > /dev/null 2>&1
+        
+        # Install Node.js
+        sudo apt install -y nodejs > /dev/null 2>&1
+        
+        NODE_VERSION=$(node -v)
+        log_success "Node.js $NODE_VERSION installed"
+        NPM_VERSION=$(npm -v)
+        log_success "npm $NPM_VERSION installed"
+    else
+        log_success "Node.js $NODE_VERSION already installed"
+        NPM_VERSION=$(npm -v)
+        log_success "npm $NPM_VERSION installed"
+    fi
+else
+    log_info "Installing Node.js 20.x via NodeSource..."
     
     # Add NodeSource repository
     curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - > /dev/null 2>&1
@@ -188,13 +218,9 @@ if [[ "$NODE_VERSION" == "none" ]] || [[ ! "$NODE_VERSION" =~ ^v20\. ]]; then
     
     NODE_VERSION=$(node -v)
     log_success "Node.js $NODE_VERSION installed"
-else
-    log_success "Node.js $NODE_VERSION already installed"
+    NPM_VERSION=$(npm -v)
+    log_success "npm $NPM_VERSION installed"
 fi
-
-# Verify npm
-NPM_VERSION=$(npm -v)
-log_success "npm $NPM_VERSION installed"
 
 #############################################################################
 # Step 4: Configure Git
