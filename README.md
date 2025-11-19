@@ -389,6 +389,12 @@ cd Spotify-echo
 # Install dependencies (REQUIRED - run this first!)
 npm install
 
+# That's it! npm install handles everything automatically.
+# Optional helper scripts available if needed:
+#   ./install-guide.sh - Check what dependencies you need
+#   ./install-ubuntu.sh - Automated Ubuntu/WSL setup
+#   ./test-npm-install.sh - Test npm install before running
+
 # Generate Prisma Client (REQUIRED if using PostgreSQL) ✨ NEW
 # Note: Run this after setting up your .env file with POSTGRES_URL and DATABASE_URL
 # This command generates the Prisma Client for database operations
