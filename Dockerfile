@@ -16,6 +16,8 @@ COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
 # 2) Install deps
 # ------------------------------
 FROM base AS deps
+# Copy scripts directory for preinstall check-node-version.js
+COPY scripts ./scripts
 # Skip Puppeteer download during install to prevent Docker build failures
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
@@ -30,6 +32,8 @@ RUN if [ -f package-lock.json ]; then npm ci --legacy-peer-deps; \
 # ------------------------------
 FROM base AS prod-deps
 COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
+# Copy scripts directory for preinstall check-node-version.js
+COPY scripts ./scripts
 # Skip Puppeteer download during production install
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
@@ -91,6 +95,7 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/server.js ./server.js
 COPY --from=build /app/src ./src
 COPY --from=build /app/lib ./lib
+COPY --from=build /app/scripts ./scripts
 COPY --from=build /app/package.json ./package.json
 
 # Expose app port (configurable via PORT)
