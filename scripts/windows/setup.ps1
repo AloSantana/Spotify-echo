@@ -21,6 +21,32 @@ Write-Host "📦 Checking Node.js installation..." -ForegroundColor Yellow
 try {
     $nodeVersion = node --version
     Write-Host "✅ Node.js version: $nodeVersion" -ForegroundColor Green
+    
+    # Parse version and check if it meets requirements
+    $versionNumber = $nodeVersion -replace 'v', ''
+    $majorVersion = [int]($versionNumber -split '\.')[0]
+    
+    if ($majorVersion -lt 18) {
+        Write-Host ""
+        Write-Host "═══════════════════════════════════════════════════════════════" -ForegroundColor Red
+        Write-Host "  ❌ Node.js Version Error" -ForegroundColor Red
+        Write-Host "═══════════════════════════════════════════════════════════════" -ForegroundColor Red
+        Write-Host ""
+        Write-Host "  Current version:  Node.js $versionNumber" -ForegroundColor Red
+        Write-Host "  Required version: Node.js 18.0.0 or higher" -ForegroundColor Red
+        Write-Host ""
+        Write-Host "  This project requires Node.js 18 or higher." -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "  💡 How to upgrade:" -ForegroundColor Cyan
+        Write-Host ""
+        Write-Host "  1. Download Node.js 20.x LTS from: https://nodejs.org/" -ForegroundColor White
+        Write-Host "  2. Run the installer and follow the prompts" -ForegroundColor White
+        Write-Host "  3. Restart PowerShell and run this script again" -ForegroundColor White
+        Write-Host ""
+        Write-Host "═══════════════════════════════════════════════════════════════" -ForegroundColor Red
+        Write-Host ""
+        exit 1
+    }
 } catch {
     Write-Host "❌ Node.js not found. Please install Node.js 18+ from https://nodejs.org/" -ForegroundColor Red
     exit 1
@@ -31,6 +57,15 @@ Write-Host "📦 Checking npm installation..." -ForegroundColor Yellow
 try {
     $npmVersion = npm --version
     Write-Host "✅ npm version: $npmVersion" -ForegroundColor Green
+    
+    # Parse npm version and check if it meets requirements
+    $npmVersionNumber = $npmVersion
+    $npmMajorVersion = [int]($npmVersionNumber -split '\.')[0]
+    
+    if ($npmMajorVersion -lt 8) {
+        Write-Host "⚠️  npm version $npmVersion is older than required (8.0.0+)" -ForegroundColor Yellow
+        Write-Host "    Upgrade recommended: npm install -g npm@latest" -ForegroundColor Yellow
+    }
 } catch {
     Write-Host "❌ npm not found. Please install Node.js from https://nodejs.org/" -ForegroundColor Red
     exit 1
