@@ -291,12 +291,19 @@ sequenceDiagram
 
 ### Prerequisites
 
-> **⚠️ Important**: Node.js 18 or higher is **required**. Older versions (12.x, 14.x, 16.x) will fail with syntax errors during installation.
+> **⚠️ Important**: Node.js 18 or higher is **required**. Older versions (12.x, 14.x, 16.x) will fail with syntax errors during installation due to modern JavaScript syntax (ES2021+ features including nullish coalescing and optional chaining).
 
-- **Node.js** 18.x or higher (20.x recommended - see `.nvmrc`)
+**Required:**
+- **Node.js** 18.x or higher (20.x or 22.x recommended - see `.nvmrc`)
+  - Tested on: Node.js 18.0+, 20.x, 22.x
+  - Required for: Prisma, ESLint 9, modern JavaScript features
+- **npm** 8.x or higher (comes with Node.js 18+)
 - **MongoDB** (Atlas recommended) or use embedded SQLite
-- **PostgreSQL** (optional but recommended for chat & preferences) ✨ NEW
 - **Spotify Developer Account** + **Premium Account** (for playback control)
+
+**Optional but Recommended:**
+- **PostgreSQL** (for chat history & user preferences) ✨ NEW
+- **Redis** (for caching and session management)
 
 ### 🎵 Spotify API Setup
 
@@ -378,6 +385,11 @@ cd Spotify-echo
 
 # Install dependencies (REQUIRED - run this first!)
 npm install
+
+# Generate Prisma Client (REQUIRED if using PostgreSQL) ✨ NEW
+# Note: Run this after setting up your .env file with POSTGRES_URL and DATABASE_URL
+# This command generates the Prisma Client for database operations
+npx prisma generate
 
 # Optional: Setup PostgreSQL (recommended) ✨ NEW
 # See docs/POSTGRESQL_SETUP.md for detailed instructions
@@ -703,14 +715,23 @@ If you see **"No active device found"**:
   - OpenTelemetry packages for observability
   - See `package.json` for complete list
 
-**"SyntaxError: Unexpected token '='" during npm install**
+**"SyntaxError: Unexpected token '?'" or "Unexpected token '='" during npm install**
 - **Cause**: Your Node.js version is too old (likely 12.x, 14.x, or 16.x)
-- **Fix**: Upgrade to Node.js 18 or higher (20.x recommended)
+- **Specific error**: This typically occurs in `@prisma/debug` or `@prisma/engines` due to nullish coalescing operator (`??=`) which requires Node.js 14.4+
+- **Fix**: Upgrade to Node.js 18 or higher (20.x or 22.x recommended)
 - **How to upgrade**:
   - Using nvm: `nvm install 20 && nvm use 20`
   - Or download from https://nodejs.org/
-- The project uses modern JavaScript syntax (ES2021+) that requires Node.js 18+
-- After upgrading, run `npm install` again
+- The project uses modern JavaScript syntax (ES2021+, nullish coalescing, optional chaining) that requires Node.js 18+
+- After upgrading, run `rm -rf node_modules package-lock.json && npm install` again
+
+**Deprecation warnings during npm install**
+- **Expected behavior**: Some deprecation warnings are normal and come from transitive dependencies (dependencies of dependencies)
+- **No action required**: These don't affect functionality or security
+- **Common warnings**: `inflight`, `glob@7.x`, `rimraf@3.x`, `lodash.get`, `lodash.isequal`
+- **Details**: See [docs/DEPRECATED_DEPENDENCIES.md](docs/DEPRECATED_DEPENDENCIES.md) for full analysis
+- **What's fixed**: We've upgraded ESLint to v9 and Prisma to v6.19.0 to minimize deprecations
+- **Still present**: Some warnings remain from packages like `sqlite3`, `jest`, and `swagger-jsdoc` - these are waiting for upstream updates
 
 **OpenTelemetry warnings**
 - If you see "OpenTelemetry modules not available" - run `npm install`

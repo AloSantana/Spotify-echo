@@ -1,10 +1,14 @@
 // ESLint configuration for EchoTune AI
 // Modern ESLint v9+ flat config format
 
+const js = require('@eslint/js');
 const globals = require('globals');
 
 
 module.exports = [
+  // Apply recommended rules
+  js.configs.recommended,
+  
   // Global configuration for all files
   {
     languageOptions: {
