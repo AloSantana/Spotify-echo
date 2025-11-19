@@ -291,12 +291,19 @@ sequenceDiagram
 
 ### Prerequisites
 
-> **⚠️ Important**: Node.js 18 or higher is **required**. Older versions (12.x, 14.x, 16.x) will fail with syntax errors during installation.
+> **⚠️ Important**: Node.js 18 or higher is **required**. Older versions (12.x, 14.x, 16.x) will fail with syntax errors during installation due to modern JavaScript syntax (ES2021+ features including nullish coalescing and optional chaining).
 
-- **Node.js** 18.x or higher (20.x recommended - see `.nvmrc`)
+**Required:**
+- **Node.js** 18.x or higher (20.x or 22.x recommended - see `.nvmrc`)
+  - Tested on: Node.js 18.0+, 20.x, 22.x
+  - Required for: Prisma, ESLint 9, modern JavaScript features
+- **npm** 8.x or higher (comes with Node.js 18+)
 - **MongoDB** (Atlas recommended) or use embedded SQLite
-- **PostgreSQL** (optional but recommended for chat & preferences) ✨ NEW
 - **Spotify Developer Account** + **Premium Account** (for playback control)
+
+**Optional but Recommended:**
+- **PostgreSQL** (for chat history & user preferences) ✨ NEW
+- **Redis** (for caching and session management)
 
 ### 🎵 Spotify API Setup
 
@@ -378,6 +385,11 @@ cd Spotify-echo
 
 # Install dependencies (REQUIRED - run this first!)
 npm install
+
+# Generate Prisma Client (REQUIRED if using PostgreSQL) ✨ NEW
+# Note: Run this after setting up your .env file with POSTGRES_URL and DATABASE_URL
+# This command generates the Prisma Client for database operations
+npx prisma generate
 
 # Optional: Setup PostgreSQL (recommended) ✨ NEW
 # See docs/POSTGRESQL_SETUP.md for detailed instructions
