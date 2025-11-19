@@ -1,9 +1,9 @@
 
-# Task: Implement Backend Chat Pipeline for User Context
-# Description: Enhance the backend chat pipeline to attach user context (mood/history/preferences) and persist conversation summaries.
-# Files to modify: ['src/chat/chatPipeline.js', 'src/db/conversationSummary.js']
+# Task: Docker Optimization: Multi-Stage Builds
+# Description: Optimize Dockerfiles for backend and frontend services by implementing multi-stage builds to reduce image size and improve build caching.
+# Files to modify: ['Dockerfile', 'Dockerfile.frontend', 'docker-compose.yml']
 
-print("Implementing: Implement Backend Chat Pipeline for User Context")
+print("Implementing: Docker Optimization: Multi-Stage Builds")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

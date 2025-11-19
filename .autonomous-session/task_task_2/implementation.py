@@ -1,9 +1,9 @@
 
-# Task: Add Request Correlation IDs for End-to-End Tracing
-# Description: Attach a unique correlation ID to each request in the backend chat pipeline for easier tracing and debugging.
-# Files to modify: ['src/chat/chatPipeline.js', 'src/middleware/correlationId.js']
+# Task: Expand Automated Test Coverage
+# Description: Increase the number of automated tests for critical backend endpoints, focusing on provider switching and telemetry metrics to ensure reliability.
+# Files to modify: ['src/api/routes/providers.test.js', 'src/api/routes/telemetry.test.js']
 
-print("Implementing: Add Request Correlation IDs for End-to-End Tracing")
+print("Implementing: Expand Automated Test Coverage")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
