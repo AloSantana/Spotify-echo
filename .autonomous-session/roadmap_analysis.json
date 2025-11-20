@@ -3,102 +3,129 @@
     {
       "id": "task_1",
       "title": "Implement Circuit Breaker Pattern for Provider Failover",
-      "description": "Add a circuit breaker mechanism to the backend provider selection logic to automatically failover when a provider is unhealthy, improving system resilience.",
+      "description": "Add circuit breaker logic to the backend provider switching system to prevent cascading failures and improve reliability during LLM provider outages.",
       "priority": "high",
       "estimated_time": "60-90 minutes",
       "files_to_modify": [
-        "src/providers/providerManager.js",
-        "src/providers/circuitBreaker.js",
-        "src/api/routes/providers.js"
+        "src/api/routes/providers.js",
+        "src/utils/circuitBreaker.js"
       ],
       "implementation_steps": [
-        "Create a new module (circuitBreaker.js) implementing the circuit breaker logic (open/half-open/closed states, error thresholds, reset timeouts).",
-        "Integrate the circuit breaker into providerManager.js so that each provider instance is wrapped with the circuit breaker.",
-        "Update provider selection logic to skip providers in 'open' state.",
-        "Add logging for state transitions and errors.",
-        "Write a basic test in providers.test.js to simulate provider failures and verify failover."
+        "Research and select a lightweight circuit breaker library (e.g., opossum).",
+        "Wrap provider switching and health check endpoints with circuit breaker logic.",
+        "Add configuration for failure thresholds and reset timeouts.",
+        "Log circuit breaker state changes for observability."
       ],
       "complexity_score": 7
     },
     {
       "id": "task_2",
       "title": "Add Request Correlation IDs for End-to-End Tracing",
-      "description": "Attach a unique correlation ID to each incoming API request and propagate it through backend services for improved traceability and debugging.",
-      "priority": "medium",
-      "estimated_time": "30-45 minutes",
+      "description": "Inject correlation IDs into all backend requests to enable tracing across services and improve debugging and monitoring.",
+      "priority": "high",
+      "estimated_time": "30-60 minutes",
       "files_to_modify": [
-        "src/api/middleware/correlationId.js",
-        "src/api/routes/*",
-        "src/utils/logger.js"
+        "src/middleware/correlationId.js",
+        "src/api/routes/*.js"
       ],
       "implementation_steps": [
-        "Create a middleware (correlationId.js) that generates or extracts a correlation ID from incoming requests.",
-        "Attach the correlation ID to the request object and response headers.",
-        "Update logger.js to include the correlation ID in all log entries.",
-        "Ensure all route handlers and downstream service calls propagate the correlation ID."
+        "Create middleware to generate and attach correlation IDs to incoming requests.",
+        "Pass correlation IDs to downstream services and logs.",
+        "Update logging format to include correlation IDs."
+      ],
+      "complexity_score": 6
+    },
+    {
+      "id": "task_3",
+      "title": "Implement MongoDB Compound Indexes for Analytics Queries",
+      "description": "Create compound indexes in MongoDB to optimize performance of analytics queries, especially for engagement KPIs and listening patterns.",
+      "priority": "medium",
+      "estimated_time": "30-60 minutes",
+      "files_to_modify": [
+        "src/db/indexes.js",
+        "src/analytics/analytics.js"
+      ],
+      "implementation_steps": [
+        "Identify frequently queried fields in analytics collections.",
+        "Define and create compound indexes for these fields.",
+        "Test query performance before and after index creation."
       ],
       "complexity_score": 5
     },
     {
-      "id": "task_3",
-      "title": "Expand Automated Test Coverage for MCP Endpoints",
-      "description": "Increase automated test coverage for MCP endpoints and provider health checks to ensure reliability and catch regressions early.",
-      "priority": "medium",
-      "estimated_time": "45-60 minutes",
-      "files_to_modify": [
-        "src/api/routes/providers.test.js",
-        "src/api/routes/mcp.test.js"
-      ],
-      "implementation_steps": [
-        "Identify untested or under-tested MCP endpoints and provider health routes.",
-        "Write new Jest tests to cover edge cases (e.g., provider downtime, latency spikes, error responses).",
-        "Add assertions for expected status codes, response bodies, and error handling.",
-        "Run tests and verify coverage improvements."
-      ],
-      "complexity_score": 6
-    },
-    {
       "id": "task_4",
-      "title": "Optimize Dockerfile for Multi-Stage Builds and Caching",
-      "description": "Refactor the Dockerfile(s) to use multi-stage builds, reducing image size and improving build cache efficiency for faster deployments.",
+      "title": "Implement TTL Indexes for Telemetry Data Rotation",
+      "description": "Set up TTL indexes in MongoDB to automatically expire old telemetry data and manage storage efficiently.",
       "priority": "medium",
-      "estimated_time": "45-60 minutes",
+      "estimated_time": "30-60 minutes",
       "files_to_modify": [
-        "Dockerfile",
-        "docker-compose.yml"
+        "src/db/indexes.js",
+        "src/analytics/telemetry.js"
       ],
       "implementation_steps": [
-        "Update the Dockerfile to use separate stages for dependencies, build, and final runtime.",
-        "Ensure only production dependencies and built artifacts are included in the final image.",
-        "Test the new Docker build locally and verify image size reduction.",
-        "Update docker-compose.yml if necessary to use the optimized image."
+        "Identify telemetry collections that require data rotation.",
+        "Create TTL indexes with appropriate expiration times.",
+        "Monitor data expiration and adjust as needed."
       ],
-      "complexity_score": 6
+      "complexity_score": 5
     },
     {
       "id": "task_5",
-      "title": "Implement MongoDB TTL Indexes for Telemetry Data Rotation",
-      "description": "Add TTL (Time-To-Live) indexes to MongoDB telemetry collections to automatically expire old data, improving storage efficiency.",
-      "priority": "low",
-      "estimated_time": "30-45 minutes",
+      "title": "Add Prometheus Metrics Export for Alerting",
+      "description": "Integrate Prometheus metrics export in the backend to enable alerting and monitoring of key performance indicators.",
+      "priority": "medium",
+      "estimated_time": "60-90 minutes",
       "files_to_modify": [
-        "src/db/telemetry.js",
-        "src/db/initIndexes.js"
+        "src/metrics/prometheus.js",
+        "src/server.js"
       ],
       "implementation_steps": [
-        "Identify telemetry collections storing time-series or log data.",
-        "Add code in initIndexes.js to create TTL indexes on timestamp fields (e.g., expire after 30 days).",
-        "Test by inserting sample data and verifying automatic expiration.",
-        "Document the TTL policy in code comments."
+        "Install and configure the Prometheus client library.",
+        "Expose metrics endpoint for Prometheus scraping.",
+        "Define and export key metrics (e.g., request latency, error rates)."
       ],
-      "complexity_score": 4
+      "complexity_score": 7
+    },
+    {
+      "id": "task_6",
+      "title": "Complete Spotify Authentication Interface",
+      "priority": "medium",
+      "description": "Finish the frontend implementation of the Spotify authentication interface to ensure seamless user login and OAuth flow.",
+      "estimated_time": "60-90 minutes",
+      "files_to_modify": [
+        "src/frontend/components/SpotifyAuth.js",
+        "src/frontend/routes/auth.js"
+      ],
+      "implementation_steps": [
+        "Review and complete missing UI elements for Spotify OAuth.",
+        "Ensure proper handling of OAuth callbacks and token storage.",
+        "Test authentication flow end-to-end."
+      ],
+      "complexity_score": 6
+    },
+    {
+      "id": "task_7",
+      "title": "Implement Comprehensive Metrics Collection for Performance Monitoring",
+      "description": "Enhance backend to collect and expose comprehensive performance metrics for monitoring and optimization.",
+      "priority": "medium",
+      "estimated_time": "60-90 minutes",
+      "files_to_modify": [
+        "src/metrics/performance.js",
+        "src/api/routes/*.js"
+      ],
+      "implementation_steps": [
+        "Identify key performance metrics to collect (e.g., response times, error rates).",
+        "Implement middleware to capture and aggregate metrics.",
+        "Expose metrics via API endpoint for dashboard integration."
+      ],
+      "complexity_score": 7
     }
   ],
   "next_research_topics": [
-    "Best practices for circuit breaker implementation in Node.js",
-    "Correlation ID propagation in distributed Node.js applications",
-    "Optimizing Docker multi-stage builds for Node.js and React",
-    "MongoDB TTL index limitations and monitoring"
+    "Advanced circuit breaker patterns for distributed systems",
+    "Best practices for request correlation and distributed tracing",
+    "MongoDB index optimization strategies",
+    "Prometheus alerting and monitoring best practices"
   ],
   "completion_percentage": 75
 }

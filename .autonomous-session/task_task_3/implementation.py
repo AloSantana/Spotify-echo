@@ -1,9 +1,9 @@
 
-# Task: Expand Automated Test Coverage for MCP Endpoints
-# Description: Increase automated test coverage for MCP endpoints and provider health checks to ensure reliability and catch regressions early.
-# Files to modify: ['src/api/routes/providers.test.js', 'src/api/routes/mcp.test.js']
+# Task: Implement MongoDB Compound Indexes for Analytics Queries
+# Description: Create compound indexes in MongoDB to optimize performance of analytics queries, especially for engagement KPIs and listening patterns.
+# Files to modify: ['src/db/indexes.js', 'src/analytics/analytics.js']
 
-print("Implementing: Expand Automated Test Coverage for MCP Endpoints")
+print("Implementing: Implement MongoDB Compound Indexes for Analytics Queries")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
