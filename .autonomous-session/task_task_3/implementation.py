@@ -1,6 +1,6 @@
 
 # Task: Implement MongoDB Compound Indexes for Analytics Queries
-# Description: Create compound indexes in MongoDB to optimize performance of analytics queries, especially for engagement KPIs and listening patterns.
+# Description: Create compound indexes in MongoDB to optimize analytics queries and improve dashboard performance.
 # Files to modify: ['src/db/indexes.js', 'src/analytics/analytics.js']
 
 print("Implementing: Implement MongoDB Compound Indexes for Analytics Queries")
