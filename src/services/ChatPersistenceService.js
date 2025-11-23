@@ -1,4 +1,10 @@
-const { PrismaClient } = require('@prisma/client');
+let PrismaClient;
+try {
+  PrismaClient = require('@prisma/client').PrismaClient;
+} catch (error) {
+  // Prisma client not generated yet
+  PrismaClient = null;
+}
 
 /**
  * Chat Persistence Service
@@ -6,6 +12,21 @@ const { PrismaClient } = require('@prisma/client');
  */
 class ChatPersistenceService {
   constructor() {
+    if (!PrismaClient) {
+      const errorMsg = [
+        '\n❌ Prisma client not initialized.',
+        '📋 To fix this issue:',
+        '   1. Ensure you have POSTGRES_URL set in your .env file',
+        '   2. Run: npm run db:generate',
+        '   3. Run: npm run db:push (to sync your database schema)',
+        '   4. Restart the server with: npm start',
+        '\n💡 For quick setup: npm run db:init\n'
+      ].join('\n');
+      
+      console.error(errorMsg);
+      throw new Error('Prisma client not generated. Run "npm run db:generate" first.');
+    }
+    
     this.prisma = new PrismaClient();
     this.initialized = false;
   }

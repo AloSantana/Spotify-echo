@@ -379,44 +379,93 @@ PORT=3000
 
 ### Installation & Launch
 
-> **⚠️ Important**: Before running `npm start`, you must first run `npm install` to install all required dependencies including `dotenv`, `express`, and other packages. Skipping this step will result in "Cannot find module" errors.
+> **⚠️ Important**: Before running `npm start`, you must first run `npm install` to install all required dependencies. The installation process now automatically handles Prisma client generation.
+
+#### Standard Setup (Linux, macOS, WSL)
 
 ```bash
-# Clone repository
+# 1. Clone repository
 git clone https://github.com/primoscope/Spotify-echo.git
 cd Spotify-echo
 
-# Install dependencies (REQUIRED - run this first!)
+# 2. Copy environment template
+cp env.example .env
+# Edit .env and add your POSTGRES_URL and other credentials
+
+# 3. Install dependencies (automatically runs Prisma generation)
 npm install
 
-# That's it! npm install handles everything automatically.
-# Optional helper scripts available if needed:
-#   ./install-guide.sh - Check what dependencies you need
-#   ./install-ubuntu.sh - Automated Ubuntu/WSL setup
-#   ./test-npm-install.sh - Test npm install before running
+# 4. Initialize database (generate Prisma client + sync schema)
+npm run db:init
 
-# Generate Prisma Client (REQUIRED if using PostgreSQL) ✨ NEW
-# Note: Run this after setting up your .env file with POSTGRES_URL and DATABASE_URL
-# This command generates the Prisma Client for database operations
-npx prisma generate
+# 5. Start the application
+npm start
 
-# Optional: Setup PostgreSQL (recommended) ✨ NEW
-# See docs/POSTGRESQL_SETUP.md for detailed instructions
-# Quick setup with Docker:
-docker-compose up -d postgres
-npx prisma migrate dev
+# Or use development mode with hot-reload
+npm run dev
+```
 
-# Optional: Build React frontend ✨ NEW
-npx vite build
+#### Windows WSL Setup
 
-# Validate environment configuration
+**For detailed Windows WSL setup, see [docs/WSL-SETUP.md](docs/WSL-SETUP.md)**
+
+Quick steps:
+```bash
+# In WSL Ubuntu terminal:
+
+# 1. Ensure Node 20.x is installed
+node --version  # Should be v20.x.x
+
+# 2. Start PostgreSQL (Docker recommended)
+docker run --name echotune-postgres \
+  -e POSTGRES_PASSWORD=password \
+  -e POSTGRES_DB=echotune \
+  -p 5432:5432 -d postgres:15
+
+# 3. Clone and setup
+git clone https://github.com/primoscope/Spotify-echo.git
+cd Spotify-echo
+cp env.example .env
+
+# 4. Edit .env with your database URL
+# POSTGRES_URL=postgresql://postgres:password@localhost:5432/echotune
+
+# 5. Install and initialize
+npm install
+npm run db:init
+
+# 6. Start the server
+npm start
+```
+
+#### Manual Database Setup (if needed)
+
+```bash
+# Generate Prisma client only
+npm run db:generate
+
+# Push schema to database (for quick sync)
+npm run db:push
+
+# Or run migrations (for production)
+npm run db:migrate
+
+# Combined init (recommended for first-time setup)
+npm run db:init
+```
+
+#### Validate Installation
+
+```bash
+# Test environment configuration
 npm run validate:env
 
-# Optional: Test Spotify credentials
+# Test Spotify credentials
 npm run auth:test-credentials
 
-# Start the application
-npm start
+# Run health check
+curl http://localhost:3000/health
+```
 
 # Access the application at http://localhost:3000
 # Chat interface loads as the default page ✨ NEW
@@ -971,6 +1020,123 @@ npm run validate:env
 2. Review server logs for detailed error messages
 3. Use development tools in your browser to inspect network requests
 4. For issues with this app, check existing GitHub issues
+
+## 🔧 Troubleshooting
+
+### Common Errors and Solutions
+
+#### Error: "Prisma client did not initialize yet"
+
+**Problem**: Prisma client not generated before server starts.
+
+**Solution**:
+```bash
+# 1. Ensure POSTGRES_URL is set in .env
+echo $POSTGRES_URL
+
+# 2. Generate Prisma client
+npm run db:generate
+
+# 3. Initialize database
+npm run db:init
+
+# 4. Restart server
+npm start
+```
+
+#### Error: "OpenTelemetry tracing error: Class extends value undefined"
+
+**Problem**: OpenTelemetry package version mismatch (non-fatal).
+
+**Solution**: This error is now caught gracefully and won't prevent startup. To disable tracing warnings:
+```bash
+# Add to .env
+ENABLE_TRACING=false
+```
+
+#### Error: "ECONNREFUSED ::1:5432" or "Cannot connect to PostgreSQL"
+
+**Problem**: PostgreSQL is not running or connection URL is incorrect.
+
+**Solution**:
+```bash
+# Check if PostgreSQL is running (Docker)
+docker ps | grep postgres
+
+# Start PostgreSQL (Docker)
+docker start echotune-postgres
+
+# Or create new container
+docker run --name echotune-postgres \
+  -e POSTGRES_PASSWORD=password \
+  -e POSTGRES_DB=echotune \
+  -p 5432:5432 -d postgres:15
+
+# Test connection
+psql postgresql://postgres:password@localhost:5432/echotune -c "SELECT version();"
+
+# Update .env with correct URL
+POSTGRES_URL=postgresql://postgres:password@localhost:5432/echotune
+```
+
+#### Error: "MongoDB connection failed" 
+
+**Problem**: MongoDB not available (this is OK - app has SQLite fallback).
+
+**Expected Behavior**:
+```
+✅ SQLite fallback database ready
+📦 Database running in fallback mode (sqlite)
+```
+
+MongoDB is optional. If you see this, the app is working correctly with SQLite.
+
+#### Error: "Cannot find module 'dotenv'"
+
+**Problem**: Dependencies not installed.
+
+**Solution**:
+```bash
+# Install dependencies
+npm install
+
+# Verify installation
+npm list dotenv
+```
+
+#### Error: "Port 3000 already in use"
+
+**Problem**: Another process is using port 3000.
+
+**Solution**:
+```bash
+# Find process using port 3000
+lsof -i :3000  # Linux/macOS
+netstat -ano | findstr :3000  # Windows
+
+# Kill the process
+kill -9 <PID>  # Linux/macOS
+taskkill /PID <PID> /F  # Windows
+
+# Or change port in .env
+PORT=3001
+```
+
+#### Slow Performance on Windows
+
+**Problem**: Running from `/mnt/c/` in WSL.
+
+**Solution**: Move project to WSL filesystem:
+```bash
+# In WSL
+cd ~
+git clone https://github.com/primoscope/Spotify-echo.git
+cd Spotify-echo
+```
+
+For more detailed troubleshooting, see:
+- **[WSL Setup Guide](docs/WSL-SETUP.md)** for Windows-specific issues
+- **[Development Guide](docs/DEVELOPMENT.md)** for development-related problems
 
 ## 🔧 Environment Variables
 

@@ -29,6 +29,10 @@ try {
   throw error;
 }
 
+// Validate environment configuration
+const { validateAndExit } = require('./src/utils/startup-validator');
+validateAndExit();
+
 // Initialize AgentOps with feature flag
 let agentops = null;
 const enableAgentOps = process.env.ENABLE_AGENTOPS !== 'false' && process.env.AGENTOPS_API_KEY;
