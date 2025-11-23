@@ -70,5 +70,41 @@
     "context": {
       "attempt": 3
     }
+  },
+  {
+    "id": "error_1763936002099_pqasuxy2m",
+    "timestamp": "2025-11-23T22:13:22.099Z",
+    "category": "unknown",
+    "severity": "low",
+    "errorSnippet": "Command failed: npm run db:init",
+    "command": "npm run db:init",
+    "matchedPatterns": [],
+    "context": {
+      "attempt": 1
+    }
+  },
+  {
+    "id": "error_1763936002996_nfnx4n821",
+    "timestamp": "2025-11-23T22:13:22.996Z",
+    "category": "unknown",
+    "severity": "low",
+    "errorSnippet": "Command failed: npm run db:init",
+    "command": "npm run db:init",
+    "matchedPatterns": [],
+    "context": {
+      "attempt": 2
+    }
+  },
+  {
+    "id": "error_1763936003909_6y9qgbh1v",
+    "timestamp": "2025-11-23T22:13:23.909Z",
+    "category": "unknown",
+    "severity": "low",
+    "errorSnippet": "Command failed: npm run db:init",
+    "command": "npm run db:init",
+    "matchedPatterns": [],
+    "context": {
+      "attempt": 3
+    }
   }
 ]

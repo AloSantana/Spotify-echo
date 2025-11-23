@@ -75,14 +75,27 @@ class ReliableInstallAgent {
     this.log(`Executing: ${command}`, 'debug');
     
     try {
+      // Always capture output for error analysis, but also show to user if not silent
       const output = execSync(command, {
         cwd: this.options.projectRoot,
         encoding: 'utf8',
-        stdio: options.silent ? 'pipe' : 'inherit',
+        stdio: 'pipe', // Always pipe to capture
         ...options
       });
+      
+      // Show output if not silent
+      if (!options.silent) {
+        console.log(output);
+      }
+      
       return { success: true, output };
     } catch (error) {
+      // Show error output if not silent
+      if (!options.silent) {
+        if (error.stdout) console.log(error.stdout.toString());
+        if (error.stderr) console.error(error.stderr.toString());
+      }
+      
       return {
         success: false,
         error: error.message,
