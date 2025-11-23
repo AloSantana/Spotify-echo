@@ -10,6 +10,10 @@
   "scripts": {
     "preinstall": "node scripts/check-node-version.js",
     "postinstall": "node scripts/conditional-prisma-generate.js",
+    "setup": "node scripts/reliable-install-agent.js",
+    "setup:ci": "node scripts/reliable-install-agent.js --skip-start",
+    "setup:quick": "node scripts/reliable-install-agent.js --skip-db",
+    "agent:memory": "node scripts/agent-helpers/memory-store.js report",
     "start": "node server.js",
     "start:ci": "cross-env NODE_ENV=production PORT=${PORT:-3000} node server.js",
     "dev": "nodemon server.js",
