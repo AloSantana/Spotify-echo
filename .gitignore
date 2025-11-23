@@ -617,3 +617,4 @@ BROWSERSCREENSHOT-TESTING/
 qa-*.log
 
 /src/generated/prisma
+.agent-memory-test/

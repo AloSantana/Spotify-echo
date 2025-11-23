@@ -1,0 +1,110 @@
+[
+  {
+    "id": "error_1763935773986_4jnli8zqu",
+    "timestamp": "2025-11-23T22:09:33.986Z",
+    "category": "unknown",
+    "severity": "low",
+    "errorSnippet": "Command failed: npm run db:init",
+    "command": "npm run db:init",
+    "matchedPatterns": [],
+    "context": {
+      "attempt": 1
+    }
+  },
+  {
+    "id": "error_1763935774890_qxhyir7ap",
+    "timestamp": "2025-11-23T22:09:34.890Z",
+    "category": "unknown",
+    "severity": "low",
+    "errorSnippet": "Command failed: npm run db:init",
+    "command": "npm run db:init",
+    "matchedPatterns": [],
+    "context": {
+      "attempt": 2
+    }
+  },
+  {
+    "id": "error_1763935775790_kn0xwutpu",
+    "timestamp": "2025-11-23T22:09:35.790Z",
+    "category": "unknown",
+    "severity": "low",
+    "errorSnippet": "Command failed: npm run db:init",
+    "command": "npm run db:init",
+    "matchedPatterns": [],
+    "context": {
+      "attempt": 3
+    }
+  },
+  {
+    "id": "error_1763935832446_mx4germ77",
+    "timestamp": "2025-11-23T22:10:32.446Z",
+    "category": "unknown",
+    "severity": "low",
+    "errorSnippet": "Command failed: npm run db:init",
+    "command": "npm run db:init",
+    "matchedPatterns": [],
+    "context": {
+      "attempt": 1
+    }
+  },
+  {
+    "id": "error_1763935833340_tp2z4tv6k",
+    "timestamp": "2025-11-23T22:10:33.340Z",
+    "category": "unknown",
+    "severity": "low",
+    "errorSnippet": "Command failed: npm run db:init",
+    "command": "npm run db:init",
+    "matchedPatterns": [],
+    "context": {
+      "attempt": 2
+    }
+  },
+  {
+    "id": "error_1763935834243_ynpoiv5ie",
+    "timestamp": "2025-11-23T22:10:34.243Z",
+    "category": "unknown",
+    "severity": "low",
+    "errorSnippet": "Command failed: npm run db:init",
+    "command": "npm run db:init",
+    "matchedPatterns": [],
+    "context": {
+      "attempt": 3
+    }
+  },
+  {
+    "id": "error_1763936002099_pqasuxy2m",
+    "timestamp": "2025-11-23T22:13:22.099Z",
+    "category": "unknown",
+    "severity": "low",
+    "errorSnippet": "Command failed: npm run db:init",
+    "command": "npm run db:init",
+    "matchedPatterns": [],
+    "context": {
+      "attempt": 1
+    }
+  },
+  {
+    "id": "error_1763936002996_nfnx4n821",
+    "timestamp": "2025-11-23T22:13:22.996Z",
+    "category": "unknown",
+    "severity": "low",
+    "errorSnippet": "Command failed: npm run db:init",
+    "command": "npm run db:init",
+    "matchedPatterns": [],
+    "context": {
+      "attempt": 2
+    }
+  },
+  {
+    "id": "error_1763936003909_6y9qgbh1v",
+    "timestamp": "2025-11-23T22:13:23.909Z",
+    "category": "unknown",
+    "severity": "low",
+    "errorSnippet": "Command failed: npm run db:init",
+    "command": "npm run db:init",
+    "matchedPatterns": [],
+    "context": {
+      "attempt": 3
+    }
+  }
+]
