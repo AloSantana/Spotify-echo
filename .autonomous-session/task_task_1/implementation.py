@@ -1,9 +1,9 @@
 
-# Task: Frontend UI Completion: Spotify Authentication Interface
-# Description: Implement and finalize the Spotify OAuth login and authentication UI, ensuring users can securely connect their Spotify accounts from the frontend.
-# Files to modify: ['src/frontend/components/SpotifyAuth.js', 'src/frontend/pages/Login.js', 'src/frontend/styles/Auth.css']
+# Task: Implement Circuit Breaker Pattern for Provider Failover
+# Description: Add a circuit breaker mechanism to the backend provider switching logic to automatically failover when a provider is unhealthy. This improves reliability and user experience during provider outages.
+# Files to modify: ['src/api/providers.js', 'src/utils/circuitBreaker.js']
 
-print("Implementing: Frontend UI Completion: Spotify Authentication Interface")
+print("Implementing: Implement Circuit Breaker Pattern for Provider Failover")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

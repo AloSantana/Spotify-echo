@@ -1,9 +1,9 @@
 
-# Task: Fix Unused Variables in High-Change Backend Modules
-# Description: Scan and remove unused variables in backend modules with high change rates, starting with 'src/api/routes/*' and 'src/chat/*', to improve code quality and maintainability.
-# Files to modify: ['src/api/routes/*.js', 'src/chat/*.js']
+# Task: Add Request Correlation IDs for End-to-End Tracing
+# Description: Attach a unique correlation ID to each incoming request and propagate it through backend services for improved traceability and debugging.
+# Files to modify: ['src/api/middleware/requestTracing.js', 'src/api/routes/*']
 
-print("Implementing: Fix Unused Variables in High-Change Backend Modules")
+print("Implementing: Add Request Correlation IDs for End-to-End Tracing")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
