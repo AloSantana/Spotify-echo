@@ -1,9 +1,9 @@
 
-# Task: Add Request Correlation IDs for End-to-End Tracing
-# Description: Attach a unique correlation ID to each incoming API request and propagate it through backend services for improved traceability and debugging.
-# Files to modify: ['src/api/middleware/requestLogger.js', 'src/api/routes/*', 'src/utils/tracing.js']
+# Task: Fix Unused Variables in High-Change Backend Modules
+# Description: Scan and remove unused variables in backend modules with high change rates, starting with 'src/api/routes/*' and 'src/chat/*', to improve code quality and maintainability.
+# Files to modify: ['src/api/routes/*.js', 'src/chat/*.js']
 
-print("Implementing: Add Request Correlation IDs for End-to-End Tracing")
+print("Implementing: Fix Unused Variables in High-Change Backend Modules")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

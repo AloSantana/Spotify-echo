@@ -1,9 +1,9 @@
 
-# Task: Implement Circuit Breaker Pattern for Provider Failover
-# Description: Add a circuit breaker mechanism to the backend provider selection logic to automatically failover to alternate LLM providers when error rates or latency exceed thresholds.
-# Files to modify: ['src/providers/providerManager.js', 'src/providers/circuitBreaker.js', 'src/api/routes/providers.js']
+# Task: Frontend UI Completion: Spotify Authentication Interface
+# Description: Implement and finalize the Spotify OAuth login and authentication UI, ensuring users can securely connect their Spotify accounts from the frontend.
+# Files to modify: ['src/frontend/components/SpotifyAuth.js', 'src/frontend/pages/Login.js', 'src/frontend/styles/Auth.css']
 
-print("Implementing: Implement Circuit Breaker Pattern for Provider Failover")
+print("Implementing: Frontend UI Completion: Spotify Authentication Interface")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

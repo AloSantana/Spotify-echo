@@ -1,1 +1,81 @@
-{"actionable_tasks": [], "error": "'content'", "fallback": true}
+{
+  "actionable_tasks": [
+    {
+      "id": "task_1",
+      "title": "Frontend UI Completion: Spotify Authentication Interface",
+      "description": "Implement and finalize the Spotify OAuth login and authentication UI, ensuring users can securely connect their Spotify accounts from the frontend.",
+      "priority": "high",
+      "estimated_time": "60-90 minutes",
+      "files_to_modify": [
+        "src/frontend/components/SpotifyAuth.js",
+        "src/frontend/pages/Login.js",
+        "src/frontend/styles/Auth.css"
+      ],
+      "implementation_steps": [
+        "Review current Spotify OAuth flow and identify missing UI elements.",
+        "Add or update login button and authentication status indicator.",
+        "Handle OAuth redirect and token storage in frontend state.",
+        "Test the flow with a real Spotify account to ensure successful authentication and error handling."
+      ],
+      "complexity_score": 6
+    },
+    {
+      "id": "task_2",
+      "title": "Fix Unused Variables in High-Change Backend Modules",
+      "description": "Scan and remove unused variables in backend modules with high change rates, starting with 'src/api/routes/*' and 'src/chat/*', to improve code quality and maintainability.",
+      "priority": "medium",
+      "estimated_time": "30-45 minutes",
+      "files_to_modify": [
+        "src/api/routes/*.js",
+        "src/chat/*.js"
+      ],
+      "implementation_steps": [
+        "Run ESLint or similar linter on the specified directories.",
+        "Identify and remove or refactor unused variable declarations.",
+        "Re-run tests to ensure no regressions.",
+        "Commit changes with clear messages referencing code quality improvements."
+      ],
+      "complexity_score": 4
+    },
+    {
+      "id": "task_3",
+      "title": "Add Quality Maintenance Scripts to package.json",
+      "description": "Ensure 'lint', 'security:audit', and 'quality:check' scripts are present in package.json for ongoing code health monitoring.",
+      "priority": "medium",
+      "estimated_time": "20-30 minutes",
+      "files_to_modify": [
+        "package.json"
+      ],
+      "implementation_steps": [
+        "Open package.json and check for existing scripts.",
+        "Add or update scripts for linting, security audit (e.g., 'npm audit'), and quality checks.",
+        "Test each script to confirm correct operation.",
+        "Document script usage in README.md if not already present."
+      ],
+      "complexity_score": 3
+    },
+    {
+      "id": "task_4",
+      "title": "Expand Jest Integration/Security Tests for MCP Endpoints",
+      "description": "Write additional Jest tests to cover MCP server endpoints and provider health checks, improving automated test coverage and reliability.",
+      "priority": "medium",
+      "estimated_time": "60-90 minutes",
+      "files_to_modify": [
+        "src/__tests__/mcpEndpoints.test.js",
+        "src/mcp/server.js"
+      ],
+      "implementation_steps": [
+        "Identify MCP endpoints and provider health check logic.",
+        "Write new Jest test cases for endpoint responses, error handling, and edge cases.",
+        "Run tests and ensure all pass.",
+        "Refactor code as needed based on test results."
+      ],
+      "complexity_score": 5
+    }
+  ],
+  "next_research_topics": [
+    "Implementing circuit breaker pattern for provider failover in Node.js",
+    "MongoDB TTL and compound index best practices for analytics data"
+  ],
+  "completion_percentage": 75
+}

@@ -1,9 +1,9 @@
 
-# Task: Expand Automated Test Coverage for MCP Endpoints
-# Description: Increase automated test coverage for MCP endpoints and provider health checks to ensure reliability and catch regressions.
-# Files to modify: ['tests/mcpEndpoints.test.js', 'src/api/routes/providers.js']
+# Task: Add Quality Maintenance Scripts to package.json
+# Description: Ensure 'lint', 'security:audit', and 'quality:check' scripts are present in package.json for ongoing code health monitoring.
+# Files to modify: ['package.json']
 
-print("Implementing: Expand Automated Test Coverage for MCP Endpoints")
+print("Implementing: Add Quality Maintenance Scripts to package.json")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
