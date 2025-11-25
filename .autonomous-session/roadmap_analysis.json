@@ -2,94 +2,101 @@
   "actionable_tasks": [
     {
       "id": "task_1",
-      "title": "Implement Circuit Breaker Pattern for Provider Failover",
-      "description": "Add a circuit breaker mechanism to the backend provider switching logic to automatically failover when a provider is unhealthy. This improves reliability and user experience during provider outages.",
+      "title": "Frontend UI Completion: Spotify Authentication Interface",
+      "description": "Implement and finalize the Spotify OAuth authentication UI, ensuring users can log in and authorize the app for playlist creation and streaming. This involves connecting the frontend to the existing backend OAuth endpoints and providing clear user feedback on authentication status.",
       "priority": "high",
-      "estimated_time": "60 minutes",
+      "estimated_time": "60-90 minutes",
       "files_to_modify": [
-        "src/api/providers.js",
-        "src/utils/circuitBreaker.js"
+        "src/frontend/components/SpotifyAuth.js",
+        "src/frontend/pages/Login.js",
+        "src/frontend/styles/Auth.css"
       ],
       "implementation_steps": [
-        "Create a utility module for circuit breaker logic (track failures, open/close state).",
-        "Integrate circuit breaker checks into provider request flow.",
-        "Add basic logging for circuit breaker state transitions.",
-        "Test failover by simulating provider errors."
+        "Review backend Spotify OAuth endpoints for expected request/response.",
+        "Design and implement the login button and authentication flow in the UI.",
+        "Handle OAuth redirects and token storage securely in the frontend.",
+        "Display authentication status and error messages to the user.",
+        "Test the flow with valid and invalid credentials."
       ],
-      "complexity_score": 7
+      "complexity_score": 6
     },
     {
       "id": "task_2",
-      "title": "Add Request Correlation IDs for End-to-End Tracing",
-      "description": "Attach a unique correlation ID to each incoming request and propagate it through backend services for improved traceability and debugging.",
+      "title": "Fix Unused Variables in High-Change Backend Modules",
+      "description": "Perform a targeted cleanup of unused variables in backend modules with high change rates, such as API routes and chat handlers, to improve maintainability and reduce potential bugs.",
       "priority": "medium",
-      "estimated_time": "30 minutes",
+      "estimated_time": "30-45 minutes",
       "files_to_modify": [
-        "src/api/middleware/requestTracing.js",
-        "src/api/routes/*"
+        "src/api/routes/*.js",
+        "src/chat/*.js"
       ],
       "implementation_steps": [
-        "Implement middleware to generate and attach correlation IDs to requests.",
-        "Ensure correlation ID is included in logs and passed to downstream services.",
-        "Update test cases to verify correlation ID propagation."
+        "Run ESLint with the unused-vars rule on the specified directories.",
+        "Remove or refactor unused variable declarations and imports.",
+        "Rerun tests to ensure no regressions.",
+        "Commit changes with clear messages referencing code quality improvements."
+      ],
+      "complexity_score": 4
+    },
+    {
+      "id": "task_3",
+      "title": "Expand Automated Test Coverage for MCP Endpoints",
+      "description": "Increase automated test coverage for MCP (Multi-Provider) endpoints, focusing on provider health and switching logic. This will improve reliability and catch regressions early.",
+      "priority": "medium",
+      "estimated_time": "60-90 minutes",
+      "files_to_modify": [
+        "src/tests/mcpEndpoints.test.js",
+        "src/api/providers.js"
+      ],
+      "implementation_steps": [
+        "Identify untested MCP endpoint logic (health checks, provider switching).",
+        "Write new Jest test cases for edge cases and error handling.",
+        "Run the test suite and ensure all tests pass.",
+        "Document new tests in the test coverage report."
       ],
       "complexity_score": 5
     },
     {
-      "id": "task_3",
-      "title": "Expand Automated Test Coverage for Provider Switching",
-      "description": "Increase automated test coverage for provider switching and telemetry endpoints to ensure robust failover and metric collection.",
-      "priority": "medium",
-      "estimated_time": "45 minutes",
-      "files_to_modify": [
-        "tests/providers.test.js",
-        "src/api/providers.js"
-      ],
-      "implementation_steps": [
-        "Add new test cases for edge scenarios (provider failure, latency spikes).",
-        "Mock provider responses to simulate errors and verify failover.",
-        "Validate telemetry metrics are correctly updated."
-      ],
-      "complexity_score": 6
-    },
-    {
       "id": "task_4",
-      "title": "Frontend: Complete Spotify Authentication Interface",
-      "description": "Finish the Spotify OAuth login flow and UI, ensuring users can authenticate and connect their accounts seamlessly.",
-      "priority": "high",
-      "estimated_time": "60 minutes",
+      "title": "Add Docker Compose for Local Development",
+      "description": "Create a simple Docker Compose file to orchestrate the Node backend, React frontend, and MCP servers for streamlined local development and testing.",
+      "priority": "medium",
+      "estimated_time": "45-60 minutes",
       "files_to_modify": [
-        "src/frontend/components/SpotifyAuth.js",
-        "src/frontend/pages/Login.js"
+        "docker-compose.yml",
+        "Dockerfile.backend",
+        "Dockerfile.frontend",
+        "README.md"
       ],
       "implementation_steps": [
-        "Implement missing UI elements for Spotify login.",
-        "Wire up OAuth callback handling and error states.",
-        "Test authentication flow end-to-end."
+        "Draft a docker-compose.yml with services for backend, frontend, and MCP servers.",
+        "Reference existing Dockerfiles or create minimal ones if missing.",
+        "Test local startup and inter-service communication.",
+        "Update README with usage instructions."
       ],
-      "complexity_score": 7
+      "complexity_score": 5
     },
     {
       "id": "task_5",
-      "title": "Frontend: Add Mode Selection to EnhancedMusicDiscovery",
-      "description": "Implement UI controls for selecting music discovery modes (smart, mood, trending, social, AI radio) in the EnhancedMusicDiscovery component.",
-      "priority": "medium",
-      "estimated_time": "45 minutes",
+      "title": "Add Quality Maintenance Scripts to package.json",
+      "description": "Ensure that lint, security audit, and quality check scripts are present and correctly configured in package.json for ongoing code health.",
+      "priority": "low",
+      "estimated_time": "20-30 minutes",
       "files_to_modify": [
-        "src/frontend/components/EnhancedMusicDiscovery.js"
+        "package.json"
       ],
       "implementation_steps": [
-        "Add dropdown or button group for mode selection.",
-        "Wire up mode selection to backend API calls.",
-        "Display selected mode and update recommendations accordingly."
+        "Verify presence of 'lint', 'security:audit', and 'quality:check' scripts.",
+        "Add or update scripts to use ESLint, npm audit, and any custom quality checks.",
+        "Test scripts locally and document usage in package.json comments."
       ],
-      "complexity_score": 6
+      "complexity_score": 2
     }
   ],
   "next_research_topics": [
-    "Optimizing MongoDB compound and TTL indexes for analytics queries",
-    "Implementing OpenTelemetry distributed tracing in Node.js",
-    "Efficient response streaming for large datasets in Express.js"
+    "Implementing circuit breaker pattern for provider failover in Node.js",
+    "Efficient MongoDB compound and TTL index strategies for analytics",
+    "OpenTelemetry distributed tracing integration best practices"
   ],
   "completion_percentage": 75
 }

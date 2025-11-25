@@ -1,9 +1,9 @@
 
-# Task: Expand Automated Test Coverage for Provider Switching
-# Description: Increase automated test coverage for provider switching and telemetry endpoints to ensure robust failover and metric collection.
-# Files to modify: ['tests/providers.test.js', 'src/api/providers.js']
+# Task: Expand Automated Test Coverage for MCP Endpoints
+# Description: Increase automated test coverage for MCP (Multi-Provider) endpoints, focusing on provider health and switching logic. This will improve reliability and catch regressions early.
+# Files to modify: ['src/tests/mcpEndpoints.test.js', 'src/api/providers.js']
 
-print("Implementing: Expand Automated Test Coverage for Provider Switching")
+print("Implementing: Expand Automated Test Coverage for MCP Endpoints")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
