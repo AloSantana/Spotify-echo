@@ -3,22 +3,22 @@
   "tasks_list": [
     {
       "task_id": "task_1",
-      "title": "Implement Circuit Breaker Pattern for Provider Failover",
-      "status": "attempted",
-      "complexity": 7
-    },
-    {
-      "task_id": "task_2",
-      "title": "Add Request Correlation IDs for End-to-End Tracing",
+      "title": "Implement Request Correlation IDs in Backend Chat Pipeline",
       "status": "attempted",
       "complexity": 5
     },
     {
-      "task_id": "task_3",
-      "title": "Expand Automated Test Coverage for Provider Switching",
+      "task_id": "task_2",
+      "title": "Add Basic Circuit Breaker Wrapper for LLM Providers",
       "status": "attempted",
       "complexity": 6
+    },
+    {
+      "task_id": "task_3",
+      "title": "Add TTL Indexes for Telemetry Collections in MongoDB",
+      "status": "attempted",
+      "complexity": 4
     }
   ],
-  "timestamp": "Tue Nov 25 12:48:19 UTC 2025"
+  "timestamp": "Fri Dec 26 01:51:57 UTC 2025"
 }

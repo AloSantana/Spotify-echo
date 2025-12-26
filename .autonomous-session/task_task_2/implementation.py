@@ -1,9 +1,9 @@
 
-# Task: Add Request Correlation IDs for End-to-End Tracing
-# Description: Attach unique correlation IDs to each request in the backend chat pipeline to enable tracing across logs and metrics for debugging and observability.
-# Files to modify: ['src/api/chat.js', 'src/middleware/requestLogger.js']
+# Task: Add Basic Circuit Breaker Wrapper for LLM Providers
+# Description: Introduce a lightweight, in-memory circuit breaker around provider calls to support simple failover without external dependencies.
+# Files to modify: ['src/providers/circuitBreaker.js', 'src/providers/providerRegistry.js', 'src/providers/*Provider.js', 'src/utils/logger.js']
 
-print("Implementing: Add Request Correlation IDs for End-to-End Tracing")
+print("Implementing: Add Basic Circuit Breaker Wrapper for LLM Providers")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

@@ -1,9 +1,9 @@
 
-# Task: Expand Automated Test Coverage for Provider Switching
-# Description: Increase the number and scope of automated tests for provider switching and telemetry to ensure robust failover and metric reporting.
-# Files to modify: ['tests/providers.test.js']
+# Task: Add TTL Indexes for Telemetry Collections in MongoDB
+# Description: Define MongoDB TTL indexes for telemetry/metrics collections to automatically expire old data and keep analytics storage manageable.
+# Files to modify: ['src/db/models/TelemetryEvent.js', 'src/db/models/ProviderMetric.js', 'src/db/indexes.js', 'src/config/analytics.config.js']
 
-print("Implementing: Expand Automated Test Coverage for Provider Switching")
+print("Implementing: Add TTL Indexes for Telemetry Collections in MongoDB")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

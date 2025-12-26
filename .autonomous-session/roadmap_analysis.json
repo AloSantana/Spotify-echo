@@ -2,97 +2,186 @@
   "actionable_tasks": [
     {
       "id": "task_1",
-      "title": "Implement Circuit Breaker Pattern for Provider Failover",
-      "description": "Add a circuit breaker mechanism to the backend provider switching logic to automatically failover when a provider is unhealthy. This improves reliability and user experience during provider outages.",
+      "title": "Implement Request Correlation IDs in Backend Chat Pipeline",
+      "description": "Add generation and propagation of request correlation IDs for end-to-end tracing in the chat pipeline, logging, and provider calls.",
       "priority": "high",
-      "estimated_time": "60 minutes",
+      "estimated_time": "60-90 minutes",
       "files_to_modify": [
-        "src/api/providers.js",
-        "src/utils/circuitBreaker.js"
+        "src/api/middleware/requestId.js",
+        "src/api/routes/chat.js",
+        "src/chat/chatPipeline.js",
+        "src/providers/*Provider.js",
+        "src/utils/logger.js"
       ],
       "implementation_steps": [
-        "Create a utility module for circuit breaker logic (track failures, open/close state).",
-        "Integrate circuit breaker checks into provider request flow.",
-        "Add configuration for failure thresholds and reset timeouts.",
-        "Test failover behavior with simulated provider errors."
-      ],
-      "complexity_score": 7
-    },
-    {
-      "id": "task_2",
-      "title": "Add Request Correlation IDs for End-to-End Tracing",
-      "description": "Attach unique correlation IDs to each request in the backend chat pipeline to enable tracing across logs and metrics for debugging and observability.",
-      "priority": "medium",
-      "estimated_time": "30 minutes",
-      "files_to_modify": [
-        "src/api/chat.js",
-        "src/middleware/requestLogger.js"
-      ],
-      "implementation_steps": [
-        "Generate a UUID for each incoming request.",
-        "Propagate the correlation ID through all relevant backend calls.",
-        "Log the correlation ID with each request and response.",
-        "Update documentation to describe tracing usage."
+        "Create an Express middleware (e.g., requestId.js) that checks for an incoming `x-request-id` header; if missing, generate a UUID and attach it to `req.requestId` and response headers.",
+        "Register the middleware early in the backend app initialization (e.g., in app.js or server.js) so all routes receive `req.requestId`.",
+        "Update the chat route handler (src/api/routes/chat.js) to pass `req.requestId` into the chat pipeline function.",
+        "Update chatPipeline.js to accept a `requestId` parameter and include it in all internal logs and when calling provider wrappers.",
+        "Update LLM provider wrappers (e.g., OpenAI, Gemini, OpenRouter files under src/providers) to accept an optional `requestId` and include it in logs and, where supported, as headers/metadata to downstream APIs.",
+        "Extend logger utility (src/utils/logger.js) to always include `requestId` in log contexts/fields so logs can be filtered by correlation ID."
       ],
       "complexity_score": 5
     },
     {
-      "id": "task_3",
-      "title": "Expand Automated Test Coverage for Provider Switching",
-      "description": "Increase the number and scope of automated tests for provider switching and telemetry to ensure robust failover and metric reporting.",
-      "priority": "medium",
-      "estimated_time": "45 minutes",
+      "id": "task_2",
+      "title": "Add Basic Circuit Breaker Wrapper for LLM Providers",
+      "description": "Introduce a lightweight, in-memory circuit breaker around provider calls to support simple failover without external dependencies.",
+      "priority": "high",
+      "estimated_time": "60-120 minutes",
       "files_to_modify": [
-        "tests/providers.test.js"
+        "src/providers/circuitBreaker.js",
+        "src/providers/providerRegistry.js",
+        "src/providers/*Provider.js",
+        "src/utils/logger.js"
       ],
       "implementation_steps": [
-        "Identify untested edge cases in provider switching logic.",
-        "Write new Jest tests for failover, error handling, and metric persistence.",
-        "Run tests and verify coverage improvements.",
-        "Update test documentation."
+        "Create a generic circuitBreaker module that tracks failures and half-open/open state per provider in memory, configurable via thresholds (e.g., maxFailures, resetTimeout).",
+        "Expose functions like `executeWithBreaker(providerName, fn)` that will short-circuit when the provider is open and record success/failure statistics.",
+        "Integrate the circuit breaker into providerRegistry or the main provider selection layer so all provider calls go through the breaker wrapper.",
+        "Update individual provider call sites (e.g., OpenAIProvider, GeminiProvider, ClaudeProvider) to use `executeWithBreaker` rather than calling the raw HTTP client directly.",
+        "Add logging in the circuit breaker to record state transitions (closed\u2192open, open\u2192half-open, etc.) with provider name and requestId for traceability.",
+        "Optionally add a very simple in-memory metric export (e.g., current breaker state per provider) to the existing GET /providers/health endpoint response."
       ],
       "complexity_score": 6
     },
     {
-      "id": "task_4",
-      "title": "Frontend: Complete Spotify Authentication Interface",
-      "description": "Finish the implementation of the Spotify OAuth login and token management UI to enable users to connect their Spotify accounts for music discovery.",
+      "id": "task_3",
+      "title": "Add TTL Indexes for Telemetry Collections in MongoDB",
+      "description": "Define MongoDB TTL indexes for telemetry/metrics collections to automatically expire old data and keep analytics storage manageable.",
       "priority": "high",
-      "estimated_time": "60 minutes",
+      "estimated_time": "30-60 minutes",
       "files_to_modify": [
-        "src/frontend/components/SpotifyAuth.js",
-        "src/frontend/pages/Login.js"
+        "src/db/models/TelemetryEvent.js",
+        "src/db/models/ProviderMetric.js",
+        "src/db/indexes.js",
+        "src/config/analytics.config.js"
       ],
       "implementation_steps": [
-        "Implement OAuth flow and token storage in frontend state.",
-        "Add UI feedback for authentication success/failure.",
-        "Test integration with backend authentication endpoint.",
-        "Update user documentation for Spotify login."
+        "Identify MongoDB collections used for telemetry and analytics (e.g., TelemetryEvent, ProviderMetric) and ensure each schema includes a timestamp field such as `createdAt`.",
+        "Update Mongoose schemas (or native driver definitions) to set `timestamps: true` or explicitly define a `createdAt` field if not already present.",
+        "Create or update an indexes initialization module (e.g., src/db/indexes.js) to add TTL indexes using `{ expireAfterSeconds: <desired_seconds> }` on the timestamp field for each telemetry collection.",
+        "Wire the indexes initialization function into the MongoDB connection bootstrap (e.g., after successful `mongoose.connect` call) so indexes are ensured on startup.",
+        "Make TTL durations configurable via a config file (analytics.config.js) or environment variables (e.g., TELEMETRY_TTL_SECONDS).",
+        "Add brief comments/docstrings documenting the retention policy and how to change it for operators."
       ],
-      "complexity_score": 7
+      "complexity_score": 4
+    },
+    {
+      "id": "task_4",
+      "title": "Define MongoDB Compound Indexes for Analytics Queries",
+      "description": "Add compound indexes to the main analytics collections to speed up common query patterns used by the dashboard and KPIs.",
+      "priority": "medium",
+      "estimated_time": "45-75 minutes",
+      "files_to_modify": [
+        "src/db/models/ListeningSession.js",
+        "src/db/models/EngagementEvent.js",
+        "src/db/indexes.js",
+        "src/analytics/queries.js"
+      ],
+      "implementation_steps": [
+        "Review existing analytics query functions (e.g., in src/analytics/queries.js or analytics.js/insights.js) to identify the most common filter and sort patterns (such as by userId + timestamp or provider + timestamp).",
+        "For each hot path, design a compound index that matches the query shape (e.g., `{ userId: 1, playedAt: -1 }`, `{ provider: 1, createdAt: -1 }`).",
+        "Update Mongoose schema definitions or the central index initialization file (src/db/indexes.js) to create these compound indexes on the relevant collections.",
+        "Ensure index creation is idempotent and does not rely on blocking operations at runtime (use `createIndexes` or equivalent).",
+        "Optionally add small JSDoc comments on each index definition explaining which query it optimizes.",
+        "Verify with a local run (if possible) that the application starts without index errors; if not running code now, at least double-check index names and field names against schemas."
+      ],
+      "complexity_score": 5
     },
     {
       "id": "task_5",
-      "title": "Backend: Add MongoDB TTL Indexes for Telemetry Data Rotation",
-      "description": "Implement TTL (Time-To-Live) indexes on MongoDB telemetry collections to automatically expire old data and optimize storage.",
+      "title": "Add Dockerfile for Node Backend with Multi-Stage Build",
+      "description": "Create a production-ready multi-stage Dockerfile for the Node backend service to optimize build size and cache use.",
       "priority": "medium",
-      "estimated_time": "30 minutes",
+      "estimated_time": "45-75 minutes",
       "files_to_modify": [
-        "src/db/telemetry.js"
+        "Dockerfile.backend",
+        "package.json",
+        ".dockerignore"
       ],
       "implementation_steps": [
-        "Define TTL index on telemetry collections (e.g., expire after 30 days).",
-        "Apply index using MongoDB driver or migration script.",
-        "Test data expiration with sample records.",
-        "Document TTL configuration."
+        "Create a new Dockerfile (e.g., Dockerfile.backend) using a builder stage (Node LTS) that installs dependencies with `npm ci` and runs `npm test` or `npm run build` if applicable.",
+        "Add a final runtime stage using a slim Node image that copies only the built artifacts and `node_modules` (or uses `npm ci --omit=dev`) for smaller image size.",
+        "Configure `NODE_ENV=production` and minimal environment defaults, and set a non-root user if feasible.",
+        "Add or update a .dockerignore file to exclude node_modules (for build context), logs, temp files, and local tooling configs.",
+        "Update package.json with an optional `docker:build` script that runs a standard build command (e.g., `docker build -f Dockerfile.backend -t echotune-backend .`).",
+        "Document basic build/run commands in a brief comment at the top of Dockerfile.backend or in PROJECT_CONFIG.md."
+      ],
+      "complexity_score": 4
+    },
+    {
+      "id": "task_6",
+      "title": "Add Jest Integration Tests Around MCP Provider Health Endpoints",
+      "description": "Expand Jest tests to cover MCP endpoints and provider health responses, validating status codes and key payload fields.",
+      "priority": "medium",
+      "estimated_time": "45-90 minutes",
+      "files_to_modify": [
+        "tests/integration/mcpHealth.test.js",
+        "src/api/routes/providers.js",
+        "jest.config.js"
+      ],
+      "implementation_steps": [
+        "Create a new Jest integration test file (tests/integration/mcpHealth.test.js) that spins up the Express app using the existing test harness or a lightweight in-memory server.",
+        "Write tests for GET /providers/health to assert 200 responses and presence of fields like `latency`, `errorRate`, and breaker state if added.",
+        "If there is a dedicated MCP health endpoint, add tests that mock MCP server responses and verify the app\u2019s mapping of statuses to JSON.",
+        "Use existing test utilities (supertest or similar) to avoid additional dependencies and keep tests self-contained.",
+        "Ensure the new test file is picked up by Jest via jest.config.js and that no real external calls are made (mock any HTTP client modules as needed).",
+        "Run the test suite locally (or plan to do so) and adjust any timeouts or environment flags required for integration tests."
       ],
       "complexity_score": 5
+    },
+    {
+      "id": "task_7",
+      "title": "Add Basic Performance Metrics Collection Hook",
+      "description": "Introduce a simple in-process performance metrics collector for key HTTP endpoints, paving the way for full monitoring.",
+      "priority": "medium",
+      "estimated_time": "45-75 minutes",
+      "files_to_modify": [
+        "src/middleware/metrics.js",
+        "src/api/server.js",
+        "src/metrics/collector.js",
+        "src/api/routes/performance.js"
+      ],
+      "implementation_steps": [
+        "Implement a metrics collector module that maintains in-memory counters and simple histograms for request counts, error counts, and response time buckets per endpoint.",
+        "Create an Express middleware (metrics.js) that records start time, then on response finish updates the collector with path, method, status code, and duration.",
+        "Register the metrics middleware globally in server.js so all API routes are instrumented without changing each route handler.",
+        "Add or extend an internal endpoint (e.g., GET /api/performance/endpoints) to read from the collector and return basic aggregates for use by the EnhancedAnalyticsDashboard.",
+        "Ensure the collector is lightweight and does not depend on Prometheus/OpenTelemetry yet, using only native JS data structures.",
+        "Include minimal safeguards against unbounded growth (e.g., cap the number of distinct endpoint keys or aggregate by normalized route templates)."
+      ],
+      "complexity_score": 6
+    },
+    {
+      "id": "task_8",
+      "title": "Add Minimal TypeScript Scaffolding for Backend Routes",
+      "description": "Set up initial TypeScript config and migrate one high-change backend route module to TypeScript to start the gradual migration.",
+      "priority": "low",
+      "estimated_time": "60-90 minutes",
+      "files_to_modify": [
+        "tsconfig.json",
+        "package.json",
+        "src/api/routes/chat.ts",
+        "src/types/global.d.ts"
+      ],
+      "implementation_steps": [
+        "Add TypeScript as a dev dependency in package.json and create a tsconfig.json tuned for incremental migration (e.g., `allowJs: true`, `checkJs: false`, `esModuleInterop: true`).",
+        "Rename one representative high-change route file (e.g., src/api/routes/chat.js) to chat.ts and update imports/exports to be TS-compatible.",
+        "Add minimal type definitions for common entities (e.g., ChatRequest, ChatResponse) in a shared types file (src/types/global.d.ts or similar).",
+        "Update npm scripts to include a `typecheck` command running `tsc --noEmit` and optionally include it in the existing quality:check script.",
+        "Ensure the existing build/run pipeline still works by either compiling TS to JS on build or relying on ts-node only for local/dev as appropriate.",
+        "Document the intended migration pattern (e.g., \"rename .js to .ts, add minimal types, keep any complex typing for later\") in a short comment or internal doc."
+      ],
+      "complexity_score": 6
     }
   ],
   "next_research_topics": [
-    "Best practices for OpenTelemetry distributed tracing integration in Node.js",
-    "Optimizing Docker multi-stage builds for Node/React projects",
-    "Implementing Prometheus metrics export for real-time alerting"
+    "Best-practice circuit breaker patterns for Node.js HTTP clients and multi-provider LLM routing",
+    "Designing efficient MongoDB compound and TTL indexing strategies for analytics-heavy applications",
+    "Lightweight in-process metrics collection vs. full Prometheus/OpenTelemetry setup for Node services",
+    "Incremental TypeScript migration patterns for existing JavaScript Express backends",
+    "Correlation ID propagation patterns across microservices and third-party API calls"
   ],
-  "completion_percentage": 75
+  "completion_percentage": 68
 }
