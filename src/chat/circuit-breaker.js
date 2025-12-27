@@ -168,25 +168,32 @@ class CircuitBreaker extends EventEmitter {
 
   /**
    * Check if circuit should open based on failure rate
+   * Uses failures within the monitoring window for consistent time-based evaluation
    * @returns {boolean} True if circuit should open
    */
   shouldOpen() {
-    const recentFailures = this.failures.length;
-    const totalRecent = this.stats.totalRequests;
+    // Prune failures first to ensure we're working with recent data
+    this.pruneFailures();
     
-    // Need minimum volume before opening
-    if (totalRecent < this.config.volumeThreshold) {
+    const recentFailures = this.failures.length;
+    
+    // Need minimum volume of recent failures before considering opening
+    // This prevents opening on sporadic failures
+    if (recentFailures < this.config.volumeThreshold) {
       return false;
     }
     
-    // Check failure threshold
+    // Check failure threshold - if we have enough recent failures, open the circuit
     if (recentFailures >= this.config.failureThreshold) {
       return true;
     }
     
-    // Check error rate
-    const errorRate = recentFailures / totalRecent;
-    if (errorRate >= this.config.errorRateThreshold) {
+    // Calculate error rate based on total requests
+    // Note: This is a secondary check - primary is the failure count threshold
+    const errorRate = this.stats.totalRequests > 0 
+      ? this.stats.totalFailures / this.stats.totalRequests 
+      : 0;
+    if (errorRate >= this.config.errorRateThreshold && recentFailures > 0) {
       return true;
     }
     

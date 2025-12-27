@@ -18,7 +18,7 @@ describe('CircuitBreaker', () => {
     breaker = new CircuitBreaker('test-provider', {
       failureThreshold: 3,
       successThreshold: 2,
-      timeout: 1000,
+      timeout: 100, // Reduced from 1000ms for faster tests
       monitoringWindow: 5000,
       volumeThreshold: 5,
     });
@@ -137,8 +137,8 @@ describe('CircuitBreaker', () => {
       breaker.forceOpen();
       expect(breaker.getState()).toBe(CircuitState.OPEN);
 
-      // Wait for timeout
-      await new Promise(resolve => setTimeout(resolve, 1100));
+      // Wait for timeout (now 100ms, wait 150ms to be safe)
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       // Should now be HALF_OPEN
       expect(breaker.getState()).toBe(CircuitState.HALF_OPEN);
@@ -146,7 +146,7 @@ describe('CircuitBreaker', () => {
 
     test('should allow limited requests in HALF_OPEN', async () => {
       breaker.forceOpen();
-      await new Promise(resolve => setTimeout(resolve, 1100));
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       // Should allow first request
       expect(breaker.isAllowed()).toBe(true);
@@ -154,7 +154,7 @@ describe('CircuitBreaker', () => {
 
     test('should close after success threshold in HALF_OPEN', async () => {
       breaker.forceOpen();
-      await new Promise(resolve => setTimeout(resolve, 1100));
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       // Record successes (need 2 for successThreshold)
       breaker.recordSuccess();
@@ -165,7 +165,7 @@ describe('CircuitBreaker', () => {
 
     test('should re-open on failure in HALF_OPEN', async () => {
       breaker.forceOpen();
-      await new Promise(resolve => setTimeout(resolve, 1100));
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       // Force transition to HALF_OPEN by checking state
       breaker.getState();
