@@ -1,9 +1,9 @@
 
-# Task: Implement Request Correlation IDs in Backend Chat Pipeline
-# Description: Add generation and propagation of request correlation IDs for end-to-end tracing in the chat pipeline, logging, and provider calls.
-# Files to modify: ['src/api/middleware/requestId.js', 'src/api/routes/chat.js', 'src/chat/chatPipeline.js', 'src/providers/*Provider.js', 'src/utils/logger.js']
+# Task: Implement Circuit Breaker Pattern for Provider Failover
+# Description: Add circuit breaker to backend provider switching logic to automatically failover on high error rates or latency, as derived from M2 milestone research.
+# Files to modify: ['src/api/providers.js', 'src/services/llm-provider-manager.js']
 
-print("Implementing: Implement Request Correlation IDs in Backend Chat Pipeline")
+print("Implementing: Implement Circuit Breaker Pattern for Provider Failover")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

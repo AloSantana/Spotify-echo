@@ -1,9 +1,9 @@
 
-# Task: Add Basic Circuit Breaker Wrapper for LLM Providers
-# Description: Introduce a lightweight, in-memory circuit breaker around provider calls to support simple failover without external dependencies.
-# Files to modify: ['src/providers/circuitBreaker.js', 'src/providers/providerRegistry.js', 'src/providers/*Provider.js', 'src/utils/logger.js']
+# Task: Add Request Correlation IDs for Tracing
+# Description: Implement end-to-end request correlation IDs for debugging chat pipeline and provider calls, as specified in M2.
+# Files to modify: ['src/middleware/tracing.js', 'src/api/chat.js', 'src/services/*']
 
-print("Implementing: Add Basic Circuit Breaker Wrapper for LLM Providers")
+print("Implementing: Add Request Correlation IDs for Tracing")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

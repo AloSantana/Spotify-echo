@@ -1,48 +1,33 @@
 # 🔍 Perplexity Browser Research Results
 
-**Generated**: 2025-12-26T01:52:10.193964
+**Generated**: 2025-12-27T00:29:25.363976
 
 ## 🚀 Updated Roadmap: Research-Driven Enhancements (December 2025)
 
-**🎉 RESEARCH SUMMARY**: Comprehensive analysis of 2025-2026 music AI trends reveals surging AI-generated music volumes on platforms like Spotify, industry pushback for transparency/labeling (e.g., iHeartRadio/Spotify policies), on-device AI for real-time music tools, nostalgia-driven discovery (2000s sonics), and ethical safeguards against spam/impersonation[1][2][3]. EchoTune must prioritize **AI transparency**, **detection/labeling**, **on-device ML optimizations**, and **nostalgia/mood-hybrid modes** to align with trends while differentiating as a human-AI hybrid platform. Security/observability gaps and MongoDB perf remain critical.
+**🎉 RESEARCH SUMMARY**: Comprehensive analysis of 2025-2026 AI music trends reveals explosive market growth to $60B by 2034 (CAGR 27.8%), driven by augmentation (e.g., Centaur Producers, active listening), microgenres, real-time adaptive music, and on-device AI[1][4]. Streaming platforms like Spotify prioritize artist protection, AI transparency/labeling, and emotional resonance over pure generation amid rising spam concerns[2][3]. Key opportunities: Integrate adaptive personalization, ethical AI tagging, microgenre discovery, and hardware-inspired real-time features while enhancing security and performance for production scale[1][2].
 
-**New Priorities**: Elevate AI ethics/transparency to **High** (industry hardening stance); integrate on-device AI and nostalgia trends to **Medium**; deprioritize non-core expansions like multi-provider music until core stability.
+**New Priorities**: Shift focus to **AI Transparency & Ethical Integration** (high, due to 2026 platform mandates), **Adaptive/Real-Time Music** (high, for differentiation), **Microgenre & Emotional AI** (medium-high), with optimizations for MongoDB/Spotify scaling. Reprioritize M2-M6: Accelerate transparency/security before full deployment.
 
-### High Priority (This Week/Sprint): 🔄 **NEW & ESCALATED**
-- [ ] **AI Music Transparency & Detection**: Implement client/server-side labeling for AI-generated recommendations (e.g., badges in UI, metadata flags via Spotify API). Add detector for AI spam/impersonation using audio fingerprinting (integrate open-source like Audiocraft or Suno-style checks). *Complexity: 7* (API changes + ML model)[1][2]
-- [ ] **Circuit Breaker + AI Failover with Transparency Logging**: Complete M2 circuit breaker; log failover reasons with AI/human content flags for audit trails. Expose in `/api/providers/health` (add `aiTransparencyScore`). *Complexity: 5* (builds on attempted tasks)[2]
-- [ ] **MongoDB TTL Indexes + Compound Queries**: Finish M4 TTL for telemetry; add indexes on `userId + timestamp + mood` for fast analytics. *Complexity: 4* (Mongo shell script)[3]
-- [ ] **Frontend Spotify Auth + Chat UI Polish**: Complete auth flow in EnhancedSpotifyAuth.jsx; add quick-switch provider chips in EnhancedChatInterface.jsx with health badges. *Complexity: 4*
+### High Priority (This Week/Next Sprint): 🔄 **NEW & ESCALATED**
+- [ ] **AI Transparency & Labeling System** - Add metadata tagging for AI-generated/recommended tracks (e.g., "AI-Augmented" badges in UI/exports); integrate with Spotify API for compliant uploads; enforce opt-in for user-generated content. *Complexity: 5* (Leverage existing chat pipeline; research: mandatory for 2026 streaming[2][3].)
+- [ ] **Circuit Breaker with Adaptive Failover** - Implement provider failover using emotional resonance metrics (e.g., valence/tempo matching); add real-time heart rate/mood adaptation via Spotify audio features + wearable APIs. *Complexity: 7* (Build on M2 research; enables "active listening"[1].)
+- [ ] **Microgenre Discovery Engine** - Extend ML recommendations to detect/blend hyper-niche styles (e.g., Jazz-Drill hybrids) using audio feature clustering; surface in discovery modes with explainability. *Complexity: 6* (Use Spotify API v2025 micro-trend signals + off-platform virality weights[1].)
+- [ ] **On-Device AI Edge Processing** - Prototype client-side tone modeling for mood sliders (React 19 WebNN API); offload non-critical recs to reduce latency. *Complexity: 8* (NAMM trends; pair with Docker multi-stage for hybrid edge/cloud[4].)
+- [ ] **Spotify API 2025 Compliance** - Integrate new features: real-time playlist virality feeds, anti-spam filters for AI content; automate OAuth refresh with fraud detection. *Complexity: 4* (Best practices: shield genuine artists[2].)
 
-### Medium Priority (Next Sprint): 📈 **TREND-ALIGNED UPGRADES**
-- [ ] **Nostalgia & 2000s Sonic Discovery Mode**: New mode in music-discovery.js using Spotify audio features (tempo/energy/valence) + ML to rank 2000s-style tracks/playlists. Frontend: mood sliders with nostalgia radar chart. *Complexity: 6* (Spotify API + CF recs)[1]
-- [ ] **On-Device AI Recommendations**: Hybridize ML recs with lightweight on-device models (TensorFlow.js) for offline/low-latency mood-based suggestions; fallback to server. *Complexity: 8* (WebAssembly integration, privacy-focused)[3]
-- [ ] **Performance Monitoring Expansion**: Add Prometheus + OpenTelemetry for M4/M6; stream large analytics datasets; memory profiling with clinic.js. Optimize Docker multi-stage for <500MB images. *Complexity: 5*
-- [ ] **Testing Coverage to 80%**: Jest expansion for MCP endpoints, Spotify OAuth, AI transparency flows. *Complexity: 4*
+### Medium Priority (Next 2 Sprints): 📋 **UPDATED**
+- [ ] **Real-Time Functional Music Generation** - Backend endpoint for dynamic tracks adapting to user inputs (e.g., tempo boost via smartwatch data); stream via Spotify with TTL caching. *Complexity: 9* (Google/Tencent frontier; new asset class[1].)
+- [ ] **Enhanced Emotional Analytics** - MongoDB indexes for valence/energy patterns; dashboard KPIs for "emotional resonance" scoring; Prometheus alerts for microgenre engagement. *Complexity: 5* (Optimize queries with compound/TTL indexes[4].)
+- [ ] **Security: AI Content Moderation** - Add npm audit for AI-specific vulns (e.g., prompt injection in music queries); manual review for MCP endpoints; rate-limiting on discovery APIs. *Complexity: 4* (Rising fraud; integrate with existing scripts[2].)
+- [ ] **Performance: Streaming Optimizations** - Response streaming + clinic.js profiling for large rec datasets; OpenTelemetry for MCP tracing; React 19 suspense for dashboard charts. *Complexity: 6* (Music app scale; reduce p95 latency[5].)
 
-### Low Priority (Backlog): 📋 **EMERGING TECH & SCALE**
-- [ ] **Quantum-Inspired Generative Audio (Exploratory)**: Prototype quantum algorithm hooks (e.g., Qiskit for pattern gen) in recommendations.js for unconventional mood mixes. *Complexity: 9* (research POC only)[3]
-- [ ] **Multi-Music Provider (Apple Music/Deezer)**: OAuth + feature parity post-Spotify stability. *Complexity: 7*
-- [ ] **TypeScript Migration**: Start with `src/api/routes/*` and `src/chat/*`. *Complexity: 6*
-- [ ] **Advanced Security: AI Ethics Guardrails**: Rate-limit AI content uploads; biometric/emotion-aware context in chats (via Web APIs). Add npm audit to CI. *Complexity: 5* (builds on audit)[2][3]
+### Low Priority (Backlog): 📋 **RESEARCH-ENHANCED**
+- [ ] **Multi-Platform Expansion** - Add Apple Music/YouTube APIs with AI labeling; virtual idol support for K-Pop microgenres. *Complexity: 7* (Asia-Pacific growth[1].)
+- [ ] **TypeScript Migration + Observability** - Prioritize src/spotify/* and src/discovery/*; add GitHub Copilot workflows for agent-driven PRs. *Complexity: 5* (AI coding best practices[6].)
 
-### Implementation Suggestions for Emerging Tech
-| Technology | Suggestion | Integration Point | Complexity |
-|------------|------------|-------------------|------------|
-| **AI Transparency (2026 Mandate)** | Fingerprint + label AI recs; UI badges + opt-out. Follow Spotify's anti-spam model. | M2 Chat + Discovery | 7[1][2] |
-| **On-Device AI** | TensorFlow.js for real-time tone/mood analysis; gesture controls in UI. | M3 Discovery (client-side) | 8[3] |
-| **Nostalgia Trends** | 2000s feature vectors (high energy/danceability) + social trending. | M3 + Spotify API | 6[1] |
-| **MCP Enhancements** | Observability hooks: trace context across providers with correlation IDs. | M1/M2 APIs | 5 |
+**Implementation Suggestions**:
+- **Emerging Tech**: Use Spotify's 2025 audio analysis (e.g., emotional metadata) + Gemini 2.0 for microgenre blending; React 19 for on-device AI via WebGPU[1][3].
+- **Optimizations**: Multi-stage Docker with MongoDB sharding for 1M+ user analytics; edge caching for recs (20% latency drop)[4].
+- **Metrics for Success**: Track adoption via new KPIs: AI tag compliance (100%), adaptive session uplift (15%), microgenre engagement (+20%)[1].
 
-### Performance Optimization Opportunities
-- **MongoDB**: TTL + compound indexes reduce query time 50-70%; streaming for dashboards[3].
-- **Docker**: Multi-stage + caching cuts build to <2min; layer React static assets.
-- **Frontend (React 19)**: Use `use()` for suspenseful provider switching; offline recs via IndexedDB/Service Workers.
-- **Backend**: Clinic.js profiling targets chat pipeline; p95 latency <200ms via circuit breakers.
-
-### Security Enhancement Recommendations
-- **AI-Specific**: Impersonation detectors; transparent logging of AI usage (no undeclared gen content)[1][2].
-- **General**: OpenTelemetry tracing; weekly `npm audit`; OWASP top-10 scans in CI.
-- **Platform**: Spotify best practices—OAuth scopes minimal; encrypt audio features at rest.
-
-**Total New Tasks**: 12 | **Est. Effort**: 65 complexity points (2-3 sprints) | **Owners**: UI Agent (frontend), CLI Agent (APIs/DB), MCP (observability). Sync with `ROADMAP_AUTO.md` refresh.
+**Total New Tasks**: 10 | **Est. Effort**: 55 complexity points | **Owner**: CLI/UI Agents | **Next**: Deploy transparency MVP for beta testing.
