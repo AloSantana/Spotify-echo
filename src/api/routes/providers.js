@@ -417,4 +417,54 @@ router.get('/settings-data', (req, res) => {
   }
 });
 
+/**
+ * Get circuit breaker status for all providers
+ * Research-derived from Perplexity sweep 2025-08-16 (M2 Context-Aware Conversations)
+ */
+router.get('/circuit-breaker', async (req, res) => {
+  try {
+    const { getProviderFactory } = require('../../chat/provider-factory');
+    const factory = getProviderFactory();
+    
+    const circuitStatus = factory.getCircuitBreakerStatus();
+    
+    res.json({
+      success: true,
+      circuitBreakers: circuitStatus,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Circuit breaker status failed:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get circuit breaker status',
+    });
+  }
+});
+
+/**
+ * Reset circuit breaker for a specific provider
+ */
+router.post('/circuit-breaker/:providerId/reset', async (req, res) => {
+  try {
+    const { providerId } = req.params;
+    const { getProviderFactory } = require('../../chat/provider-factory');
+    const factory = getProviderFactory();
+    
+    factory.resetCircuitBreaker(providerId);
+    
+    res.json({
+      success: true,
+      message: `Circuit breaker reset for ${providerId}`,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Circuit breaker reset failed:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to reset circuit breaker',
+    });
+  }
+});
+
 module.exports = router;
