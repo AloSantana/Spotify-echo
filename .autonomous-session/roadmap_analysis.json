@@ -2,120 +2,103 @@
   "actionable_tasks": [
     {
       "id": "task_1",
-      "title": "Implement Circuit Breaker Pattern for Provider Failover",
-      "description": "Add circuit breaker to backend provider switching logic to automatically failover on high error rates or latency, as derived from M2 milestone research.",
-      "priority": "high",
-      "estimated_time": "60-90 minutes",
+      "title": "Complete MongoDB TTL Indexes",
+      "description": "Finish implementing MongoDB TTL indexes at 50% progress for automatic document expiration, targeting logs or temporary data collections to optimize storage and performance.",
+      "priority": "medium",
+      "estimated_time": "30-60 minutes",
       "files_to_modify": [
-        "src/api/providers.js",
-        "src/services/llm-provider-manager.js"
+        "src/db/mongodb.js",
+        "src/models/Log.js"
       ],
       "implementation_steps": [
-        "Define circuit breaker states (closed/open/half-open) and thresholds (e.g., 5 failures in 10 requests)",
-        "Implement using a simple state machine with recentLatencies array already available",
-        "Add automatic failover to next healthy provider on open state",
-        "Add logging and health endpoint exposure for monitoring",
-        "Write 2-3 unit tests for state transitions"
-      ],
-      "complexity_score": 6
-    },
-    {
-      "id": "task_2",
-      "title": "Add Request Correlation IDs for Tracing",
-      "description": "Implement end-to-end request correlation IDs for debugging chat pipeline and provider calls, as specified in M2.",
-      "priority": "high",
-      "estimated_time": "30-45 minutes",
-      "files_to_modify": [
-        "src/middleware/tracing.js",
-        "src/api/chat.js",
-        "src/services/*"
-      ],
-      "implementation_steps": [
-        "Create middleware to generate UUID correlation ID per request",
-        "Propagate ID through all LLM provider calls and log with each operation",
-        "Expose ID in API responses and frontend console for debugging",
-        "Update existing debug logs to include correlation ID"
+        "Identify collections needing TTL (e.g., session logs, temp recommendations)",
+        "Add TTL index on expiry field: db.collection.createIndex({ \"expiresAt\": 1 }, { expireAfterSeconds: 0 })",
+        "Test index creation and document auto-deletion",
+        "Update schema models to include expiresAt field where missing"
       ],
       "complexity_score": 4
     },
     {
-      "id": "task_3",
-      "title": "Complete Spotify Authentication Interface",
-      "description": "Finish frontend Spotify OAuth flow UI as listed in Medium Priority (IN PROGRESS).",
+      "id": "task_2",
+      "title": "Expand Performance Monitoring to p50/p95 Tracking",
+      "description": "Advance performance monitoring from 40% by adding p50 and p95 latency metrics collection and dashboard display, using existing basic metrics setup.",
       "priority": "medium",
-      "estimated_time": "45-60 minutes",
+      "estimated_time": "45-90 minutes",
       "files_to_modify": [
-        "src/components/SpotifyAuth.jsx",
-        "src/pages/Settings.jsx"
+        "src/monitoring/performance.js",
+        "src/dashboard/components/Metrics.jsx"
       ],
       "implementation_steps": [
-        "Create OAuth button and modal with loading states",
-        "Handle callback URL parsing and token storage",
-        "Add error handling and user feedback",
-        "Test end-to-end flow with Spotify test credentials",
-        "Style with existing glassmorphism theme"
+        "Integrate percentile calculation library or custom function for p50/p95 from latency samples",
+        "Update metric collection middleware to aggregate percentiles",
+        "Add p50/p95 visualizations to analytics dashboard",
+        "Test with load simulation to verify accuracy against Q1 target <200ms p95"
       ],
       "complexity_score": 5
     },
     {
-      "id": "task_4",
-      "title": "Add MongoDB Compound Indexes for Analytics",
-      "description": "Implement compound indexes for M4 analytics queries to improve dashboard performance.",
+      "id": "task_3",
+      "title": "Implement Basic Testing Expansion",
+      "description": "Increase test coverage from ~45% to >50% by adding Jest tests for MCP endpoints and provider health checks, focusing on high-impact untested areas.",
       "priority": "medium",
-      "estimated_time": "30-45 minutes",
+      "estimated_time": "60-120 minutes",
       "files_to_modify": [
-        "db/migrations/indexes.js",
-        "src/services/analytics.js"
+        "tests/api/mcp.test.js",
+        "tests/providers/health.test.js",
+        "package.json"
       ],
       "implementation_steps": [
-        "Identify common query patterns from existing analytics endpoints",
-        "Create compound indexes on {userId:1, timestamp:-1, provider:1}",
-        "Add TTL index on telemetry collections (e.g., expire after 30 days)",
-        "Test query performance before/after with explain()",
-        "Add index creation to deployment script"
+        "Write unit tests for MCP server endpoints (e.g., health checks, failover)",
+        "Add integration tests for multi-provider LLM switching",
+        "Run coverage report and target gaps in src/api/routes/* and src/chat/*",
+        "Update CI to fail on coverage <50%"
+      ],
+      "complexity_score": 6
+    },
+    {
+      "id": "task_4",
+      "title": "Add Docker Optimization for Multi-Stage Builds",
+      "description": "Optimize Docker setup with multi-stage builds and caching for faster dev/prod images, using existing containerization base.",
+      "priority": "medium",
+      "estimated_time": "30-60 minutes",
+      "files_to_modify": [
+        "Dockerfile",
+        "docker-compose.yml"
+      ],
+      "implementation_steps": [
+        "Refactor Dockerfile into build and runtime stages (e.g., npm ci --only=production)",
+        "Add .dockerignore and layer caching for node_modules",
+        "Test build time reduction and image size",
+        "Update compose for local dev with volume mounts"
       ],
       "complexity_score": 4
     },
     {
       "id": "task_5",
-      "title": "Implement Basic Chat Interface Toggle",
-      "description": "Add simple context toggle button to existing chat UI for M2 context-aware conversations.",
-      "priority": "medium",
-      "estimated_time": "20-30 minutes",
+      "title": "Implement AI Transparency Metadata Tagging",
+      "description": "Start AI Transparency by adding metadata tagging for AI-generated recommendations in MongoDB and API responses.",
+      "priority": "high",
+      "estimated_time": "45-75 minutes",
       "files_to_modify": [
-        "src/components/ChatInterface.jsx"
+        "src/recommendations/engine.js",
+        "src/api/responses.js",
+        "src/models/Recommendation.js"
       ],
       "implementation_steps": [
-        "Add toggle switch for 'Include Context' in chat settings",
-        "Pass context flag to backend chat endpoint",
-        "Update backend to conditionally attach user context when enabled",
-        "Add tooltip explaining what context includes (mood/history)"
+        "Add aiGenerated: true/false and modelUsed: string fields to recommendation schema",
+        "Tag responses from LLM providers automatically",
+        "Verify tagging in chat interface responses",
+        "Document for upcoming UI badges"
       ],
-      "complexity_score": 3
-    },
-    {
-      "id": "task_6",
-      "title": "Add Quality Scripts to package.json",
-      "description": "Ensure all quality scripts from recent improvements are properly added and documented.",
-      "priority": "low",
-      "estimated_time": "15-20 minutes",
-      "files_to_modify": [
-        "package.json"
-      ],
-      "implementation_steps": [
-        "Verify/add 'lint', 'security:audit', 'quality:check' scripts",
-        "Add script descriptions in comments",
-        "Test all scripts run successfully",
-        "Update README with usage instructions"
-      ],
-      "complexity_score": 1
+      "complexity_score": 5
     }
   ],
   "next_research_topics": [
-    "Circuit breaker implementation patterns for Node.js LLM providers",
-    "MongoDB optimal indexing strategies for time-series analytics data",
-    "Lightweight request tracing without full OpenTelemetry",
-    "Spotify Web API audio features extraction for mood detection"
+    "Best practices for MongoDB TTL indexes in Node.js music apps",
+    "Percentile latency tracking tools for Express.js APIs",
+    "Quick Jest test patterns for LLM provider failover",
+    "Multi-stage Docker optimization for React + Node monorepos",
+    "2026 AI music transparency regulations and UI labeling standards"
   ],
-  "completion_percentage": 82
+  "completion_percentage": 65
 }
