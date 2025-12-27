@@ -13,6 +13,9 @@ const MockProvider = require('./llm-providers/mock-provider');
 // Provider health monitoring
 const ProviderHealthMonitor = require('./provider-health-monitor');
 
+// Circuit breaker for failover (research-derived from Perplexity sweep 2025-08-16)
+const { getCircuitBreakerManager, CircuitState } = require('./circuit-breaker');
+
 /**
  * Provider Registry
  * Maps provider names to their classes and configuration
@@ -78,9 +81,15 @@ class ProviderFactory {
   constructor() {
     this.providers = new Map();
     this.healthMonitor = new ProviderHealthMonitor();
+    this.circuitBreakerManager = getCircuitBreakerManager();
     this.roundRobinIndex = 0;
     this.selectionStrategy = process.env.AI_ROUTING_STRATEGY || SELECTION_STRATEGIES.FAILOVER;
     this.initialized = false;
+    
+    // Set up circuit breaker event listeners
+    this.circuitBreakerManager.on('stateChange', (data) => {
+      console.log(`🔌 Provider ${data.provider} circuit: ${data.from} → ${data.to}`);
+    });
   }
 
   /**
@@ -226,16 +235,26 @@ class ProviderFactory {
   }
 
   /**
-   * Failover selection: Use first healthy provider
+   * Failover selection: Use first healthy provider with circuit breaker check
    */
   async failoverSelect(available) {
-    for (const key of available) {
+    // First, filter by circuit breaker state
+    const circuitBreakerAvailable = available.filter(key => 
+      this.circuitBreakerManager.isAvailable(key)
+    );
+    
+    // If circuit breakers are blocking all providers, try any available
+    const candidates = circuitBreakerAvailable.length > 0 ? circuitBreakerAvailable : available;
+    
+    for (const key of candidates) {
       if (await this.healthMonitor.isHealthy(key)) {
         return key;
       }
     }
-    // If no healthy provider, return first available
-    return available[0];
+    
+    // If no healthy provider, use circuit breaker's best selection
+    const best = this.circuitBreakerManager.selectBestProvider(available);
+    return best || available[0];
   }
 
   /**
@@ -375,6 +394,51 @@ class ProviderFactory {
       return false;
     }
   }
+
+  /**
+   * Record successful request to update circuit breaker and health monitor
+   * @param {string} providerName - Provider that succeeded
+   * @param {number} latencyMs - Request latency in milliseconds
+   */
+  async recordSuccess(providerName, latencyMs = 0) {
+    // Update circuit breaker
+    this.circuitBreakerManager.recordSuccess(providerName, latencyMs);
+    
+    // Update health monitor
+    await this.healthMonitor.recordSuccess(providerName, latencyMs);
+  }
+
+  /**
+   * Record failed request to update circuit breaker and health monitor
+   * @param {string} providerName - Provider that failed
+   * @param {Error|string} error - The error
+   */
+  async recordFailure(providerName, error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    
+    // Update circuit breaker
+    this.circuitBreakerManager.recordFailure(providerName, errorMessage);
+    
+    // Update health monitor
+    await this.healthMonitor.recordFailure(providerName, errorMessage);
+  }
+
+  /**
+   * Get circuit breaker status for all providers
+   * @returns {Object} Circuit breaker summary
+   */
+  getCircuitBreakerStatus() {
+    return this.circuitBreakerManager.getSummary();
+  }
+
+  /**
+   * Reset circuit breaker for a provider (manual intervention)
+   * @param {string} providerName - Provider to reset
+   */
+  resetCircuitBreaker(providerName) {
+    this.circuitBreakerManager.reset(providerName);
+    console.log(`🔄 Circuit breaker reset for ${providerName}`);
+  }
 }
 
 // Singleton instance
@@ -396,4 +460,7 @@ module.exports = {
   getProviderFactory,
   PROVIDER_REGISTRY,
   SELECTION_STRATEGIES,
+  // Re-export circuit breaker for direct access
+  getCircuitBreakerManager,
+  CircuitState,
 };
