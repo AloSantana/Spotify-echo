@@ -1,9 +1,9 @@
 
-# Task: Expand Performance Monitoring to p50/p95 Tracking
-# Description: Advance performance monitoring from 40% by adding p50 and p95 latency metrics collection and dashboard display, using existing basic metrics setup.
-# Files to modify: ['src/monitoring/performance.js', 'src/dashboard/components/Metrics.jsx']
+# Task: Add Jest integration tests for MCP provider health endpoints
+# Description: Increase automated test coverage by adding focused integration tests around MCP provider health and failover behavior to support the Advanced AI Integration and Analytics Dashboard pillars.
+# Files to modify: ['tests/integration/mcpHealth.test.js', 'src/api/routes/mcpProviders.js', 'jest.config.js']
 
-print("Implementing: Expand Performance Monitoring to p50/p95 Tracking")
+print("Implementing: Add Jest integration tests for MCP provider health endpoints")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

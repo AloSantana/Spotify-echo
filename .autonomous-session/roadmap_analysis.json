@@ -2,103 +2,109 @@
   "actionable_tasks": [
     {
       "id": "task_1",
-      "title": "Complete MongoDB TTL Indexes",
-      "description": "Finish implementing MongoDB TTL indexes at 50% progress for automatic document expiration, targeting logs or temporary data collections to optimize storage and performance.",
-      "priority": "medium",
-      "estimated_time": "30-60 minutes",
+      "title": "Implement basic p50/p95 API latency tracking",
+      "description": "Extend existing performance monitoring to calculate and store p50/p95 response times for key backend endpoints, aligned with the performance metrics roadmap.",
+      "priority": "high",
+      "estimated_time": "60-90 minutes",
       "files_to_modify": [
-        "src/db/mongodb.js",
-        "src/models/Log.js"
+        "src/metrics/performanceMonitor.js",
+        "src/api/middleware/requestTiming.js",
+        "src/api/routes/*",
+        "src/config/metrics.ts"
       ],
       "implementation_steps": [
-        "Identify collections needing TTL (e.g., session logs, temp recommendations)",
-        "Add TTL index on expiry field: db.collection.createIndex({ \"expiresAt\": 1 }, { expireAfterSeconds: 0 })",
-        "Test index creation and document auto-deletion",
-        "Update schema models to include expiresAt field where missing"
-      ],
-      "complexity_score": 4
-    },
-    {
-      "id": "task_2",
-      "title": "Expand Performance Monitoring to p50/p95 Tracking",
-      "description": "Advance performance monitoring from 40% by adding p50 and p95 latency metrics collection and dashboard display, using existing basic metrics setup.",
-      "priority": "medium",
-      "estimated_time": "45-90 minutes",
-      "files_to_modify": [
-        "src/monitoring/performance.js",
-        "src/dashboard/components/Metrics.jsx"
-      ],
-      "implementation_steps": [
-        "Integrate percentile calculation library or custom function for p50/p95 from latency samples",
-        "Update metric collection middleware to aggregate percentiles",
-        "Add p50/p95 visualizations to analytics dashboard",
-        "Test with load simulation to verify accuracy against Q1 target <200ms p95"
+        "Add a lightweight in-memory metrics collector that records per-endpoint response times and maintains rolling histograms or sorted arrays to compute p50/p95.",
+        "Wire a request timing middleware that records start/end times for each request and forwards the duration plus route key to the metrics collector.",
+        "Expose a new internal metrics endpoint (e.g., GET /api/metrics/performance) that returns p50/p95 for main API groups (chat, Spotify, analytics).",
+        "Add minimal unit tests for the percentile calculation utility and the new metrics endpoint to avoid regressions."
       ],
       "complexity_score": 5
     },
     {
+      "id": "task_2",
+      "title": "Add Jest integration tests for MCP provider health endpoints",
+      "description": "Increase automated test coverage by adding focused integration tests around MCP provider health and failover behavior to support the Advanced AI Integration and Analytics Dashboard pillars.",
+      "priority": "high",
+      "estimated_time": "60-120 minutes",
+      "files_to_modify": [
+        "tests/integration/mcpHealth.test.js",
+        "src/api/routes/mcpProviders.js",
+        "jest.config.js"
+      ],
+      "implementation_steps": [
+        "Identify or create an HTTP route exposing MCP provider health (latency, error rate), or add a minimal one if missing.",
+        "Create a new Jest integration test file that spins up the app in test mode and hits the MCP health endpoint(s).",
+        "Mock at least two providers (healthy/unhealthy) and assert correct status payloads and HTTP codes, including error paths.",
+        "Tag tests appropriately (e.g., `integration` or `mcp`) and ensure they run as part of the existing `quality:check` or CI pipeline."
+      ],
+      "complexity_score": 6
+    },
+    {
       "id": "task_3",
-      "title": "Implement Basic Testing Expansion",
-      "description": "Increase test coverage from ~45% to >50% by adding Jest tests for MCP endpoints and provider health checks, focusing on high-impact untested areas.",
+      "title": "Create minimal Dockerfiles for backend, frontend, and MCP services",
+      "description": "Containerize the main services with simple, production-ready multi-stage Dockerfiles and a basic docker-compose setup for local dev.",
       "priority": "medium",
       "estimated_time": "60-120 minutes",
       "files_to_modify": [
-        "tests/api/mcp.test.js",
-        "tests/providers/health.test.js",
-        "package.json"
+        "Dockerfile.backend",
+        "Dockerfile.frontend",
+        "Dockerfile.mcp",
+        "docker-compose.yml"
       ],
       "implementation_steps": [
-        "Write unit tests for MCP server endpoints (e.g., health checks, failover)",
-        "Add integration tests for multi-provider LLM switching",
-        "Run coverage report and target gaps in src/api/routes/* and src/chat/*",
-        "Update CI to fail on coverage <50%"
+        "Add a multi-stage Node.js Dockerfile for the backend (build stage + slim runtime stage with `npm ci --only=production`).",
+        "Add a Dockerfile for the React frontend that builds static assets and serves them via a lightweight HTTP server (e.g., nginx or node-based static server).",
+        "Add a simple Dockerfile for MCP servers that installs dependencies and starts the MCP process defined in existing scripts.",
+        "Create a docker-compose.yml that wires backend, frontend, MongoDB, and MCP containers together with appropriate environment variables and ports for local development."
       ],
       "complexity_score": 6
     },
     {
       "id": "task_4",
-      "title": "Add Docker Optimization for Multi-Stage Builds",
-      "description": "Optimize Docker setup with multi-stage builds and caching for faster dev/prod images, using existing containerization base.",
+      "title": "Implement basic MongoDB TTL indexes for log/metrics collections",
+      "description": "Finish the MongoDB TTL index work by adding explicit TTL indexes on time-based collections (e.g., logs, performance metrics) to auto-expire stale data.",
       "priority": "medium",
-      "estimated_time": "30-60 minutes",
+      "estimated_time": "45-90 minutes",
       "files_to_modify": [
-        "Dockerfile",
-        "docker-compose.yml"
+        "src/db/initIndexes.js",
+        "src/models/PerformanceMetric.js",
+        "src/models/RequestLog.js"
       ],
       "implementation_steps": [
-        "Refactor Dockerfile into build and runtime stages (e.g., npm ci --only=production)",
-        "Add .dockerignore and layer caching for node_modules",
-        "Test build time reduction and image size",
-        "Update compose for local dev with volume mounts"
+        "Identify collections storing time-series or log-style data (request logs, metrics) and ensure each has a `createdAt` or `timestamp` field.",
+        "Update or create an index initialization module to define `expireAfterSeconds` TTL indexes on these collections (e.g., 7 or 30 days).",
+        "Invoke the index initialization module during app startup, guarding it so it is idempotent and safe across restarts.",
+        "Add a short test or a dev script assertion that verifies the indexes exist in a test database."
       ],
       "complexity_score": 4
     },
     {
       "id": "task_5",
-      "title": "Implement AI Transparency Metadata Tagging",
-      "description": "Start AI Transparency by adding metadata tagging for AI-generated recommendations in MongoDB and API responses.",
-      "priority": "high",
-      "estimated_time": "45-75 minutes",
+      "title": "Add simple TypeScript migration scaffold for backend routes",
+      "description": "Start the gradual TypeScript migration by configuring TypeScript and converting one or two high-change backend route modules to `.ts` with basic types.",
+      "priority": "low",
+      "estimated_time": "60-120 minutes",
       "files_to_modify": [
-        "src/recommendations/engine.js",
-        "src/api/responses.js",
-        "src/models/Recommendation.js"
+        "tsconfig.json",
+        "src/api/routes/chat.ts",
+        "src/api/routes/spotify.ts",
+        "package.json"
       ],
       "implementation_steps": [
-        "Add aiGenerated: true/false and modelUsed: string fields to recommendation schema",
-        "Tag responses from LLM providers automatically",
-        "Verify tagging in chat interface responses",
-        "Document for upcoming UI badges"
+        "Add a minimal `tsconfig.json` targeting Node, enabling `allowJs` and incremental migration, and update build scripts to compile TypeScript where needed.",
+        "Rename one or two key route files from `.js` to `.ts` and add lightweight type annotations for request/response objects and handler signatures.",
+        "Ensure imports/exports are compatible with the existing build pipeline and update any relative paths if necessary.",
+        "Add an npm script (e.g., `build:ts`) and hook it into the existing `quality:check` or CI pipeline so TS compilation errors are caught early."
       ],
       "complexity_score": 5
     }
   ],
   "next_research_topics": [
-    "Best practices for MongoDB TTL indexes in Node.js music apps",
-    "Percentile latency tracking tools for Express.js APIs",
-    "Quick Jest test patterns for LLM provider failover",
-    "Multi-stage Docker optimization for React + Node monorepos",
-    "2026 AI music transparency regulations and UI labeling standards"
+    "Best-practice implementation patterns for p50/p95 metrics in Node.js APIs without heavy external dependencies",
+    "Schema design examples for MongoDB time-series/TTL index strategies for observability data",
+    "Recommended Docker multi-stage patterns for Node + React monorepos optimized for build caching",
+    "Minimal-risk strategies for incremental TypeScript adoption in existing JavaScript backends",
+    "Test design patterns for high-value integration tests around provider health and failover"
   ],
-  "completion_percentage": 65
+  "completion_percentage": 78
 }

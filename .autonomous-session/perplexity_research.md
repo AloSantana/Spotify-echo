@@ -1,66 +1,224 @@
 # 🔍 Perplexity Browser Research Results
 
-**Generated**: 2025-12-27T12:12:54.535798
+**Generated**: 2025-12-28T00:34:01.754817
 
-## 📅 Q1 2026 Development Cycle Update (Research-Enhanced)
+EchoTune’s roadmap should add a new **“2026 Research‑Aligned Enhancements”** section that emphasizes emotional AI, microgenres, transparency, performance, and security. Below is a markdown block you can paste directly into your roadmap.
 
-**🎉 RESEARCH SUMMARY**: Analysis of 2025-2026 music AI trends reveals surging demand for **hyper-personalization**, **AI content detection/watermarking**, **model controllability** (e.g., real-time parameter adjustments like Google's MusicFX DJ), **immersive VR/AR experiences**, and **copyright-safe generative tools** (e.g., artist-owned stem remixers like Delphos Soundworld). Market growth projects AI music boosting industry revenue 17.2% by 2025 end, with platforms like Suno/Udio raising $100M+; however, rising criticism of generic AI tracks emphasizes **transparency** and **human-AI collaboration**. Spotify API best practices stress enriched metadata, contextual recs (mood/activity), and hi-res audio. React 19 enables server-side rendering for <200ms loads. Performance opts include MongoDB compound indexes + Prometheus. Security adds deepfake detection amid 2026 mandates.[1][2][3][4][5][6][7]
+---
 
-### 🎯 Current Sprint Focus (Updated Priorities)
+## 📡 2026 Research‑Aligned Enhancements (EchoTune AI)
 
-#### ✅ Recently Completed (No Changes)
-- Code Quality Assessment, Security Audit, Chat Interface, Multi-Provider LLM, Spotify Integration, Circuit Breaker Failover.
+### 🎯 Strategic Themes (Based on 2025–2026 Music & Tech Trends)
 
-#### 🔄 In Progress (This Sprint) - Accelerated
-| Task | Status | Priority | Est. Completion | Complexity (1-10) |
-|------|--------|----------|-----------------|-------------------|
-| **AI Transparency & Labeling** (Add watermarking + deepfake detection) | 🔄 60% | **Critical** (2026 mandates) | Jan 10 | 5 |
-| MongoDB TTL Indexes (Add compound for recs queries) | 🔄 70% | High | Jan 3 | 4 |
-| **Performance Monitoring** (p50/p95 + Prometheus export) | 🔄 60% | High | Jan 10 | 6 |
+- **Emotional & Contextual Personalization** – Algorithms increasingly optimize for *emotional resonance*, not just clicks.[1][2]
+- **Microgenre & Active Listener Era** – AI accelerates **microgenre** explosion and “active listening” (interactive, adaptive music).[1]
+- **Generative & Functional Music** – Text‑to‑music, stem separation, and adaptive “functional music” (wellness, gaming) are becoming core workflows.[1][2]
+- **Transparency & Regulation Readiness** – EU‑style rules make **AI transparency mandatory**; “black‑box” systems are commercially risky.[1][3]
+- **High‑Performance, Secure Platforms** – Streaming apps must invest in low‑latency APIs, strong security, and robust data infrastructure.[2][3]
 
-#### 📋 Upcoming (Next Sprint) - Research-Prioritized Additions
-| Task | Description & Tech Suggestions | Priority | Est. Completion | Complexity (1-10) |
-|------|--------------------------------|----------|-----------------|-------------------|
-| **Hyper-Personalized Playlists** | Context-aware (time/location/mood/activity) using Spotify audio features + user social data; integrate VR/AR previews via WebXR. | **Critical** | Jan 17 | 7 |
-| **AI Content Detection/Watermarking** | Scan uploads for AI/deepfakes (Pex/IRCAM-inspired); add "AI-Made" labels + metadata tags for compliance. | **Critical** | Jan 17 | 6 |
-| Microgenre Discovery Engine | ML for niche styles via synthetic data training + controllability (e.g., tempo/vibrato sliders like MusicFX). | High | Jan 24 | 8 |
-| Real-time Collaborative Playlists | WebSocket + AI latency sync/lyric translation for global jams; community hubs for fan-driven discovery. | High | Jan 24 | 7 |
-| React 19 Migration | Server components for concurrent rendering; optimize Lighthouse to >90 via code-splitting. | High | Feb 1 | 5 |
-| Enhanced Audio Visualization | Web Audio API + hi-res waveforms; stem separation for user remixing (Diff-a-Riff style). | Medium | Feb 7 | 6 |
-| Test Coverage Expansion | Target >70% with Jest for MCP/Spotify endpoints; add AI recs fuzzing. | Medium | Jan 17 | 4 |
+Complexity scale: 1 (trivial) – 10 (very complex).
 
-### 🤖 Updated AI/ML Integration Roadmap (Trend-Aligned)
+---
 
-1. **AI Transparency & Detection** (Priority: **Critical** ↑)
-   - Watermark social uploads + deepfake scanners (e.g., Pex integration).[1]
-   - **Action**: Embed Audible Magic API for user refs; UI badges for AI-augmented recs. (Complexity: 4)
+### 1) New High‑Priority Product & AI Tasks
 
-2. **Adaptive/Hyper-Personalized Features** (Priority: **Critical** ↑)
-   - Mood/activity/context playlists; data-driven A&R for niche artists.[2][4]
-   - **Action**: Fuse Spotify features with device/location data; collaborative group playlists. (Complexity: 6)
+#### 1.1 Emotional AI & Mood‑First Discovery (High Priority)
 
-3. **Generative AI with Controllability** (Priority: **High** ↑)
-   - Text-to-music + stem shuffling; artist-owned generators (Soundworld-like).[4]
-   - **Action**: Scaffold Suno/Udio APIs; add granular controls (vibrato/energy). Retain copyright via user stems. (Complexity: 8)
+1. **Emotional Audio & Lyrics Analyzer Service**  
+   - Build a backend service that computes **emotional vectors** per track using Spotify audio features (valence, energy, tempo, mode) plus lyrics sentiment (when available).  
+   - Store normalized features (e.g., mood coordinates: calm–energetic, dark–bright, tense–relaxed).  
+   - Complexity: **7**
 
-4. **Immersive & Community Features** (Priority: **High** New)
-   - VR/AR concerts + real-time global collab.[2][6]
-   - **Action**: WebXR for personalized visuals; AI-synchronized jamming. (Complexity: 7)
+2. **Emotion‑First Recommendation Mode (“Emotional Engine”)**  
+   - Add a **Discovery Mode: Emotion‑First** that ranks tracks primarily by emotional similarity rather than genre or popularity, mirroring emerging Spotify approaches.[1]  
+   - Add UI sliders (energy, positivity, intensity) to tune recommendations.  
+   - Complexity: **6**
 
-### 📊 Updated Key Metrics & Targets (Q1 2026)
+3. **Context‑Aware Playlist Scenarios**  
+   - Define explicit contexts (e.g., *focus, commute, workout, unwind, sleep*) and build curated + AI‑ranked track pools for each, using emotional and tempo constraints.[1][2]  
+   - Integrate with existing chat interface: “Create a late‑night focus playlist that slowly calms down.”  
+   - Complexity: **5**
 
-| Metric | Current | Target Q1 2026 | Optimization Notes |
-|--------|---------|----------------|-------------------|
-| API Response Time (p95) | ~400ms | **<150ms** | React 19 SSR + Mongo indexes.[3] |
-| Test Coverage | ~45% | >75% | AI-specific tests. |
-| Lighthouse Score | 75 | >95 | Hi-res audio + WebXR caching. |
-| Chat Success Rate | 92% | >98% | Controllability failover. |
-| **AI Detection Accuracy** (New) | N/A | >95% | Deepfake benchmarks.[1] |
-| Provider Failover Time | 500ms | <50ms | Circuit breaker + Prometheus alerting. |
+4. **Off‑Platform Signal Scaffold (Phase 1)**  
+   - Design schema + ingestion hooks for future off‑platform signals (e.g., TikTok/short‑video virality flags, simple boolean or score), anticipating cross‑platform discovery importance.[1][2]  
+   - Complexity: **4**
 
-### 🔒 Security & Performance Enhancements (Research-Driven)
-- **High-Prio Security**: Integrate AI watermarking + dependency scans for deepfake vulns; OAuth PKCE hardening.[1][7] (Complexity: 3)
-- **Perf Opts**: Multi-stage Docker + edge caching; Mongo TTL/compounds for 10x query speed.[4] (Complexity: 4)
-- **MCP Opportunities**: Extend for VR music gen + real-time stem collab via protocol extensions. (Complexity: 5)
+#### 1.2 Microgenre Discovery & Active Listener Features (High Priority)
 
-**Total New Tasks**: 8 | **Est. Sprint Time**: 4 weeks | **Risks**: AI criticism—prioritize opt-in transparency to build trust.[7]
+5. **Microgenre Cluster Detection v1**  
+   - Use track audio features + existing recommendation embeddings to cluster tracks into **emerging microgenres** (e.g., k‑means or density clustering).  
+   - Auto‑label clusters via LLMs (e.g., “ambient hyperpop,” “lo‑fi phonk,” etc.).[1]  
+   - Complexity: **8**
+
+6. **Microgenre Explorer UI**  
+   - New frontend module: **Microgenre Map** with chips/cards showing cluster names, key artists, and “enter radio” action.  
+   - Include user controls to follow/favorite microgenres.  
+   - Complexity: **5**
+
+7. **Active Listening Controls (Dynamic Playlists)**  
+   - Add **“Adaptive Playlist” toggle** that periodically regenerates queue based on current skip rate, likes, and session duration (simulating “active listening” evolution).[1]  
+   - Complexity: **6**
+
+#### 1.3 Generative & Creator‑Facing Features (Medium–High Priority)
+
+8. **Stem‑Separation Integration (Third‑Party API)**  
+   - Integrate a stem‑separation API for creator‑mode (not consumer playback) to enable remix suggestions and micro‑sampling workflows, aligned with producers’ leading AI use cases.[1][2]  
+   - Complexity: **7**
+
+9. **Text‑to‑Playlist & Text‑to‑Theme Music Scaffolding**  
+   - Extend chat to support advanced creative prompts: “Build a playlist like a 1980s sci‑fi movie ending, hopeful but bittersweet.”  
+   - Optionally integrate a **text‑to‑music** API for short stingers/transition cues as experimental “EchoTune Originals,” matching growth in generative AI in music.[2]  
+   - Complexity: **6–8** (depending on provider)
+
+10. **AI‑Assisted Metadata Enrichment**  
+    - Use LLMs to enrich track metadata with mood tags, use‑case tags (study, gym, sleep), and narrative descriptions, aligning with the industry’s move toward metadata‑rich catalogs.[2][3]  
+    - Complexity: **6**
+
+---
+
+### 2) Updated Priorities & Governance (Transparency, Compliance, Trust)
+
+#### 2.1 AI Transparency & Labeling 2.0 (Critical, Regulatory‑Driven)
+
+11. **Multi‑Layer AI Attribution System**  
+    - Define a unified **AI Attribution Model**: recommendation source, model version, features used (mood, similarity, popularity), and whether content is AI‑generated, AI‑assisted, or human‑only.[1][3]  
+    - Complexity: **5**
+
+12. **User‑Facing “Why Am I Hearing This?” Panel**  
+    - In the player UI, add an expandable explanation component:  
+      - e.g., “Recommended because you often play mellow tracks at night with acoustic instrumentation.”[1]  
+    - Complexity: **5**
+
+13. **AI Usage Log for Compliance Export**  
+    - Maintain per‑user logs of AI decision rationale fields in an exportable format for upcoming transparency mandates (EU‑style).[1][3]  
+    - Complexity: **6**
+
+#### 2.2 Human‑in‑the‑Loop Controls (Medium Priority)
+
+14. **AI Personalization Sensitivity Slider**  
+    - Let users tune: *Minimal personalization* ↔ *Balanced* ↔ *Highly adaptive / experimental*.  
+    - Complexity: **4**
+
+15. **Hybrid “Editor‑Verified” Discovery Lane**  
+    - Tag certain playlists or microgenres as **“Human‑Curated + AI Assisted”** to reflect the shift back toward trusted, editorial discovery alongside algorithmic feeds.[4][5]  
+    - Complexity: **4**
+
+---
+
+### 3) Implementation Suggestions for Emerging Tech
+
+#### 3.1 MCP & Tooling
+
+16. **MCP Tool: “Emotional Insights”**  
+    - MCP server that surfaces emotional metrics, microgenre, and context suggestions to LLMs for richer chat responses.  
+    - Complexity: **6**
+
+17. **MCP Tool: “Discovery Experiment Designer”**  
+    - Tool for agents to create A/B experiments (e.g., emotional vs. genre‑based sort) and log results for analysis.  
+    - Complexity: **7**
+
+#### 3.2 React 19 & Modern Frontend
+
+18. **React 19 Server Components for Heavy Analytics Views**  
+    - Migrate **Analytics Dashboard** to use server components for data‑heavy charts, reducing bundle size and improving TTI.  
+    - Complexity: **7**
+
+19. **Streaming UI for Large Playlists & Catalog Browsing**  
+    - Use React 19 + Suspense streaming to progressively render large playlist/microgenre views.  
+    - Complexity: **6**
+
+20. **Design Tokens & Theming for “AI States”**  
+    - Introduce design tokens to visually distinguish AI‑generated, AI‑assisted, and organic content (color accents, badges), reinforcing transparency.[1][3]  
+    - Complexity: **4**
+
+---
+
+### 4) Performance Optimization Opportunities
+
+21. **Latency Budget & SLOs per Flow**  
+    - Define explicit latency budgets for: chat completion, playlist generation, playback start, analytics queries.  
+    - Add SLOs and dashboards to monitor p50/p95/p99 per flow (extend current partial p50/p95 work).  
+    - Complexity: **4**
+
+22. **LLM Call Optimization & Caching Layer**  
+    - Implement **semantic caching** for common chat intents (e.g., “chill focus playlist”) and **per‑user short‑term cache** of next‑track suggestions.  
+    - Complexity: **7**
+
+23. **Pre‑Computation Jobs for “Hot” Microgenres & Contexts**  
+    - Nightly/periodic jobs pre‑compute:  
+      - Top tracks per microgenre  
+      - Context playlists (e.g., “Workout – High Intensity”)  
+      - Emotional similarity graphs  
+    - Complexity: **6**
+
+24. **MongoDB Query & Index Review for Analytics & Telemetry**  
+    - Add compound indexes for high‑volume queries (by userId + timestamp, microgenreId + date, etc.).  
+    - Validate TTL indexes for telemetry and chat logs to control growth.  
+    - Complexity: **5**
+
+25. **Streaming Responses for Large Analytics Export**  
+    - For heavy analytics endpoints, use server‑sent events or chunked responses to avoid timeouts and keep p95 under target.  
+    - Complexity: **6**
+
+26. **Edge Caching for Static & Semi‑Static Assets**  
+    - CDN/edge caching for artwork, static playlists, and microgenre descriptions to reduce frontend latency.  
+    - Complexity: **4**
+
+---
+
+### 5) Security & Compliance Enhancements
+
+#### 5.1 Data Protection & Abuse Prevention (High Priority)
+
+27. **Fine‑Grained Secrets & Token Management**  
+    - Rotate and scope Spotify and LLM provider tokens; separate dev/stage/prod secrets with automated rotation.  
+    - Complexity: **4**
+
+28. **Privacy‑First Context Features**  
+    - For time/location/mood features, design explicit opt‑in, clear consent text, and granular toggles.  
+    - Store coarse‑grained location (city or country) only, unless strictly needed.  
+    - Complexity: **5**
+
+29. **Account & Session Hardening**  
+    - Add device/session management UI, suspicious login detection heuristics, and optional MFA for high‑value accounts.  
+    - Complexity: **6**
+
+30. **Abuse & Prompt Injection Safeguards for Chat**  
+    - Implement input/output filters for:  
+      - Prompt injection attempts  
+      - Content policy violations (e.g., copyright‑sensitive content requests)  
+    - Add logging and rate‑limiting per IP/user.  
+    - Complexity: **6**
+
+31. **Security‑Focused Test Suite & CI Gates**  
+    - Extend Jest and integration tests to cover:  
+      - Auth/Z flows for Spotify & internal APIs  
+      - MCP endpoints access control  
+      - Rate limits and circuit breaker under attack simulations  
+    - Enforce minimum security test coverage threshold in CI.  
+    - Complexity: **7**
+
+#### 5.2 Compliance & Auditability (Medium Priority)
+
+32. **Audit Log Service**  
+    - Central service for recording security‑relevant events (auth changes, token access, admin actions, AI system changes).  
+    - Complexity: **6**
+
+33. **Data Retention & Deletion Policies**  
+    - Implement configurable retention for telemetry, chat logs, and recommendation traces (e.g., 30/90/180 days) with automatic purge via MongoDB TTL + background jobs.  
+    - Complexity: **5**
+
+---
+
+### 6) Suggested Priority Buckets
+
+- **Critical (Next 1–2 Sprints)**  
+  - 11, 12, 21, 24, 27, 28, 31, 33
+
+- **High (Q1–Q2 2026)**  
+  - 1, 2, 3, 5, 6, 7, 8, 14, 20, 22, 23, 25, 29, 30, 32
+
+- **Medium (2026 Backlog / Experiments)**  
+  - 4, 9, 10, 13, 15, 16, 17, 18, 19, 26  
+
+---
