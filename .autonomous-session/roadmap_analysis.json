@@ -2,109 +2,110 @@
   "actionable_tasks": [
     {
       "id": "task_1",
-      "title": "Implement basic p50/p95 API latency tracking",
-      "description": "Extend existing performance monitoring to calculate and store p50/p95 response times for key backend endpoints, aligned with the performance metrics roadmap.",
-      "priority": "high",
-      "estimated_time": "60-90 minutes",
+      "title": "Complete MongoDB TTL Indexes (remaining 50%)",
+      "description": "Finish implementing MongoDB TTL indexes at 50% progress. TTL indexes automatically expire documents after a set time, ideal for logs, sessions, or temporary data in EchoTune AI.",
+      "priority": "medium",
+      "estimated_time": "30-60 minutes",
       "files_to_modify": [
-        "src/metrics/performanceMonitor.js",
-        "src/api/middleware/requestTiming.js",
-        "src/api/routes/*",
-        "src/config/metrics.ts"
+        "src/db/mongodb/indexes.js",
+        "src/models/Session.js",
+        "package.json"
       ],
       "implementation_steps": [
-        "Add a lightweight in-memory metrics collector that records per-endpoint response times and maintains rolling histograms or sorted arrays to compute p50/p95.",
-        "Wire a request timing middleware that records start/end times for each request and forwards the duration plus route key to the metrics collector.",
-        "Expose a new internal metrics endpoint (e.g., GET /api/metrics/performance) that returns p50/p95 for main API groups (chat, Spotify, analytics).",
-        "Add minimal unit tests for the percentile calculation utility and the new metrics endpoint to avoid regressions."
+        "Identify collections needing TTL (e.g., chat sessions, temp recommendations) via MongoDB shell or Compass.",
+        "Add TTL indexes: db.collection.createIndex({ \"expiresAt\": 1 }, { expireAfterSeconds: 3600 }) for 1-hour expiry.",
+        "Update relevant models/schemas to include expiresAt field with TTL date.",
+        "Test by inserting sample docs and verifying auto-deletion after expiry.",
+        "Run npm run lint and commit with message 'Complete MongoDB TTL indexes'"
       ],
-      "complexity_score": 5
+      "complexity_score": 4
     },
     {
       "id": "task_2",
-      "title": "Add Jest integration tests for MCP provider health endpoints",
-      "description": "Increase automated test coverage by adding focused integration tests around MCP provider health and failover behavior to support the Advanced AI Integration and Analytics Dashboard pillars.",
-      "priority": "high",
-      "estimated_time": "60-120 minutes",
+      "title": "Expand Performance Monitoring to p50/p95 Tracking (60% remaining)",
+      "description": "Performance monitoring at 40% complete; add p50/p95 latency percentiles for API endpoints to meet Q1 2026 target of <200ms p95.",
+      "priority": "medium",
+      "estimated_time": "45-90 minutes",
       "files_to_modify": [
-        "tests/integration/mcpHealth.test.js",
-        "src/api/routes/mcpProviders.js",
-        "jest.config.js"
+        "src/monitoring/performance.js",
+        "src/middleware/metrics.js",
+        "src/api/routes/*.js"
       ],
       "implementation_steps": [
-        "Identify or create an HTTP route exposing MCP provider health (latency, error rate), or add a minimal one if missing.",
-        "Create a new Jest integration test file that spins up the app in test mode and hits the MCP health endpoint(s).",
-        "Mock at least two providers (healthy/unhealthy) and assert correct status payloads and HTTP codes, including error paths.",
-        "Tag tests appropriately (e.g., `integration` or `mcp`) and ensure they run as part of the existing `quality:check` or CI pipeline."
+        "Install or use existing Prometheus client or StatsD for histograms.",
+        "Instrument key endpoints (e.g., /chat, /spotify/play) with timing middleware.",
+        "Calculate p50/p95 from histogram buckets; log to MongoDB or console.",
+        "Add dashboard query for visualization in analytics UI.",
+        "Test under load with Artillery or similar; verify metrics in logs."
       ],
       "complexity_score": 6
     },
     {
       "id": "task_3",
-      "title": "Create minimal Dockerfiles for backend, frontend, and MCP services",
-      "description": "Containerize the main services with simple, production-ready multi-stage Dockerfiles and a basic docker-compose setup for local dev.",
+      "title": "Implement Basic Testing Expansion for 10% Coverage Increase",
+      "description": "Current test coverage ~45%; target >70% in Q1. Add Jest tests for MCP endpoints and provider health checks to boost coverage quickly.",
+      "priority": "medium",
+      "estimated_time": "60-90 minutes",
+      "files_to_modify": [
+        "src/__tests__/mcp.test.js",
+        "src/api/mcp.js",
+        "jest.config.js"
+      ],
+      "implementation_steps": [
+        "Run npm test -- --coverage to identify low-coverage files (focus on src/api/routes, src/chat).",
+        "Write 5-10 unit tests for MCP health checks and failover logic.",
+        "Mock LLM providers (Gemini, OpenAI) using Jest mocks.",
+        "Add integration test for provider switching endpoint.",
+        "Run coverage report; aim for +5-10% gain; update package.json scripts if needed."
+      ],
+      "complexity_score": 5
+    },
+    {
+      "id": "task_4",
+      "title": "Add Docker Optimization for Multi-Stage Builds",
+      "description": "Optimize Docker for production: implement multi-stage builds to reduce image size and improve caching for Node backend and React frontend.",
       "priority": "medium",
       "estimated_time": "60-120 minutes",
       "files_to_modify": [
         "Dockerfile.backend",
         "Dockerfile.frontend",
-        "Dockerfile.mcp",
         "docker-compose.yml"
       ],
       "implementation_steps": [
-        "Add a multi-stage Node.js Dockerfile for the backend (build stage + slim runtime stage with `npm ci --only=production`).",
-        "Add a Dockerfile for the React frontend that builds static assets and serves them via a lightweight HTTP server (e.g., nginx or node-based static server).",
-        "Add a simple Dockerfile for MCP servers that installs dependencies and starts the MCP process defined in existing scripts.",
-        "Create a docker-compose.yml that wires backend, frontend, MongoDB, and MCP containers together with appropriate environment variables and ports for local development."
+        "Create multi-stage Dockerfile: builder stage for npm install, runtime stage for copy node_modules.",
+        "Use .dockerignore for node_modules, git, etc.",
+        "Add docker-compose for dev with volumes; test build with docker build --no-cache.",
+        "Benchmark image size reduction (target <500MB combined).",
+        "Push to registry if applicable; document in README."
       ],
       "complexity_score": 6
     },
     {
-      "id": "task_4",
-      "title": "Implement basic MongoDB TTL indexes for log/metrics collections",
-      "description": "Finish the MongoDB TTL index work by adding explicit TTL indexes on time-based collections (e.g., logs, performance metrics) to auto-expire stale data.",
-      "priority": "medium",
-      "estimated_time": "45-90 minutes",
-      "files_to_modify": [
-        "src/db/initIndexes.js",
-        "src/models/PerformanceMetric.js",
-        "src/models/RequestLog.js"
-      ],
-      "implementation_steps": [
-        "Identify collections storing time-series or log-style data (request logs, metrics) and ensure each has a `createdAt` or `timestamp` field.",
-        "Update or create an index initialization module to define `expireAfterSeconds` TTL indexes on these collections (e.g., 7 or 30 days).",
-        "Invoke the index initialization module during app startup, guarding it so it is idempotent and safe across restarts.",
-        "Add a short test or a dev script assertion that verifies the indexes exist in a test database."
-      ],
-      "complexity_score": 4
-    },
-    {
       "id": "task_5",
-      "title": "Add simple TypeScript migration scaffold for backend routes",
-      "description": "Start the gradual TypeScript migration by configuring TypeScript and converting one or two high-change backend route modules to `.ts` with basic types.",
-      "priority": "low",
-      "estimated_time": "60-120 minutes",
+      "title": "Start AI Transparency & Labeling with UI Badges",
+      "description": "High-priority AI Transparency at 'Started'; add 'AI-Augmented' badges in chat UI for recommendations to comply with 2026 mandates.",
+      "priority": "high",
+      "estimated_time": "45-75 minutes",
       "files_to_modify": [
-        "tsconfig.json",
-        "src/api/routes/chat.ts",
-        "src/api/routes/spotify.ts",
-        "package.json"
+        "src/components/ChatBubble.jsx",
+        "src/utils/aiLabels.js",
+        "src/api/chat.js"
       ],
       "implementation_steps": [
-        "Add a minimal `tsconfig.json` targeting Node, enabling `allowJs` and incremental migration, and update build scripts to compile TypeScript where needed.",
-        "Rename one or two key route files from `.js` to `.ts` and add lightweight type annotations for request/response objects and handler signatures.",
-        "Ensure imports/exports are compatible with the existing build pipeline and update any relative paths if necessary.",
-        "Add an npm script (e.g., `build:ts`) and hook it into the existing `quality:check` or CI pipeline so TS compilation errors are caught early."
+        "Create aiLabels.js util to tag responses (e.g., { isAI: true, source: 'LLM' }).",
+        "Modify ChatBubble component: render badge if isAI true using CSS badge.",
+        "Update /chat endpoint to include metadata in response payload.",
+        "Style badge with glassmorphism to match UI theme.",
+        "Test with sample AI-generated music recs; ensure no perf impact."
       ],
       "complexity_score": 5
     }
   ],
   "next_research_topics": [
-    "Best-practice implementation patterns for p50/p95 metrics in Node.js APIs without heavy external dependencies",
-    "Schema design examples for MongoDB time-series/TTL index strategies for observability data",
-    "Recommended Docker multi-stage patterns for Node + React monorepos optimized for build caching",
-    "Minimal-risk strategies for incremental TypeScript adoption in existing JavaScript backends",
-    "Test design patterns for high-value integration tests around provider health and failover"
+    "Best practices for WebSocket real-time collaborative playlists using Socket.io and MongoDB",
+    "Web Audio API implementation for enhanced audio waveform visualization in React",
+    "React 19 migration guide: server components and concurrent rendering for music apps",
+    "ML models for microgenre discovery using Spotify audio features (tempo, energy, valence)"
   ],
-  "completion_percentage": 78
+  "completion_percentage": 82
 }

@@ -3,22 +3,22 @@
   "tasks_list": [
     {
       "task_id": "task_1",
-      "title": "Implement basic p50/p95 API latency tracking",
+      "title": "Complete MongoDB TTL Indexes (remaining 50%)",
       "status": "attempted",
-      "complexity": 5
+      "complexity": 4
     },
     {
       "task_id": "task_2",
-      "title": "Add Jest integration tests for MCP provider health endpoints",
+      "title": "Expand Performance Monitoring to p50/p95 Tracking (60% remaining)",
       "status": "attempted",
       "complexity": 6
     },
     {
       "task_id": "task_3",
-      "title": "Create minimal Dockerfiles for backend, frontend, and MCP services",
+      "title": "Implement Basic Testing Expansion for 10% Coverage Increase",
       "status": "attempted",
-      "complexity": 6
+      "complexity": 5
     }
   ],
-  "timestamp": "Sun Dec 28 00:33:27 UTC 2025"
+  "timestamp": "Mon Dec 29 00:32:34 UTC 2025"
 }
