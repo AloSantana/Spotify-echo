@@ -1,304 +1,223 @@
 # 🔍 Perplexity Research Results - Cycle 4
 
-**Generated**: 2025-12-28T12:11:28.330676
+**Generated**: 2025-12-29T00:27:00.138720
 **Cycle**: 4/5
 **Tasks Completed This Cycle**: 3
 
-Here is a concrete, Copilot-friendly task plan for the next coding cycle, structured by area and already broken down into small, automatable units. Adjust naming to match your actual repo conventions.
+Here is a concrete next‑cycle plan for **EchoTune AI**, structured as small, Copilot‑friendly tasks that can be implemented largely automatically.
 
 ---
 
-## 1. Codebase Structure & Refactoring
+## 1. Repository & Architecture Improvements
 
-**Goal:** Clarify layers (API, services, ML, integration) and reduce coupling so Copilot can extend safely.
+**1.1. Standardize repo structure and configs (High)**  
+- Add top-level folders: `backend/`, `frontend/`, `ml/`, `infrastructure/`, `scripts/`, `docs/`.  
+- Introduce central config pattern for each service: `config.ts`/`config.py` reading from environment variables (no hard‑coded secrets/URLs).  
+- Add `.editorconfig`, `.gitignore` and basic lint/format configs (ESLint + Prettier for React, flake8/black or ruff for Python).  
+- Add `README.md` sections: architecture overview, folder layout, how to run dev (frontend, backend, ML), how to run tests.  
 
-**Tasks**
-
-1. **Introduce explicit high-level structure (Priority: High)**  
-   - Add top-level folders (if not already present):  
-     - `backend/api/` (HTTP handlers/controllers)  
-     - `backend/services/` (domain logic)  
-     - `backend/integrations/spotify/`  
-     - `backend/ml/` (EchoTune AI models, feature extraction, inference)  
-   - Move existing modules into these folders with minimal path-breaking refactors and update imports.  
-   - Add a `backend/README.md` describing responsibilities of each folder.
-
-2. **Centralize configuration (Priority: High)**  
-   - Create `backend/config/settings.{ts|py|js}` that:  
-     - Reads all env vars (Spotify keys, DB URL, model paths, feature flags).  
-     - Provides typed, validated accessors (e.g., `getSpotifyConfig()`, `getModelConfig()`).  
-   - Remove duplicated ad‑hoc env access throughout code and use this module instead.
-
-3. **Define shared types/interfaces (Priority: Medium)**  
-   - Add `frontend/src/types/music.ts` and `backend/api/types.{ts|py}` for:  
-     - `Track`, `Playlist`, `Recommendation`, `UserProfile`, `AudioFeatures`, `EchoTuneAnalysis`.  
-   - Replace inline/duplicated type definitions across components and endpoints.
-
-4. **Introduce service interfaces and adapters (Priority: Medium)**  
-   - In `backend/services/spotifyService.{ts|py}`, define interface for Spotify operations (search, fetch audio features, user library, recommendations).  
-   - Implement concrete class `SpotifyServiceHttp` using the Spotify Web API.  
-   - Ensure all controllers use the service rather than direct Spotify calls.
+**1.2. Introduce modular “music‑engine” boundary (High)**  
+- Create a `backend/music_engine/` (or `ml/engine/`) module that exposes clean functions:  
+  - `analyze_track(audio_or_features)`  
+  - `generate_recommendations(user_id | audio_features)`  
+  - `create_playlist(seed_tracks, target_mood, target_energy)`  
+- Refactor existing Spotify + ML logic into this module so frontend only hits simple REST endpoints and backend orchestrates Spotify + models through this layer.
 
 ---
 
-## 2. Music AI/ML Trends & Integration
+## 2. Music AI/ML Enhancements
 
-**Goal:** Make the ML layer modular and ready for current trends: embeddings, personalization, and multimodal features.
+**2.1. Add pluggable model wrapper layer (High)**  
+Inside `ml/`:
 
-**Tasks**
+- Define interface (Python):  
+  ```python
+  class EchoTuneModel(Protocol):
+      def analyze_features(self, features: dict) -> dict: ...
+      def recommend_tracks(self, user_profile: dict, candidate_tracks: list[dict]) -> list[dict]: ...
+  ```
+- Implement `BaselineModel(EchoTuneModel)` using simple heuristics (energy/valence/danceability) as a default.  
+- Add a `model_registry.py` that maps strings (`"baseline"`, `"transformer_v1"`, etc.) to classes, reading active model name from env/config.
 
-1. **Create a model abstraction layer (Priority: High)**  
-   - In `backend/ml/model_registry.{ts|py}`:  
-     - Define interface: `analyzeTrack`, `recommendTracks`, `embedTrack`, `embedPlaylist`.  
-     - Implement a default model backend (e.g., `SimpleAudioFeatureModel`) that wraps existing logic.  
-   - Route all ML calls in services/controllers through this abstraction.
+**2.2. Prepare for modern music‑ML trends (Medium)**  
+(Tasks Copilot can scaffold now, even if models are stubbed)
 
-2. **Add track embedding infrastructure (Priority: Medium)**  
-   - Define `Embedding` type and add `track_embeddings` table or collection in persistence layer.  
-   - Implement `backend/ml/embeddings.{ts|py}`:  
-     - `computeTrackEmbedding(trackFeatures)` (initially reusing scaled Spotify audio features).  
-     - `storeTrackEmbedding(trackId, embedding)` and `getNearestTracks(embedding, k)`.  
-   - Add a background job/CLI script `scripts/backfill_embeddings` to process existing tracks.
-
-3. **Prepare for personalized models (Priority: Medium)**  
-   - Add `UserPreferenceProfile` type (e.g., weights over audio features/genres).  
-   - Implement `backend/services/userProfileService` with functions:  
-     - `buildUserPreferenceProfile(userId)` from listening history + liked tracks.  
-     - `getUserPreferenceProfile(userId)` with caching.  
-   - Wire `recommendTracksForUser(userId)` to take this profile as an argument (even if currently ignored) to make the signature future-proof.
-
-4. **Hook for LLM-assisted explanation (Priority: Low)**  
-   - Add `backend/ml/explanations.{ts|py}` with function stub  
-     - `explainRecommendation(userId, trackIds) -> list[str]`  
-   - For now, implement a simple rule-based explanation using audio features; leave TODO marker for future LLM integration.
+- Add placeholders for:  
+  - **Contrastive representation**: `ml/embeddings.py` with functions `get_track_embedding(features)` and `similar_tracks(embedding, candidates)`.  
+  - **Reranker hook**: `ml/rerank.py` with `rerank_for_mood(tracks, mood_label)` to later host a small reranking model.  
+- Expose these as optional steps in the pipeline (flagged via config).
 
 ---
 
-## 3. Spotify API Usage & Enhancements
+## 3. Spotify API Usage Improvements
 
-**Goal:** Make Spotify integration robust, efficient, and easy to extend.
+**3.1. Centralize Spotify client and rate‑limit handling (High)**  
+- Create `backend/spotify/client.ts` (or `.py`) that:  
+  - Encapsulates all Spotify Web API calls.  
+  - Implements token refresh internally.  
+  - Adds rate‑limit/backoff handling (check `Retry-After` header and sleep/retry).  
+- Replace scattered direct `fetch`/`axios` Spotify calls with calls to this client.
 
-**Tasks**
+**3.2. Introduce cached feature & profile layer (Medium)**  
+- Add `backend/spotify/cache.ts`: simple in‑memory map now, with TODO for Redis.  
+- Cache:  
+  - `getAudioFeatures(track_ids)`  
+  - `getUserTopTracks(user_id)`  
+  - `getUserProfile(user_id)`  
+- Add config‑driven TTL and cache busting.  
+- Ensure all high‑volume endpoints go through cache.
 
-1. **Centralize Spotify API client (Priority: High)**  
-   - Create `backend/integrations/spotify/client.{ts|py}`:  
-     - Handles token management (client credentials + user auth where applicable).  
-     - Wraps HTTP calls and error mapping.  
-   - Migrate all Spotify calls to this client module.
-
-2. **Batch API calls and caching (Priority: High)**  
-   - Ensure use of batch endpoints (`/audio-features`, `/tracks`, `/artists`) where possible.  
-   - Add a simple caching layer for Spotify responses (e.g., Redis or in-memory) with configurable TTL:  
-     - Keyed by endpoint + params.  
-     - Used transparently by the Spotify client.
-
-3. **Add rate-limiting and retry logic (Priority: Medium)**  
-   - Implement automatic backoff when receiving 429 or transient 5xx from Spotify:  
-     - Exponential backoff with jitter, capped retries.  
-   - Log rate-limit events with structured metadata.
-
-4. **Harden error handling and typing (Priority: Medium)**  
-   - Introduce typed error classes: `SpotifyAuthError`, `SpotifyRateLimitError`, `SpotifyApiError`.  
-   - Wrap and rethrow all Spotify errors with these classes, and convert to clear HTTP responses in the API layer.
-
-5. **Add capability discovery helpers (Priority: Low)**  
-   - Add utility function to detect available Spotify scopes for current user and store them.  
-   - Use this to conditionally enable features in frontend (e.g., library analysis vs generic recommendations).
+**3.3. Add API usage logging hooks (Medium)**  
+- Add simple logging wrapper around Spotify client: log method name, status code, and latency (without PII).  
+- Store logs via existing logging mechanism, with a tag like `spotify_api`.
 
 ---
 
-## 4. Frontend React Performance & UX
+## 4. Frontend (React) Performance & UX
 
-**Goal:** Improve responsiveness and make components predictable for Copilot to extend.
+**4.1. Split and optimize heavy components (High)**  
+- Identify main dashboard / playlist builder component.  
+- Refactor into smaller components: `TrackList`, `PlaylistPreview`, `MoodSelector`, `EnergySlider`, etc.  
+- Use `React.memo` for pure presentational components.  
+- Use `useCallback` and `useMemo` for stable callbacks/derived data in container components.
 
-**Tasks**
+**4.2. Introduce route‑level code splitting (Medium)**  
+- Use `React.lazy` + `Suspense` for non‑critical views (settings, about, advanced analytics).  
+- Optionally add dynamic import for heavy charts/visualizations.
 
-1. **Audit and memoize heavy components (Priority: High)**  
-   - Identify components rendering large lists (tracks, recommendations, playlists).  
-   - Wrap them in `React.memo` and use `useMemo` / `useCallback` to stabilize props and handlers.  
-   - Replace inline arrow functions in JSX with memoized callbacks when they are passed down multiple levels.
+**4.3. Debouncing and batch updates (Medium)**  
+- For sliders/inputs that trigger recompute or API calls (mood, energy, tempo):  
+  - Wrap change handlers with a debounced function (e.g., 250–400 ms).  
+- Ensure state updates that affect lists use functional updates to avoid extra renders.
 
-2. **Implement virtualized lists (Priority: High)**  
-   - Introduce a virtualized list component using `react-window` or similar for track lists.  
-   - Refactor existing long lists (search results, playlist contents, recommendations) to use virtualization.
-
-3. **Extract reusable UI primitives (Priority: Medium)**  
-   - Create `TrackCard`, `PlaylistCard`, `AnalysisBadge`, `RecommendationReason` components with clear props.  
-   - Replace duplicated markup across pages with these primitives.
-
-4. **Improve loading and error states (Priority: Medium)**  
-   - Standardize UI for loading, empty, and error states in a single `AsyncState` component or hook.  
-   - Ensure all async data fetching components use this pattern for consistent UX.
-
-5. **Add client-side caching of recent results (Priority: Low)**  
-   - Use React Query/TanStack Query or a minimal custom hook to cache:  
-     - Recent searches  
-     - Recent recommendation results  
-   - Configure stale time and background refetch for better perceived performance.
+**4.4. Accessibility & micro‑optimizations (Low/Medium)**  
+- Add semantic labels, ARIA attributes, and keyboard focus handling to core UI controls.  
+- Replace inline functions in lists with pre‑defined handlers.  
+- Ensure stable `key` props on list items (use track ID).
 
 ---
 
-## 5. New Features for Roadmap (Copilot-executable)
+## 5. New Features for Next Cycle
 
-**Goal:** Add clear, relatively contained features that Copilot can implement with existing services.
+**5.1. “Smart Mood Playlist” v1 (High, Feature)**  
+- Frontend:  
+  - Add a **Mood & Intensity** panel where user selects mood (dropdown/chips: *chill, focus, party, melancholy, happy*) and an intensity slider.  
+- Backend:  
+  - Endpoint `POST /api/playlists/mood` with payload `{ mood, intensity, seedTracks? }`.  
+  - Use baseline ML model + Spotify recommendations to build a playlist matching target average valence/energy/danceability ranges based on mood.  
+- Return playlist preview and an option to “Save to Spotify”.
 
-**Tasks**
+**5.2. “Explain My Mix” tool (Medium, Feature)**  
+- Backend endpoint `GET /api/explanations/playlist/:id`:  
+  - Aggregate track features and compute summary (average energy, valence, tempo, acousticness).  
+  - Create plain‑language explanation (e.g., “This playlist leans towards high energy and positive mood with moderate tempo.”).  
+- Frontend view: small card under playlist preview with this explanation.
 
-1. **“Mood-based Mix” generator (Priority: High)**  
-   - New endpoint: `POST /mixes/mood` accepting `mood` + optional seed tracks.  
-   - Backend:  
-     - Map moods to audio feature ranges (valence, energy, tempo).  
-     - Use Spotify + internal embedding index to select matching tracks.  
-   - Frontend:  
-     - New page or panel with mood selector chips (e.g., Chill, Focus, Party, Melancholy).  
-     - Display generated mix and allow saving as a Spotify playlist via existing API.
-
-2. **“Explain this recommendation” tooltip (Priority: Medium)**  
-   - Extend recommendation API to return a short explanation string per track (for now from rules or simple heuristics).  
-   - Frontend:  
-     - Add tooltip or expandable text under each recommended track showing “Based on your liking of X and Y; similar energy and tempo.”
-
-3. **User “Taste Profile” view (Priority: Medium)**  
-   - Backend endpoint: `GET /users/me/taste-profile` using `UserPreferenceProfile`.  
-   - Frontend page: radar chart or badges for top genres, energy/valence ranges, typical tempo.  
-   - Include copy-only description (no complex ML) that Copilot can generate from profile values.
-
-4. **Session-based quick recommendations (Priority: Low)**  
-   - Add API `GET /recommendations/session` that uses last N tracks in session to adapt recommendations (stateless; uses request body/headers).  
-   - Frontend: button “Refresh for this session” on recommendation view.
+**5.3. Recent sessions / history list (Low/Medium, Feature)**  
+- Backend: simple `sessions` table or JSON file: `{ id, created_at, mood, parameters, track_ids }`.  
+- Endpoints:  
+  - `GET /api/sessions/recent`  
+  - `POST /api/sessions` on playlist creation.  
+- Frontend: “Recent Mixes” sidebar showing last N sessions with quick “reopen”.
 
 ---
 
-## 6. Architecture & Scalability
+## 6. Code Quality & Refactoring
 
-**Goal:** Prepare for increased usage with clearer boundaries and basic scaling primitives.
+**6.1. Type safety & interfaces (High)**  
+- Add/complete TypeScript types for:  
+  - `Track`, `AudioFeatures`, `UserProfile`, `Playlist`, `RecommendationRequest`.  
+- Replace `any` and untyped `props` with these interfaces.  
+- Add type guards where necessary for external data.
 
-**Tasks**
+**6.2. Reduce duplication in feature mapping (Medium)**  
+- Create a `ml/feature_mapping.ts` (or `.py`) that:  
+  - Normalizes Spotify audio features into internal representation.  
+- Replace ad‑hoc transforms across the codebase with calls to this module.
 
-1. **Introduce layered architecture README (Priority: High)**  
-   - Add `ARCHITECTURE.md` describing:  
-     - API layer, service layer, integration layer, ML layer, data persistence, and frontend.  
-     - Data flow for a typical recommendation request.  
-   - Include ASCII diagrams simple enough for Copilot to parse and extend.
-
-2. **Add async job/execution layer (Priority: Medium)**  
-   - Introduce job runner abstraction (e.g., BullMQ / Celery / simple queue).  
-   - Implement jobs for:  
-     - Backfilling track embeddings  
-     - Periodic refreshing of long-lived Spotify data (e.g., user library snapshots, popular tracks).  
-   - Add basic monitoring logs for job executions.
-
-3. **Introduce configuration-based feature flags (Priority: Medium)**  
-   - Implement `featureFlags` module that reads env or config file.  
-   - Use flags for new features (mood mixes, explanations, taste profile) so they can be rolled out gradually.
-
-4. **Abstract persistence layer (Priority: Low)**  
-   - If using raw queries in multiple places, wrap them in repository modules (e.g., `TrackRepository`, `UserRepository`).  
-   - Move direct DB calls from services/controllers to these repositories.
+**6.3. Central error handling (Medium)**  
+- Backend:  
+  - Add global error middleware that maps known errors (Spotify error, validation error) into consistent JSON structure.  
+- Frontend:  
+  - Add a small error boundary component around major routes.  
+  - Normalize error messages from API into a shared `ApiError` type.
 
 ---
 
 ## 7. Security Enhancements
 
-**Goal:** Ensure Spotify integration and user data are handled securely with minimal manual work.
+**7.1. Secrets & environment handling (High)**  
+- Ensure Spotify client ID/secret, DB URLs, and JWT secrets come only from environment variables.  
+- Add `.env.example` with placeholders (no real secrets).  
+- Add a simple `validateEnv()` at startup to assert required variables.
 
-**Tasks**
+**7.2. Input validation & sanitization (High)**  
+- Introduce schema validation (e.g., Zod/Joi/Yup) for key endpoints:  
+  - `POST /api/playlists/mood`  
+  - any text input endpoints (search, playlist name, etc.).  
+- Reject invalid payloads with clear 400‑level errors.
 
-1. **Secret management and environment safety (Priority: High)**  
-   - Confirm all secrets (Spotify client secret, JWT keys, DB password) are read from environment only.  
-   - Add checks that the app fails fast with clear logs if required secrets are missing.  
-   - Add `.env.example` with non-sensitive placeholders.
+**7.3. Basic auth hardening (Medium)**  
+- If using JWT:  
+  - Enforce reasonable token expiry.  
+  - Ensure tokens are signed with strong secret and algorithm.  
+- If using cookies:  
+  - Mark as `Secure`, `HttpOnly`, `SameSite=Lax/Strict`.
 
-2. **Input validation and sanitization (Priority: High)**  
-   - For each public endpoint, introduce request schemas (e.g., Zod/Joi/Pydantic) for body, params, query.  
-   - Centralize error responses when validation fails.
-
-3. **Harden authentication & authorization (Priority: Medium)**  
-   - Ensure all user-specific endpoints check authenticated user ID and do not accept arbitrary user IDs from client.  
-   - Add middleware to enforce scopes or roles if applicable.
-
-4. **Security headers and HTTPS assumptions (Priority: Medium)**  
-   - Configure security middleware (Helmet or equivalent) to add standard headers.  
-   - Add configuration flag `TRUST_PROXY` and ensure proper handling of `X-Forwarded-*` headers for deployments behind proxies.
-
-5. **Basic rate limiting at API gateway (Priority: Low)**  
-   - Add per-IP and per-user rate limiting middleware for public endpoints to avoid abuse.  
+**7.4. Spotify scopes minimization (Medium)**  
+- Review OAuth scopes and remove unused ones.  
+- Document which feature uses which scope in `docs/spotify-scopes.md`.
 
 ---
 
-## 8. Documentation Updates
+## 8. Testing & Validation
 
-**Goal:** Reach at least “Professional” tier repository standards for AI projects.[1]
+**8.1. Establish minimal test scaffolding (High)**  
+- Add test frameworks:  
+  - Backend: Jest/Vitest or Pytest.  
+  - Frontend: Jest + React Testing Library.  
+- Add `npm test` / `pytest` scripts and ensure they run green with example tests.
 
-**Tasks**
+**8.2. Core unit tests (High)**  
+- Backend/ML:  
+  - Tests for `feature_mapping` (correct ranges, missing fields).  
+  - Tests for baseline `EchoTuneModel` recommendation ordering.  
+- Frontend:  
+  - Render tests for main dashboard and Mood Playlist panel.  
+  - Interaction test: changing mood/slider triggers API call (mocked).
 
-1. **Top-level README restructuring (Priority: High)**  
-   - Include: short product description, architecture overview, quickstart, environment setup, and example workflows (e.g., “Generate a mood-based mix”).  
-   - Add short section: “How EchoTune AI works (high level)” describing dataset, ML approach, and limitations.
+**8.3. API contract tests (Medium)**  
+- Add tests that hit major endpoints (using supertest or similar) with mocked Spotify responses:  
+  - `GET /api/user/top-tracks`  
+  - `POST /api/playlists/mood`.  
+- Validate response shape and required fields.
 
-2. **API documentation (Priority: Medium)**  
-   - Auto-generate or hand-write API docs in `docs/api.md` listing endpoints, parameters, and response schemas.  
-   - Ensure new endpoints (mood mix, taste profile, explanations) are documented.
-
-3. **ML documentation (Priority: Medium)**  
-   - Create `docs/ml-overview.md` describing:  
-     - Current model(s) used.  
-     - Features consumed (Spotify audio features, embeddings).  
-     - Where to plug in alternative models.  
-
-4. **Operations / deployment guide (Priority: Low)**  
-   - Add `docs/deploy.md` with instructions for:  
-     - Required env vars.  
-     - Running migrations.  
-     - Scaling strategies (horizontal replicas, worker processes).
-
----
-
-## 9. Testing & Validation Improvements
-
-**Goal:** Provide enough automated checks for Copilot-generated changes to be verified in CI.
-
-**Tasks**
-
-1. **Establish a minimal test harness (Priority: High)**  
-   - If not already present, add unit test framework config (Jest/Pytest/Vitest).  
-   - Ensure `npm test` / `pytest` runs with a simple example spec.
-
-2. **Add tests for critical services (Priority: High)**  
-   - Backend:  
-     - `spotifyService` (mocking HTTP responses).  
-     - `recommendationService` logic (given controlled features/embeddings).  
-   - Frontend:  
-     - Render tests for key pages and components (recommendations list, mood-mix view).
-
-3. **Contract tests for Spotify integration (Priority: Medium)**  
-   - Add tests with mocked Spotify API responses to ensure parsing and error handling remain correct.  
-   - Use recorded fixtures for primary endpoints.
-
-4. **Snapshot tests for API responses (Priority: Medium)**  
-   - For main endpoints (`/recommendations`, `/mixes/mood`, `/users/me/taste-profile`), create snapshot tests of JSON output, using stable fixtures.
-
-5. **Introduce basic CI workflow (Priority: Medium)**  
-   - GitHub Actions workflow:  
-     - Install dependencies.  
-     - Run linters/formatters.  
-     - Run test suite.  
-   - Fail PRs if tests or lints fail.
-
-6. **Add simple load test script (Priority: Low)**  
-   - Create a k6/Locust or custom script to hit `/recommendations` and `/mixes/mood` endpoints at various RPS.  
-   - Store in `scripts/loadtest/` with a short README on usage.
+**8.4. Lightweight performance checks (Low/Medium)**  
+- Add a small script in `scripts/load-smoke.ts` that:  
+  - Calls core endpoints a few times and logs response times.  
+- Integrate into CI as an optional step or manual check.
 
 ---
 
-### Suggested Cycle-5 Focus (if you want a concise subset)
+## 9. Documentation Updates
 
-If you need a tight set of tasks for the very next cycle, prioritize:
+**9.1. High‑level architecture doc (High)**  
+- Create `docs/architecture.md` including:  
+  - High‑level diagram: frontend ↔ backend ↔ Spotify ↔ ML engine.  
+  - Description of the music recommendation pipeline.  
+  - Where models plug in (model registry).
 
-- Structure & config: tasks 1.1, 1.2, 3.1  
-- New feature: 5.1 Mood-based Mix  
-- Frontend perf: 4.1, 4.2  
-- Security: 7.1, 7.2  
-- Testing: 9.1, 9.2 (backend services only)
+**9.2. Developer quickstart (Medium)**  
+- Create `docs/development-setup.md`:  
+  - How to set up Spotify app and env vars.  
+  - Commands to run frontend, backend, and tests.  
+  - Example workflows: “Add a new model”, “Add a new API endpoint”.
 
-All of these can be implemented largely autonomously by a GitHub Copilot agent operating via PRs with review.
+**9.3. Public feature overview (Low/Medium)**  
+- Update main `README.md` with:  
+  - Description of Smart Mood Playlist and Explain My Mix.  
+  - Short GIFs or screenshots section placeholder.
+
+---
+
+If you share a tree of the current repo or key files, I can turn these into very concrete, file‑level edit plans and prompt templates that GitHub Copilot can follow step‑by‑step.

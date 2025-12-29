@@ -1,53 +1,300 @@
 # 🔍 Perplexity Research Results - Cycle 1
 
-**Generated**: 2025-12-28T12:10:25.927292
+**Generated**: 2025-12-29T00:26:02.807583
 **Cycle**: 1/5
 **Tasks Completed This Cycle**: 3
 
-### Repository Analysis Summary for EchoTune AI
+Here is a concrete, Copilot-friendly task plan for the **next coding cycle** for EchoTune AI, organized by area and priority, assuming a typical stack of: React frontend, Node/Express (or similar) backend, Spotify Web API integration, and AI/ML music features.
 
-EchoTune AI's current codebase, at Cycle 1/5 with 3 tasks completed, requires structured improvements aligned with AI/ML best practices to enhance reproducibility, maintainability, and scalability. Optimization opportunities center on adopting a tiered framework (Essential → Professional → Elite) across documentation, structure, dependencies, licensing, and code quality, while leveraging GitHub Copilot for automated analysis and refactoring[1][2][3].
+---
 
-#### 1. Current Codebase Structure and Optimization Opportunities
-Without direct repo access, apply the AI repository framework: Ensure logical folder structure (e.g., `/src`, `/tests`, `/docs`), environment files (e.g., `.env.example`), and dependency locks (e.g., `package-lock.json`). Opportunities include reducing code duplication, limiting functions to <50 lines, and adding type hints/docstrings for Professional tier[1].
+## 1) New Features (roadmap items)
 
-#### 2. Latest Music AI/ML Trends and Integration Possibilities
-Integrate trends like generative AI for music (e.g., automated composition via models like MusicGen or Stable Audio), real-time audio processing with transformers, and multimodal models combining lyrics/audio. Use Copilot to prototype integrations, such as PyTorch/TensorFlow modules for melody generation[7].
+### 1.1 “Smart Playlist Seed Recommendations” (High)
 
-#### 3. Spotify API Usage Patterns and Enhancements
-Review for rate limiting, token refresh, and error handling in API calls. Enhance with caching (Redis), batch requests, and WebSocket for real-time playlists. Copilot can refactor async patterns for efficiency[3].
+Add a feature that suggests **seed tracks/artists/genres** for Spotify recommendations based on the user’s listening history and liked tracks.
 
-#### 4. Frontend React Components Performance Improvements
-Optimize by implementing React.memo, useCallback/useMemo, lazy loading (React.lazy), and code splitting. Audit for re-renders with React DevTools; Copilot excels at suggesting these refactors[2][3].
+Actionable tasks:
+- Add backend endpoint `GET /ai/recommend-seeds`:
+  - Input: optional `userId`, `limit`.
+  - Logic: 
+    - Call Spotify API to get user’s top tracks and artists.
+    - Compute simple scores (frequency / recency).
+    - Return top N tracks, artists, and genres as seed candidates.
+- Add frontend React hook `useSeedRecommendations()` to call the new endpoint.
+- Add UI section on the “Create AI Mix” page:
+  - “Suggested seeds” list with:
+    - Top tracks (show name + artist).
+    - Top artists.
+    - Top genres as clickable chips.
+- Wire “Use all seeds” and “Clear seeds” buttons into existing playlist generation flow.
 
-#### 5. New Features and Roadmap Capabilities
-Prioritize AI-driven features: personalized playlists via ML recommendations, AI music generator, lyrics-to-melody converter. Roadmap: Short-term (Cycle 2: prototypes), mid-term (integrations), long-term (user-facing app)[1][7].
+### 1.2 “AI Mix Explainability” (Medium)
 
-#### 6. Architecture Improvements and Scalability Enhancements
-Shift to microservices (e.g., separate ML inference service), containerize with Docker/Kubernetes, and use serverless (AWS Lambda) for API endpoints. Add queueing (Celery/RabbitMQ) for ML jobs[1].
+Display a **short textual explanation** for why a track was added to an AI-generated playlist.
 
-#### 7. Security Enhancements and Best Practices
-Use environment variables for API keys, implement OAuth2 for Spotify, add input validation/sanitization, and JWT for auth. Scan with tools like Snyk via Copilot suggestions[1][3][4].
+Actionable tasks:
+- Extend playlist generation backend:
+  - For each track, store metadata such as:
+    - Closest seed track(s)/artist(s).
+    - Key audio features (tempo, energy, danceability).
+  - Add a small explanation generator function that produces a 1–2 sentence reason string per track.
+- Extend playlist response schema to include `reason` per track.
+- Update React playlist view:
+  - Add a collapsible “Why this track?” section for each track, showing the reason string.
 
-#### 8. Testing and Validation Improvements
-Achieve Professional tier: Add unit/integration tests (Jest/Pytest, >70% coverage), CI/CD with GitHub Actions, and e2e tests (Cypress). Use Copilot for test generation[1][2][3].
+### 1.3 “Session Presets” (Medium)
 
-### Actionable Tasks for Next Coding Cycle (Cycle 2/5)
-Focus on GitHub Copilot-automatable tasks: Use Copilot Chat for repo/commit analysis, code explanations/refactors, PR reviews, and auto-generating tests/docs[2][3][4]. Aim for 5-8 tasks, completable via prompts like "Refactor this component for performance" or "Add tests for Spotify API calls." Session: coding-cycle-20251228-121011-5411 (update to next).
+Let users save and re-apply **AI mix configuration presets** (mood, energy, tempo range, genres).
 
-| Category | Task Description | Priority | Copilot Prompt Example |
-|----------|------------------|----------|------------------------|
-| **New Features** | Implement basic AI playlist recommender using simple ML (e.g., collaborative filtering stub). | High | "Generate React component for AI playlist recs integrated with Spotify API." |
-| **New Features** | Add lyrics-to-melody prototype using Hugging Face transformers. | Medium | "Create Python module for generative music from text input." |
-| **Code Improvements/Refactoring** | Refactor React components: Add memoization and hooks optimization across frontend. | High | "Optimize this React component for re-renders using useMemo/useCallback." |
-| **Code Improvements/Refactoring** | Eliminate code duplication in API handlers; extract shared utils. | High | "Refactor these duplicate Spotify API calls into a single service class." |
-| **Performance Optimizations** | Implement lazy loading and code splitting in React app bundle. | High | "Add React.lazy and Suspense to this route component." |
-| **Performance Optimizations** | Cache Spotify API responses with localStorage or Redis stub. | Medium | "Add caching layer to this fetch function." |
-| **Security Enhancements** | Replace hardcoded secrets with env vars; add input validation. | High | "Convert hardcoded API keys to process.env and add Joi validation." |
-| **Security Enhancements** | Integrate basic rate limiting middleware for endpoints. | Medium | "Add express-rate-limit to this API route." |
-| **Documentation Updates** | Generate README.md with setup instructions, API docs, and tiered framework assessment. | Medium | "Write Professional-tier README based on AI/ML repo best practices." |
-| **Documentation Updates** | Add JSDoc/Pydoc strings to all functions/modules. | Low | "Add docstrings with params/returns to this file." |
-| **Testing Improvements** | Auto-generate Jest unit tests for React components (>50% coverage). | High | "Write comprehensive Jest tests for this component, including edge cases." |
-| **Testing Improvements** | Add GitHub Actions CI for linting/tests on PRs. | High | "Create .github/workflows/ci.yml for Jest and ESLint." |
+Actionable tasks:
+- Add backend CRUD endpoints:
+  - `POST /presets`
+  - `GET /presets`
+  - `DELETE /presets/:id`
+- Add minimal persistence model: `Preset { id, userId, name, paramsJSON, createdAt }`.
+- On the frontend:
+  - Add “Save current settings as preset” button on the main mixer panel.
+  - Add dropdown listing user presets with “Apply” and “Delete” actions.
 
-**Implementation Notes**: Total tasks: 12 (select top 6-8 for Cycle 2). Track progress: 3 prior + new = aim for 6 completed. Use Copilot for analysis first ("Analyze repo structure for best practices")[2], then execute. Target Professional tier completion[1]. Reassess post-cycle with Copilot Chat on commits/PRs[2][3].
+---
+
+## 2) Code Improvements & Refactoring
+
+### 2.1 Centralize Spotify API Client (High)
+
+Actionable tasks:
+- Create a single `spotifyClient.ts` (or `spotify.service.ts`) module:
+  - Export strongly typed functions: `getUserTopTracks`, `getUserTopArtists`, `getAudioFeatures`, `createPlaylist`, `addTracksToPlaylist`, etc.
+  - Handle token injection, rate limiting (simple retry with backoff), and error normalization.
+- Replace scattered raw `fetch`/`axios` Spotify calls with this unified client.
+- Add basic logging for 4xx/5xx responses in one place.
+
+### 2.2 Extract AI/ML Logic Into a Service Layer (Medium)
+
+Actionable tasks:
+- Create `ai` or `recommendations` service module:
+  - Functions such as `buildFeatureVectorFromTrack`, `scoreTrackSimilarity`, `generatePlaylistFromSeeds`.
+- Move data science-ish logic out of route handlers/controllers into that service.
+- Ensure service is **pure** (no direct HTTP/DB calls) where possible to simplify testing.
+
+### 2.3 Normalize Types and Interfaces (Medium)
+
+Actionable tasks:
+- For TypeScript:
+  - Create `types/spotify.ts`, `types/playlist.ts`, `types/ai.ts` with shared interfaces.
+  - Replace inline `any`/implicit `object` types with these shared types.
+- For JS-only:
+  - Add JSDoc type comments for main domain objects and function parameters.
+
+---
+
+## 3) Performance Optimizations
+
+### 3.1 Memoization and Suspense for Heavy React Components (High)
+
+Actionable tasks:
+- Identify components that re-render frequently (playlist lists, track rows, charts).
+- Wrap item components in `React.memo` and ensure stable `key` and props.
+- Use `useMemo`/`useCallback` for derived data and callbacks passed deep into the tree.
+- Use code-splitting (`React.lazy` + `Suspense`) for non-critical views like “About AI” or advanced settings.
+
+### 3.2 Virtualized Lists for Large Playlists (Medium)
+
+Actionable tasks:
+- If playlist pages render more than ~50 tracks:
+  - Install `react-window` or `react-virtualized`.
+  - Replace plain `.map()` over large track arrays with a virtualized list component.
+- Ensure row heights are fixed or predictable for smoother virtualization.
+
+### 3.3 Backend Caching of Spotify Results (Medium)
+
+Actionable tasks:
+- Implement simple in-memory cache module:
+  - Key by `userId` + endpoint name (`userTopTracks`, etc.).
+  - TTL configurable (e.g., 5–10 minutes).
+- Wrap `getUserTopTracks` and similar functions with cache lookups to reduce API calls.
+
+---
+
+## 4) Spotify API Usage Enhancements
+
+### 4.1 Robust Token Management (High)
+
+Actionable tasks:
+- Implement a central auth module:
+  - Functions: `getAccessToken(userId)`, `refreshAccessToken(userId)`.
+- Ensure all Spotify calls:
+  - Refresh on 401/expired token.
+  - Do not log tokens.
+- Add defensive checks for missing scopes; provide clear error messages to the frontend.
+
+### 4.2 Rate Limit Handling (Medium)
+
+Actionable tasks:
+- In `spotifyClient`, detect `429` responses:
+  - Read `Retry-After` header.
+  - Retry once or twice after a delay.
+- Surface “rate limit” errors to frontend as a user-friendly message (“We are talking to Spotify too fast. Please try again in a moment.”).
+
+### 4.3 Expand Use of Audio Features (Medium)
+
+Actionable tasks:
+- Update AI mix algorithm to use:
+  - `tempo`, `key`, `mode`, `energy`, `valence`, `danceability`.
+- Add parameters in the UI for at least:
+  - Energy slider
+  - Mood slider (valence)
+- Ensure backend’s selection logic reads these parameters and filters or rescales scores accordingly.
+
+---
+
+## 5) Architecture & Scalability Improvements
+
+### 5.1 Modular API Routing (High)
+
+Actionable tasks:
+- Split routes by domain:
+  - `/api/spotify/*`
+  - `/api/ai/*`
+  - `/api/presets/*`
+- Put each router in its own file and mount them in `app.ts` or `server.ts`.
+- Ensure shared middlewares (auth, logging, error handling) are applied consistently.
+
+### 5.2 Configuration Normalization (Medium)
+
+Actionable tasks:
+- Introduce a `config` module:
+  - Read environment variables once.
+  - Validate presence using a small schema or manual checks.
+- Replace direct `process.env.X` usage across codebase with `config.X`.
+
+### 5.3 Prepare for Multi-User Load (Medium)
+
+Actionable tasks:
+- Ensure any in-memory per-user caches are namespaced by `userId`.
+- Avoid shared mutable state not keyed by user.
+- Guard against N+1 Spotify calls inside loops; batch track IDs for audio-features where possible.
+
+---
+
+## 6) Security Enhancements
+
+### 6.1 Secrets and Env Management (High)
+
+Actionable tasks:
+- Verify all secrets (Spotify client secret, JWT secrets, API keys) are:
+  - Loaded via environment variables.
+  - Never committed to repo.
+- Add `.env.example` file with non-sensitive placeholders.
+- Add `.gitignore` rules for `.env*`.
+
+### 6.2 Input Validation and Sanitization (High)
+
+Actionable tasks:
+- Add a small validation layer (e.g., `zod` or `Joi`) for:
+  - Playlist creation inputs.
+  - AI mix settings (tempo ranges, sliders, text fields).
+- Normalize and bounds-check inputs before using them in queries or AI prompts.
+
+### 6.3 HTTP Security Headers (Medium)
+
+Actionable tasks:
+- Use `helmet` middleware (Node/Express):
+  - Enable defaults.
+  - Set sensible CSP if not yet present (even a relaxed one).
+- Ensure `cors` is configured with explicit origins, not `*` for production.
+
+### 6.4 Frontend Security Hardening (Medium)
+
+Actionable tasks:
+- Ensure any AI-generated or external text shown in UI is escaped (no `dangerouslySetInnerHTML` unless absolutely needed).
+- If currently using `dangerouslySetInnerHTML`, wrap it with a sanitization function (e.g., DOMPurify) and limit allowed tags.
+
+---
+
+## 7) Documentation Updates
+
+### 7.1 Developer Onboarding Guide (High)
+
+Actionable tasks:
+- Add `docs/DEVELOPMENT.md`:
+  - Prerequisites (Node version, package managers).
+  - How to set up Spotify app and callback URL.
+  - How to run backend, frontend, and tests (`npm`/`yarn` scripts).
+  - Brief architecture overview (frontend, backend, AI service, Spotify integration).
+
+### 7.2 API Reference Stub (Medium)
+
+Actionable tasks:
+- Add `docs/API.md`:
+  - Document main endpoints (`/ai/generate-playlist`, `/ai/recommend-seeds`, `/presets`, etc.).
+  - For each: method, params, and example response (short and synthetic).
+
+### 7.3 Frontend Component Conventions (Low)
+
+Actionable tasks:
+- Add a short style guide:
+  - Folder structure for components/hooks.
+  - State management approach.
+  - Naming conventions.
+
+---
+
+## 8) Testing & Validation Improvements
+
+### 8.1 Unit Tests for AI Logic (High)
+
+Actionable tasks:
+- For the AI/recommendation service functions:
+  - Add tests covering:
+    - Similarity scoring.
+    - Parameter influence (energy, mood, tempo).
+    - Edge cases (no seeds, very few tracks).
+- Use fixed fixture data for audio features.
+
+### 8.2 Integration Tests for Spotify Flow (Medium)
+
+Actionable tasks:
+- Add tests for:
+  - Happy path: user auth → get top tracks → generate AI playlist.
+  - Expired token path: verify refresh is attempted.
+- Use mocking for Spotify HTTP calls to keep tests offline.
+
+### 8.3 Frontend Component Tests (Medium)
+
+Actionable tasks:
+- Add tests (React Testing Library) for:
+  - AI Mix form: slider changes call `onChange` with expected values.
+  - Seed recommendations UI: renders seeds from mocked API hook, calls handler on click.
+- Snapshot or minimal DOM checks where appropriate.
+
+### 8.4 Basic E2E Happy Path (Low–Medium)
+
+Actionable tasks:
+- Using Playwright or Cypress:
+  - Script: login (mocked), open AI mix page, set parameters, generate playlist, confirm tracks render, and reasons are visible.
+- Gate this behind a separate script so it can be run on demand.
+
+---
+
+## Prioritization Recap for Next Cycle
+
+**High priority (aim to complete next cycle):**
+- Smart Playlist Seed Recommendations feature (backend + frontend).
+- Centralized Spotify client and token management.
+- Modular API routing + config module.
+- React memoization and basic performance tuning.
+- Secrets/env management and input validation.
+- Unit tests for AI logic.
+- Developer onboarding doc.
+
+**Medium priority (start or partially complete next cycle):**
+- AI mix explainability.
+- Session presets.
+- Caching Spotify results and rate-limit handling.
+- Virtualized lists for large playlists.
+- Security headers and basic CSP.
+- API docs and component tests.
+
+All of these tasks are structured so a GitHub Copilot coding agent can implement them incrementally via small, focused pull requests.
