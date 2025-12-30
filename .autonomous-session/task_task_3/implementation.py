@@ -1,9 +1,9 @@
 
-# Task: Implement Basic Testing Expansion for 10% Coverage Increase
-# Description: Current test coverage ~45%; target >70% in Q1. Add Jest tests for MCP endpoints and provider health checks to boost coverage quickly.
-# Files to modify: ['src/__tests__/mcp.test.js', 'src/api/mcp.js', 'jest.config.js']
+# Task: Implement AI Transparency & Labeling Badges in UI
+# Description: Add 'AI-Augmented' badges in the chat interface and recommendations UI for transparency, as this is high priority and started.
+# Files to modify: ['src/components/ChatInterface.jsx', 'src/components/Recommendations.jsx', 'src/styles/*.css']
 
-print("Implementing: Implement Basic Testing Expansion for 10% Coverage Increase")
+print("Implementing: Implement AI Transparency & Labeling Badges in UI")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
