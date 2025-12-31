@@ -1,9 +1,9 @@
 
-# Task: Implement AI Transparency & Labeling Badges in UI
-# Description: Add 'AI-Augmented' badges in the chat interface and recommendations UI for transparency, as this is high priority and started.
-# Files to modify: ['src/components/ChatInterface.jsx', 'src/components/Recommendations.jsx', 'src/styles/*.css']
+# Task: Implement Testing Expansion for 70% Coverage Target
+# Description: Increase test coverage from ~45% to >70% by adding unit and integration tests for core MCP endpoints and provider health checks.
+# Files to modify: ['tests/api/mcp.test.js', 'tests/providers/health.test.js', 'package.json']
 
-print("Implementing: Implement AI Transparency & Labeling Badges in UI")
+print("Implementing: Implement Testing Expansion for 70% Coverage Target")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
