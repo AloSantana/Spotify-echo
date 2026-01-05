@@ -1,1 +1,103 @@
-{"actionable_tasks": [], "error": "'content'", "fallback": true}
+{
+  "actionable_tasks": [
+    {
+      "id": "task_1",
+      "title": "Complete MongoDB TTL Indexes (Remaining 50%)",
+      "description": "Finish implementing MongoDB TTL indexes which are currently at 50% completion. TTL indexes automatically expire documents after a specified time, ideal for logs, sessions, or temporary data in EchoTune AI.",
+      "priority": "medium",
+      "estimated_time": "30-60 minutes",
+      "files_to_modify": [
+        "src/db/mongodb.js",
+        "src/models/*.js"
+      ],
+      "implementation_steps": [
+        "Identify collections needing TTL (e.g., chat sessions, temp recommendations)",
+        "Add TTL indexes via MongoDB shell or Mongoose schema: db.collection.createIndex({ \"createdAt\": 1 }, { expireAfterSeconds: 3600 })",
+        "Test expiration by inserting sample docs and verifying deletion after TTL",
+        "Update roadmap status to 100% and commit"
+      ],
+      "complexity_score": 4
+    },
+    {
+      "id": "task_2",
+      "title": "Expand Performance Monitoring to p50/p95 Tracking",
+      "description": "Performance monitoring is at 40%; add p50/p95 latency tracking to meet Q1 2026 target of API response time <200ms p95. Use existing metrics setup.",
+      "priority": "medium",
+      "estimated_time": "45-90 minutes",
+      "files_to_modify": [
+        "src/monitoring/performance.js",
+        "src/middleware/metrics.js"
+      ],
+      "implementation_steps": [
+        "Integrate a stats library like prometheus-client or simple percentile calc",
+        "Hook into API routes to record response times",
+        "Expose p50/p95 endpoints or dashboard metrics",
+        "Test with load (e.g., artillery) and verify current ~400ms p95 improves visibility"
+      ],
+      "complexity_score": 5
+    },
+    {
+      "id": "task_3",
+      "title": "Implement Basic Testing Expansion for 10% Coverage Gain",
+      "description": "Increase test coverage from ~45% to ~55% by adding Jest tests for high-impact areas like MCP endpoints and provider health checks. Target >70% by Q1.",
+      "priority": "medium",
+      "estimated_time": "60-120 minutes",
+      "files_to_modify": [
+        "tests/api/mcp.test.js",
+        "tests/providers/health.test.js",
+        "package.json"
+      ],
+      "implementation_steps": [
+        "Run `npm test -- --coverage` to identify low-coverage files",
+        "Write 5-10 unit tests for MCP endpoints (e.g., failover logic)",
+        "Add integration tests for provider health checks",
+        "Run coverage report and update roadmap"
+      ],
+      "complexity_score": 6
+    },
+    {
+      "id": "task_4",
+      "title": "Add AI Transparency Badges to Chat UI",
+      "description": "For AI Transparency & Labeling (high priority, started): Add simple 'AI-Augmented' badges in the chat interface for recommendations, complying with 2026 mandates.",
+      "priority": "high",
+      "estimated_time": "30-45 minutes",
+      "files_to_modify": [
+        "src/components/ChatInterface.jsx",
+        "src/utils/aiLabels.js"
+      ],
+      "implementation_steps": [
+        "Create a badge component (e.g., <span className='ai-badge'>AI-Augmented</span>)",
+        "Tag responses from LLM providers in chat state",
+        "Style with glassmorphism to match UI theme",
+        "Test in conversational music search flow"
+      ],
+      "complexity_score": 3
+    },
+    {
+      "id": "task_5",
+      "title": "Create Simple Dockerfiles for Dev Containerization",
+      "description": "Start Docker optimization: Add basic Dockerfiles for Node backend, React frontend, and docker-compose for local dev (no multi-stage needed yet).",
+      "priority": "medium",
+      "estimated_time": "45-75 minutes",
+      "files_to_modify": [
+        "Dockerfile.backend",
+        "Dockerfile.frontend",
+        "docker-compose.yml"
+      ],
+      "implementation_steps": [
+        "Write Node Dockerfile: FROM node:20, COPY ., npm ci, npm run dev",
+        "Write React Dockerfile: FROM node:20, npm ci, npm run build & serve",
+        "Add docker-compose.yml linking services + MongoDB",
+        "Test with `docker-compose up` and update docs"
+      ],
+      "complexity_score": 5
+    }
+  ],
+  "next_research_topics": [
+    "MongoDB TTL index best practices for music app session data",
+    "Lightweight p50/p95 latency tracking in Node.js without external deps",
+    "Quick Jest test patterns for LLM provider failover",
+    "Glassmorphism CSS for AI badges in React music UIs"
+  ],
+  "completion_percentage": 65
+}
