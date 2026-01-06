@@ -1,9 +1,9 @@
 
-# Task: Implement Basic Testing Expansion for 10% Coverage Gain
-# Description: Increase test coverage from ~45% to ~55% by adding Jest tests for high-impact areas like MCP endpoints and provider health checks. Target >70% by Q1.
-# Files to modify: ['tests/api/mcp.test.js', 'tests/providers/health.test.js', 'package.json']
+# Task: Implement Basic p50/p95 Metrics in Performance Monitoring
+# Description: Complete performance monitoring at 40% by adding p50/p95 latency tracking for API responses, using existing tools like Prometheus or console logging.
+# Files to modify: ['src/middleware/performance.js', 'src/utils/metrics.js', 'dashboard/src/components/PerfChart.jsx']
 
-print("Implementing: Implement Basic Testing Expansion for 10% Coverage Gain")
+print("Implementing: Implement Basic p50/p95 Metrics in Performance Monitoring")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
