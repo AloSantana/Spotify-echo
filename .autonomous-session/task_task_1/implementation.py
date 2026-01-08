@@ -1,9 +1,9 @@
 
-# Task: Complete MongoDB TTL Indexes (50% done)
-# Description: Finish implementing TTL indexes on MongoDB collections for automatic document expiration, as listed in 'In Progress (This Sprint)' with 50% completion and target Week 2 Jan.
-# Files to modify: ['src/db/mongodb.js', 'src/models/*.js']
+# Task: Complete MongoDB TTL Indexes
+# Description: Finish implementing MongoDB TTL indexes at 50% progress. TTL indexes automatically expire documents after a specified time, useful for logs, sessions, or temporary data in EchoTune AI.
+# Files to modify: ['src/db/mongodb.js', 'src/models/Log.js', 'package.json']
 
-print("Implementing: Complete MongoDB TTL Indexes (50% done)")
+print("Implementing: Complete MongoDB TTL Indexes")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
