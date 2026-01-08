@@ -1,9 +1,9 @@
 
-# Task: Implement p50/p95 Metrics in Performance Monitoring
-# Description: Complete performance monitoring at 40% by adding p50/p95 tracking to existing basic metrics, using tools like Prometheus or simple in-memory tracking.
-# Files to modify: ['src/monitoring/performance.js', 'src/middleware/metrics.js']
+# Task: Add Basic AI Transparency Metadata Tagging in Recommendation Responses
+# Description: Introduce a simple metadata field in AI-generated recommendation responses indicating whether the content is AI-augmented, laying groundwork for full transparency and labeling.
+# Files to modify: ['src/recommendations/aiRecommender.js', 'src/api/routes/recommendations.js', 'frontend/src/components/RecommendationsList.tsx or .jsx']
 
-print("Implementing: Implement p50/p95 Metrics in Performance Monitoring")
+print("Implementing: Add Basic AI Transparency Metadata Tagging in Recommendation Responses")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

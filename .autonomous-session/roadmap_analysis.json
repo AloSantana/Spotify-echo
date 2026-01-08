@@ -2,125 +2,111 @@
   "actionable_tasks": [
     {
       "id": "task_1",
-      "title": "Complete MongoDB TTL Indexes",
-      "description": "Finish implementing MongoDB TTL indexes at 50% progress. TTL indexes automatically expire documents after a specified time, useful for logs, sessions, or temporary data in EchoTune AI.",
+      "title": "Implement p50/p95 Latency Tracking for Performance Monitoring",
+      "description": "Extend the existing basic performance monitoring to record and expose p50 and p95 API response times so they can be compared against the <200ms p95 target.",
       "priority": "medium",
-      "estimated_time": "30-60 minutes",
+      "estimated_time": "45-90 minutes",
       "files_to_modify": [
-        "src/db/mongodb.js",
-        "src/models/Log.js",
-        "package.json"
+        "src/monitoring/performanceMetrics.js",
+        "src/api/middleware/requestTiming.js",
+        "src/dashboard/components/PerformancePanel.tsx or .jsx"
       ],
       "implementation_steps": [
-        "Identify collections needing TTL (e.g., chat logs, sessions).",
-        "Add TTL indexes via MongoDB shell or Mongoose schema: db.collection.createIndex({ \"createdAt\": 1 }, { expireAfterSeconds: 3600 }).",
-        "Test expiration by inserting sample docs and verifying deletion after TTL.",
-        "Update any existing indexes to avoid conflicts."
-      ],
-      "complexity_score": 4
-    },
-    {
-      "id": "task_2",
-      "title": "Expand Testing Coverage to 70%",
-      "description": "Increase automated test coverage from ~45% to >70% target, focusing on MCP endpoints, providers health, and chat interface using Jest.",
-      "priority": "medium",
-      "estimated_time": "60-90 minutes",
-      "files_to_modify": [
-        "tests/api/mcp.test.js",
-        "tests/providers.test.js",
-        "jest.config.js"
-      ],
-      "implementation_steps": [
-        "Run coverage report: npm test -- --coverage.",
-        "Prioritize untested paths in MCP endpoints and provider failover.",
-        "Write 5-10 new Jest tests for key functions (e.g., failover logic, health checks).",
-        "Refactor code for testability if needed (e.g., extract pure functions).",
-        "Re-run coverage and commit if >70%."
+        "Add a rolling window or histogram-based data structure in performanceMetrics.js to record request durations and compute p50/p95 periodically.",
+        "Update requestTiming.js (or equivalent middleware) to record each request duration into the metrics module.",
+        "Expose the computed p50/p95 values via an existing metrics endpoint or add a new `/api/metrics/performance` route.",
+        "Update the analytics dashboard Performance panel to display p50/p95 alongside current basic metrics.",
+        "Add simple unit tests for the percentile calculation helper and a quick integration test that hits the metrics endpoint and asserts presence of p50/p95 fields."
       ],
       "complexity_score": 6
     },
     {
-      "id": "task_3",
-      "title": "Implement p50/p95 Metrics in Performance Monitoring",
-      "description": "Complete performance monitoring at 40% by adding p50/p95 tracking to existing basic metrics, using tools like Prometheus or simple in-memory tracking.",
+      "id": "task_2",
+      "title": "Add MongoDB TTL Index for a Single Collection",
+      "description": "Create a TTL index on a high-churn collection (for example, request logs or ephemeral sessions) to automatically expire old documents and move MongoDB TTL work closer to completion.",
       "priority": "medium",
-      "estimated_time": "45-75 minutes",
+      "estimated_time": "30-60 minutes",
       "files_to_modify": [
-        "src/monitoring/performance.js",
-        "src/middleware/metrics.js"
+        "src/db/mongoClient.js",
+        "src/db/initIndexes.js",
+        "PROJECT_CONFIG.md or DB_SCHEMA.md"
       ],
       "implementation_steps": [
-        "Install percentile calc library if needed (e.g., simple-stats).",
-        "Extend existing metrics collector to bucket response times.",
-        "Add endpoints or logs for p50/p95 queries (e.g., sort and slice array).",
-        "Integrate into dashboard or console output.",
-        "Test with load simulation (e.g., artillery.io)."
+        "Identify one suitable collection for TTL (e.g., `request_logs` or `session_events`) that already stores a timestamp field.",
+        "Create or extend initIndexes.js to define a TTL index using `createIndex({ createdAt: 1 }, { expireAfterSeconds: 60 * 60 * 24 * 7 })` or a similar policy.",
+        "Ensure initIndexes.js is called once on startup in mongoClient.js after establishing the MongoDB connection.",
+        "Add or update documentation to note the TTL behavior and required timestamp field for the collection.",
+        "Add a minimal test that mocks MongoDB\u2019s `createIndex` call and asserts that a TTL index is requested with the expected options."
       ],
       "complexity_score": 5
+    },
+    {
+      "id": "task_3",
+      "title": "Add Basic AI Transparency Metadata Tagging in Recommendation Responses",
+      "description": "Introduce a simple metadata field in AI-generated recommendation responses indicating whether the content is AI-augmented, laying groundwork for full transparency and labeling.",
+      "priority": "high",
+      "estimated_time": "45-90 minutes",
+      "files_to_modify": [
+        "src/recommendations/aiRecommender.js",
+        "src/api/routes/recommendations.js",
+        "frontend/src/components/RecommendationsList.tsx or .jsx"
+      ],
+      "implementation_steps": [
+        "Update the AI recommendation generation function to attach a metadata field such as `source: 'ai_augmented'` or a boolean `isAiAugmented: true` to each recommended item or to the response envelope.",
+        "Ensure the REST/GraphQL API route that returns recommendations includes this metadata in the serialized JSON.",
+        "In the frontend RecommendationsList component, read the metadata and conditionally render a small text label placeholder where the future 'AI-Augmented' badge will appear (e.g., '(AI)' next to the title).",
+        "Guard the new UI label behind a simple feature flag or configuration value if needed to keep behavior predictable.",
+        "Add a unit test for the recommender to assert the metadata field is present, and a UI snapshot or DOM test that checks the label appears when `isAiAugmented` is true."
+      ],
+      "complexity_score": 6
     },
     {
       "id": "task_4",
-      "title": "Add AI Transparency Badges in UI",
-      "description": "For AI Transparency & Labeling (started, High priority), add 'AI-Augmented' badges in chat interface and recommendations UI.",
-      "priority": "high",
-      "estimated_time": "30-45 minutes",
-      "files_to_modify": [
-        "src/components/ChatInterface.jsx",
-        "src/components/RecommendationCard.jsx"
-      ],
-      "implementation_steps": [
-        "Create reusable Badge component with 'AI-Augmented' text.",
-        "Tag recommendations/metadata where AI is used (e.g., prop from backend).",
-        "Style with glassmorphism to match theme.",
-        "Test in chat and playlist views."
-      ],
-      "complexity_score": 3
-    },
-    {
-      "id": "task_5",
-      "title": "Create Simple Dockerfiles and docker-compose for Dev",
-      "description": "Containerize Node backend, React frontend, MCP servers with basic Dockerfiles and dev compose file.",
+      "title": "Create Initial Jest Test File to Start Increasing Coverage",
+      "description": "Add a focused Jest test suite for a stable, high-value module (for example, the LLM provider manager or Spotify playback service) to make measurable progress toward the 70% test coverage goal.",
       "priority": "medium",
-      "estimated_time": "60-90 minutes",
+      "estimated_time": "45-90 minutes",
       "files_to_modify": [
-        "Dockerfile.backend",
-        "Dockerfile.frontend",
-        "docker-compose.dev.yml",
-        "README.md"
+        "jest.config.js",
+        "src/services/llmProviderManager.js",
+        "tests/services/llmProviderManager.test.js"
       ],
       "implementation_steps": [
-        "Write multi-stage Dockerfile for backend (Node build/prod).",
-        "Write Dockerfile for frontend (React build/serve).",
-        "Add docker-compose.yml linking services (backend:3001, frontend:3000, mongo).",
-        "Test locally: docker-compose up.",
-        "Document in README."
+        "Identify a pure or low-side-effect module such as llmProviderManager that encapsulates provider selection and failover logic.",
+        "Create a new Jest test file that covers core behaviors (e.g., selecting default provider, switching providers, handling a simulated failure).",
+        "Mock external APIs or network calls so the tests run quickly and deterministically.",
+        "Run the existing quality scripts (lint, security:audit, quality:check) and ensure the new tests are wired into the test script in package.json.",
+        "Record the new coverage percentage locally to confirm a small but measurable improvement, and update any internal notes or WORKFLOW_STATE.md if used for tracking."
       ],
       "complexity_score": 5
     },
     {
-      "id": "task_6",
-      "title": "Add Metadata Tagging for AI-Generated Recommendations",
-      "description": "Implement backend metadata tagging for AI-generated recs to support transparency (Critical priority).",
-      "priority": "high",
-      "estimated_time": "45-60 minutes",
+      "id": "task_5",
+      "title": "Add Basic Dockerfile for Node Backend Service",
+      "description": "Introduce a simple, single-stage Dockerfile for the Node backend to take the first concrete step toward full containerization.",
+      "priority": "medium",
+      "estimated_time": "30-60 minutes",
       "files_to_modify": [
-        "src/services/recommendations.js",
-        "src/models/Recommendation.js"
+        "backend/Dockerfile",
+        "docker/.dockerignore or .dockerignore",
+        "PROJECT_CONFIG.md or DEPLOYMENT.md"
       ],
       "implementation_steps": [
-        "Add 'aiGenerated: true' field to recommendation schema.",
-        "Tag outputs from LLM providers automatically.",
-        "Expose in API response for frontend badges.",
-        "Unit test tagging logic."
+        "Create a Dockerfile in the backend directory that uses a stable Node LTS base image, installs dependencies with `npm ci`, copies the source, and defines the default `CMD` to start the server.",
+        "Add a .dockerignore file to exclude node_modules, logs, coverage reports, and local config files from the Docker build context.",
+        "Build and run the container locally to verify that the backend starts correctly and can serve basic health or status endpoints.",
+        "Document the build and run commands in DEPLOYMENT.md or the relevant configuration document.",
+        "Optionally wire a simple `docker:build` script into package.json or a Makefile for easier use by other developers."
       ],
       "complexity_score": 4
     }
   ],
   "next_research_topics": [
-    "Best practices for WebSocket real-time collaborative playlists in React/Node",
-    "Web Audio API waveform visualization tutorials and examples",
-    "React 19 server components migration guide for existing apps",
-    "ML models for microgenre detection using Spotify audio features"
+    "Detailed design for full AI transparency & labeling system, including UI badge states, logging, and compliance hooks",
+    "Selection and schema design for all MongoDB collections that will use TTL indexes and their expiration policies",
+    "End-to-end performance observability stack (metrics store, dashboards, alert thresholds) to reach p95 < 200ms",
+    "Test strategy to move from ~45% to >70% coverage (module prioritization, tooling, and CI integration)",
+    "Design of multi-stage Docker builds and Docker Compose layout for backend, frontend, and MCP servers"
   ],
-  "completion_percentage": 65
+  "completion_percentage": 78
 }
