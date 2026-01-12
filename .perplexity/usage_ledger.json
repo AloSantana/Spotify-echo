@@ -5121,8 +5121,8 @@
     ]
   },
   "2026-W03": {
-    "total_cost": 0.320152,
-    "request_count": 5,
+    "total_cost": 0.47513000000000005,
+    "request_count": 7,
     "requests": [
       {
         "timestamp": "2026-01-12 01:47:35.814888",
@@ -5175,6 +5175,28 @@
         "output_tokens": 2814,
         "searches_performed": 5,
         "estimated_cost": 0.06403400000000001,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2026-01-12 02:01:09.476584",
+        "model": "sonar-pro",
+        "input_tokens": 2242,
+        "output_tokens": 2765,
+        "searches_performed": 5,
+        "estimated_cost": 0.075452,
+        "actual_cost": null,
+        "cache_hit": false,
+        "complexity_score": 10
+      },
+      {
+        "timestamp": "2026-01-12 02:01:40.180519",
+        "model": "sonar-pro",
+        "input_tokens": 2921,
+        "output_tokens": 2921,
+        "searches_performed": 5,
+        "estimated_cost": 0.07952600000000001,
         "actual_cost": null,
         "cache_hit": false,
         "complexity_score": 10

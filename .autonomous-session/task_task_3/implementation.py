@@ -1,9 +1,9 @@
 
-# Task: Add Basic AI Transparency Metadata Tagging in Recommendation Responses
-# Description: Introduce a simple metadata field in AI-generated recommendation responses indicating whether the content is AI-augmented, laying groundwork for full transparency and labeling.
-# Files to modify: ['src/recommendations/aiRecommender.js', 'src/api/routes/recommendations.js', 'frontend/src/components/RecommendationsList.tsx or .jsx']
+# Task: Implement MongoDB TTL index creation for time-based collections
+# Description: Finish the MongoDB TTL indexes task (currently 50%) by programmatically ensuring TTL indexes exist on time-based collections used for logs, metrics, and transient data.
+# Files to modify: ['src/db/mongoClient.js', 'src/db/indexes.js', 'config/database.json', 'docs/database-indexing.md']
 
-print("Implementing: Add Basic AI Transparency Metadata Tagging in Recommendation Responses")
+print("Implementing: Implement MongoDB TTL index creation for time-based collections")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

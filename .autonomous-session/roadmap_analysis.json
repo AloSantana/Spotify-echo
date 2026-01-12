@@ -1,1 +1,175 @@
-{"actionable_tasks": [], "error": "'content'", "fallback": true}
+{
+  "actionable_tasks": [
+    {
+      "id": "task_1",
+      "title": "Implement p50/p95 API latency tracking for Performance Monitoring",
+      "description": "Extend the existing performance monitoring (currently 40% complete) to record and expose p50 and p95 latency for key backend endpoints and provider calls, aligned with the API Response Time p95 target.",
+      "priority": "medium",
+      "estimated_time": "45-90 minutes",
+      "files_to_modify": [
+        "src/monitoring/performanceMetrics.js",
+        "src/server/middleware/requestTiming.js",
+        "src/api/routes/metrics.js",
+        "docs/metrics.md"
+      ],
+      "implementation_steps": [
+        "Add a lightweight timing middleware that records start/end time for each request and passes duration to a central metrics collector.",
+        "In the metrics collector, store recent latencies in a fixed-size window per route/provider and compute p50/p95 using a simple percentile function.",
+        "Expose an internal `/api/metrics/performance` endpoint that returns per-route and per-provider p50/p95 stats in JSON.",
+        "Wire the new metrics into any existing dashboard or logging so they are visible in the Analytics Dashboard and/or logs.",
+        "Add or update unit tests to cover percentile calculations and the metrics endpoint response shape.",
+        "Document how p50/p95 are computed and where to view them in `docs/metrics.md`."
+      ],
+      "complexity_score": 4
+    },
+    {
+      "id": "task_2",
+      "title": "Add Jest tests to increase coverage for LLM provider failover logic",
+      "description": "Targeted test expansion to push overall coverage beyond 45% by adding Jest tests around the existing multi-provider LLM circuit breaker/failover logic and routing decisions.",
+      "priority": "high",
+      "estimated_time": "60-120 minutes",
+      "files_to_modify": [
+        "src/llm/providerRouter.js",
+        "src/llm/circuitBreaker.js",
+        "__tests__/llm/providerRouter.test.js",
+        "__tests__/llm/circuitBreaker.test.js",
+        "package.json"
+      ],
+      "implementation_steps": [
+        "Identify the core modules that implement provider selection, health checks, and circuit breaker decisions (e.g., `providerRouter`, `circuitBreaker`).",
+        "Create or extend Jest test files to cover success, failure, and timeout paths, asserting that failover occurs when a provider is unhealthy and that healthy providers are preferred.",
+        "Mock external LLM calls so tests run without network access and execute quickly in CI.",
+        "Run Jest with coverage flags and confirm that overall coverage for these modules is >80%, and that global coverage moves above the current ~45%.",
+        "If needed, add a `test:unit:llm` script in `package.json` to run just these tests quickly during development."
+      ],
+      "complexity_score": 5
+    },
+    {
+      "id": "task_3",
+      "title": "Implement MongoDB TTL index creation for time-based collections",
+      "description": "Finish the MongoDB TTL indexes task (currently 50%) by programmatically ensuring TTL indexes exist on time-based collections used for logs, metrics, and transient data.",
+      "priority": "medium",
+      "estimated_time": "45-90 minutes",
+      "files_to_modify": [
+        "src/db/mongoClient.js",
+        "src/db/indexes.js",
+        "config/database.json",
+        "docs/database-indexing.md"
+      ],
+      "implementation_steps": [
+        "Identify collections that store ephemeral data (e.g., `logs`, `sessions`, `metrics`) and the timestamp field to use for TTL (e.g., `createdAt`).",
+        "Add an `ensureIndexes` function that runs at startup to create TTL indexes with appropriate `expireAfterSeconds` for each collection.",
+        "Guard index creation with `background: true` and idempotent checks so repeated startups do not fail.",
+        "Add a simple integration test (or script) that connects to a test MongoDB instance and asserts that the TTL indexes are present.",
+        "Document which collections have TTL, their retention periods, and how to adjust them in `docs/database-indexing.md`."
+      ],
+      "complexity_score": 4
+    },
+    {
+      "id": "task_4",
+      "title": "Add basic AI transparency metadata tagging in recommendations API responses",
+      "description": "Implement the first step of the AI Transparency & Labeling roadmap by tagging AI-generated or AI-augmented music recommendations in API responses with clear metadata fields.",
+      "priority": "high",
+      "estimated_time": "45-90 minutes",
+      "files_to_modify": [
+        "src/api/routes/recommendations.js",
+        "src/recommendations/engine.js",
+        "src/types/Recommendation.d.ts",
+        "frontend/src/types/recommendation.ts",
+        "docs/ai-transparency.md"
+      ],
+      "implementation_steps": [
+        "Define a minimal transparency schema for recommendations, e.g., `ai_generated: boolean`, `ai_source: 'llm' | 'ml_recommender' | 'hybrid'`, and `explanation_available: boolean`.",
+        "Update the recommendation engine to set these fields whenever AI models or ML logic significantly influence the result.",
+        "Ensure the backend API responses include these fields in a backward-compatible way (e.g., additive properties).",
+        "Update any frontend TypeScript types or models to reflect the new fields, even if the UI does not yet display them.",
+        "Add unit tests asserting that different recommendation paths (pure Spotify vs ML vs LLM-augmented) produce the correct transparency metadata.",
+        "Document the semantics of each field and how clients should interpret them in `docs/ai-transparency.md`."
+      ],
+      "complexity_score": 5
+    },
+    {
+      "id": "task_5",
+      "title": "Display 'AI-Augmented' badge in chat results using existing transparency flags",
+      "description": "Use the new or existing transparency metadata to render a simple 'AI-Augmented' badge in the chat interface for responses where AI significantly shapes the recommendation.",
+      "priority": "medium",
+      "estimated_time": "30-60 minutes",
+      "files_to_modify": [
+        "frontend/src/components/chat/ChatMessage.tsx",
+        "frontend/src/components/chat/RecommendationCard.tsx",
+        "frontend/src/styles/badges.css"
+      ],
+      "implementation_steps": [
+        "Extend the chat message or recommendation card props to accept a boolean flag (e.g., `isAiAugmented`) derived from the transparency metadata returned by the backend.",
+        "Render a small badge with text such as 'AI-Augmented' or 'AI Recommendation' when the flag is true, styled to be visually distinct but unobtrusive.",
+        "Ensure accessibility by adding appropriate `aria-label` and contrast-compliant styles.",
+        "Manually test a few chat flows to verify that AI-driven recommendations show the badge and non-AI results do not."
+      ],
+      "complexity_score": 3
+    },
+    {
+      "id": "task_6",
+      "title": "Add basic health-check based routing unit tests for existing circuit breaker",
+      "description": "Although the circuit breaker failover is marked done, add small, focused tests to validate that provider health status correctly influences routing decisions, improving resilience and coverage.",
+      "priority": "medium",
+      "estimated_time": "45-90 minutes",
+      "files_to_modify": [
+        "src/llm/healthMonitor.js",
+        "__tests__/llm/healthMonitor.test.js",
+        "__tests__/llm/integrationRouting.test.js"
+      ],
+      "implementation_steps": [
+        "Inspect the current circuit breaker / health monitor implementation to identify the function that returns a list of healthy providers or chooses a provider.",
+        "Write Jest tests that simulate providers with various health states (healthy, degraded, open circuit) and assert that routing only selects healthy providers.",
+        "Include a test case for recovery, asserting that when a provider transitions from unhealthy to healthy, it becomes eligible again after the configured cooldown.",
+        "Run tests and ensure they pass without external network dependencies."
+      ],
+      "complexity_score": 4
+    },
+    {
+      "id": "task_7",
+      "title": "Add `docker:dev` multi-service Docker Compose file for local dev",
+      "description": "Create a minimal Docker Compose setup to spin up the Node backend, React frontend, and MongoDB for development, aligning with the containerization roadmap without heavy optimization.",
+      "priority": "medium",
+      "estimated_time": "60-120 minutes",
+      "files_to_modify": [
+        "Dockerfile.backend",
+        "Dockerfile.frontend",
+        "docker-compose.dev.yml",
+        "docs/docker-dev.md"
+      ],
+      "implementation_steps": [
+        "Create simple, single-stage Dockerfiles for the backend and frontend that install dependencies and run the dev server (no complex optimization).",
+        "Add a `docker-compose.dev.yml` that defines services for backend, frontend, MongoDB, and any required MCP servers, with appropriate ports and environment variables.",
+        "Verify that `docker compose -f docker-compose.dev.yml up` starts all services and that the frontend can reach the backend and MongoDB.",
+        "Document the dev workflow in `docs/docker-dev.md`, including common commands and environment configuration."
+      ],
+      "complexity_score": 6
+    },
+    {
+      "id": "task_8",
+      "title": "Add npm script aliases for quality and test workflows",
+      "description": "Expand `package.json` scripts to provide clear, discoverable commands for linting, security audit, and running the test suite, improving developer experience and consistency with the quality roadmap.",
+      "priority": "low",
+      "estimated_time": "15-30 minutes",
+      "files_to_modify": [
+        "package.json",
+        "docs/development-workflow.md"
+      ],
+      "implementation_steps": [
+        "Inspect current `package.json` scripts and ensure standard entries exist: `lint`, `security:audit`, `quality:check`, `test`, and `test:watch`.",
+        "If any commands are missing or inconsistent, add or normalize them to run ESLint, `npm audit`, and Jest with coverage as appropriate.",
+        "Update `docs/development-workflow.md` to reference these scripts and describe when to run each (e.g., before PRs, before releases)."
+      ],
+      "complexity_score": 2
+    }
+  ],
+  "next_research_topics": [
+    "Design of emotional resonance metrics for provider failover and how to quantify them using existing audio features",
+    "Best-practice React 19 migration patterns for server components and concurrent rendering in production-scale apps",
+    "Architecture options for a microgenre discovery engine using existing Spotify audio features and clustering techniques",
+    "WebSocket-based real-time collaborative playlist editing patterns and conflict resolution strategies",
+    "Lightweight approaches to stem separation suitable for integration with a text-to-music or remix API"
+  ],
+  "completion_percentage": 78
+}
