@@ -1,9 +1,9 @@
 
-# Task: Implement MongoDB TTL index creation for time-based collections
-# Description: Finish the MongoDB TTL indexes task (currently 50%) by programmatically ensuring TTL indexes exist on time-based collections used for logs, metrics, and transient data.
-# Files to modify: ['src/db/mongoClient.js', 'src/db/indexes.js', 'config/database.json', 'docs/database-indexing.md']
+# Task: Implement Basic AI Transparency Badges in UI
+# Description: Add simple 'AI-Augmented' badges to recommendation results and chat responses in the frontend for compliance and user trust.
+# Files to modify: ['src/components/ChatInterface.jsx', 'src/components/Recommendations.jsx']
 
-print("Implementing: Implement MongoDB TTL index creation for time-based collections")
+print("Implementing: Implement Basic AI Transparency Badges in UI")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

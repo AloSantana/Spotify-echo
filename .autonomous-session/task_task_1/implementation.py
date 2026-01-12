@@ -1,9 +1,9 @@
 
-# Task: Implement p50/p95 API latency tracking for Performance Monitoring
-# Description: Extend the existing performance monitoring (currently 40% complete) to record and expose p50 and p95 latency for key backend endpoints and provider calls, aligned with the API Response Time p95 target.
-# Files to modify: ['src/monitoring/performanceMetrics.js', 'src/server/middleware/requestTiming.js', 'src/api/routes/metrics.js', 'docs/metrics.md']
+# Task: Complete MongoDB TTL Indexes (50% done)
+# Description: Finish implementing TTL indexes on MongoDB collections for automatic document expiration, focusing on logs, sessions, or temporary data to manage storage efficiently.
+# Files to modify: ['src/db/mongodb.js', 'src/models/*.js']
 
-print("Implementing: Implement p50/p95 API latency tracking for Performance Monitoring")
+print("Implementing: Complete MongoDB TTL Indexes (50% done)")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

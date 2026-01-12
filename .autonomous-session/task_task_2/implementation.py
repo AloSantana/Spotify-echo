@@ -1,9 +1,9 @@
 
-# Task: Add Jest tests to increase coverage for LLM provider failover logic
-# Description: Targeted test expansion to push overall coverage beyond 45% by adding Jest tests around the existing multi-provider LLM circuit breaker/failover logic and routing decisions.
-# Files to modify: ['src/llm/providerRouter.js', 'src/llm/circuitBreaker.js', '__tests__/llm/providerRouter.test.js', '__tests__/llm/circuitBreaker.test.js', 'package.json']
+# Task: Expand Performance Monitoring to p50/p95 Tracking (40% done)
+# Description: Enhance existing metrics to include p50 and p95 response times for API endpoints, using basic logging or a lightweight library like prom-client.
+# Files to modify: ['src/middleware/performance.js', 'src/api/routes/*.js']
 
-print("Implementing: Add Jest tests to increase coverage for LLM provider failover logic")
+print("Implementing: Expand Performance Monitoring to p50/p95 Tracking (40% done)")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
