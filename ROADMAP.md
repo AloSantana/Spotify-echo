@@ -16669,3 +16669,266 @@ Incorporating 2026 AI music trends research (real-time generation, stem separati
     
     ---
     
+                
+                ---
+                
+                ## 🤖 Autonomous Coding Cycle 1 - 2026-01-12 01:47 UTC
+                
+                ### Cycle 1 Results:
+                - **Tasks Completed**: 3
+                - **Total Tasks**: 3
+                - **Research Model**: sonar-pro
+                - **Session ID**: coding-cycle-20260112-014658-12344
+                
+                ### Perplexity Research Insights:
+                Here is an actionable, Copilot-friendly plan for the next coding cycle, organized by focus area and written as concrete tasks a coding agent can execute autonomously.
+
+---
+
+## 1) Repository & Architecture Improvements
+
+**1.1. Standardize project structure (High)**  
+- Create a top-level structure like:  
+  - `backend/` (API, Spotify integration, AI services)  
+  - `frontend/` (React app)  
+  - `models/` or `ai/` (training/inference code, if separate)  
+  - `scripts/` (maintenance, data prep, utilities)  
+  - `tests/` (backend + frontend)  
+  - `docs/`  
+- Add a `README.md` at root describing this structure and entry points.[1]  
+- Add `backend/README.md` and `frontend/README.md` explaining how to run each service and how they communicate.
+
+**1.2. Introduce modular service boundaries (Medium)**  
+- Split backend into clear modules:  
+  - `spotify/` (all Spotify API calls)  
+  - `recommendation/` (EchoTune AI logic)  
+  - `users/` (user profiles, auth, preferences)  
+  - `common/` (logging, error handling, types)  
+- Refactor imports to use these modules instead of cross-cutting utilities.  
+- Add a lightweight architecture overview in `docs/architecture.md` using text + simple ASCII diagrams (no images needed for Copilot).
+
+**1.3. Add environment & dependency management (High)**  
+- Add `requirements.txt` or `pyproject.toml` for Python, or `package.json` cleanup for Node-based backend.[1]  
+- Add `.env.example` for API keys (Spotify client ID/secret, JWT secret, etc.).  
+- Ens...
+                
+                [Full research results in autonomous session: .autonomous-coding-session/research_cycle_1.md]
+                
+                ### Next Cycle Preparation:
+                Based on research findings, the following tasks have been identified for automatic implementation by GitHub Copilot coding agent.
+                
+                ---
+                
+                
+                ---
+                
+                ## 🤖 Autonomous Coding Cycle 2 - 2026-01-12 01:48 UTC
+                
+                ### Cycle 2 Results:
+                - **Tasks Completed**: 3
+                - **Total Tasks**: 6
+                - **Research Model**: sonar-pro
+                - **Session ID**: coding-cycle-20260112-014658-12344
+                
+                ### Perplexity Research Insights:
+                Here is a concrete, Copilot-friendly task plan for the next coding cycle, structured by area and written so that an autonomous coding agent can execute it with minimal ambiguity.
+
+---
+
+## 1. Codebase Structure & Refactoring
+
+**Goal:** Make the EchoTune AI repo easier to navigate, safer to extend, and more automation-friendly.[1]
+
+### Tasks
+
+1. **Standardize repository layout (Priority: High)**  
+   - Create or update a top-level structure like:
+     - `backend/` (API, Spotify integration, ML orchestration)
+     - `frontend/` (React app)
+     - `models/` or `ml/` (training, inference pipelines)
+     - `scripts/` (CLI utilities, maintenance scripts)
+     - `tests/` (backend + frontend tests)
+     - `docs/` (architecture, API, setup)  
+   - Ensure shared utilities are moved to `backend/common/` or `backend/utils/` and remove duplicate helper code.
+
+2. **Introduce/normalize module boundaries (Priority: Medium)**  
+   - Group backend modules into:
+     - `services/` (Spotify, recommendation, user profiles)
+     - `routes/` or `controllers/` (HTTP handlers)
+     - `repositories/` (DB access if applicable)
+     - `core/` (domain logic: tracks, playlists, features)  
+   - Update imports to use these new module paths.
+
+3. **Add configuration system with environment variables (Priority: High)**  
+   - Create `backend/config/index.(ts|js)` that:
+     - Reads env vars (Spotify keys, DB URL, model paths, etc.).
+     - Performs basic validation (throw error if required env vars missing).
+ ...
+                
+                [Full research results in autonomous session: .autonomous-coding-session/research_cycle_2.md]
+                
+                ### Next Cycle Preparation:
+                Based on research findings, the following tasks have been identified for automatic implementation by GitHub Copilot coding agent.
+                
+                ---
+                
+                
+                ---
+                
+                ## 🤖 Autonomous Coding Cycle 3 - 2026-01-12 01:49 UTC
+                
+                ### Cycle 3 Results:
+                - **Tasks Completed**: 3
+                - **Total Tasks**: 9
+                - **Research Model**: sonar-pro
+                - **Session ID**: coding-cycle-20260112-014658-12344
+                
+                ### Perplexity Research Insights:
+                Here is a concrete, Copilot-friendly task plan for the next coding cycle, organized by area and priority, and written so that an automated agent can execute it with minimal clarification.
+
+---
+
+## 1. Codebase Structure & Refactoring
+
+**Goal:** Make the repo easier for Copilot and humans to navigate and extend.
+
+### Tasks
+
+1. **Standardize project structure**  
+   - [P1] Create or update a clear top-level structure:  
+     - `frontend/` (React app)  
+     - `backend/` (API, ML orchestration, Spotify integration)  
+     - `ml/` or `models/` (music AI models, experiments)  
+     - `scripts/` (utility scripts, data prep)  
+     - `docs/`  
+   - Ensure each subfolder has a short `README.md` explaining its purpose.
+
+2. **Introduce/configure linting & formatting**  
+   - [P1] Add ESLint + Prettier for React (TypeScript if used), with a standard config (`airbnb`, `react-app`, or similar).  
+   - [P2] Add a formatter/linter for backend language (e.g., `black` + `ruff` for Python, or `eslint` for Node).  
+   - [P2] Add basic pre-commit hooks (e.g., `husky` + `lint-staged` or `pre-commit` for Python) so Copilot changes get auto-formatted.
+
+3. **Refactor large/complex files**  
+   - [P1] Identify any file > 300–400 lines or with multiple responsibilities (e.g., a React page container that manages state, rendering, and API calls).  
+   - Split into:  
+     - **UI-only components**  
+     - **hooks** (e.g., `useEchoTuneSession`, `useSpotifyPlayback`, `useTrackAnalysis`)  
+     - **API clie...
+                
+                [Full research results in autonomous session: .autonomous-coding-session/research_cycle_3.md]
+                
+                ### Next Cycle Preparation:
+                Based on research findings, the following tasks have been identified for automatic implementation by GitHub Copilot coding agent.
+                
+                ---
+                
+                
+                ---
+                
+                ## 🤖 Autonomous Coding Cycle 4 - 2026-01-12 01:49 UTC
+                
+                ### Cycle 4 Results:
+                - **Tasks Completed**: 3
+                - **Total Tasks**: 12
+                - **Research Model**: sonar-pro
+                - **Session ID**: coding-cycle-20260112-014658-12344
+                
+                ### Perplexity Research Insights:
+                Here is a concrete, Copilot-friendly plan for the next coding cycle, organized by area and broken down into **small, automatable tasks**.
+
+---
+
+## 1. Codebase Structure & Refactoring
+
+**Goal:** Make the repo easier for Copilot and humans to navigate, extend, and test.
+
+**Tasks**
+
+1. **Introduce a clear top-level structure** (if not already present):  
+   - `backend/` (API, ML services)  
+   - `frontend/` (React app)  
+   - `ml/` (models, training scripts, experiments)  
+   - `infra/` (CI, deployment, Docker)  
+   - `docs/` (architecture, API, usage)  
+   **Priority:** P1  
+
+2. **Add central configuration management**:  
+   - Create `backend/config/index.ts` or `config.py` (depending on stack) to load env vars (Spotify keys, DB URLs, model paths) with validation.  
+   - Replace scattered `process.env.*` or hardcoded string literals with config imports.  
+   **Priority:** P1  
+
+3. **Modularize large files**:  
+   - Identify any backend or ML files >300 lines or React components >200 lines.  
+   - Split them by responsibility (e.g., `spotifyService.ts`, `playlistService.ts`, `audioAnalysisService.ts`).  
+   **Priority:** P2  
+
+4. **Introduce shared types/interfaces**:  
+   - Add `backend/types/spotify.ts` and `backend/types/music.ts` defining track, playlist, audio features, and recommendation result interfaces.  
+   - Replace inline type definitions and `any` usage.  
+   **Priority:** P2  
+
+---
+
+## 2. Music AI/ML Integration Opportunities
+
+**Goal:** Align with current music-AI ...
+                
+                [Full research results in autonomous session: .autonomous-coding-session/research_cycle_4.md]
+                
+                ### Next Cycle Preparation:
+                Based on research findings, the following tasks have been identified for automatic implementation by GitHub Copilot coding agent.
+                
+                ---
+                
+                
+                ---
+                
+                ## 🤖 Autonomous Coding Cycle 5 - 2026-01-12 01:50 UTC
+                
+                ### Cycle 5 Results:
+                - **Tasks Completed**: 3
+                - **Total Tasks**: 15
+                - **Research Model**: sonar-pro
+                - **Session ID**: coding-cycle-20260112-014658-12344
+                
+                ### Perplexity Research Insights:
+                Here is a proposed, **Copilot-executable** task plan for the next EchoTune AI coding cycle, aligned with your focus areas. I’ll assume a typical stack: React frontend, Node/TypeScript (or Python) backend, Spotify Web API, and an AI/ML recommendations module.
+
+---
+
+## 1. Codebase Structure & Refactoring
+
+**Goal:** Make the repo more modular, analyzable, and easy for Copilot to work in.
+
+### 1.1 Module & folder structure cleanup  
+**Priority:** P1  
+**Tasks:**
+- [ ] Introduce a clear top-level structure:
+  - `frontend/` (React app)
+  - `backend/` (API + business logic)
+  - `ml/` or `services/recommendation/` (AI/ML logic)
+  - `scripts/` (one-off scripts, data prep, etc.)
+  - `docs/` (markdown documentation)  
+- [ ] Create/normalize index files (`index.ts` / `index.js`) in feature folders to re-export internal modules for cleaner imports.  
+- [ ] Enforce path aliases (e.g., `@components/`, `@hooks/`, `@services/`) in tsconfig/jsconfig and React build config.
+
+### 1.2 Configuration & environment separation  
+**Priority:** P1  
+**Tasks:**
+- [ ] Introduce a unified `config` module:
+  - `config/index.ts` that reads environment variables and centralizes them (Spotify keys, model endpoints, etc.).  
+- [ ] Replace hard-coded constants throughout the codebase with imports from the config module, using environment variables for secrets and URLs.[1]  
+- [ ] Add `.env.example` with all required variables (no secrets).[1]  
+
+### 1.3 Copilot & repository meta  
+**Priority:** P2  
+**Tasks:**
+...
+                
+                [Full research results in autonomous session: .autonomous-coding-session/research_cycle_5.md]
+                
+                ### Next Cycle Preparation:
+                Based on research findings, the following tasks have been identified for automatic implementation by GitHub Copilot coding agent.
+                
+                ---
+                
