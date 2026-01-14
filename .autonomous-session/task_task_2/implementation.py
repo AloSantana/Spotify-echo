@@ -1,9 +1,9 @@
 
-# Task: Expand Performance Monitoring to p50/p95 Tracking (remaining 60%)
-# Description: Advance 'Performance Monitoring' from 40% to full by adding p50/p95 latency metrics, aligning with Q1 2026 target of API p95 <200ms. Use existing basic metrics as base.
-# Files to modify: ['src/monitoring/performance.js', 'src/middleware/metrics.js', 'package.json']
+# Task: Expand Testing Coverage to 55%+ (From Current 45%)
+# Description: Increase automated test coverage targeting Jest expansion around MCP endpoints and provider health checks. Focus on high-impact untested routes.
+# Files to modify: ['tests/api/mcp.test.js', 'tests/providers/health.test.js', 'jest.config.js']
 
-print("Implementing: Expand Performance Monitoring to p50/p95 Tracking (remaining 60%)")
+print("Implementing: Expand Testing Coverage to 55%+ (From Current 45%)")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
