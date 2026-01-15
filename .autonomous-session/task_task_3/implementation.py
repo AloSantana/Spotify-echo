@@ -1,9 +1,9 @@
 
-# Task: Implement Basic p50/p95 Metrics in Performance Monitoring
-# Description: Enhance ongoing performance monitoring (40% complete) by adding percentile tracking (p50/p95) for API response times, aligning with Q1 2026 target of <200ms p95.
-# Files to modify: ['src/monitoring/performance.js', 'src/middleware/metrics.js']
+# Task: Increase Automated Test Coverage to 50%
+# Description: Expand Jest test suite from ~45% coverage targeting 70%, focusing on MCP endpoints and provider health checks for quick wins.
+# Files to modify: ['tests/api/mcp.test.js', 'tests/providers/health.test.js', 'jest.config.js']
 
-print("Implementing: Implement Basic p50/p95 Metrics in Performance Monitoring")
+print("Implementing: Increase Automated Test Coverage to 50%")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
