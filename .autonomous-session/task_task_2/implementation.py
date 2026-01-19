@@ -1,6 +1,6 @@
 
 # Task: Expand Performance Monitoring to p50/p95 Tracking
-# Description: Advance performance monitoring from 40% completion by adding p50 and p95 latency metrics tracking to meet Q1 2026 target of API response time <200ms.
+# Description: Enhance existing performance monitoring (40% complete) by adding percentile calculations (p50, p95) for API response times using existing metrics library.
 # Files to modify: ['src/monitoring/performance.js', 'src/middleware/metrics.js']
 
 print("Implementing: Expand Performance Monitoring to p50/p95 Tracking")

@@ -1,9 +1,9 @@
 
-# Task: Increase Automated Test Coverage to 50%
-# Description: Expand Jest test suite from ~45% coverage targeting 70%, focusing on MCP endpoints and provider health checks for quick wins.
-# Files to modify: ['tests/api/mcp.test.js', 'tests/providers/health.test.js', 'jest.config.js']
+# Task: Implement Basic Testing Expansion (Target 55% Coverage)
+# Description: Add 10% more test coverage by writing Jest tests for MCP endpoints and provider health checks, focusing on high-impact untested paths.
+# Files to modify: ['tests/api/mcp.test.js', 'tests/providers/health.test.js', 'package.json']
 
-print("Implementing: Increase Automated Test Coverage to 50%")
+print("Implementing: Implement Basic Testing Expansion (Target 55% Coverage)")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

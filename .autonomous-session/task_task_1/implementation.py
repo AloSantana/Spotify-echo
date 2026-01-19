@@ -1,9 +1,9 @@
 
-# Task: Complete MongoDB TTL Indexes
-# Description: Finish implementing MongoDB TTL (Time To Live) indexes at 50% progress, targeting documents like logs or sessions that expire after a set time to optimize storage and performance.
-# Files to modify: ['src/db/mongodb.js', 'src/models/Log.js']
+# Task: Complete MongoDB TTL Indexes (finish remaining 50%)
+# Description: Finalize implementation of TTL indexes on MongoDB collections for automatic document expiration (e.g., logs, sessions, temp data) to optimize storage and performance.
+# Files to modify: ['src/db/mongodb.js', 'src/models/*.js']
 
-print("Implementing: Complete MongoDB TTL Indexes")
+print("Implementing: Complete MongoDB TTL Indexes (finish remaining 50%)")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation
