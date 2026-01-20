@@ -1,9 +1,9 @@
 
-# Task: Expand Performance Monitoring to p50/p95 Tracking
-# Description: Enhance existing performance monitoring (40% complete) by adding percentile calculations (p50, p95) for API response times using existing metrics library.
-# Files to modify: ['src/monitoring/performance.js', 'src/middleware/metrics.js']
+# Task: Expand Testing Coverage to 70%
+# Description: Increase automated test coverage from ~45% to >70% target, as marked [ ] in Medium Priority. Focus on Jest tests for MCP endpoints, providers health, and chat interface.
+# Files to modify: ['tests/*.test.js', 'src/api/routes/*.js', 'package.json']
 
-print("Implementing: Expand Performance Monitoring to p50/p95 Tracking")
+print("Implementing: Expand Testing Coverage to 70%")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

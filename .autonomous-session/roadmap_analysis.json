@@ -2,8 +2,8 @@
   "actionable_tasks": [
     {
       "id": "task_1",
-      "title": "Complete MongoDB TTL Indexes (finish remaining 50%)",
-      "description": "Finalize implementation of TTL indexes on MongoDB collections for automatic document expiration (e.g., logs, sessions, temp data) to optimize storage and performance.",
+      "title": "Complete MongoDB TTL Indexes",
+      "description": "Finish implementing MongoDB TTL (Time-To-Live) indexes at 50% progress, as listed in 'In Progress (This Sprint)' with estimated completion Week 2 Jan. This optimizes data retention by automatically expiring old documents like logs or sessions.",
       "priority": "medium",
       "estimated_time": "30-60 minutes",
       "files_to_modify": [
@@ -11,98 +11,93 @@
         "src/models/*.js"
       ],
       "implementation_steps": [
-        "Identify collections needing TTL (e.g., sessions, audit logs)",
-        "Add TTL indexes via MongoDB shell or Mongoose schema: db.collection.createIndex({ \"expiresAt\": 1 }, { expireAfterSeconds: 3600 })",
-        "Test index creation and document auto-deletion",
-        "Update ROADMAP.md status to \u2705 Done"
+        "Identify collections needing TTL (e.g., logs, sessions, temp data)",
+        "Add indexes via MongoDB shell or driver: db.collection.createIndex({ \"createdAt\": 1 }, { expireAfterSeconds: 3600 })",
+        "Test expiration by inserting sample docs and verifying deletion after TTL",
+        "Update schema/docs and run npm run quality:check"
       ],
       "complexity_score": 4
     },
     {
       "id": "task_2",
-      "title": "Expand Performance Monitoring to p50/p95 Tracking",
-      "description": "Enhance existing performance monitoring (40% complete) by adding percentile calculations (p50, p95) for API response times using existing metrics library.",
+      "title": "Expand Testing Coverage to 70%",
+      "description": "Increase automated test coverage from ~45% to >70% target, as marked [ ] in Medium Priority. Focus on Jest tests for MCP endpoints, providers health, and chat interface.",
       "priority": "medium",
-      "estimated_time": "45-90 minutes",
+      "estimated_time": "60-90 minutes",
       "files_to_modify": [
-        "src/monitoring/performance.js",
-        "src/middleware/metrics.js"
+        "tests/*.test.js",
+        "src/api/routes/*.js",
+        "package.json"
       ],
       "implementation_steps": [
-        "Install or use existing stats library (e.g., prometheus-client or simple-histogram)",
-        "Modify metric collection to track response times in buckets",
-        "Implement p50/p95 computation from histogram data",
-        "Expose endpoints /metrics/p50 and /metrics/p95",
-        "Test with load generation and update dashboard",
-        "Update progress in ROADMAP.md to 80%"
+        "Run coverage report: npm test -- --coverage",
+        "Add unit tests for untested functions in chat/Spotify integration (5-10 tests)",
+        "Cover edge cases like provider failover and OAuth errors",
+        "Integrate coverage thresholds in package.json scripts and verify"
       ],
       "complexity_score": 6
     },
     {
       "id": "task_3",
-      "title": "Implement Basic Testing Expansion (Target 55% Coverage)",
-      "description": "Add 10% more test coverage by writing Jest tests for MCP endpoints and provider health checks, focusing on high-impact untested paths.",
+      "title": "Finish Performance Monitoring (p50/p95 Tracking)",
+      "description": "Complete at 40% progress by adding p50/p95 latency tracking to existing basic metrics, targeting API Response Time p95 <200ms.",
       "priority": "medium",
-      "estimated_time": "60-120 minutes",
+      "estimated_time": "45-75 minutes",
       "files_to_modify": [
-        "tests/api/mcp.test.js",
-        "tests/providers/health.test.js",
-        "package.json"
+        "src/monitoring/performance.js",
+        "src/middleware/metrics.js"
       ],
       "implementation_steps": [
-        "Run `npm test -- --coverage` to identify low-coverage files",
-        "Prioritize MCP endpoints and provider failover tests",
-        "Write 10-15 unit/integration tests using Jest/Supertest",
-        "Run coverage report and verify increase to ~55%",
-        "Commit and update test coverage metric in ROADMAP.md"
+        "Use Prometheus or console.time() to capture p50/p95 percentiles",
+        "Instrument key endpoints (e.g., /api/search, LLM calls)",
+        "Log/export metrics to MongoDB dashboard",
+        "Test with load (e.g., artillery) and validate against targets"
       ],
       "complexity_score": 5
     },
     {
       "id": "task_4",
-      "title": "Add AI Transparency Badges to Chat UI",
-      "description": "Implement simple 'AI-Augmented' badges in chat interface for recommendations, using existing multi-provider LLM metadata.",
-      "priority": "high",
-      "estimated_time": "30-45 minutes",
+      "title": "Implement Basic Docker Optimization",
+      "description": "Apply multi-stage builds and caching for Node backend, React frontend, MCP servers as [ ] in Medium Priority, enabling faster deploys.",
+      "priority": "medium",
+      "estimated_time": "60-120 minutes",
       "files_to_modify": [
-        "src/components/ChatMessage.jsx",
-        "src/hooks/useLLM.js"
+        "Dockerfile",
+        "docker-compose.yml",
+        "package.json"
       ],
       "implementation_steps": [
-        "Modify LLM response hook to tag responses with provider source",
-        "Add badge component: <Badge>A I-Augmented ({provider})</Badge>",
-        "Style with glassmorphism matching existing UI",
-        "Test in chat interface with different providers",
-        "Update AI Transparency status in ROADMAP.md"
+        "Create multi-stage Dockerfile: builder stage for deps, runtime for app",
+        "Add .dockerignore and layer caching for node_modules",
+        "Test build: docker build -t echotune . && docker run",
+        "Add docker-compose for local dev stack"
       ],
-      "complexity_score": 3
+      "complexity_score": 7
     },
     {
       "id": "task_5",
-      "title": "Create Simple Dockerfiles for Core Services",
-      "description": "Add basic Dockerfiles for Node backend and React frontend (no multi-stage yet) to enable containerization testing.",
-      "priority": "medium",
-      "estimated_time": "45-75 minutes",
+      "title": "Add AI Transparency & Labeling Badges",
+      "description": "For 'AI Transparency & Labeling' at High priority (\ud83d\udd04 Started), add 'AI-Augmented' badges in UI for recommendations and metadata tagging.",
+      "priority": "high",
+      "estimated_time": "30-60 minutes",
       "files_to_modify": [
-        "Dockerfile.backend",
-        "Dockerfile.frontend",
-        "docker-compose.yml"
+        "src/components/Recommendation.jsx",
+        "src/api/recommendations.js"
       ],
       "implementation_steps": [
-        "Create standard Node Dockerfile: FROM node:20, COPY ., npm ci, npm run build, CMD npm start",
-        "Create React Dockerfile: FROM node:20, npm ci, npm run build, serve -s build",
-        "Add basic docker-compose.yml linking services + MongoDB",
-        "Test locally: docker-compose up",
-        "Update Quality & Containerization section in ROADMAP.md"
+        "Tag responses in backend: add ai_generated: true flag to recs metadata",
+        "UI: Conditional badge <span className='ai-badge'>AI-Augmented</span> in playlist/chat views",
+        "Style with glassmorphism CSS matching settings UI",
+        "Test with sample AI vs human-curated results"
       ],
       "complexity_score": 4
     }
   ],
   "next_research_topics": [
-    "MongoDB TTL index best practices for music recommendation logs",
-    "Node.js p95 latency tracking with Prometheus without external deps",
-    "React badge components for AI transparency labeling (2026 compliance)",
-    "Simple Docker multi-stage builds for React+Node music streaming apps"
+    "Best practices for WebSocket real-time collaborative playlists using Socket.io",
+    "Web Audio API implementation for enhanced audio waveform visualization",
+    "React 19 migration guide focusing on server components for music app",
+    "ML models for microgenre discovery using Spotify audio features"
   ],
-  "completion_percentage": 68
+  "completion_percentage": 65
 }
