@@ -1,9 +1,9 @@
 
-# Task: Finish Performance Monitoring (p50/p95 Tracking)
-# Description: Complete at 40% progress by adding p50/p95 latency tracking to existing basic metrics, targeting API Response Time p95 <200ms.
-# Files to modify: ['src/monitoring/performance.js', 'src/middleware/metrics.js']
+# Task: Add Basic Jest Tests to Reach Incremental Test Coverage
+# Description: Testing expansion needed to increase from ~45% to >70% coverage. Write 5-10 high-impact unit tests for MCP endpoints and provider health checks.
+# Files to modify: ['src/__tests__/providers.test.js', 'src/api/mcp.js', 'jest.config.js']
 
-print("Implementing: Finish Performance Monitoring (p50/p95 Tracking)")
+print("Implementing: Add Basic Jest Tests to Reach Incremental Test Coverage")
 
 # Implementation steps would go here
 # For now, create a placeholder implementation

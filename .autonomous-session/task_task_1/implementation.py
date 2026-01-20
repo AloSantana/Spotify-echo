@@ -1,7 +1,7 @@
 
 # Task: Complete MongoDB TTL Indexes
-# Description: Finish implementing MongoDB TTL (Time-To-Live) indexes at 50% progress, as listed in 'In Progress (This Sprint)' with estimated completion Week 2 Jan. This optimizes data retention by automatically expiring old documents like logs or sessions.
-# Files to modify: ['src/db/mongodb.js', 'src/models/*.js']
+# Description: Finish implementing MongoDB TTL indexes at 50% progress. Add TTL indexes for expiring temporary data like user sessions, chat histories, or logs to automatically clean up old records and improve performance.
+# Files to modify: ['src/db/mongodb.js', 'src/models/Session.js', 'src/models/ChatLog.js']
 
 print("Implementing: Complete MongoDB TTL Indexes")
 
