@@ -218,7 +218,7 @@ function main() {
   fs.mkdirSync(path.dirname(reportPath), { recursive: true });
   fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
   
-  console.log(`\n💾 Detailed report saved to: reports/duplicate-routes-analysis.json`);
+  console.log('\n💾 Detailed report saved to: reports/duplicate-routes-analysis.json');
   console.log('\n✨ Analysis complete!\n');
 }
 

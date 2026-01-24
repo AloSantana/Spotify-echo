@@ -93,7 +93,7 @@ app.use('/api/*', (req, res) => {
 });
 
 // Error handling middleware
-// eslint-disable-next-line no-unused-vars
+ 
 app.use((error, req, res, _next) => {
   console.error('API Error:', error);
   
