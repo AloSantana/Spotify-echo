@@ -1,5 +1,7 @@
 # 🎵 EchoTune AI - Spotify Music Discovery Platform
 
+> **🚨 CODING AGENT INSTRUCTIONS:** Please refer to the [Coding Agent Workflow](CODING_AGENT_WORKFLOW.md) for the "Fresh Start" protocols and cleanup checklist before making changes.
+
 <div align="center">
 
 ![EchoTune AI Logo](https://via.placeholder.com/150x150/007ACC/FFFFFF?text=🎵)
@@ -60,7 +62,7 @@ npm run qa:full     # Comprehensive automation
 
 ## 🌟 What is EchoTune AI?
 
-EchoTune AI is a comprehensive music discovery platform that combines Spotify's vast music catalog with AI-powered recommendations and conversational search. The platform provides personalized music discovery through hybrid recommendation algorithms, natural language chat interfaces, and comprehensive user preference management.
+EchoTune AI is a comprehensive music discovery platform that combines Spotify's vast music catalog with AI-powered recommendations and conversational search. The platform provides personalized music experiences through a modern web interface.
 
 **✨ NEW: Modernized Chat-First Architecture** - Complete platform overhaul with PostgreSQL integration, advanced AI provider management, and natural language Spotify control!
 
@@ -291,7 +293,7 @@ sequenceDiagram
 
 ### Prerequisites
 
-> **⚠️ Important**: Node.js **20.x LTS** is the recommended and tested version. While Node 18.x is the minimum requirement, Node 20.x provides better compatibility with all dependencies (Prisma 6.x, Vite 7.x, React 19, Playwright 1.56+).
+> **⚠️ Important**: Node.js **20.x LTS** is the recommended and tested version. While Node 18.x is the minimum requirement, Node 20.x provides better compatibility with all dependencies (Prisma, etc.).
 
 **Required:**
 - **Node.js 20.x LTS** (recommended - see `.nvmrc`)
@@ -562,7 +564,7 @@ git clone https://github.com/primoscope/Spotify-echo.git
 cd Spotify-echo
 
 # Run automated setup script
-.\scripts\windows\setup.ps1
+.scriptslash-windowsun.ps1
 ```
 
 **3. Configure Environment**
@@ -574,7 +576,7 @@ notepad .env
 **4. Run the Application**
 ```powershell
 # Using PowerShell script
-.\scripts\windows\run.ps1
+.scriptslash-windowsun.ps1
 
 # Or using npm directly
 npm start
@@ -583,28 +585,28 @@ npm start
 **5. Run Tests**
 ```powershell
 # Smoke tests
-.\scripts\windows\test.ps1 -Type smoke
+.scriptslash-windows	est.ps1 -Type smoke
 
 # All E2E tests
-.\scripts\windows\test.ps1 -Type e2e
+.scriptslash-windows	est.ps1 -Type e2e
 
 # All tests
-.\scripts\windows\test.ps1 -Type all
+.scriptslash-windows	est.ps1 -Type all
 ```
 
 **6. Docker on Windows**
 ```powershell
 # Build image
-.\scripts\windows\docker.ps1 -Action build
+.scriptslash-windowsuild.ps1
 
 # Run container
-.\scripts\windows\docker.ps1 -Action run
+.scriptslash-windowsun.ps1
 
 # View logs
-.\scripts\windows\docker.ps1 -Action logs
+.scriptslash-windowsun.ps1
 
 # Stop container
-.\scripts\windows\docker.ps1 -Action stop
+.scriptslash-windowsun.ps1
 ```
 
 📖 **Full Windows Documentation**: See [docs/WINDOWS_SETUP.md](docs/WINDOWS_SETUP.md) for comprehensive Windows setup, troubleshooting, and best practices.
@@ -633,7 +635,6 @@ npm ERR! Actual:   { node: 'v12.22.9', npm: '8.5.1' }
    node --version  # Should show v20.x.x
    npm --version   # Should show 10.x.x or higher
    ```
-
 2. **Check `.nvmrc` for recommended version:**
    ```bash
    # Use the project's recommended version
@@ -641,7 +642,6 @@ npm ERR! Actual:   { node: 'v12.22.9', npm: '8.5.1' }
    # or
    nvm install
    ```
-
 3. **If you don't have nvm:**
    - Download Node.js 20.x LTS from [nodejs.org](https://nodejs.org/)
    - Or use package managers:
@@ -665,7 +665,7 @@ node --version  # Must be >=18.0.0
 # 3. Clean install (recommended for CI/CD)
 npm ci
 
-# Or regular install
+# 4. Or regular install
 npm install
 ```
 
@@ -678,7 +678,7 @@ npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supp
 npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
 ```
 
-**Solution:** These are **warnings** from transitive dependencies and do **NOT** prevent installation or operation. They can be safely ignored. The maintainers will update these in future releases. Your installation will complete successfully despite these warnings.
+**Solution:** These are **warnings** from transitive dependencies and do **NOT** prevent installation or operation. They can be safely ignored. The maintainers will update these in future releases.
 
 #### MCP Server Dependencies
 
@@ -736,238 +736,6 @@ docker run --rm node:20-alpine node --version
 **Problem:** "Cannot find module 'dotenv'" or similar errors
 
 **Solution:**
-```bash
-# You skipped npm install - run it now
-npm install
-
-# Then start the application
-npm start
-```
-
-**Problem:** "Missing environment variable" errors
-
-**Solution:**
-```bash
-# 1. Copy example environment file
-cp .env.example .env
-
-# 2. Edit .env with your credentials
-# At minimum, you need:
-# - SPOTIFY_CLIENT_ID
-# - SPOTIFY_CLIENT_SECRET
-# - MONGODB_URI
-
-# 3. Validate environment
-npm run validate:env
-```
-
-#### Setup Script Issues
-
-**Problem:** Getting "command not found" when trying to run setup scripts
-
-**Common Issues:**
-
-1. **Running PowerShell script from bash/WSL:**
-   ```bash
-   # ❌ WRONG - Trying to run PowerShell script from bash
-   .\scripts\windows\setup.ps1
-   # Error: .scriptswindowssetup.ps1: command not found
-   ```
-   
-   **Solution:** Use the correct script for your environment:
-   ```bash
-   # ✅ For Linux/WSL (bash):
-   ./install-ubuntu.sh
-   
-   # ✅ For Windows PowerShell:
-   # Open PowerShell and run:
-   .\scripts\windows\setup.ps1
-   ```
-
-2. **Script not executable:**
-   ```bash
-   # If script isn't executable
-   chmod +x install-ubuntu.sh
-   ./install-ubuntu.sh
-   ```
-
-3. **Using npm install (simplest approach):**
-   ```bash
-   # Skip all setup scripts - just use npm directly
-   npm install
-   npm start
-   ```
-
-**Platform-Specific Setup Entrypoints:**
-- **Linux/Ubuntu/WSL:** `./install-ubuntu.sh` or just `npm install`
-- **Windows PowerShell:** `.\scripts\windows\setup.ps1` or just `npm install`
-- **macOS:** `npm install` (uses same script as Linux if needed)
-
-#### Still Having Issues?
-
-1. Check existing [GitHub Issues](https://github.com/primoscope/Spotify-echo/issues)
-2. Review [CONTRIBUTING.md](CONTRIBUTING.md) for detailed troubleshooting
-3. Open a new issue with:
-   - Node version: `node --version`
-   - npm version: `npm --version`
-   - Operating system
-   - Full error message
-   - Steps to reproduce
-
-### 🐳 Docker Installation
-
-You can run EchoTune AI using Docker for a containerized setup:
-
-```bash
-# Build and start with docker compose
-docker compose up --build
-
-# Or run in detached mode
-docker compose up --build -d
-
-# Check container health
-curl -fsS http://localhost:3000/health
-
-# View logs
-docker compose logs -f app
-
-# Stop containers
-docker compose down
-```
-
-**Docker Environment Variables:**
-- Create a `.env` file in the project root with your configuration
-- The Docker setup includes MongoDB and Redis containers
-- The app container runs as non-root user for security
-- Health checks are configured on `/health` endpoint
-
-**Troubleshooting Docker:**
-- Ensure ports 3000, 27017 (MongoDB), and 6379 (Redis) are available
-- Check logs with `docker compose logs app` for errors
-- Verify `.env` file exists and contains required variables
-- Use `docker compose down -v` to reset volumes if needed
-
-### 🔐 Authentication Testing
-
-Test your Spotify setup before full launch:
-
-#### Validate Configuration
-```bash
-# Check auth health (should show clientConfigured: true)
-curl http://localhost:3000/auth/health
-
-# Test client credentials (should connect to Spotify API)
-npm run auth:test-credentials
-```
-
-#### Manual OAuth Flow
-```bash
-# Generate authorization URL
-npm run auth:url
-# Copy URL, visit in browser, authorize app, copy code from callback
-
-# Exchange code for tokens (replace <your-code>)
-npm run auth:exchange -- --code=<your-code>
-```
-
-### First Run Experience
-
-1. **Validate Setup**: Run `npm run auth:test-credentials` to ensure Spotify connection
-2. **Connect Spotify**: Click "Login with Spotify" to complete OAuth flow
-3. **Configure Settings**: Visit `/settings.html` to set music preferences  
-4. **Start Chatting**: Use `/chat` to begin AI-powered music discovery
-5. **Explore Data**: Admin panel at `/admin.html` shows analytics
-
-### 🎵 Spotify Playback Setup
-
-EchoTune AI provides full playback control when connected to Spotify. Follow these steps to enable music playback:
-
-#### Activating an "Active Device"
-
-Spotify requires an **active device** to control playback. An active device is any Spotify-enabled device currently playing music.
-
-**Quick Setup:**
-1. Open Spotify on **any device** (phone, computer, tablet, smart speaker)
-2. **Start playing any song** (this makes the device "active")
-3. Return to EchoTune AI and use the playback controls
-
-**Supported Devices:**
-- 📱 **Mobile**: Spotify mobile app (iOS/Android)
-- 💻 **Desktop**: Spotify desktop app (Windows/Mac/Linux)
-- 🌐 **Web Player**: [open.spotify.com](https://open.spotify.com)
-- 🔊 **Smart Speakers**: Alexa, Google Home, etc.
-- 🎧 **Hardware**: Spotify Connect-enabled devices
-
-#### Available Playback Controls
-
-Once you have an active device, you can use:
-
-- ▶️ **Play/Pause** - Start or stop playback
-- ⏭️ **Next Track** - Skip to next song
-- ⏮️ **Previous Track** - Go to previous song  
-- 📱 **Device Transfer** - Switch playback between devices
-- 📋 **Device List** - View all available Spotify devices
-
-#### Testing Playback Controls
-
-```bash
-# Check available devices (requires login)
-npm run spotify:devices
-
-# Example API calls (after authentication)
-curl -X GET "http://localhost:3000/api/spotify/devices"
-curl -X POST "http://localhost:3000/api/spotify/next"
-```
-
-#### "No Active Device" Troubleshooting
-
-If you see **"No active device found"**:
-
-1. ✅ **Start music on any device**: Open Spotify and press play
-2. ✅ **Wait a moment**: Can take 10-30 seconds for device to register
-3. ✅ **Refresh the page**: Device list updates when UI loads
-4. ✅ **Check device is online**: Ensure device has internet connection
-
-**Quick Test Workflow:**
-1. Open [open.spotify.com](https://open.spotify.com) in another tab
-2. Play any song
-3. Return to EchoTune AI
-4. Try the playback controls - they should work immediately!
-
-### 🔧 Troubleshooting
-
-#### Common Issues
-
-**"SPOTIFY_CLIENT_ID not configured"**
-- Ensure `.env` file exists with valid credentials
-- Check Spotify Developer Dashboard for correct Client ID
-
-**"Invalid redirect URI"**  
-- Verify redirect URI in Spotify app settings exactly matches the one shown by `npm run auth:url`
-- For local development: `http://localhost:3000/auth/callback` (or your custom PORT)
-- For production: Set `SPOTIFY_REDIRECT_URI` in `.env` to match your deployed domain
-- Check for trailing slashes or protocol mismatches (http vs https)
-- **Important**: The redirect URI must be added to your Spotify Developer Dashboard:
-  1. Go to https://developer.spotify.com/dashboard
-  2. Select your app
-  3. Click "Edit Settings"
-  4. Add the exact redirect URI to "Redirect URIs" section
-  5. Click "Save"
-
-**"Invalid client" during OAuth**
-- Double-check Client ID and Client Secret are correct
-- Ensure Client Secret is kept private and not exposed
-
-**"Access denied" during authorization**
-- App may be in development mode (limited to 25 users)
-- Submit quota extension request in Spotify Dashboard
-
-**Token refresh errors**
-- Tokens automatically refresh when expiring
-- Check server logs for refresh errors
-- May need to re-authorize if refresh token expires
-
-**"Cannot find module 'dotenv'" or other module errors on startup**
 - **First time setup**: Run `npm install` to install all dependencies
 - **After updating**: Run `npm install` to install new dependencies
 - If issue persists, try `rm -rf node_modules package-lock.json && npm install`
@@ -978,7 +746,7 @@ If you see **"No active device found"**:
   - OpenTelemetry packages for observability
   - See `package.json` for complete list
 
-**"SyntaxError: Unexpected token '?'" or "Unexpected token '='" during npm install**
+**Problem:** "SyntaxError: Unexpected token '?" or "Unexpected token '='" during npm install**
 - **Cause**: Your Node.js version is too old (likely 12.x, 14.x, or 16.x)
 - **Specific error**: This typically occurs in `@prisma/debug` or `@prisma/engines` due to nullish coalescing operator (`??=`) which requires Node.js 14.4+
 - **Fix**: Upgrade to Node.js 18 or higher (20.x or 22.x recommended)
@@ -998,367 +766,3 @@ If you see **"No active device found"**:
 
 **OpenTelemetry warnings**
 - If you see "OpenTelemetry modules not available" - run `npm install`
-- These warnings are informational and won't prevent startup
-- Full tracing requires all OpenTelemetry packages installed
-
-#### Health Checks
-
-```bash
-# Check overall auth health  
-curl http://localhost:3000/auth/health
-
-# Check server status
-curl http://localhost:3000/health
-
-# Validate environment variables
-npm run validate:env
-```
-
-#### Getting Help
-
-1. Check the [Spotify Web API Documentation](https://developer.spotify.com/documentation/web-api/)
-2. Review server logs for detailed error messages
-3. Use development tools in your browser to inspect network requests
-4. For issues with this app, check existing GitHub issues
-
-## 🔧 Troubleshooting
-
-### Common Errors and Solutions
-
-#### Error: "Prisma client did not initialize yet"
-
-**Problem**: Prisma client not generated before server starts.
-
-**Solution**:
-```bash
-# 1. Ensure POSTGRES_URL is set in .env
-echo $POSTGRES_URL
-
-# 2. Generate Prisma client
-npm run db:generate
-
-# 3. Initialize database
-npm run db:init
-
-# 4. Restart server
-npm start
-```
-
-#### Error: "OpenTelemetry tracing error: Class extends value undefined"
-
-**Problem**: OpenTelemetry package version mismatch (non-fatal).
-
-**Solution**: This error is now caught gracefully and won't prevent startup. To disable tracing warnings:
-```bash
-# Add to .env
-ENABLE_TRACING=false
-```
-
-#### Error: "ECONNREFUSED ::1:5432" or "Cannot connect to PostgreSQL"
-
-**Problem**: PostgreSQL is not running or connection URL is incorrect.
-
-**Solution**:
-```bash
-# Check if PostgreSQL is running (Docker)
-docker ps | grep postgres
-
-# Start PostgreSQL (Docker)
-docker start echotune-postgres
-
-# Or create new container
-docker run --name echotune-postgres \
-  -e POSTGRES_PASSWORD=password \
-  -e POSTGRES_DB=echotune \
-  -p 5432:5432 -d postgres:15
-
-# Test connection
-psql postgresql://postgres:password@localhost:5432/echotune -c "SELECT version();"
-
-# Update .env with correct URL
-POSTGRES_URL=postgresql://postgres:password@localhost:5432/echotune
-```
-
-#### Error: "MongoDB connection failed" 
-
-**Problem**: MongoDB not available (this is OK - app has SQLite fallback).
-
-**Expected Behavior**:
-```
-✅ SQLite fallback database ready
-📦 Database running in fallback mode (sqlite)
-```
-
-MongoDB is optional. If you see this, the app is working correctly with SQLite.
-
-#### Error: "Cannot find module 'dotenv'"
-
-**Problem**: Dependencies not installed.
-
-**Solution**:
-```bash
-# Install dependencies
-npm install
-
-# Verify installation
-npm list dotenv
-```
-
-#### Error: "Port 3000 already in use"
-
-**Problem**: Another process is using port 3000.
-
-**Solution**:
-```bash
-# Find process using port 3000
-lsof -i :3000  # Linux/macOS
-netstat -ano | findstr :3000  # Windows
-
-# Kill the process
-kill -9 <PID>  # Linux/macOS
-taskkill /PID <PID> /F  # Windows
-
-# Or change port in .env
-PORT=3001
-```
-
-#### Slow Performance on Windows
-
-**Problem**: Running from `/mnt/c/` in WSL.
-
-**Solution**: Move project to WSL filesystem:
-```bash
-# In WSL
-cd ~
-git clone https://github.com/primoscope/Spotify-echo.git
-cd Spotify-echo
-```
-
-For more detailed troubleshooting, see:
-- **[WSL Setup Guide](docs/WSL-SETUP.md)** for Windows-specific issues
-- **[Development Guide](docs/DEVELOPMENT.md)** for development-related problems
-
-## 🔧 Environment Variables
-
-### Core Configuration
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `MONGODB_URI` | ✅ | - | MongoDB connection string |
-| `SPOTIFY_CLIENT_ID` | ✅ | - | Spotify API client ID |
-| `SPOTIFY_CLIENT_SECRET` | ✅ | - | Spotify API client secret |
-
-### AI Provider Configuration
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `GEMINI_API_KEY` | One required | - | Google Gemini API key |
-| `OPENAI_API_KEY` | One required | - | OpenAI API key |
-| `OPENROUTER_API_KEY` | One required | - | OpenRouter API key |
-| `DEFAULT_LLM_PROVIDER` | No | `gemini` | Preferred AI provider |
-
-### Optional Features
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `REDIS_URL` | No | - | Redis for caching |
-| `NODE_ENV` | No | `development` | Environment mode |
-| `PORT` | No | `3000` | Server port |
-
-## 🤖 MCP Integration
-
-EchoTune AI includes a comprehensive MCP (Model Context Protocol) ecosystem that runs automatically during development to enhance productivity:
-
-### Automatic Integration
-
-- **🔧 Package Management**: Automated dependency updates and security scanning
-- **📊 Analytics Server**: Real-time performance monitoring and insights
-- **🧪 Testing Automation**: Continuous validation and quality assurance
-- **📁 File Operations**: Secure file handling with directory scoping
-- **🌐 Browser Automation**: UI testing and screenshot capabilities
-
-### Validation
-
-MCP servers are automatically validated during CI/CD. Manual validation:
-
-```bash
-# Quick MCP health check
-bash scripts/mcp-smoke-test.sh
-
-# Comprehensive validation
-npm run mcp:validate:all
-```
-
-For detailed MCP information, see: [MCP Quick Test Guide](docs/MCP_QUICKTEST.md)
-
-## 🗺️ Roadmap
-
-| Phase | Feature | Status | Target | Notes |
-|-------|---------|--------|--------|-------|
-| **Phase 1** | Core Platform | ✅ DONE | Q4 2024 | Spotify integration, basic chat |
-| **Phase 2** | Hybrid Algorithms | 🚧 IN PROGRESS | Q1 2025 | ML recommendation engine |
-| **Phase 3** | User Settings | ✅ DONE | Q4 2024 | Personalization system |
-| **Phase 4** | Real-time Features | 📋 PLANNED | Q2 2025 | Live recommendations |
-| **Phase 5** | PWA & Mobile | 📋 PLANNED | Q2 2025 | Offline capabilities |
-| **Phase 6** | Social Features | 📋 PLANNED | Q3 2025 | Shared playlists |
-
-For detailed roadmap information, see: [Detailed Roadmap](docs/ROADMAP.md)
-
-## 📊 Current Status Snapshot
-
-What works today when you run the application:
-
-- ✅ **Spotify Login**: Complete OAuth flow with token management
-- ✅ **Music Control**: Play, pause, skip tracks via Spotify Web API
-- ✅ **Chat Interface**: Ask for music in natural language
-- ✅ **User Settings**: Save and retrieve personalized preferences
-- ✅ **Analytics View**: Browse 200K+ listening history records
-- ✅ **Admin Dashboard**: System health and usage statistics
-- ✅ **API Endpoints**: 27+ functional REST API routes
-- ⚠️ **Recommendations**: Basic implementation (hybrid algorithms in development)
-
-## 🤝 Contributing
-
-We welcome contributions! Here's how to get started:
-
-### Development Setup
-
-1. **Fork & Clone**: Fork the repository and clone locally
-2. **Environment**: Copy `.env.example` to `.env` and configure
-3. **Dependencies**: Run `npm install` to install packages
-4. **Database**: Set up MongoDB Atlas or local instance
-5. **Spotify App**: Create Spotify application for API credentials
-
-### Adding New Features
-
-- **API Routes**: Add to `src/api/routes/`
-- **Frontend Pages**: Add to `public/`
-- **Database Models**: Follow existing MongoDB schema patterns
-- **AI Providers**: Extend the multi-provider chat system
-
-### MCP Server Development
-
-To add new MCP servers:
-
-1. Create server in `mcp-servers/your-server/`
-2. Follow existing patterns for server structure
-3. Add health checks and validation
-4. Update orchestrator configuration
-5. Test with smoke test suite
-
-For detailed guidelines, see: [Contributing Guide](CONTRIBUTING.md)
-
-## 🧪 Testing & Validation
-
-EchoTune AI includes a comprehensive test suite that validates installation, configuration, APIs, authentication, and UI components.
-
-### Quick Test Commands
-
-```bash
-# Run complete test suite
-npm run test:comprehensive
-
-# Run individual test components
-npm run test:installation        # Validate dependencies & setup
-node scripts/env-validate.js     # Check environment configuration
-node scripts/comprehensive-api-testing.js  # Test all APIs
-```
-
-### What Gets Tested
-
-- ✅ **Installation & Setup**: Node.js, npm, Python, dependencies, project structure
-- ✅ **Environment & Configuration**: Required variables, placeholder detection, API keys
-- ✅ **APIs & Services**: Spotify, MongoDB, Redis, LLM providers, infrastructure services
-- ✅ **Authentication & Security**: OAuth flows, JWT tokens, session management
-- ✅ **UI & Screenshots**: All pages, responsive design, error states
-
-### Test Reports
-
-All tests generate detailed reports in two formats:
-
-- **JSON Reports** (`reports/*.json`): Machine-readable, schema v2 compliant
-- **Markdown Reports** (`reports/*.md`): Human-readable summaries
-- **Main Report**: `COMPREHENSIVE_TEST_REPORT.md` (copied to root)
-
-### Documentation
-
-- **[📚 Comprehensive Test Guide](docs/COMPREHENSIVE_TEST_GUIDE.md)** - Detailed test documentation
-- **[🧪 Testing README](TESTING_README.md)** - Quick reference guide
-- **[📋 Test Strategy](docs/TEST_STRATEGY.md)** - Testing architecture and philosophy
-
-### CI/CD Integration
-
-The test suite integrates seamlessly with GitHub Actions. See `.github/workflows/comprehensive-tests.yml` for the workflow configuration.
-
-```yaml
-# Example: Run tests on push
-- name: Run Comprehensive Tests
-  run: npm run test:comprehensive
-  env:
-    MONGODB_URI: ${{ secrets.MONGODB_URI }}
-    SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
-    # ... other secrets
-```
-
-For more details, see [Comprehensive Test Guide](docs/COMPREHENSIVE_TEST_GUIDE.md).
-
-## 📖 Documentation
-
-### Quick Links
-
-- **[🤖 AI Platform](docs/AI_PLATFORM.md)** - Multi-provider AI integration and routing
-- **[🧠 Coding Agent](docs/CODING_AGENT.md)** - GitHub agent workflows and commands  
-- **[🔧 MCP Integration](docs/MCP_QUICKTEST.md)** - Model Context Protocol server validation
-- **[🗺️ Roadmap](docs/ROADMAP.md)** - Detailed development roadmap
-- **[🤝 Contributing](CONTRIBUTING.md)** - Development guidelines and setup
-
-### Technical Documentation
-
-- **[📊 Data Management](docs/guides/DATA_MANAGEMENT.md)** - MongoDB schema and data handling
-- **[⚙️ User Settings](docs/USER_SETTINGS.md)** - Settings system API and implementation
-- **[🔒 Environment Config](docs/config/environment_variables.md)** - Complete variable reference
-- **[🔗 API Reference](docs/api/)** - REST API documentation
-
----
-
-**Ready to discover music with AI?** Start with our [Quick Start Guide](#-quick-start) and join the future of intelligent music discovery!
-
----
-
-## 📚 Documentation Links
-
-### Core Documentation
-- **[📖 Main Documentation](docs/README.md)** - Comprehensive documentation index
-- **[🚀 Quick Start Guide](docs/QUICK_START.md)** - Get started in 5 minutes
-- **[🛠️ Setup Entrypoints](SETUP-ENTRYPOINTS.md)** - Platform-specific setup commands reference
-- **[📝 Setup Guide](SETUP.md)** - Detailed installation instructions and troubleshooting
-- **[🏗️ Architecture Guide](docs/ARCHITECTURE.md)** - System architecture and design
-- **[📊 Data Model](docs/DATA_MODEL.md)** - Database schemas and structures
-- **[🔧 API Documentation](docs/API_DOCUMENTATION.md)** - Complete API reference
-
-### Developer Guides
-- **[👥 Contributing Guide](docs/CONTRIBUTING.md)** - How to contribute to the project
-- **[🧪 Testing Guide](docs/TESTING_POLICY.md)** - Testing standards and procedures
-- **[🔒 Security Guide](docs/SECRETS.md)** - Security configuration and best practices
-- **[📋 Coding Standards](docs/guides/coding-standards.md)** - Code style and conventions
-
-### Advanced Features
-- **[🤖 AI Platform Integration](docs/AI_PLATFORM.md)** - Multi-provider AI configuration
-- **[🧠 GitHub Coding Agent](docs/CODING_AGENT.md)** - Automated development workflows
-- **[🔧 MCP Integration](docs/MCP_INTEGRATION.md)** - Model Context Protocol servers
-- **[⚡ MCP Quick Test](docs/MCP_QUICKTEST.md)** - Rapid MCP validation
-- **[🗺️ Roadmap](docs/ROADMAP.md)** - Development roadmap and milestones
-
-### Agent Instructions & Automation
-- **[🤖 Agent Instructions](docs/guides/AGENTS.md)** - AI agent development guidelines
-- **[🔄 GitHub Automation](docs/guides/github-automation.md)** - Automated workflows and CI/CD
-- **[📝 Workflow Guide](docs/guides/WORKFLOW_GUIDE.md)** - Development workflow documentation
-- **[⌨️ Copilot Commands](docs/guides/COPILOT_SLASH_COMMANDS.md)** - GitHub Copilot slash commands
-
-### Deployment & Production
-- **[🚀 Production Guide](docs/PRODUCTION_READINESS_GUIDE.md)** - Production deployment checklist
-- **[🐳 Docker Deployment](docs/deployment/DOCKER.md)** - Containerized deployment
-- **[☁️ Vercel Deployment](docs/DEPLOYMENT_VERCEL.md)** - Serverless deployment guide
-- **[🔧 Performance Optimization](docs/guides/production-optimization.md)** - Performance tuning guide
-
-
