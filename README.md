@@ -1,6 +1,6 @@
 # 🎵 EchoTune AI - Spotify Music Discovery Platform
 
-> **🚨 CODING AGENT INSTRUCTIONS:** Please refer to the [Coding Agent Workflow](CODING_AGENT_WORKFLOW.md) for the "Fresh Start" protocols and cleanup checklist before making changes.
+> **🛑 DEVELOPMENT NOTICE**: This repository is undergoing a "Fresh Start" modernization. Please refer to the [Coding Agent Workflow](CODING_AGENT_WORKFLOW.md) for the new development standards and cleanup instructions.
 
 <div align="center">
 
@@ -22,7 +22,7 @@
 <!-- QA-AUTOMATION-START -->
 ## 🧪 Latest QA Automation Results
 
-**Last Run:** 2025-10-13  
+**Last Run:** 2025-10-13 03:34:28   
 **Duration:** 43.21s  
 **Status:** ⚠️ ISSUES DETECTED
 
@@ -62,7 +62,7 @@ npm run qa:full     # Comprehensive automation
 
 ## 🌟 What is EchoTune AI?
 
-EchoTune AI is a comprehensive music discovery platform that combines Spotify's vast music catalog with AI-powered recommendations and conversational search. The platform provides personalized music experiences through a modern web interface.
+EchoTune AI is a comprehensive music discovery platform that combines Spotify's vast music catalog with AI-powered recommendations and conversational search. The platform provides personalized music recommendations based on your listening history, mood, and preferences.
 
 **✨ NEW: Modernized Chat-First Architecture** - Complete platform overhaul with PostgreSQL integration, advanced AI provider management, and natural language Spotify control!
 
@@ -293,7 +293,7 @@ sequenceDiagram
 
 ### Prerequisites
 
-> **⚠️ Important**: Node.js **20.x LTS** is the recommended and tested version. While Node 18.x is the minimum requirement, Node 20.x provides better compatibility with all dependencies (Prisma, etc.).
+> **⚠️ Important**: Node.js **20.x LTS** is the recommended and tested version. While Node 18.x is the minimum requirement, Node 20.x provides better compatibility with all dependencies (Prisma 6.x, Vite 7.x).
 
 **Required:**
 - **Node.js 20.x LTS** (recommended - see `.nvmrc`)
@@ -472,297 +472,3 @@ curl http://localhost:3000/health
 # Access the application at http://localhost:3000
 # Chat interface loads as the default page ✨ NEW
 ```
-
-### 🎵 Using Natural Language Spotify Commands ✨ NEW
-
-Once you've authenticated with Spotify, you can control playback using natural language in the chat:
-
-```
-"play some energetic rock music"
-"pause"
-"skip to the next song"
-"add Blinding Lights to the queue"
-"what's playing?"
-"turn on shuffle"
-"set volume to 70%"
-"switch to my phone"
-```
-
-See [Spotify Integration Guide](docs/SPOTIFY_INTEGRATION.md) for complete command reference.
-
-#### Windows 11 + WSL Setup
-
-If you're using Windows 11 with WSL (Windows Subsystem for Linux), follow these guidelines for optimal performance:
-
-**1. Use WSL2 and Ubuntu Terminal**
-```bash
-# Ensure you're using WSL2 (recommended for better file system performance)
-wsl --set-default-version 2
-wsl --install -d Ubuntu
-```
-
-**2. Store Repository in Linux Filesystem**
-```bash
-# Store repo in your Linux home directory (not /mnt/c/)
-# This provides better file watching and performance
-cd ~
-mkdir -p ~/projects
-cd ~/projects
-git clone https://github.com/primoscope/Spotify-echo.git
-cd Spotify-echo
-```
-
-**3. Line Endings Configuration**
-```bash
-# Configure Git to use LF line endings (prevents CRLF issues)
-git config --global core.autocrlf false
-```
-Alternatively, the repository includes a `.gitattributes` file to enforce LF endings.
-
-**4. Node.js Version**
-```bash
-# Ensure Node.js 20.x is installed
-node --version  # Should show v20.x.x
-
-# If not, install Node.js 20.x using nvm:
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-source ~/.bashrc
-nvm install 20
-nvm use 20
-```
-
-**5. Opening URLs from WSL**
-```bash
-# If `open` or `xdg-open` commands don't work in WSL:
-# 1. Copy the URL shown in the terminal
-# 2. Manually paste it into your Windows browser
-# Example: http://localhost:3000
-
-# Or configure WSL to open URLs in Windows browser:
-export BROWSER=wslview  # If you have wslu installed
-```
-
-**6. Common WSL Pitfalls**
-- ❌ Don't store the repo in `/mnt/c/Users/...` (Windows filesystem) - slower and file watching may not work
-- ✅ Do store the repo in `~/projects/...` (Linux filesystem) - faster and reliable file watching
-- ✅ Always run `npm install` and `npm start` from within WSL terminal (not Windows Command Prompt)
-- ✅ Access the app via `http://localhost:3000` from your Windows browser
-
-#### Native Windows Setup (PowerShell)
-
-For native Windows development without WSL, we provide PowerShell scripts for a smooth experience:
-
-**1. Prerequisites**
-- Node.js 18+ from [nodejs.org](https://nodejs.org/)
-- Git for Windows from [git-scm.com](https://git-scm.com/download/win)
-- (Optional) Docker Desktop for Windows from [docker.com](https://www.docker.com/products/docker-desktop)
-
-**2. Quick Setup with PowerShell**
-```powershell
-# Clone repository
-git clone https://github.com/primoscope/Spotify-echo.git
-cd Spotify-echo
-
-# Run automated setup script
-.scriptslash-windowsun.ps1
-```
-
-**3. Configure Environment**
-```powershell
-# Edit .env file with your configuration
-notepad .env
-```
-
-**4. Run the Application**
-```powershell
-# Using PowerShell script
-.scriptslash-windowsun.ps1
-
-# Or using npm directly
-npm start
-```
-
-**5. Run Tests**
-```powershell
-# Smoke tests
-.scriptslash-windows	est.ps1 -Type smoke
-
-# All E2E tests
-.scriptslash-windows	est.ps1 -Type e2e
-
-# All tests
-.scriptslash-windows	est.ps1 -Type all
-```
-
-**6. Docker on Windows**
-```powershell
-# Build image
-.scriptslash-windowsuild.ps1
-
-# Run container
-.scriptslash-windowsun.ps1
-
-# View logs
-.scriptslash-windowsun.ps1
-
-# Stop container
-.scriptslash-windowsun.ps1
-```
-
-📖 **Full Windows Documentation**: See [docs/WINDOWS_SETUP.md](docs/WINDOWS_SETUP.md) for comprehensive Windows setup, troubleshooting, and best practices.
-
-### 🔧 Troubleshooting Installation
-
-#### Node.js Version Issues
-
-**Problem:** Installation fails with engine compatibility errors
-
-```
-npm ERR! engine Unsupported engine
-npm ERR! Required: { node: '>=18.0.0' }
-npm ERR! Actual:   { node: 'v12.22.9', npm: '8.5.1' }
-```
-
-**Solution:**
-1. **Upgrade to a supported Node.js version:**
-   ```bash
-   # Using nvm (recommended)
-   nvm install 20
-   nvm use 20
-   nvm alias default 20
-   
-   # Verify installation
-   node --version  # Should show v20.x.x
-   npm --version   # Should show 10.x.x or higher
-   ```
-2. **Check `.nvmrc` for recommended version:**
-   ```bash
-   # Use the project's recommended version
-   nvm use
-   # or
-   nvm install
-   ```
-3. **If you don't have nvm:**
-   - Download Node.js 20.x LTS from [nodejs.org](https://nodejs.org/)
-   - Or use package managers:
-     - Ubuntu/Debian: `sudo apt update && sudo apt install nodejs npm`
-     - macOS: `brew install node@20`
-     - Windows: Download from [nodejs.org](https://nodejs.org/)
-
-#### Clean Install After Errors
-
-**Problem:** Installation partially completed but has errors
-
-**Solution:**
-```bash
-# 1. Clean everything
-npm cache clean --force
-rm -rf node_modules package-lock.json
-
-# 2. Verify Node version
-node --version  # Must be >=18.0.0
-
-# 3. Clean install (recommended for CI/CD)
-npm ci
-
-# 4. Or regular install
-npm install
-```
-
-#### Deprecated Dependency Warnings
-
-**Problem:** Seeing warnings about deprecated packages
-
-```
-npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
-npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
-```
-
-**Solution:** These are **warnings** from transitive dependencies and do **NOT** prevent installation or operation. They can be safely ignored. The maintainers will update these in future releases.
-
-#### MCP Server Dependencies
-
-**Problem:** Errors or warnings about MCP servers during installation
-
-**Solution:** 
-- MCP servers (like `@browserbasehq/mcp-server-browserbase`) are **optional** features
-- They use `npx` for on-demand installation and are NOT installed during `npm install`
-- They are only downloaded when explicitly started
-- To disable MCP features: Add `SKIP_MCP_SERVERS=true` to your `.env` file
-- See [MCP_SERVERS_INTEGRATION_GUIDE.md](MCP_SERVERS_INTEGRATION_GUIDE.md) for details
-
-#### Database Connection Issues
-
-**Problem:** Application starts but can't connect to MongoDB or PostgreSQL
-
-**Solution:**
-```bash
-# MongoDB
-# 1. Check MongoDB is running
-mongosh --eval "db.adminCommand('ping')"
-
-# 2. Verify connection string in .env
-# MONGODB_URI=mongodb://localhost:27017/echotune
-# OR
-# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/echotune
-
-# PostgreSQL (optional)
-# 1. Check PostgreSQL is running
-pg_isready
-
-# 2. Verify connection string in .env
-# POSTGRES_URL=postgresql://localhost:5432/echotune_ai
-```
-
-#### Docker Build Issues
-
-**Problem:** Docker build fails or uses wrong Node version
-
-**Solution:**
-```bash
-# The Dockerfile uses Node 20-alpine by default
-# 1. Rebuild with no cache
-docker build --no-cache -t echotune-ai:latest .
-
-# 2. Or use docker-compose
-docker compose up --build --force-recreate
-
-# 3. Check Docker base image
-docker run --rm node:20-alpine node --version
-```
-
-#### Common Runtime Errors
-
-**Problem:** "Cannot find module 'dotenv'" or similar errors
-
-**Solution:**
-- **First time setup**: Run `npm install` to install all dependencies
-- **After updating**: Run `npm install` to install new dependencies
-- If issue persists, try `rm -rf node_modules package-lock.json && npm install`
-- Key runtime dependencies required:
-  - `dotenv` for environment variable management (required for startup)
-  - `@google/generative-ai` for Gemini AI integration
-  - `mongodb` for database connectivity
-  - OpenTelemetry packages for observability
-  - See `package.json` for complete list
-
-**Problem:** "SyntaxError: Unexpected token '?" or "Unexpected token '='" during npm install**
-- **Cause**: Your Node.js version is too old (likely 12.x, 14.x, or 16.x)
-- **Specific error**: This typically occurs in `@prisma/debug` or `@prisma/engines` due to nullish coalescing operator (`??=`) which requires Node.js 14.4+
-- **Fix**: Upgrade to Node.js 18 or higher (20.x or 22.x recommended)
-- **How to upgrade**:
-  - Using nvm: `nvm install 20 && nvm use 20`
-  - Or download from https://nodejs.org/
-- The project uses modern JavaScript syntax (ES2021+, nullish coalescing, optional chaining) that requires Node.js 18+
-- After upgrading, run `rm -rf node_modules package-lock.json && npm install` again
-
-**Deprecation warnings during npm install**
-- **Expected behavior**: Some deprecation warnings are normal and come from transitive dependencies (dependencies of dependencies)
-- **No action required**: These don't affect functionality or security
-- **Common warnings**: `inflight`, `glob@7.x`, `rimraf@3.x`, `lodash.get`, `lodash.isequal`
-- **Details**: See [docs/DEPRECATED_DEPENDENCIES.md](docs/DEPRECATED_DEPENDENCIES.md) for full analysis
-- **What's fixed**: We've upgraded ESLint to v9 and Prisma to v6.19.0 to minimize deprecations
-- **Still present**: Some warnings remain from packages like `sqlite3`, `jest`, and `swagger-jsdoc` - these are waiting for upstream updates
-
-**OpenTelemetry warnings**
-- If you see "OpenTelemetry modules not available" - run `npm install`
