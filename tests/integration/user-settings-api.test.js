@@ -5,8 +5,8 @@
 
 const request = require('supertest');
 const express = require('express');
-const settingsRoutes = require('../../src/routes/settings');
-const legacyUserSettingsRoutes = require('../../src/routes/user-settings');
+const settingsRoutes = require('../../src/api/routes/settings');
+const legacyUserSettingsRoutes = require('../../src/api/routes/user-settings');
 
 // Mock the UserSettingsService
 jest.mock('../../src/services/UserSettingsService', () => {
