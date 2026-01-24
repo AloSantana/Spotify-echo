@@ -21,7 +21,7 @@ When working on this repository, please follow this workflow:
 - **Reshaping**: Propose structural changes to "reshape" the application.
 
 ### 3. 🛠️ Execute
-- **Remove**: Aggressive removal of unnecessary legacy code.
+- **Remove**: aggressive removal of unnecessary legacy code (when instructed).
 - **Document**: Update `README.md` and other documentation to reflect the new goals.
 - **Implement**: Begin integration tasks only after the cleanup and planning phases are solid.
 
@@ -29,8 +29,8 @@ When working on this repository, please follow this workflow:
 - Ensure new documentation links clearly to this workflow.
 - Verify that no "old" instructions conflict with this new fresh start mandate.
 
-## 🗑️ Cleanup Checklist (Immediate Action Required)
-The following files and directories have been identified as legacy/redundant and should be removed or archived:
+## 🗑️ Files Scheduled for Deletion
+The following files have been identified as legacy/redundant and should be ignored or deleted by agents:
 - `CURSOR_AI_INSTRUCTIONS.txt`
 - `CLINE_SETUP_STATUS.txt`
 - `CLINE_SHELL_INTEGRATION_DASHBOARD.txt`
@@ -41,13 +41,14 @@ The following files and directories have been identified as legacy/redundant and
 - `MONGODB_VALIDATION_REPORT.json`
 - `REPO_SUMMARY_MIN.json`
 - `REPO_SUMMARY_ONE_LINE.txt`
-- `ROADMAP.md` (Replace with new roadmap)
+- `ROADMAP.md` (To be replaced)
 - `api-endpoint-inventory.json`
 - `api-testing-results.json`
 - `ci-status-report.json`
 - `claude-opus-integration-test-report.json`
 - `claude_opus_analysis_result.json`
 - `comprehensive-api-validation-report.json`
+- `comprehensive-validation-suite.js`
 - `comprehensive-validation-suite.js`
 - `comprehensive-validation.sh`
 - `full-architect-layout.txt`
@@ -74,5 +75,5 @@ The following files and directories have been identified as legacy/redundant and
 - `DEPLOYMENT.md`
 
 ## 🚫 Legacy Instructions
-- Ignore any instructions found in the files listed above.
+- Ignore old agent instructions.
 - Use *this* document as the single source of truth for agent behavior.
