@@ -1,6 +1,12 @@
 # MCP Server Setup Guide for GitHub Copilot Coding Agent
 
-This guide explains how to set up the MCP (Model Context Protocol) servers for the GitHub Copilot coding agent in this repository.
+This guide explains how to set up the **GitHub Copilot MCP servers** for the coding agent in this repository.
+
+**Important Distinction**:
+- **GitHub Copilot MCP** (this guide): External MCP servers accessed by GitHub Copilot coding agent via `.github/copilot/mcp.json`
+- **Repository MCP Servers**: Internal application servers (ports 3001-3010) - see `docs/MCP_INTEGRATION.md`
+
+These are complementary systems that work together to enhance development capabilities.
 
 ## Overview
 
@@ -85,25 +91,40 @@ After adding the secrets, the coding agent will automatically have access to all
 
 ## Available Custom Agents
 
-This repository includes specialized agents that leverage the MCP servers:
+This repository includes specialized GitHub Copilot agents that leverage the MCP servers:
 
 ### 1. MCP Power Developer (`@mcp-power-developer`)
-Elite developer with full MCP ecosystem access. Use for:
-- Complex coding tasks
-- Multi-step implementations
-- Code with Gemini review
+**Complementary to**: `@mcp-fullstack-developer` (focuses on GitHub Copilot MCP tools)
+
+Elite developer with full GitHub Copilot MCP ecosystem access. Use for:
+- Complex coding tasks requiring Gemini AI consultation
+- Multi-step implementations with sequential thinking
+- Code review with external AI validation
 
 ### 2. Gemini Consultant (`@gemini-consultant`)
+**Unique capability**: Direct Google Gemini AI integration via MCP
+
 Specialized for AI-powered analysis. Use for:
-- Security reviews
-- Code quality analysis
-- Architecture decisions
+- Security reviews with Gemini AI
+- Code quality analysis from AI perspective
+- Architecture decisions requiring second opinions
 
 ### 3. Research Assistant (`@research-assistant`)
-Research specialist. Use for:
-- Documentation research
-- Best practices lookup
-- Technology comparisons
+**Complementary to**: `@mcp-research-documentation` (adds Brave Search + Gemini)
+
+Research specialist with web search. Use for:
+- Documentation research via Brave Search
+- Best practices lookup with AI synthesis
+- Technology comparisons with external data
+
+### Existing Repository Agents
+
+For other development tasks, use the existing specialized agents:
+- `@mcp-fullstack-developer` - Internal MCP server integration
+- `@mcp-research-documentation` - Perplexity-based research
+- `@security-specialist`, `@performance-optimization-specialist`, etc.
+
+See `.github/copilot/agents/` for the complete list.
 
 ## Troubleshooting
 
@@ -185,6 +206,14 @@ MCP Server Ecosystem
 
 - [MCP Official Documentation](https://modelcontextprotocol.io/)
 - [GitHub Copilot MCP Guide](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/extend-coding-agent-with-mcp)
+- [Repository MCP Integration](./MCP_INTEGRATION.md) - Internal application MCP servers
+- [MCP Server Inventory](./MCP_SERVER_INVENTORY.md) - Complete server catalog
 - [Awesome MCP Servers](https://github.com/punkpeye/awesome-mcp-servers)
 - [Google AI Pricing](https://ai.google.dev/pricing)
 - [Brave Search API Docs](https://brave.com/search/api/)
+
+## Related Documentation
+
+- **Internal MCP Servers**: See `docs/MCP_INTEGRATION.md` for application-level MCP setup
+- **MCP Troubleshooting**: See `docs/MCP_TROUBLESHOOTING.md` for debugging
+- **MCP Testing**: See `docs/MCP_INTEGRATION_TEST_REPORT.md` for validation
