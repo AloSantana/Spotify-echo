@@ -28,14 +28,13 @@
       "args": ["-y", "@modelcontextprotocol/server-filesystem", "."],
       "description": "File system operations"
     },
-    "gemini": {
-      "command": "npx",
-      "args": ["-y", "@anthropic/mcp-server-gemini"],
+    "gemini-bridge": {
+      "command": "uvx",
+      "args": ["gemini-bridge"],
       "env": {
-        "GOOGLE_API_KEY": "${{ secrets.COPILOT_MCP_GOOGLE_API_KEY }}",
-        "GEMINI_MODEL": "gemini-2.0-flash"
+        "GEMINI_BRIDGE_TIMEOUT": "120"
       },
-      "description": "Google Gemini AI for code analysis and second opinions"
+      "description": "Consult Google Gemini AI (zero API cost via CLI)"
     },
     "playwright": {
       "command": "npx",
