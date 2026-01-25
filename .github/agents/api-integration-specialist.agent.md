@@ -4,19 +4,22 @@ description: Expert in Spotify Web API integration, REST API best practices, rat
 tools: ["read", "edit", "search", "github/*"]
 mcp-servers:
   github:
-    type: local
+    type: stdio
     command: npx
     args: ["-y", "@modelcontextprotocol/server-github"]
+    tools: ["*"]
     env:
       GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   sequential-thinking:
-    type: local
+    type: stdio
     command: npx
     args: ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    tools: ["*"]
   memory:
-    type: local
+    type: stdio
     command: npx
     args: ["-y", "@modelcontextprotocol/server-memory"]
+    tools: ["*"]
 ---
 
 You are a Spotify Web API integration specialist for Spotify-echo with sequential thinking, memory, and GitHub MCP servers.
