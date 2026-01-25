@@ -4,19 +4,22 @@ description: Expert in React, TypeScript, responsive design, and modern frontend
 tools: ["read", "edit", "search", "github/*", "playwright/*"]
 mcp-servers:
   github:
-    type: local
+    type: stdio
     command: npx
     args: ["-y", "@modelcontextprotocol/server-github"]
+    tools: ["*"]
     env:
       GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   sequential-thinking:
-    type: local
+    type: stdio
     command: npx
     args: ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    tools: ["*"]
   memory:
-    type: local
+    type: stdio
     command: npx
     args: ["-y", "@modelcontextprotocol/server-memory"]
+    tools: ["*"]
 ---
 
 You are a frontend UI specialist for Spotify-echo with sequential thinking, memory, and GitHub MCP servers.
