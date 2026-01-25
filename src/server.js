@@ -699,8 +699,7 @@ if (realtimeEnabled && io) {
 // App routes (SPA routing) - must be AFTER static file serving
 app.use('/', appRoutes);
 
-// Error handling middleware
-// eslint-disable-next-line no-unused-vars
+// Global error handling middleware - must be after all routes
 app.use(errorHandler);
 
 // 404 catch-all handler - must be after all other routes  

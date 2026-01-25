@@ -210,6 +210,7 @@
     "react-dom": "^19.2.0",
     "sqlite3": "^5.1.7",
     "start-server-and-test": "^2.0.3",
+    "supertest": "^7.2.2",
     "terser": "^5.44.1",
     "vite": "^7.1.11",
     "vite-plugin-compression": "^0.5.1",

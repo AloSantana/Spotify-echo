@@ -5,7 +5,7 @@
 
 const request = require('supertest');
 const express = require('express');
-const settingsRouter = require('../../../src/routes/settings');
+const settingsRouter = require('../../../src/api/routes/settings');
 
 // Mock the UserSettingsService
 jest.mock('../../../src/services/UserSettingsService');
