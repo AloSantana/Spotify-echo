@@ -618,3 +618,48 @@ qa-*.log
 
 /src/generated/prisma
 .agent-memory-test/
+
+# === PHASE 2 CLEANUP - PREVENT RE-ACCUMULATION ===
+# Tool-specific configuration directories (2026-01-25)
+.autonomous-coding-session/
+.autonomous-session/
+.copilot/
+.cursor/
+.gemini/
+.mcp-config/
+.openmcp/
+.perplexity/
+.tasks/
+
+# Artifact and cache directories (2026-01-25)
+issues/
+pulls/
+pull/
+pull_request_comments/
+validation-reports/
+test-artifacts/
+perf_reports/
+search-results/
+visual-baseline/
+generated_content/
+experiments/
+
+# Duplicate directories (2026-01-25)
+prompts (2)/
+.github (2)/
+github/
+
+# Quick test and automation scripts (2026-01-25)
+quick-*.js
+capture-enhanced-ui.js
+unified_agent_*.py
+simple_test_runner.py
+
+# Validation and setup scripts (2026-01-25)
+test-bedrock-*.sh
+validate-autonomous-*.sh
+validate-final-*.sh
+validate-phase*.sh
+setup-cline-*.sh
+verify-cline-*.sh
+start-mcp-servers.sh
