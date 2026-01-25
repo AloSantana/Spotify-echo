@@ -1,15 +1,25 @@
 # 🤖 Coding Agent & Copilot Workflow
 
-## ✅ Phase 1 Complete: Initial Cleanup & Deep Analysis
-**Completion Date**: January 24, 2026  
-**Status**: 41 legacy files deleted, comprehensive deep analysis completed
+## ✅ Repository Cleanup Status: 100% COMPLETE
+**Last Updated**: January 25, 2026  
+**Cleanup Progress**: 175+ files removed across 2 phases  
+**Status**: Fresh, focused codebase ready for development
+
+### Cleanup Summary
+- **Phase 1** (95 files): Documentation, AI scripts, broken npm scripts ✅
+- **Phase 2** (80+ files): Tool configs, workflows, artifacts, duplicates ✅
+- **Total Impact**: 90% reduction in root files, zero AI tooling clutter
+
+See [CLEANUP_SUMMARY.md](CLEANUP_SUMMARY.md) for detailed statistics.
+
+---
 
 ## 🎯 Primary Goal: Fresh Start & Modernization
 This repository is a fork intended for a complete overhaul ("fresh start"). The main objectives are:
-1.  ✅ **Cleanup**: Remove redundant files, legacy configurations, and unnecessary artifacts from the previous version. *(COMPLETED)*
-2.  🔄 **Standardization**: Improve documentation and code structure to fit modern standards. *(IN PROGRESS)*
-3.  🔄 **Future Integration**: Prepare the codebase for future integration of databases and other tools. *(IN PROGRESS)*
-4.  ✅ **Deep Analysis**: Perform deep analysis of the current state to create efficient workflows. *(COMPLETED)*
+1. ✅ **Cleanup**: Remove redundant files, legacy configurations, and unnecessary artifacts. *(COMPLETED)*
+2. 🔄 **Standardization**: Improve documentation and code structure to fit modern standards. *(IN PROGRESS)*
+3. 🔄 **Future Integration**: Prepare the codebase for future integration of databases and other tools. *(IN PROGRESS)*
+4. ✅ **Deep Analysis**: Perform deep analysis of the current state to create efficient workflows. *(COMPLETED)*
 
 ## 📋 Workflow for Agents
 When working on this repository, please follow this workflow:
@@ -33,51 +43,100 @@ When working on this repository, please follow this workflow:
 - Ensure new documentation links clearly to this workflow.
 - Verify that no "old" instructions conflict with this new fresh start mandate.
 
-## ✅ Cleanup Checklist - COMPLETED
-The following files have been **successfully deleted** (January 24, 2026):
+## ✅ Cleanup Checklist - PHASE 1 COMPLETED (January 24, 2026)
+The following files have been **successfully deleted**:
 - ✅ `CURSOR_AI_INSTRUCTIONS.txt`
 - ✅ `CLINE_SETUP_STATUS.txt`
 - ✅ `CLINE_SHELL_INTEGRATION_DASHBOARD.txt`
-- ✅ `COMPREHENSIVE_VALIDATION_REPORT.json`
-- ✅ `FEATURE_VALIDATION_REPORT.json`
-- ✅ `GROK4_REPOSITORY_ANALYSIS_REPORT.json`
-- ✅ `MCP_REPOSITORY_ANALYSIS_RESEARCH_REPORT_GROK4.json`
-- ✅ `MONGODB_VALIDATION_REPORT.json`
-- ✅ `REPO_SUMMARY_MIN.json`
-- ✅ `REPO_SUMMARY_ONE_LINE.txt`
-- ✅ `ROADMAP.md`
-- ✅ `api-endpoint-inventory.json`
-- ✅ `api-testing-results.json`
-- ✅ `ci-status-report.json`
-- ✅ `claude-opus-integration-test-report.json`
-- ✅ `claude_opus_analysis_result.json`
-- ✅ `comprehensive-api-validation-report.json`
-- ✅ `comprehensive-validation-suite.js`
-- ✅ `comprehensive-validation.sh`
-- ✅ `full-architect-layout.txt`
-- ✅ `github_workflows_gpt5-advanced-multimodel.yml.txt`
-- ✅ `mcp-final-validation-report.txt`
-- ✅ `package.json.corrupted`
-- ✅ `perplexity-api-test-results.json`
-- ✅ `perplexity-cache.json`
-- ✅ `perplexity-commands-demo-report.json`
-- ✅ `perplexity-commands-test-report.json`
-- ✅ `perplexity-documentation-research.json`
-- ✅ `perplexity-enhancement-validation.json`
-- ✅ `perplexity-generated-tasks.txt`
-- ✅ `perplexity-repository-analysis.txt`
-- ✅ `perplexity-usage-tracking.json`
-- ✅ `repo_audit.json`
-- ✅ `server-phase3.js`
-- ✅ `system-prompts-and-models-of-ai-tools/` (directory)
-- ✅ `working-perplexity-models.json`
-- ✅ `PROJECT_CONFIG.md`
-- ✅ `API_DOCUMENTATION.md`
-- ✅ `ARCHITECTURE.md`
-- ✅ `DOCUMENTATION_INDEX.md`
-- ✅ `DEPLOYMENT.md`
+- ✅ 56 markdown files (AWS Bedrock, Perplexity, Cline/Cursor, MCP docs)
+- ✅ 39+ code files (Perplexity integrations, AWS Bedrock scripts)
+- ✅ 10+ directories (agent-workflow, perplexity-test, automation-artifacts)
+- ✅ 15 broken npm scripts from package.json
 
-**Total Files Removed**: 41 files (including 1 directory)
+**Total Phase 1 Removed**: 95+ files
+
+## ✅ Cleanup Checklist - PHASE 2 COMPLETED (January 25, 2026)
+
+### Tool-Specific Directories (9 removed)
+- ✅ `.autonomous-coding-session/` - Autonomous coding artifacts
+- ✅ `.autonomous-session/` - Session tracking
+- ✅ `.copilot/` - GitHub Copilot cache
+- ✅ `.cursor/` - Cursor IDE files
+- ✅ `.gemini/` - Google Gemini integration
+- ✅ `.mcp-config/` - MCP configuration cache
+- ✅ `.openmcp/` - OpenMCP tool files
+- ✅ `.perplexity/` - Perplexity API cache
+- ✅ `.tasks/` - Task management artifacts
+
+### GitHub Workflows (11 removed)
+- ✅ `autonomous-coding-perplexity-cycle.yml`
+- ✅ `autonomous-development-validation.yml`
+- ✅ `autonomous-perplexity-development-cycle.yml`
+- ✅ `aws-bedrock-validation.yml`
+- ✅ `bedrock-full-integration.yml`
+- ✅ `bedrock-real-validation.yml`
+- ✅ `bedrock-validation.yml`
+- ✅ `claude-opus-coding-agent.yml`
+- ✅ `gpt5-advanced-multimodel.yml`
+- ✅ `perplexity-budget-guard.yml`
+- ✅ `perplexity-research.yml`
+
+### .github Documentation (3 removed)
+- ✅ `BEDROCK_IMPLEMENTATION_CHECKLIST.md`
+- ✅ `perplexity-config.yml`
+- ✅ `pull_request_template_mcp.md`
+
+### Root Scripts (7 removed)
+- ✅ `test-bedrock-comprehensive.sh`
+- ✅ `validate-autonomous-system.sh`
+- ✅ `validate-final-system.sh`
+- ✅ `validate-phase0.sh`
+- ✅ `setup-cline-shell-integration.sh`
+- ✅ `verify-cline-settings.sh`
+- ✅ `start-mcp-servers.sh`
+
+### Python Demo Files (3 removed)
+- ✅ `unified_agent_cli.py`
+- ✅ `unified_agent_standalone_demo.py`
+- ✅ `unified_llm_agent_demo.py`
+
+### Quick Test JS Files (3 removed)
+- ✅ `quick-api-test.js`
+- ✅ `quick-automation-check.js`
+- ✅ `capture-enhanced-ui.js`
+
+### Artifact/Cache Directories (10 removed)
+- ✅ `issues/` - Cached GitHub issues
+- ✅ `pulls/` - Cached pull requests
+- ✅ `pull/` - Cached pull request
+- ✅ `pull_request_comments/` - Cached PR comments
+- ✅ `validation-reports/` - Validation artifacts
+- ✅ `test-artifacts/` - Test artifacts
+- ✅ `playwright-report/` - Playwright reports
+- ✅ `perf_reports/` - Performance reports
+- ✅ `search-results/` - Search cache
+- ✅ `visual-baseline/` - Visual regression baseline
+
+### Unused Directories (2 removed)
+- ✅ `experiments/` - Experimental features
+- ✅ `generated_content/` - Generated content
+
+### Duplicate Directories (3 removed)
+- ✅ `prompts (2)/` - Duplicate prompts
+- ✅ `.github (2)/` - Duplicate .github
+- ✅ `github/` - Misplaced github directory
+
+### Environment Templates Consolidated (4 removed)
+- ✅ `.env.mcp.example` - MCP env template
+- ✅ `.env.template` - Duplicate template
+- ✅ `env.example` - Duplicate example
+- ✅ `env.template` - Duplicate template
+
+**Total Phase 2 Removed**: 80+ files and directories
+
+**Combined Total**: 175+ files removed
+
+---
 
 ## 📊 Progress Update
 
@@ -242,21 +301,176 @@ The following files have been **successfully deleted** (January 24, 2026):
 - [ ] Database query optimization
 - [ ] Bundle size reduction
 
+## 🤖 Custom Coding Agents
+
+The Spotify-echo project has **12 specialized coding agents** available in `.github/agents/`:
+
+### Core Development Agents
+
+1. **fullstack-developer** - Comprehensive full-stack development
+   - TypeScript backend and frontend development
+   - Spotify OAuth 2.0 implementation (PKCE flow)
+   - AWS Bedrock AI integration
+   - Database design and DevOps
+   - **Tools**: All tools available (`*`)
+
+2. **api-integration-specialist** - Spotify Web API integration expert
+   - Spotify Web API endpoints (Player, Playlist, User Profile, Search, Library)
+   - Rate limiting and request throttling
+   - Error handling and caching strategies
+   - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+3. **frontend-ui-specialist** - React & UI development expert
+   - React components with TypeScript
+   - Responsive design and accessibility
+   - State management and performance optimization
+   - Spotify-themed design system
+   - **Tools**: Read, Edit, Search, GitHub, Playwright
+   - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+4. **spotify-oauth-specialist** - Spotify OAuth authentication expert
+   - Spotify OAuth 2.0 flows (Authorization Code, PKCE)
+   - Access tokens, refresh tokens, and token expiration handling
+   - Spotify API authentication edge cases
+   - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+### Quality & Security Agents
+
+5. **error-handling-specialist** - Error handling and monitoring expert
+   - React error boundaries and fallbacks
+   - API error handling and retry logic
+   - User-friendly error messages
+   - Error logging and monitoring (Sentry, CloudWatch)
+   - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+6. **security-specialist** - Application security expert
+   - Authentication security (OAuth, tokens, session management)
+   - XSS, CSRF, injection attack prevention
+   - Secrets management and environment variables
+   - Dependency vulnerability scanning
+   - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+7. **performance-optimization-specialist** - Performance optimization expert
+   - Bundle optimization and code splitting
+   - Core Web Vitals (LCP, FID, CLS)
+   - Caching strategies
+   - Lighthouse testing
+   - **Tools**: Read, Edit, Search, GitHub, Playwright
+   - **MCP Servers**: GitHub, Sequential Thinking, Memory, Playwright
+
+8. **testing-qa-specialist** - Testing and QA automation expert ✨ NEW
+   - Unit testing with Jest and React Testing Library
+   - Integration testing for APIs and services
+   - End-to-end testing with Playwright
+   - Test coverage analysis and CI/CD test automation
+   - **Tools**: Read, Edit, Search, Bash, GitHub, Playwright
+   - **MCP Servers**: GitHub, Sequential Thinking, Memory, Playwright
+
+9. **code-review-specialist** - Code review and quality expert ✨ NEW
+   - Code review best practices and design patterns
+   - Technical debt identification and refactoring
+   - Code quality metrics and SOLID principles
+   - Performance and security code review
+   - **Tools**: Read, Search, GitHub
+   - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+### Infrastructure & Data Agents
+
+10. **database-specialist** - Database and data migration expert ✨ NEW
+    - MongoDB schema design and optimization
+    - PostgreSQL database modeling and indexing
+    - Data migration strategies and scripts
+    - Database performance tuning and query optimization
+    - **Tools**: Read, Edit, Search, Bash, GitHub
+    - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+11. **devops-infrastructure-specialist** - DevOps and infrastructure expert ✨ NEW
+    - Docker containerization and multi-stage builds
+    - CI/CD with GitHub Actions
+    - Deployment automation (DigitalOcean, AWS, Vercel)
+    - Nginx configuration and monitoring setup
+    - **Tools**: Read, Edit, Search, Bash, GitHub
+    - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+12. **documentation-specialist** - Documentation expert ✨ NEW
+    - Technical documentation and API documentation
+    - User guides and tutorials
+    - Architecture diagrams and flowcharts
+    - Changelog and contribution guide maintenance
+    - **Tools**: Read, Edit, Search, GitHub
+    - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+### Using Agents
+
+To use a coding agent, reference it in GitHub Copilot or your workflow:
+```bash
+# Example: Request the API integration specialist
+@api-integration-specialist help me implement Spotify playlist search
+
+# Example: Request the security specialist
+@security-specialist review this OAuth implementation for vulnerabilities
+
+# Example: Request the testing specialist
+@testing-qa-specialist create comprehensive tests for the authentication flow
+
+# Example: Request the database specialist
+@database-specialist optimize the MongoDB schema for user playlists
+
+# Example: Request the documentation specialist
+@documentation-specialist create API documentation for the recommendation endpoints
+```
+
+### Agent Selection Guide
+
+Choose the right agent for your task:
+
+| Task Type | Recommended Agent |
+|-----------|------------------|
+| Full-stack features | `fullstack-developer` |
+| Spotify API integration | `api-integration-specialist` or `spotify-oauth-specialist` |
+| React components & UI | `frontend-ui-specialist` |
+| Authentication & OAuth | `spotify-oauth-specialist` or `security-specialist` |
+| Error handling | `error-handling-specialist` |
+| Security audit | `security-specialist` |
+| Performance issues | `performance-optimization-specialist` |
+| Writing tests | `testing-qa-specialist` |
+| Code review | `code-review-specialist` |
+| Database design | `database-specialist` |
+| Docker & deployment | `devops-infrastructure-specialist` |
+| Documentation | `documentation-specialist` |
+
+### Multi-Agent Collaboration
+
+For complex tasks, use multiple agents in sequence:
+
+1. **Feature Development Flow**:
+   - `fullstack-developer` → Implement the feature
+   - `testing-qa-specialist` → Write comprehensive tests
+   - `security-specialist` → Security audit
+   - `code-review-specialist` → Final code review
+   - `documentation-specialist` → Document the feature
+
+2. **Infrastructure Improvement Flow**:
+   - `devops-infrastructure-specialist` → Optimize Docker setup
+   - `performance-optimization-specialist` → Performance testing
+   - `testing-qa-specialist` → CI/CD integration tests
+   - `documentation-specialist` → Deployment documentation
+
+3. **Database Migration Flow**:
+   - `database-specialist` → Design schema and migration
+   - `fullstack-developer` → Update application code
+   - `testing-qa-specialist` → Test data integrity
+   - `documentation-specialist` → Document schema changes
+
 ## 📚 Key Documents
 
 ### 📖 Essential Reading (Start Here)
-1. **[AGENT_QUICK_START.md](AGENT_QUICK_START.md)** - ⚡ Quick reference for what to work on
-2. **[COMPREHENSIVE_ANALYSIS_REPORT.md](COMPREHENSIVE_ANALYSIS_REPORT.md)** - 📊 Full repository analysis
-3. **[ACTION_PLAN_IMMEDIATE.md](ACTION_PLAN_IMMEDIATE.md)** - 📋 Detailed Sprint 1 plan
-4. **[CODING_AGENT_WORKFLOW.md](CODING_AGENT_WORKFLOW.md)** - 🤖 This document (workflow & progress)
-
-### 🔍 Deep Dives
-- **[DEEP_ANALYSIS.md](DEEP_ANALYSIS.md)** - Technical deep analysis (51KB)
-- **[README.md](README.md)** - Project overview and quick start
+1. **[CODING_AGENT_WORKFLOW.md](CODING_AGENT_WORKFLOW.md)** - 🤖 This document (workflow & progress)
+2. **[README.md](README.md)** - Project overview and quick start
+3. **[CHANGELOG.md](CHANGELOG.md)** - Version history
+4. **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
 
 ### 📝 Standard Documentation
-- **[CHANGELOG.md](CHANGELOG.md)** - Version history
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
 - **[LICENSE](LICENSE)** - Project license
 
 ## 📊 Success Metrics Dashboard
