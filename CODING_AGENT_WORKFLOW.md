@@ -242,21 +242,176 @@ The following files have been **successfully deleted** (January 24, 2026):
 - [ ] Database query optimization
 - [ ] Bundle size reduction
 
+## 🤖 Custom Coding Agents
+
+The Spotify-echo project has **12 specialized coding agents** available in `.github/agents/`:
+
+### Core Development Agents
+
+1. **fullstack-developer** - Comprehensive full-stack development
+   - TypeScript backend and frontend development
+   - Spotify OAuth 2.0 implementation (PKCE flow)
+   - AWS Bedrock AI integration
+   - Database design and DevOps
+   - **Tools**: All tools available (`*`)
+
+2. **api-integration-specialist** - Spotify Web API integration expert
+   - Spotify Web API endpoints (Player, Playlist, User Profile, Search, Library)
+   - Rate limiting and request throttling
+   - Error handling and caching strategies
+   - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+3. **frontend-ui-specialist** - React & UI development expert
+   - React components with TypeScript
+   - Responsive design and accessibility
+   - State management and performance optimization
+   - Spotify-themed design system
+   - **Tools**: Read, Edit, Search, GitHub, Playwright
+   - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+4. **spotify-oauth-specialist** - Spotify OAuth authentication expert
+   - Spotify OAuth 2.0 flows (Authorization Code, PKCE)
+   - Access tokens, refresh tokens, and token expiration handling
+   - Spotify API authentication edge cases
+   - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+### Quality & Security Agents
+
+5. **error-handling-specialist** - Error handling and monitoring expert
+   - React error boundaries and fallbacks
+   - API error handling and retry logic
+   - User-friendly error messages
+   - Error logging and monitoring (Sentry, CloudWatch)
+   - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+6. **security-specialist** - Application security expert
+   - Authentication security (OAuth, tokens, session management)
+   - XSS, CSRF, injection attack prevention
+   - Secrets management and environment variables
+   - Dependency vulnerability scanning
+   - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+7. **performance-optimization-specialist** - Performance optimization expert
+   - Bundle optimization and code splitting
+   - Core Web Vitals (LCP, FID, CLS)
+   - Caching strategies
+   - Lighthouse testing
+   - **Tools**: Read, Edit, Search, GitHub, Playwright
+   - **MCP Servers**: GitHub, Sequential Thinking, Memory, Playwright
+
+8. **testing-qa-specialist** - Testing and QA automation expert ✨ NEW
+   - Unit testing with Jest and React Testing Library
+   - Integration testing for APIs and services
+   - End-to-end testing with Playwright
+   - Test coverage analysis and CI/CD test automation
+   - **Tools**: Read, Edit, Search, Bash, GitHub, Playwright
+   - **MCP Servers**: GitHub, Sequential Thinking, Memory, Playwright
+
+9. **code-review-specialist** - Code review and quality expert ✨ NEW
+   - Code review best practices and design patterns
+   - Technical debt identification and refactoring
+   - Code quality metrics and SOLID principles
+   - Performance and security code review
+   - **Tools**: Read, Search, GitHub
+   - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+### Infrastructure & Data Agents
+
+10. **database-specialist** - Database and data migration expert ✨ NEW
+    - MongoDB schema design and optimization
+    - PostgreSQL database modeling and indexing
+    - Data migration strategies and scripts
+    - Database performance tuning and query optimization
+    - **Tools**: Read, Edit, Search, Bash, GitHub
+    - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+11. **devops-infrastructure-specialist** - DevOps and infrastructure expert ✨ NEW
+    - Docker containerization and multi-stage builds
+    - CI/CD with GitHub Actions
+    - Deployment automation (DigitalOcean, AWS, Vercel)
+    - Nginx configuration and monitoring setup
+    - **Tools**: Read, Edit, Search, Bash, GitHub
+    - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+12. **documentation-specialist** - Documentation expert ✨ NEW
+    - Technical documentation and API documentation
+    - User guides and tutorials
+    - Architecture diagrams and flowcharts
+    - Changelog and contribution guide maintenance
+    - **Tools**: Read, Edit, Search, GitHub
+    - **MCP Servers**: GitHub, Sequential Thinking, Memory
+
+### Using Agents
+
+To use a coding agent, reference it in GitHub Copilot or your workflow:
+```bash
+# Example: Request the API integration specialist
+@api-integration-specialist help me implement Spotify playlist search
+
+# Example: Request the security specialist
+@security-specialist review this OAuth implementation for vulnerabilities
+
+# Example: Request the testing specialist
+@testing-qa-specialist create comprehensive tests for the authentication flow
+
+# Example: Request the database specialist
+@database-specialist optimize the MongoDB schema for user playlists
+
+# Example: Request the documentation specialist
+@documentation-specialist create API documentation for the recommendation endpoints
+```
+
+### Agent Selection Guide
+
+Choose the right agent for your task:
+
+| Task Type | Recommended Agent |
+|-----------|------------------|
+| Full-stack features | `fullstack-developer` |
+| Spotify API integration | `api-integration-specialist` or `spotify-oauth-specialist` |
+| React components & UI | `frontend-ui-specialist` |
+| Authentication & OAuth | `spotify-oauth-specialist` or `security-specialist` |
+| Error handling | `error-handling-specialist` |
+| Security audit | `security-specialist` |
+| Performance issues | `performance-optimization-specialist` |
+| Writing tests | `testing-qa-specialist` |
+| Code review | `code-review-specialist` |
+| Database design | `database-specialist` |
+| Docker & deployment | `devops-infrastructure-specialist` |
+| Documentation | `documentation-specialist` |
+
+### Multi-Agent Collaboration
+
+For complex tasks, use multiple agents in sequence:
+
+1. **Feature Development Flow**:
+   - `fullstack-developer` → Implement the feature
+   - `testing-qa-specialist` → Write comprehensive tests
+   - `security-specialist` → Security audit
+   - `code-review-specialist` → Final code review
+   - `documentation-specialist` → Document the feature
+
+2. **Infrastructure Improvement Flow**:
+   - `devops-infrastructure-specialist` → Optimize Docker setup
+   - `performance-optimization-specialist` → Performance testing
+   - `testing-qa-specialist` → CI/CD integration tests
+   - `documentation-specialist` → Deployment documentation
+
+3. **Database Migration Flow**:
+   - `database-specialist` → Design schema and migration
+   - `fullstack-developer` → Update application code
+   - `testing-qa-specialist` → Test data integrity
+   - `documentation-specialist` → Document schema changes
+
 ## 📚 Key Documents
 
 ### 📖 Essential Reading (Start Here)
-1. **[AGENT_QUICK_START.md](AGENT_QUICK_START.md)** - ⚡ Quick reference for what to work on
-2. **[COMPREHENSIVE_ANALYSIS_REPORT.md](COMPREHENSIVE_ANALYSIS_REPORT.md)** - 📊 Full repository analysis
-3. **[ACTION_PLAN_IMMEDIATE.md](ACTION_PLAN_IMMEDIATE.md)** - 📋 Detailed Sprint 1 plan
-4. **[CODING_AGENT_WORKFLOW.md](CODING_AGENT_WORKFLOW.md)** - 🤖 This document (workflow & progress)
-
-### 🔍 Deep Dives
-- **[DEEP_ANALYSIS.md](DEEP_ANALYSIS.md)** - Technical deep analysis (51KB)
-- **[README.md](README.md)** - Project overview and quick start
+1. **[CODING_AGENT_WORKFLOW.md](CODING_AGENT_WORKFLOW.md)** - 🤖 This document (workflow & progress)
+2. **[README.md](README.md)** - Project overview and quick start
+3. **[CHANGELOG.md](CHANGELOG.md)** - Version history
+4. **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
 
 ### 📝 Standard Documentation
-- **[CHANGELOG.md](CHANGELOG.md)** - Version history
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
 - **[LICENSE](LICENSE)** - Project license
 
 ## 📊 Success Metrics Dashboard
