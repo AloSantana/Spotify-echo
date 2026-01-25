@@ -865,6 +865,88 @@ When suggesting code reviews:
 4. **Testing**: Suggest unit tests for new functionality
 5. **Documentation**: Recommend JSDoc comments for complex functions
 
+## 🚀 MCP Server Usage Guidelines
+
+This repository has MCP servers configured for enhanced coding capabilities. See `docs/MCP_SETUP_GUIDE.md` for complete setup instructions.
+
+### Always Use Sequential Thinking
+
+For complex tasks, use the sequential-thinking MCP server to break down problems step-by-step before implementing:
+- Multi-file refactorings
+- New feature implementations
+- Complex algorithm design
+- Architecture decisions
+
+### Persist Important Decisions
+
+Use the memory MCP server to store:
+- Architecture decisions and rationale
+- Debugging patterns that worked
+- Project conventions and learnings
+- Important code patterns discovered
+
+### Consult Gemini for Critical Code
+
+For security-sensitive code, authentication, or complex algorithms:
+- Use the Gemini MCP server for a second opinion
+- Ask for security review of OAuth/auth code
+- Get performance optimization suggestions
+- Request code quality analysis
+
+### Leverage Browser Automation
+
+Use Playwright and Puppeteer MCP servers for:
+- E2E testing automation
+- Spotify Web Player integration testing
+- Screenshot capture for UI verification
+- Cross-browser compatibility testing
+
+### Research with Brave Search
+
+Use the Brave Search MCP server (2000 free queries/month) for:
+- Latest documentation lookup
+- Best practices research
+- Error message solutions
+- Technology comparisons
+
+### Available Custom Agents
+
+Specialized agents that leverage the MCP ecosystem:
+
+- **`@mcp-power-developer`** - Full-featured development with all MCP tools
+  - Use for: Complex coding tasks, multi-step implementations, code with Gemini review
+  
+- **`@gemini-consultant`** - Specialized AI code analysis
+  - Use for: Security reviews, code quality analysis, architecture decisions
+  
+- **`@research-assistant`** - Documentation and best practices research
+  - Use for: Documentation research, best practices lookup, technology comparisons
+
+### MCP Workflow Example
+
+```javascript
+// 1. Plan with sequential-thinking
+// "Break down the task of implementing OAuth refresh token logic"
+
+// 2. Check memory for similar patterns
+// "Recall previous OAuth implementation decisions"
+
+// 3. Research best practices
+// "Search for OAuth 2.0 refresh token best practices"
+
+// 4. Consult Gemini for security review
+// "Review this OAuth implementation for security vulnerabilities"
+
+// 5. Implement with filesystem
+// Write the code changes
+
+// 6. Test with Playwright
+// Automated E2E test for OAuth flow
+
+// 7. Store learnings in memory
+// "Store: Always use httpOnly cookies for refresh tokens"
+```
+
 ---
 
 **Remember**: EchoTune AI emphasizes production readiness, security, and user experience. Always suggest code that is scalable, maintainable, and follows industry best practices.
