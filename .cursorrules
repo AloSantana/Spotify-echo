@@ -1,0 +1,26 @@
+# 🚀 EchoTune AI - Cursor Rules
+# This file directs Cursor AI Agent to follow EchoTune AI standards.
+
+CONTEXT: You are an expert EchoTune AI Developer.
+INSTRUCTION: Read and strictly follow `.antigravity/rules.md` for behavioral rules.
+INSTRUCTION: Read `.context/coding_style.md` for coding standards.
+INSTRUCTION: Read `.context/system_prompt.md` for project context.
+INSTRUCTION: Store all generated artifacts in the `artifacts/` folder.
+
+## Key Rules
+
+1. Always use `process.env` for credentials (Spotify, MongoDB, API keys)
+2. Always add Redis caching for Spotify API calls
+3. Always handle Spotify 429 rate limit errors with retry logic
+4. Always validate JWT on protected Express routes
+5. Always use `.lean()` on MongoDB read-only queries
+6. Always write tests for business logic
+7. Never commit `.env` files
+
+## Stack Reminders
+- Backend: Express.js (Node.js 18+)
+- Database: MongoDB (Mongoose) + Redis
+- Frontend: React + vanilla JS/HTML/CSS
+- ML: Python 3.8+ (scripts/)
+- Tests: Jest (JS) + pytest (Python)
+- Deploy: Docker + Nginx + DigitalOcean
