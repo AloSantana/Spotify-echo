@@ -1,6 +1,6 @@
 {
   "$schema": "https://modelcontextprotocol.io/schema/mcp.json",
-  "description": "MCP server configuration for GitHub Copilot - EchoTune AI (Spotify-echo). Includes servers for filesystem, git, github, database, web automation, and search capabilities.",
+  "description": "MCP server configuration for GitHub Copilot - EchoTune AI (Spotify-echo). Includes servers for filesystem, git, github, databases (MongoDB, PostgreSQL, SQLite), web automation (Playwright), search, and reasoning capabilities.",
   "mcpServers": {
     "filesystem": {
       "type": "stdio",
@@ -21,7 +21,7 @@
       "env": {
         "GITHUB_TOKEN": "${GITHUB_TOKEN}"
       },
-      "tools": ["get_file_contents", "get_issue", "get_pull_request", "list_issues", "list_pull_requests", "search_code", "search_issues", "search_repositories", "create_issue", "create_pull_request", "update_issue", "create_or_update_file", "push_files", "create_branch", "list_commits", "list_branches"]
+      "tools": ["get_file_contents", "get_issue", "get_pull_request", "list_issues", "list_pull_requests", "search_code", "search_issues", "search_repositories", "create_issue", "create_pull_request", "update_issue", "create_or_update_file", "push_files", "create_branch", "list_commits", "list_branches", "fork_repository", "merge_pull_request", "get_pull_request_files", "create_pull_request_review", "list_workflow_runs", "list_workflow_jobs"]
     },
     "memory": {
       "type": "stdio",
@@ -47,6 +47,30 @@
       "args": ["-y", "@modelcontextprotocol/server-sqlite", "--db-path", "data/echotune.db"],
       "tools": ["read_query", "write_query", "create_table", "list_tables", "describe_table", "append_insight"]
     },
+    "mongodb": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@mongodb-js/mongodb-mcp-server"],
+      "env": {
+        "MDB_MCP_CONNECTION_STRING": "${MONGODB_URI}"
+      }
+    },
+    "postgres": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "${POSTGRES_URL}"
+      }
+    },
+    "brave-search": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+      }
+    },
     "docker": {
       "type": "stdio",
       "command": "npx",
@@ -58,11 +82,11 @@
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-time"]
     },
-    "puppeteer": {
+    "playwright": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@anthropic/server-puppeteer"],
-      "tools": ["puppeteer_navigate", "puppeteer_screenshot", "puppeteer_click", "puppeteer_fill", "puppeteer_select", "puppeteer_hover", "puppeteer_evaluate"]
+      "args": ["-y", "@playwright/mcp"],
+      "tools": ["browser_navigate", "browser_screenshot", "browser_click", "browser_type", "browser_fill", "browser_select_option", "browser_snapshot", "browser_evaluate", "browser_wait_for", "browser_close", "browser_resize", "browser_hover", "browser_drag", "browser_press_key", "browser_handle_dialog", "browser_file_upload", "browser_network_requests", "browser_console_messages", "browser_tabs"]
     }
   }
 }
