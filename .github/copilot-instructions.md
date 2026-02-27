@@ -21,7 +21,7 @@ This document provides comprehensive guidance for GitHub Copilot and AI coding a
 - Conversational AI for natural language music discovery
 - Large-scale Spotify listening history processing and audio feature analysis
 - Browser automation for Spotify Web Player integration via MCP
-- MCP (Model Context Protocol) ecosystem with 10+ integrated servers
+- MCP (Model Context Protocol) ecosystem with 13 integrated servers — see `.github/copilot/mcp.json` for the full list
 - AWS Bedrock model integration with Claude Sonnet 4.5 / Opus 4.1
 
 ## Tech Stack
@@ -108,20 +108,25 @@ This repository includes **13 specialized agents** for different development tas
 ### Core Development (Always Active)
 - `filesystem`: File operations and batch read/write
 - `git`: Version control operations
-- `github`: GitHub integration (issues, PRs, code search)
+- `github`: GitHub integration (issues, PRs, code search, workflow runs)
 - `memory`: Context persistence across sessions
 - `sequential-thinking`: Enhanced multi-step reasoning
 
 ### Data & Storage
-- `sqlite`: Local database queries
+- `mongodb`: MongoDB queries, collections, and aggregations (requires `MONGODB_URI`)
+- `postgres`: PostgreSQL / Prisma database queries (requires `POSTGRES_URL`)
+- `sqlite`: SQLite local database queries
 
 ### Web & Automation
-- `puppeteer`: Browser automation (Spotify Web Player testing)
+- `playwright`: Advanced cross-browser automation with accessibility-tree interactions (Spotify Web Player, UI testing)
 - `fetch`: HTTP requests to external APIs
+- `brave-search`: Web search for research and documentation lookup (requires `BRAVE_API_KEY`)
 
 ### Infrastructure & Utilities
 - `docker`: Container management
 - `time`: Time and timezone operations
+
+> **Setup**: Credential-based servers (mongodb, postgres, brave-search) activate automatically when the corresponding environment variable is set. See `.github/copilot/OPTIONAL_SERVERS.md` for setup instructions.
 
 ## Development Guidelines
 
@@ -354,7 +359,7 @@ curl -H "Authorization: Bearer <JWT>" http://localhost:3000/api/v1/auth/status
 1. **Spotify token expired**: Token refresh happens automatically via middleware
 2. **MongoDB connection**: Verify `MONGODB_URI` in `.env`
 3. **Rate limits**: Spotify API rate limits apply; retry with exponential backoff
-4. **MCP server issues**: Run `npm list -g` to verify MCP packages are installed
+4. **MCP server issues**: Check `.github/copilot/OPTIONAL_SERVERS.md` for required env vars; run `npx -y <package>` manually to verify the package installs correctly
 
 ## Documentation
 
