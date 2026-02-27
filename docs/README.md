@@ -165,9 +165,32 @@ docs/
 | [Cursor Editor Instructions](./AGENT_INSTRUCTIONS_CURSOR.md) | Ordered editor tasks for Cursor |
 
 ---
- 
-**Documentation Version**: 2.2.0  
-**Last Updated**: $(date +%Y-%m-%d)  
+
+## 🤖 AI Agent Guides (Build-from-Scratch)
+
+These guides enable an AI agent to build an equivalent EchoTune AI application from scratch.
+MongoDB + DigitalOcean App Platform focused.
+
+| Guide | Description |
+|-------|-------------|
+| **[Agent Guides Index](./agent-guides/README.md)** | Start here — navigation table + critical facts |
+| [00 — Vision & Mission](./agent-guides/00-VISION-AND-MISSION.md) | Project vision, mission pillars, full 8-phase roadmap |
+| [01 — Architecture](./agent-guides/01-ARCHITECTURE-GUIDE.md) | System diagrams, request flows, design patterns |
+| [02 — Tech Stack](./agent-guides/02-TECH-STACK.md) | All libraries/versions, MongoDB & DigitalOcean rationale |
+| [03 — Data Models](./agent-guides/03-DATA-MODELS.md) | All MongoDB schemas, indexes, TTLs, Redis patterns |
+| [04 — Feature Spec](./agent-guides/04-FEATURE-SPECIFICATION.md) | User stories & acceptance criteria for every feature |
+| [05 — API Reference](./agent-guides/05-API-REFERENCE.md) | Every HTTP endpoint + Socket.IO events |
+| [06 — Spotify Integration](./agent-guides/06-SPOTIFY-INTEGRATION.md) | OAuth PKCE, scopes, tokens, playback, audio features |
+| [07 — AI/LLM Integration](./agent-guides/07-AI-LLM-INTEGRATION.md) | Providers, circuit breaker, fallback chain, streaming |
+| [08 — Recommendation Engine](./agent-guides/08-RECOMMENDATION-ENGINE.md) | 4 strategies with full code implementations |
+| [09 — Frontend Guide](./agent-guides/09-FRONTEND-GUIDE.md) | React SPA structure, components, Socket.IO client |
+| [10 — Deployment Guide](./agent-guides/10-DEPLOYMENT-GUIDE.md) | MongoDB Atlas + DigitalOcean App Platform step-by-step |
+| [11 — Build Checklist](./agent-guides/11-BUILD-CHECKLIST.md) | Phase-by-phase ordered build checklist with acceptance tests |
+
+---
+
+**Documentation Version**: 2.3.0  
+**Last Updated**: 2026-02-27  
 **Maintainer**: EchoTune AI Team
 
 > 💡 **Tip**: This documentation is version controlled. Check the git history for changes and updates.
