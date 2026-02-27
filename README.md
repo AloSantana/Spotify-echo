@@ -1,474 +1,180 @@
-# 🎵 EchoTune AI - Spotify Music Discovery Platform
+# 🎵 EchoTune AI
 
-> **🛑 DEVELOPMENT NOTICE**: This repository is undergoing a "Fresh Start" modernization. Please refer to the [Coding Agent Workflow](CODING_AGENT_WORKFLOW.md) for the new development standards and cleanup instructions.
+**AI-powered music discovery and Spotify control platform.**
 
-<div align="center">
-
-![EchoTune AI Logo](https://via.placeholder.com/150x150/007ACC/FFFFFF?text=🎵)
-
-**Intelligent music discovery platform powered by Spotify integration, AI recommendations, and conversational search**
-
-[![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Ready-green.svg)](https://mongodb.com/)
-[![Spotify API](https://img.shields.io/badge/Spotify-API%20Ready-1DB954.svg)](https://developer.spotify.com/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-[🚀 Quick Start](#-quick-start) • [🛠️ Dev Guide](docs/DEVELOPMENT.md) • [📖 Documentation](#-documentation) • [🤖 AI Platform](docs/AI_PLATFORM.md) • [🗺️ Roadmap](docs/ROADMAP.md)
-
-</div>
+EchoTune AI wraps the Spotify Web API with a conversational AI layer: type natural language commands ("play energetic rock", "create a chill playlist"), get personalised recommendations, and control playback — all from a single React chat interface.
 
 ---
 
-<!-- QA-AUTOMATION-START -->
-## 🧪 Latest QA Automation Results
+## Quick Start
 
-**Last Run:** 2025-10-13 03:34:28   
-**Duration:** 43.21s  
-**Status:** ⚠️ ISSUES DETECTED
-
-### Installation & Build
-- **NPM Install:** ✅ PASS
-- **Docker Build:** ❌ FAIL
-
-### Test Results
-- **Total Tests:** 4
-- **Passed:** 0 ✅
-- **Failed:** 0 ❌
-- **Skipped:** 4 ⏭️
-
-### UI Screenshots
-10 screenshots captured for regression testing.
-
-### ⚠️ Issues Detected
-1. **docker-build:** Docker build failed
-2. **comprehensive-tests:** Docker build failed
-
-### 📊 Full Reports
-Detailed reports available in: [`QA-AUTOMATION-RESULTS/master-qa-1760318996225`](./QA-AUTOMATION-RESULTS/master-qa-1760318996225)
-
-### Running QA Automation
 ```bash
-# Run full QA suite
-npm run qa:all
+# 1. Clone
+git clone https://github.com/AloSantana/Spotify-echo.git
+cd Spotify-echo
 
-# Run specific phases
-npm run qa:npm      # NPM installation & tests
-npm run qa:docker   # Docker build & validation
-npm run qa:full     # Comprehensive automation
+# 2. Configure
+cp .env.example .env
+# Edit .env — add Spotify credentials + at least one LLM API key
+
+# 3. Install & initialise database
+npm install
+npm run db:init      # generates Prisma client + pushes schema
+
+# 4. Start
+npm start            # http://localhost:3000
+# or
+npm run dev          # hot-reload development mode
 ```
 
-<!-- QA-AUTOMATION-END -->
+> **Requires**: Node.js ≥ 20, a [Spotify Developer App](https://developer.spotify.com/dashboard), and at least one AI key (Gemini / OpenAI / OpenRouter).
 
+---
 
-## 🌟 What is EchoTune AI?
+## Key Features
 
-EchoTune AI is a comprehensive music discovery platform that combines Spotify's vast music catalog with AI-powered recommendations and conversational search. The platform provides personalized music recommendations based on your listening history, mood, and preferences.
+| Feature | Description |
+|---|---|
+| 💬 Natural language control | "play something upbeat", "skip", "add to queue" |
+| 🤖 Multi-provider AI chat | Gemini · OpenAI · Anthropic · OpenRouter · Azure · mock fallback |
+| 🎵 Recommendation engine | Collaborative + content-based (audio features) + semantic embeddings |
+| 📋 AI playlist generation | Describe a vibe → full Spotify playlist |
+| 📊 Listening analytics | History charts, top tracks/artists, audio-feature profiles |
+| 🔄 Real-time updates | Socket.IO now-playing widget, provider health |
 
-**✨ NEW: Modernized Chat-First Architecture** - Complete platform overhaul with PostgreSQL integration, advanced AI provider management, and natural language Spotify control!
+---
 
-### Core Value Proposition
+## Technology Stack
 
-- **🎵 Natural Language Spotify Control**: Control playback with conversational commands like "play energetic rock music" ✨ NEW
-- **💬 Chat-First Experience**: Modern React UI with chat as the primary interface ✨ NEW
-- **🤖 AI-Powered Recommendations**: Multi-provider system (Gemini, OpenAI, Claude) with automatic failover ✨ ENHANCED
-- **🗄️ Hybrid Database**: PostgreSQL for state + MongoDB for analytics ✨ NEW
-- **📊 Data-Driven Insights**: 200K+ listening history records with real-time personalization
-- **⚙️ Production-Ready**: Comprehensive error handling, health monitoring, and graceful degradation ✨ NEW
+| Layer | Technology |
+|---|---|
+| Runtime | Node.js 20+, Express 4 |
+| Frontend | React 19, Vite 7, Material-UI 5 |
+| Databases | PostgreSQL (Prisma) · MongoDB · Redis · SQLite fallback |
+| AI providers | Gemini, OpenAI, Anthropic, OpenRouter, Azure OpenAI |
+| Real-time | Socket.IO 4 |
+| Deployment | Docker, Nginx, DigitalOcean App Platform, Vercel |
 
-## 🎯 Current Features
+---
 
-### ✨ New Modernization Features (Phase 1-5 Complete)
+## Environment Variables
 
-- **💬 Chat-First UI**: React 19 + Vite + Material-UI with optimized code splitting (<1s load time) ✨ NEW
-- **🎵 Natural Language Spotify Commands**: Control playback conversationally (13 command types) ✨ NEW
-  - "play some energetic rock music", "pause", "add to queue", "what's playing?"
-- **🗄️ PostgreSQL Integration**: Hybrid database with 9 models for chat, preferences, and state ✨ NEW
-- **🤖 AI Provider Factory**: Centralized management with 5 selection strategies and <100ms failover ✨ NEW
-- **📊 Provider Health Monitoring**: Real-time tracking with PostgreSQL persistence ✨ NEW
-- **🎵 Now Playing Widget**: Real-time playback display with inline controls ✨ NEW
-- **🔧 Playback Controller**: Complete Spotify API coverage (15+ operations) ✨ NEW
-
-### ✅ Core Features (Production Ready)
-
-- **🔐 Spotify Authentication**: OAuth 2.0 PKCE flow with token refresh ✅
-- **🎵 Spotify Playback Control**: Play, pause, skip, queue, shuffle, repeat, volume, device management ✅
-- **👤 User Settings System**: PostgreSQL preferences + MongoDB persistence ✅
-- **💬 Multi-Provider Chat**: Gemini, OpenAI, Claude, OpenRouter with automatic failover ✅
-- **📊 Listening History**: 203,090+ documents with comprehensive indexing ✅
-- **📱 Modern Web Interface**: React SPA with lazy-loaded components ✅
-- **🔧 API Ecosystem**: 30+ API routes including Spotify integration ✅
-- **🤖 AI/ML Services**: Real-time inference with provider health monitoring ✅
-- **🔄 Feature Flags**: Dynamic control with PostgreSQL backend ✅
-- **📊 Hybrid Database**: PostgreSQL (state) + MongoDB (analytics) + Redis (cache) ✅
-- **🎯 Recommendation Engine**: Content-based filtering + AI-powered suggestions ✅
-
-### 🚧 Partial Implementation (In Progress)
-
-- **🎯 Hybrid Recommendations**: Algorithm framework with feature flags ✅ (content-based working, collaborative partially implemented)
-- **📈 Analytics Dashboard**: Real-time insights ✅ (basic API endpoints active)  
-- **🧪 A/B Testing**: Experimentation framework ✅ (feature flags system operational)
-- **📱 PWA Features**: Offline capabilities and push notifications ⏳ (scaffolded)
-- **🤖 Advanced AI Routing**: Multi-provider optimization strategies ✅ (implemented with fallbacks)
-- **🔍 Advanced Search**: Vector similarity search ⏳ (embedding strategy partial)
-- **📊 Real-time Analytics**: Live user behavior tracking ⏳ (infrastructure ready)
-
-### 📋 Planned Features (Roadmap)
-
-- **🔄 Real-time Personalization**: Live preference learning
-- **🎵 Smart Playlist Generation**: AI-curated playlists
-- **📱 Mobile-Responsive PWA**: Full offline functionality
-- **🏢 Multi-user Support**: Shared playlists and social features
-- **🔍 Advanced Search**: Vector similarity and semantic search
-
-## 🏗️ Architecture Overview
-
-```mermaid
-graph TB
-    Frontend[🖥️ Web Interface] --> API[🔌 Express API Server]
-    API --> Auth[🔐 Spotify OAuth]
-    API --> Chat[💬 Chat Service]
-    API --> Settings[⚙️ User Settings]
-    API --> Spotify[🎵 Spotify Integration]
-    
-    Chat --> LLM[🤖 Multi-Provider LLM]
-    LLM --> OpenAI[OpenAI]
-    LLM --> Gemini[Google Gemini]
-    LLM --> Mock[Mock Provider]
-    
-    Settings --> MongoDB[(🗄️ MongoDB)]
-    Spotify --> SpotifyAPI[🎧 Spotify Web API]
-    API --> MCP[🔧 MCP Servers]
-    
-    MongoDB --> Analytics[📊 Analytics]
-    MongoDB --> Recommendations[🎯 Recommendations]
-    
-    classDef frontend fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
-    classDef api fill:#f1f8e9,stroke:#388e3c,stroke-width:2px
-    classDef data fill:#fce4ec,stroke:#c2185b,stroke-width:2px
-    classDef external fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    
-    class Frontend frontend
-    class API,Auth,Chat,Settings,Spotify api
-    class MongoDB,Analytics,Recommendations data
-    class SpotifyAPI,OpenAI,Gemini,Mock external
-```
-
-## 💾 MongoDB Data Model & Recommendation Engine
-
-### Core Collections
-
-#### `listening_history` (203,090 documents)
-**Purpose**: Foundation for AI-powered music recommendations using Spotify's 13 audio features
-```json
-{
-  "_id": "composite_key_track_user_timestamp",
-  "spotify_track_uri": "spotify:track:...",
-  "timestamp": "2010-05-03T09:14:32Z",
-  "user": {
-    "username": "willexmen",
-    "platform": "Windows XP",
-    "country": "SE"
-  },
-  "track": {
-    "name": "The Quiet Place",
-    "artist": "In Flames",
-    "album": "Soundtrack To Your Escape",
-    "duration_ms": 210000,
-    "popularity": 85
-  },
-  "audio_features": {
-    "danceability": 0.7,      // Spotify's rhythm and beat strength
-    "energy": 0.8,            // Perceptual measure of intensity
-    "valence": 0.6,           // Musical positivity/happiness
-    "tempo": 150.0,           // BPM (beats per minute)
-    "acousticness": 0.3,      // Acoustic vs electronic confidence
-    "instrumentalness": 0.1,  // Vocal content prediction
-    "liveness": 0.2,          // Live performance detection
-    "speechiness": 0.05,      // Spoken word content
-    "loudness": -5.0,         // Overall loudness in dB
-    "key": 9,                 // Musical key (0=C, 1=C#, etc)
-    "mode": 1,                // Major (1) or minor (0)
-    "time_signature": 4       // Time signature beats per bar
-  },
-  "listening": {
-    "ms_played": 83863,
-    "completion_rate": 0.399,
-    "skipped": true
-  }
-}
-```
-
-### 🎯 Recommendation Engine Architecture
-
-EchoTune AI uses a **hybrid recommendation system** that combines:
-
-1. **Content-Based Filtering**: Analyzes Spotify's 13 audio features to find musically similar tracks
-2. **Collaborative Filtering**: Leverages 203K+ listening history records to identify user patterns  
-3. **LLM-Enhanced Discovery**: Uses AI to understand natural language music preferences
-4. **MongoDB Analytics**: Real-time aggregation of listening patterns and audio feature clusters
-
-#### Multi-Stage Recommendation Pipeline
-
-```mermaid
-graph TD
-    A[User Input] --> B{Input Type}
-    B -->|Natural Language| C[LLM Processing]
-    B -->|Direct Play| D[Audio Feature Analysis]
-    C --> E[Intent Extraction]
-    D --> F[Feature Clustering]
-    E --> G[MongoDB Query]
-    F --> G
-    G --> H[Collaborative Filtering]
-    H --> I[Content-Based Scoring]
-    I --> J[Hybrid Ranking]
-    J --> K[Spotify Track Enrichment]
-    K --> L[Final Recommendations]
-```
-
-#### Audio Feature Clustering Examples
-
-**High Energy Electronic** (Energy: 0.8+, Danceability: 0.7+)
-- Tempo: 120-140 BPM
-- Acousticness: <0.3
-- Valence: >0.6
-
-**Ambient/Chill** (Energy: <0.4, Valence: 0.3-0.7)
-- Instrumentalness: >0.7  
-- Acousticness: >0.5
-- Tempo: 60-100 BPM
-
-**Aggressive Rock/Metal** (Energy: 0.8+, Valence: <0.4)
-- Loudness: >-8dB
-- Tempo: 140+ BPM
-- Instrumentalness: <0.3
-
-### MongoDB Integration with AI
-
-The recommendation engine continuously learns from:
-- **203K+ historical listening patterns** for collaborative filtering
-- **Real-time user interactions** for preference adaptation  
-- **Spotify's audio feature vectors** for content similarity
-- **LLM-generated preference profiles** for semantic understanding
-
-This creates a personalized music discovery experience that understands both what you like and why you like it.
-
-#### `user_settings` (TODO)
-```json
-{
-  "userId": "user_12345",
-  "llmProvider": "gemini",
-  "strategyWeights": {
-    "collaborative": 0.4,
-    "content": 0.4,
-    "semantic": 0.2
-  },
-  "privacy": {
-    "storeHistory": true,
-    "shareAnalytics": false
-  }
-}
-```
-
-## 💬 Chat & Recommendation Flow
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Chat
-    participant LLM
-    participant Spotify
-    participant MongoDB
-    
-    User->>Chat: "Find energetic rock music"
-    Chat->>LLM: Process natural language
-    LLM->>Chat: Extract intent & preferences
-    Chat->>MongoDB: Query listening history
-    MongoDB->>Chat: Return user patterns
-    Chat->>Spotify: Search tracks with features
-    Spotify->>Chat: Return track metadata
-    Chat->>User: Curated recommendations
-```
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-> **⚠️ Important**: Node.js **20.x LTS** is the recommended and tested version. While Node 18.x is the minimum requirement, Node 20.x provides better compatibility with all dependencies (Prisma 6.x, Vite 7.x).
-
-**Required:**
-- **Node.js 20.x LTS** (recommended - see `.nvmrc`)
-  - Minimum: Node.js 18.0+
-  - Tested on: Node.js 20.19.5
-  - Required for: Prisma 6.x, Vite 7.x, ESLint 9, modern JavaScript features
-  - Check version: `node --version`
-  - Install with nvm: `nvm install 20 && nvm use 20`
-- **npm** 8.x or higher (comes with Node.js 20+)
-- **MongoDB** (Atlas recommended) or use embedded SQLite
-- **Spotify Developer Account** + **Premium Account** (for playback control)
-
-**Optional but Recommended:**
-- **PostgreSQL** (for chat history & user preferences) ✨ NEW
-- **Redis** (for caching and session management)
-
-### 🎵 Spotify API Setup
-
-#### Step 1: Create Spotify App
-
-1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-2. Click **"Create an App"**
-3. Fill in app details:
-   - **App Name**: `EchoTune AI Local` (or your preference)
-   - **App Description**: `Local development for music discovery app`
-   - **Redirect URI**: `http://localhost:3000/auth/callback`
-   - **Website**: (optional)
-4. Accept terms and click **"Create"**
-
-#### Step 2: Configure App Settings
-
-1. In your new app dashboard, click **"Settings"**
-2. Note your **Client ID** and **Client Secret**
-3. Under **"Redirect URIs"**, ensure you have:
-   ```
-   http://localhost:3000/auth/callback
-   ```
-4. **Required Scopes** (automatically requested by app):
-   - `user-read-private` - Basic profile access
-   - `user-read-email` - Email access for account linking
-   - `playlist-modify-public` - Create/modify public playlists
-   - `playlist-modify-private` - Create/modify private playlists  
-   - `user-read-recently-played` - Access listening history
-   - `user-top-read` - Access top tracks and artists
-   - `user-library-read` - Read saved tracks
-   - `user-library-modify` - Save/remove tracks
-   - `user-read-playback-state` - Read current playback state
-   - `user-modify-playback-state` - Control playback (play/pause/skip/device transfer)
-   - `streaming` - Play tracks in Web Playbook SDK (if using web player)
-
-### Environment Setup
-
-Create `.env` file with your Spotify credentials:
+Copy `.env.example` and fill in:
 
 ```env
-# Required: Spotify API Credentials
-SPOTIFY_CLIENT_ID=your_spotify_client_id_here
-SPOTIFY_CLIENT_SECRET=your_spotify_client_secret_here
+# Required — Spotify
+SPOTIFY_CLIENT_ID=
+SPOTIFY_CLIENT_SECRET=
 SPOTIFY_REDIRECT_URI=http://localhost:3000/auth/callback
 
-# Required: MongoDB Connection
-MONGODB_URI=mongodb+srv://your-cluster/echotune
+# Required — Security
+JWT_SECRET=
+SESSION_SECRET=
 
-# Required: JWT Security (generate secure secrets for production)
-JWT_SECRET=your-secure-jwt-secret-here
-SESSION_SECRET=your-secure-session-secret-here
+# Required — at least one database
+MONGODB_URI=
+POSTGRES_URL=
 
-# Optional: AI Provider (at least one recommended for chat)
-GEMINI_API_KEY=your_gemini_api_key
-# OR
-OPENAI_API_KEY=your_openai_api_key
-# OR  
-OPENROUTER_API_KEY=your_openrouter_api_key
-ANTHROPIC_API_KEY=your_anthropic_api_key
+# At least one LLM provider
+GEMINI_API_KEY=
+OPENAI_API_KEY=
+OPENROUTER_API_KEY=
+ANTHROPIC_API_KEY=
 
-# Optional: PostgreSQL for chat & preferences (recommended) ✨ NEW
-POSTGRES_URL=postgresql://localhost:5432/echotune_ai
-# See docs/POSTGRESQL_SETUP.md for setup instructions
-
-# Optional: Advanced features
+# Optional
 REDIS_URL=redis://localhost:6379
 NODE_ENV=development
 PORT=3000
 ```
 
-### Installation & Launch
+---
 
-> **⚠️ Important**: Before running `npm start`, you must first run `npm install` to install all required dependencies. The installation process now automatically handles Prisma client generation.
+## Project Structure
 
-#### Standard Setup (Linux, macOS, WSL)
+```
+Spotify-echo/
+├── src/                    # All application source code
+│   ├── server.js           # Express app factory
+│   ├── api/                # HTTP route handlers
+│   ├── routes/             # Modular route sub-modules
+│   ├── chat/               # Conversational AI (chatbot, LLM providers, intents)
+│   ├── recommendation/     # Recommendation engine strategies
+│   ├── ml/                 # ML recommendation engine
+│   ├── spotify/            # Spotify API wrapper (playback, audio features, playlists)
+│   ├── database/           # DB abstraction (MongoDB, PostgreSQL, SQLite, file)
+│   ├── infra/              # DI container, feature flags, event bus, lifecycle
+│   ├── security/           # Auth, rate limiting, security headers
+│   ├── services/           # Shared services (chat persistence, Socket.IO)
+│   ├── frontend/           # React SPA (App.jsx, 60+ components, contexts)
+│   ├── config/             # Environment and production config
+│   └── utils/              # Shared utilities
+├── prisma/
+│   └── schema.prisma       # PostgreSQL schema (9 models)
+├── tests/                  # Jest unit + integration + E2E tests
+├── public/                 # Frontend static assets
+├── nginx/                  # Nginx reverse proxy config
+├── ml_datasets/            # Sample ML datasets (README + small files)
+├── config/                 # App-level config files (weights, feature flags)
+├── docs/                   # Key documentation
+│   └── APP_SPECIFICATION.md  # Full in-depth technical specification
+├── server.js               # Root entry point (DigitalOcean / platforms)
+├── index.js                # Alternate entry point
+├── package.json
+├── Dockerfile
+├── docker-compose.yml
+├── docker-compose.full-stack.yml
+├── vite.config.js
+├── jest.config.js
+└── playwright.config.mjs
+```
+
+---
+
+## Documentation
+
+| Doc | Content |
+|---|---|
+| [`docs/APP_SPECIFICATION.md`](docs/APP_SPECIFICATION.md) | **Complete technical spec** — architecture, all APIs, data models, rebuild checklist |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | System architecture diagrams |
+| [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) | Development setup guide |
+| [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | Production deployment guide |
+| [`docs/SPOTIFY_INTEGRATION.md`](docs/SPOTIFY_INTEGRATION.md) | Spotify API integration details |
+| [`docs/LLM_INTEGRATION.md`](docs/LLM_INTEGRATION.md) | AI provider integration guide |
+| [`docs/POSTGRESQL_SETUP.md`](docs/POSTGRESQL_SETUP.md) | PostgreSQL + Prisma setup |
+| [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) | Full database schema documentation |
+
+---
+
+## Commands
 
 ```bash
-# 1. Clone repository
-git clone https://github.com/primoscope/Spotify-echo.git
-cd Spotify-echo
-
-# 2. Copy environment template
-cp env.example .env
-# Edit .env and add your POSTGRES_URL and other credentials
-
-# 3. Install dependencies (automatically runs Prisma generation)
-npm install
-
-# 4. Initialize database (generate Prisma client + sync schema)
-npm run db:init
-
-# 5. Start the application
-npm start
-
-# Or use development mode with hot-reload
-npm run dev
+npm start             # Start production server
+npm run dev           # Start with hot-reload
+npm test              # Run unit tests
+npm run test:e2e      # Run Playwright E2E tests
+npm run lint          # ESLint
+npm run db:init       # Init database (generate Prisma + push schema)
+npm run db:migrate    # Run database migrations
 ```
 
-#### Windows WSL Setup
-
-**For detailed Windows WSL setup, see [docs/WSL-SETUP.md](docs/WSL-SETUP.md)**
-
-Quick steps:
-```bash
-# In WSL Ubuntu terminal:
-
-# 1. Ensure Node 20.x is installed
-node --version  # Should be v20.x.x
-
-# 2. Start PostgreSQL (Docker recommended)
-docker run --name echotune-postgres \
-  -e POSTGRES_PASSWORD=password \
-  -e POSTGRES_DB=echotune \
-  -p 5432:5432 -d postgres:15
-
-# 3. Clone and setup
-git clone https://github.com/primoscope/Spotify-echo.git
-cd Spotify-echo
-cp env.example .env
-
-# 4. Edit .env with your database URL
-# POSTGRES_URL=postgresql://postgres:password@localhost:5432/echotune
-
-# 5. Install and initialize
-npm install
-npm run db:init
-
-# 6. Start the server
-npm start
-```
-
-#### Manual Database Setup (if needed)
+### Docker
 
 ```bash
-# Generate Prisma client only
-npm run db:generate
-
-# Push schema to database (for quick sync)
-npm run db:push
-
-# Or run migrations (for production)
-npm run db:migrate
-
-# Combined init (recommended for first-time setup)
-npm run db:init
+docker-compose up --build                              # App only
+docker-compose -f docker-compose.full-stack.yml up    # App + MongoDB + PostgreSQL + Redis
 ```
 
-#### Validate Installation
+---
 
-```bash
-# Test environment configuration
-npm run validate:env
+## Spotify API Setup
 
-# Test Spotify credentials
-npm run auth:test-credentials
+1. Create an app at [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard)
+2. Set redirect URI to `http://localhost:3000/auth/callback`
+3. Copy **Client ID** and **Client Secret** into `.env`
+4. Visit `http://localhost:3000/auth/spotify` to authenticate
 
-# Run health check
-curl http://localhost:3000/health
-```
+---
 
-# Access the application at http://localhost:3000
-# Chat interface loads as the default page ✨ NEW
-```
+## License
+
+MIT — see [LICENSE](LICENSE)
