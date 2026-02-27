@@ -1,952 +1,418 @@
-# 🤖 EchoTune AI - GitHub Copilot Instructions
+# Copilot Instructions for EchoTune AI (Spotify-echo)
 
-## Project Overview
+## Purpose
 
-**EchoTune AI** is a sophisticated music recommendation system that integrates with Spotify to provide AI-powered, personalized music discovery. This document provides comprehensive instructions for GitHub Copilot when working on this project.
+This document provides comprehensive guidance for GitHub Copilot and AI coding agents working on this repository. It follows [GitHub's best practices for Copilot coding agents](https://gh.io/copilot-coding-agent-tips).
 
-### Key Technologies
-- **Backend**: Node.js (Express), Python
-- **Frontend**: JavaScript, HTML, CSS, React
+## Quick Reference
+
+- **Language**: JavaScript/Node.js ES6+ (Backend), Python 3.8+ (Scripts/ML), JavaScript ES6+/React (Frontend)
+- **Framework**: Express.js (REST API), WebSockets (Real-time), React (Frontend)
+- **AI/ML**: OpenAI, Google Gemini, OpenRouter, AWS Bedrock (Claude Sonnet/Opus), custom ML models
 - **Database**: MongoDB (primary), SQLite (fallback), Redis (caching)
-- **AI/ML**: OpenAI, Google Gemini, OpenRouter, custom ML models
-- **Automation**: Advanced MCP (Model Context Protocol) ecosystem with 7+ integrated servers
-- **MCP Servers**: Filesystem, Puppeteer, Package Management, Analytics, Code Sandbox, Creative Automation
+- **Testing**: Jest (Node.js), pytest (Python)
 - **Deployment**: Docker, DigitalOcean, Nginx, SSL automation
+- **CI/CD**: GitHub Actions (`.github/workflows/`)
 
-## 🎯 Core Objectives
+## Repository Overview
 
-1. **Music Intelligence**: Build advanced recommendation algorithms using collaborative filtering, content-based analysis, and deep learning
-2. **Conversational AI**: Implement natural language interfaces for music discovery
-3. **Data Processing**: Handle large-scale Spotify listening history and audio feature analysis
-4. **Browser Automation**: Create seamless Spotify Web Player integration with MCP automation
-5. **Production Readiness**: Ensure scalable, secure, and maintainable code
-6. **MCP Ecosystem Integration**: Leverage community MCP servers for enhanced development workflow
-7. **Automated Testing & Validation**: Continuous integration with automated code analysis and optimization
+**EchoTune AI** is a sophisticated music recommendation system that integrates with Spotify to provide AI-powered, personalized music discovery. It features:
+- Advanced recommendation algorithms (collaborative filtering, content-based analysis, deep learning)
+- Conversational AI for natural language music discovery
+- Large-scale Spotify listening history processing and audio feature analysis
+- Browser automation for Spotify Web Player integration via MCP
+- MCP (Model Context Protocol) ecosystem with 10+ integrated servers
+- AWS Bedrock model integration with Claude Sonnet 4.5 / Opus 4.1
 
-## 🤖 Enhanced GitHub Copilot Integration & MCP Automation
+## Tech Stack
 
-**EchoTune AI** features advanced GitHub Copilot integration with comprehensive MCP (Model Context Protocol) automation, AWS Bedrock model integration, and validation gating system.
+### Backend
+- **Framework**: Express.js (Node.js 16+)
+- **AI/ML**:
+  - OpenAI API (GPT models)
+  - Google Gemini (Gemini models)
+  - OpenRouter (multi-model routing)
+  - AWS Bedrock (Claude Sonnet 4.5, Claude Opus 4.1, DeepSeek R1)
+  - Custom ML pipelines (collaborative filtering, content-based)
+- **Database**: MongoDB Atlas, Redis (caching), SQLite (fallback)
+- **Other**: WebSockets, JWT auth, Spotify Web API, Passport.js
 
-### 🚀 AWS Bedrock Model Integration
+### Frontend
+- **React** with modern hooks
+- Vanilla JS/HTML/CSS for lighter pages
+- Multi-tab interface (Music Discovery, AI Chat, Visualizations)
+- Real-time WebSocket communication
+- Spotify Web Player integration
 
-**EchoTune AI** integrates with AWS Bedrock for state-of-the-art AI model access with visible model tracking and dynamic switching capabilities.
+### Scripts / ML (Python)
+- **Python 3.8+**: Data processing, ML training, analysis
+- Collaborative filtering, content-based analysis
+- Audio feature extraction via Spotify API
+- Dataset processing in `scripts/` and `ml_datasets/`
 
-#### Default Models for Coding Sessions
-- **Claude Sonnet 4.5** (`anthropic.claude-sonnet-4-5-20250929-v1:0`) - Primary model for code generation and analysis
-- **Claude Opus 4.1** (`anthropic.claude-opus-4-1-20250805-v1:0`) - Complex analysis and architectural review
-- **DeepSeek R1** (`deepseek.r1-v1:0`) - Advanced reasoning and problem-solving
+### Infrastructure
+- **Containerization**: Docker, Docker Compose
+- **Deployment**: DigitalOcean App Platform, Nginx reverse proxy, SSL/HTTPS
+- **MCP Servers**: 10+ Model Context Protocol servers for enhanced Copilot capabilities
+- **CI/CD**: GitHub Actions with security scanning, build tests, CodeQL
 
-#### Session Model Visibility
-Every coding session displays current AWS Bedrock model information:
+## Project Structure
+
 ```
-╔════════════════════════════════════════════════════════════╗
-║  GitHub Copilot Session - AWS Bedrock Integration         ║
-╠════════════════════════════════════════════════════════════╣
-║  Model: Claude Sonnet 4.5                                  ║
-║  ID: anthropic.claude-sonnet-4-5-20250929-v1:0            ║
-║  Region: us-east-1                                         ║
-║  Purpose: Code generation & analysis                       ║
-║  Session Started: 2025-01-15 13:00:00                     ║
-╚════════════════════════════════════════════════════════════╝
-```
-
-#### AWS Bedrock Slash Commands
-```bash
-# Model Switching
-/use claude-opus-4-1          # Switch to Claude Opus 4.1 for complex analysis
-/use claude-sonnet-4-5        # Switch to Claude Sonnet 4.5 for coding (default)
-/use claude-3-5-sonnet-v2     # Switch to Claude 3.5 Sonnet v2 with vision
-/use deepseek-r1              # Switch to DeepSeek R1 for reasoning tasks
-/use titan                    # Switch to Amazon Titan Text Express
-
-# Model Information
-/model status                 # Show current model and session stats
-/model list                   # List all available AWS Bedrock models
-/model reset                  # Reset to default model (Claude Sonnet 4.5)
-/model help                   # Show all model commands
-
-# Quick Reference
-node scripts/aws-bedrock-copilot-integration.js /model list
-```
-
-#### Model Change Confirmations
-When switching models, you'll see:
-```
-📝 Model Changed
-• Previous: Claude Sonnet 4.5
-• Current: Claude Opus 4.1 (anthropic.claude-opus-4-1-20250805-v1:0)
-• Region: us-east-1
-• Reason: User requested via /use command
-```
-
-#### Enhanced GPT-5 Multi-Model Integration (Legacy)
-
-#### Available Models & Commands
-- **GPT-5**: `gpt-5` - Latest GPT model with enhanced capabilities  
-- **GPT-5 Chat**: `gpt-5-chat` - Conversational variant optimized for dialogue
-- **GPT-5 Turbo**: `gpt-5-turbo` - High-performance variant with faster response
-- **GPT-4 Turbo**: `gpt-4-turbo` - Proven high-performance model
-
-#### Slash Command Integration
-```bash
-# Enhanced GPT-5 Commands
-/gpt5 analyze                    # Full system analysis
-/analyze-gpt5                    # Quick code analysis
-/review-gpt5                     # Comprehensive code review  
-/optimize-gpt5                   # Performance optimization analysis
-/gpt5 roadmap                    # Strategic roadmap planning
-
-# Target-specific analysis
-/gpt5 analyze src/components/    # Analyze specific directory
-/review-gpt5 scripts/automation/ # Review automation scripts
-/optimize-gpt5 database/         # Optimize database components
-
-# Natural language triggers  
-"use model gpt-5 for full analysis and documentation"
-"use gpt-5-chat to review and optimize the recommendation engine"
-```
-
-### 🛡️ Enhanced MCP Validation Gateway
-
-#### Pre-Merge Validation Requirements
-All Copilot/Agent PRs **MUST** pass comprehensive validation before merge:
-
-1. **🛡️ MCP Server Validation**: All 81 tracked MCP servers operational
-2. **🔍 Integration Testing**: Community MCP server integrations verified
-3. **🛠️ Automation Testing**: Agent automation scripts validated
-4. **📊 Performance Impact**: No system performance degradation
-5. **🔒 Security Scanning**: No new vulnerabilities introduced
-
-#### MCP Slash Commands
-```bash
-# Validation Commands
-/run-mcp-all                     # Comprehensive MCP validation suite
-/run-mcp-validation              # Standard MCP validation  
-/mcp-health-check                # Quick health check only
-/mcp-discover                    # Discover new MCP servers
-
-# Admin Override Commands (Maintainers Only)
-/approve-merge                   # Override validation and approve merge
-/force-validation                # Force validation for any PR type
-```
-
-#### Auto-Merge Gating Logic
-- ✅ **Auto-merge ENABLED**: All MCP + GPT validations pass
-- ❌ **Auto-merge BLOCKED**: Critical validation failures detected
-- ⏳ **Validation PENDING**: Comprehensive checks in progress
-- 🔓 **Admin OVERRIDE**: Manual approval by maintainers
-
-### 🔧 Enhanced Development Workflow Integration
-
-#### Automated PR Validation Pipeline
-```mermaid
-graph TD
-    A[PR Created/Updated] --> B{Copilot/Agent PR?}
-    B -->|Yes| C[🚪 Pre-Merge Validation Gate]
-    B -->|No| D[📋 Standard Review Process]
-    C --> E[🛡️ MCP Server Health Check]
-    E --> F[🔍 Integration Tests]
-    F --> G[🛠️ Automation Validation]
-    G --> H[📊 Performance Analysis]
-    H --> I[🔒 Security Scanning]
-    I --> J{All Checks Pass?}
-    J -->|Yes| K[✅ Auto-Merge Ready]
-    J -->|No| L[❌ Merge Blocked]
-    L --> M[🔄 Fix & Retry]
-    M --> E
-    K --> N[🚀 Auto-Merge Enabled]
-    D --> O[👥 Standard Review & Merge]
-```
-
-#### Enhanced Workflow Triggers
-1. **Pull Request Events**: `opened`, `synchronize`, `ready_for_review`, `labeled`
-2. **Slash Commands**: `/gpt5`, `/analyze-gpt5`, `/run-mcp-all`, etc.
-3. **Natural Language**: "use model gpt-5 for analysis"
-4. **Labels**: `copilot-coding-agent`, `gpt5-analysis`, `needs-mcp-validation`
-5. **Scheduled**: Weekly MCP discovery and health monitoring
-
-#### Unified Result Reporting
-All validation results are consolidated into comprehensive PR comments:
-- 🛡️ **Validation Gateway Status**: Pass/Fail with detailed breakdown
-- 🤖 **GPT-5 Analysis Results**: Code quality, architecture, recommendations  
-- 📊 **MCP Integration Status**: All server health and performance metrics
-- 🔄 **Available Commands**: Context-aware follow-up actions
-- 🚀 **Merge Readiness**: Clear indicators for auto-merge eligibility
-
-## 📁 Enhanced Project Structure
-Spotify-echo/
-├── src/                      # Frontend JavaScript modules & React components
-├── static/                   # Static assets (CSS, images)
-├── scripts/                  # Python automation and data processing
+.
+├── .github/
+│   ├── agents/              # Custom AI agent definitions (13 specialized agents)
+│   ├── copilot/             # Copilot MCP configuration (mcp.json)
+│   └── workflows/           # CI/CD workflows
+├── .agent/                  # Agent toolkit (skills, rules, workflows)
+├── .gemini/                 # Gemini IDE configuration
+├── .context/                # Coding context and style guides
+├── src/                     # Frontend JavaScript modules & React components
+├── static/                  # Static assets (CSS, images)
+├── scripts/                 # Python automation and data processing
 ├── mcp-server/              # Enhanced MCP automation ecosystem
-│   ├── enhanced-mcp-orchestrator.js  # MCP server orchestration
-│   ├── coordination-server.js        # Multi-server coordination  
-│   └── workflow-manager.js           # Automated workflow management
 ├── mcp-servers/             # Community MCP server integrations
-│   ├── package-management/  # Automated package version management
-│   ├── code-sandbox/        # Secure code execution environment
-│   ├── analytics-server/    # Advanced analytics and telemetry
-│   └── testing-automation/  # Automated testing and validation
 ├── ml_datasets/             # Machine learning datasets
 ├── data/                    # Spotify CSV data and processed files
-├── .github/workflows/       # Enhanced CI/CD automation with MCP integration
-│   ├── gpt5-advanced-multimodel.yml    # Enhanced GPT-5 multi-model workflow
-│   ├── agent-mcp-automation.yml        # MCP validation gateway with pre-merge gating  
-│   ├── mcp-slash-commands.yml          # Slash command handler for MCP operations
-│   └── copilot-models.yml              # Legacy workflow (redirects to enhanced)
-├── nginx/                   # Nginx configuration for production
+├── config/                  # Application configuration
 ├── docs/                    # Comprehensive documentation
+├── nginx/                   # Nginx configuration for production
+├── tests/                   # Test suite (Jest + pytest)
 ├── package.json             # Node.js dependencies
 ├── requirements.txt         # Python dependencies
-└── README.md               # Comprehensive project documentation
+└── README.md                # Project documentation
 ```
 
-## 🔧 Development Environment Context
+## Custom AI Agents
 
-### Prerequisites
-- Node.js 16+ 
-- Python 3.8+
-- MongoDB Atlas account (optional but recommended)
-- Spotify Developer credentials
+This repository includes **13 specialized agents** for different development tasks:
 
-### Quick Start Commands
+1. **jules** ⭐ - Code quality, collaboration, refactoring
+2. **rapid-implementer** - Fast, autonomous end-to-end code implementation
+3. **architect** - System architecture and design decisions
+4. **debug-detective** - Advanced debugging and root cause analysis
+5. **deep-research** - Comprehensive research and analysis (flagship agent)
+6. **full-stack-developer** - Complete web application development
+7. **repo-optimizer** - Repository setup and tooling improvements
+8. **testing-stability-expert** - Testing and quality validation
+9. **performance-optimizer** - Performance profiling and optimization
+10. **code-reviewer** - Security and quality code reviews
+11. **docs-master** - Documentation creation and verification
+12. **api-developer** - API design and implementation
+13. **devops-infrastructure** - Docker, CI/CD, DigitalOcean deployment
+
+**Usage**: `@agent:rapid-implementer Implement Spotify playlist recommendation feature with collaborative filtering`
+
+## MCP Servers Available
+
+### Core Development (Always Active)
+- `filesystem`: File operations and batch read/write
+- `git`: Version control operations
+- `github`: GitHub integration (issues, PRs, code search)
+- `memory`: Context persistence across sessions
+- `sequential-thinking`: Enhanced multi-step reasoning
+
+### Data & Storage
+- `sqlite`: Local database queries
+
+### Web & Automation
+- `puppeteer`: Browser automation (Spotify Web Player testing)
+- `fetch`: HTTP requests to external APIs
+
+### Infrastructure & Utilities
+- `docker`: Container management
+- `time`: Time and timezone operations
+
+## Development Guidelines
+
+### Code Style & Conventions
+
+#### JavaScript/Node.js
+- **Style**: ESLint + Prettier (configured in `.prettierrc`)
+- **Async/Await**: Use async/await for all I/O operations (no callbacks)
+- **Error Handling**: Try/catch with proper logging (Winston logger)
+- **Imports**: CommonJS (`require`) for Node.js backend
+- **Logging**: Use existing logger utility (`require('../utils/logger')`)
+
+**Express Route Pattern:**
+```javascript
+const express = require('express');
+const router = express.Router();
+const logger = require('../utils/logger');
+const { authenticate } = require('../middleware/auth');
+
+// GET /api/v1/recommendations
+router.get('/recommendations', authenticate, async (req, res) => {
+  try {
+    const { limit = 20, seed_tracks } = req.query;
+    const userId = req.user.id;
+
+    const recommendations = await recommendationService.get(userId, {
+      limit: parseInt(limit),
+      seedTracks: seed_tracks?.split(',')
+    });
+
+    res.json({ success: true, data: recommendations });
+  } catch (error) {
+    logger.error('Recommendation error:', { userId: req.user?.id, error: error.message });
+    res.status(500).json({ success: false, error: 'Failed to generate recommendations' });
+  }
+});
+
+module.exports = router;
+```
+
+#### Python (Scripts/ML)
+- **Style**: Follow PEP 8
+- **Type Hints**: Mandatory for all function signatures
+- **Docstrings**: Google-style docstrings for all public functions/classes
+- **Async**: Use async/await for I/O operations
+- **Error Handling**: Specific exception types with proper logging
+
+**Python ML Pattern:**
+```python
+import logging
+from typing import List, Optional, Dict, Any
+
+logger = logging.getLogger(__name__)
+
+def get_spotify_recommendations(
+    user_id: str,
+    seed_tracks: List[str],
+    target_features: Optional[Dict[str, float]] = None,
+    limit: int = 20
+) -> List[Dict[str, Any]]:
+    """Get personalized Spotify recommendations.
+
+    Args:
+        user_id: Spotify user ID
+        seed_tracks: List of seed track IDs (max 5)
+        target_features: Optional target audio features
+        limit: Number of recommendations to return
+
+    Returns:
+        List of recommended track dictionaries
+
+    Raises:
+        ValueError: If seed_tracks is empty or limit is invalid
+        SpotifyAPIError: If Spotify API call fails
+    """
+    if not seed_tracks:
+        raise ValueError("seed_tracks cannot be empty")
+    if not 1 <= limit <= 100:
+        raise ValueError("limit must be between 1 and 100")
+
+    try:
+        # Implementation
+        ...
+    except Exception as e:
+        logger.error(f"Failed to get recommendations for user {user_id}: {e}")
+        raise
+```
+
+### API Design
+- RESTful conventions at `/api/v1/`
+- Consistent error responses: `{ success: false, error: 'message' }`
+- Consistent success responses: `{ success: true, data: {...} }`
+- Authentication via JWT Bearer tokens
+- Spotify OAuth 2.0 (Authorization Code Flow with PKCE)
+
+### Database Patterns
+
+#### MongoDB (Primary)
+```javascript
+const mongoose = require('mongoose');
+
+const ListeningHistorySchema = new mongoose.Schema({
+  userId: { type: String, required: true, index: true },
+  trackId: { type: String, required: true },
+  playedAt: { type: Date, default: Date.now },
+  audioFeatures: {
+    danceability: Number,
+    energy: Number,
+    valence: Number,
+    tempo: Number
+  }
+}, { timestamps: true });
+
+// Compound index for efficient queries
+ListeningHistorySchema.index({ userId: 1, playedAt: -1 });
+```
+
+### Testing Standards
+
+#### Jest (JavaScript)
+```javascript
+const RecommendationService = require('../../src/services/RecommendationService');
+
+describe('RecommendationService', () => {
+  let service;
+  const mockDb = { getUserHistory: jest.fn() };
+  const mockSpotify = { getRecommendations: jest.fn() };
+
+  beforeEach(() => {
+    service = new RecommendationService({ db: mockDb, spotify: mockSpotify });
+    jest.clearAllMocks();
+  });
+
+  test('returns personalized recommendations', async () => {
+    mockDb.getUserHistory.mockResolvedValue(mockHistory);
+    mockSpotify.getRecommendations.mockResolvedValue(mockTracks);
+
+    const result = await service.getRecommendations('user123', { limit: 10 });
+
+    expect(result).toHaveLength(10);
+    expect(result[0]).toHaveProperty('trackId');
+  });
+});
+```
+
+#### pytest (Python)
+```python
+import pytest
+from scripts.ml.collaborative_filter import CollaborativeFilter
+
+def test_collaborative_filtering_recommendations(mock_listening_matrix):
+    """Test collaborative filtering returns valid recommendations."""
+    cf = CollaborativeFilter(n_recommendations=10)
+    cf.fit(mock_listening_matrix)
+
+    recommendations = cf.predict(user_id='user123')
+
+    assert len(recommendations) == 10
+    assert all(isinstance(r, str) for r in recommendations)
+```
+
+## Spotify Integration
+
+### Key Patterns
+```javascript
+// Spotify Web API service pattern
+class SpotifyService {
+  async getUserTopTracks(userId, timeRange = 'medium_term') {
+    const token = await this.getValidToken(userId);
+    return this.client.getMyTopTracks({ time_range: timeRange, limit: 50 }, token);
+  }
+
+  async getAudioFeatures(trackIds) {
+    // Cache in Redis, expire after 24h
+    const cached = await redis.get(`features:${trackIds.join(',')}`);
+    if (cached) return JSON.parse(cached);
+
+    const features = await this.client.getAudioFeaturesForTracks(trackIds);
+    await redis.setEx(`features:${trackIds.join(',')}`, 86400, JSON.stringify(features));
+    return features;
+  }
+}
+```
+
+### OAuth Flow
+- Authorization Code Flow with PKCE
+- Token storage in MongoDB (encrypted with `ENCRYPTION_KEY`)
+- Automatic token refresh via middleware
+
+## CI/CD
+
+### GitHub Actions Workflows
+
+**CI** (`.github/workflows/ci.yml`):
+- Triggered on: Push to main, Pull Requests
+- Steps: Install deps → Lint → Test → Build
+
+**Security Scan** (`.github/workflows/security-scan.yml`):
+- npm audit, pip safety check
+- CodeQL static analysis
+
+**Running Locally:**
 ```bash
 # Install dependencies
 npm install
 pip install -r requirements.txt
 
-# Configure environment
-cp .env.example .env
+# Run JavaScript tests
+npm test
 
-# Start development
-npm start  # Main app on http://localhost:3000
-npm run mcp-server  # MCP server on http://localhost:3001
-npm run dev  # Development mode with hot reloading
+# Run Python tests
+pytest tests/
+
+# Lint
+npm run lint
 ```
 
-## 🤖 MCP Server Ecosystem Integration
+## Monitoring & Debugging
 
-### Community MCP Servers Integrated
+### Health Checks
+```bash
+# API health check
+curl http://localhost:3000/health
 
-#### 1. Package Management Server (sammcj/mcp-package-version)
-```javascript
-// Automated package version management
-const packageMCP = {
-  server: 'sammcj/mcp-package-version',
-  capabilities: ['version-checking', 'security-scanning', 'dependency-updates'],
-  integration: 'automated dependency management with security validation'
-};
+# Check Spotify token status
+curl -H "Authorization: Bearer <JWT>" http://localhost:3000/api/v1/auth/status
 ```
 
-#### 2. Code Sandbox Server (bewt85/mcp-deno-sandbox)
-```typescript
-// Secure code execution environment
-interface CodeSandboxMCP {
-  server: 'bewt85/mcp-deno-sandbox';
-  features: {
-    languages: ['TypeScript', 'JavaScript', 'Python'];
-    security: 'isolated execution environment';
-    permissions: 'explicit permission controls';
-  };
-}
-```
-
-#### 3. Analytics & Telemetry Server (shinzo-labs/shinzo-ts)
-```javascript
-// Advanced analytics with OpenTelemetry
-const analyticsMCP = {
-  server: 'shinzo-labs/shinzo-ts',
-  features: ['performance-monitoring', 'user-analytics', 'system-telemetry'],
-  integration: 'real-time insights and optimization recommendations'
-};
-```
-
-#### 4. Browser Automation Server (playcanvas/editor-mcp-server)
-```typescript
-// Enhanced browser automation capabilities
-interface BrowserMCP {
-  server: 'playcanvas/editor-mcp-server';
-  capabilities: ['ui-testing', 'e2e-automation', 'visual-regression'];
-  spotify: 'web player automation and control';
-}
-```
-
-### MCP Development Patterns
-
-#### Automated Workflow Pattern
-```javascript
-// MCP-powered development workflow
-class MCPWorkflowManager {
-  constructor() {
-    this.servers = {
-      packageManager: new PackageManagementMCP(),
-      codeSandbox: new CodeSandboxMCP(),
-      analytics: new AnalyticsMCP(),
-      browserAutomation: new BrowserMCP(),
-      filesystem: new FilesystemMCP()
-    };
-  }
-  
-  async executeWorkflow(workflowType, context) {
-    switch (workflowType) {
-      case 'code-analysis':
-        return await this.performCodeAnalysis(context);
-      case 'testing-automation':
-        return await this.runAutomatedTests(context);
-      case 'deployment-validation':
-        return await this.validateDeployment(context);
-      case 'performance-optimization':
-        return await this.optimizePerformance(context);
-    }
-  }
-  
-  async performCodeAnalysis(context) {
-    // 1. Check package versions and security
-    const packageResults = await this.servers.packageManager.analyze(context.packages);
-    
-    // 2. Execute code in sandbox for validation
-    const sandboxResults = await this.servers.codeSandbox.validate(context.code);
-    
-    // 3. Collect performance telemetry
-    const analyticsResults = await this.servers.analytics.monitor(context.metrics);
-    
-    // 4. Generate comprehensive report
-    return this.generateReport({
-      packages: packageResults,
-      validation: sandboxResults,
-      analytics: analyticsResults
-    });
-  }
-}
-```
-
-#### MCP Server Configuration Pattern
-```typescript
-// MCP server configuration and management
-interface MCPServerConfig {
-  server: string;
-  version: string;
-  capabilities: string[];
-  authentication?: {
-    type: 'api-key' | 'oauth' | 'none';
-    credentials?: Record<string, string>;
-  };
-  healthCheck: {
-    endpoint: string;
-    interval: number;
-    timeout: number;
-  };
-}
-
-class MCPServerManager {
-  async registerServer(config: MCPServerConfig) {
-    // Validate server capabilities
-    await this.validateCapabilities(config);
-    
-    // Set up authentication
-    if (config.authentication) {
-      await this.setupAuthentication(config);
-    }
-    
-    // Configure health monitoring
-    this.setupHealthMonitoring(config);
-    
-    // Register with orchestrator
-    return await this.orchestrator.register(config);
-  }
-}
-```
-
-## 🚨 Critical Coding Guidelines for Copilot
-
-### Security Requirements
-1. **Never suggest hardcoded API keys** - Always use environment variables like `process.env.SPOTIFY_CLIENT_ID`
-2. **Validate all inputs** - Sanitize user data and API responses
-3. **Use HTTPS** - Ensure secure communication in production
-4. **Implement rate limiting** - Protect against API abuse
-5. **Follow OAuth best practices** - Secure token handling and refresh
-
-### Architecture Principles
-1. **Modular Design** - Keep components loosely coupled
-2. **Error Handling** - Implement comprehensive try/catch blocks and logging
-3. **Scalability** - Design for horizontal scaling and high availability
-4. **Testing** - Suggest unit tests and integration tests for new code
-5. **Documentation** - Include JSDoc comments for functions and complex logic
-
-### Code Quality Standards
-- **JavaScript**: Follow ESLint configuration, use modern ES6+ features, async/await patterns
-- **Python**: Follow PEP 8, use type hints, implement proper error handling
-- **Git**: Use conventional commit messages
-- **Performance**: Optimize database queries, implement caching where appropriate
-
-## 🎵 Core Feature Implementation Patterns
-
-### 1. Spotify API Integration Pattern
-
-When suggesting Spotify API code, use this pattern:
-
-```javascript
-// OAuth authentication flow
-async function authenticateUser(authCode) {
-    try {
-        const tokenResponse = await fetch('https://accounts.spotify.com/api/token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': `Basic ${Buffer.from(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`).toString('base64')}`
-            },
-            body: new URLSearchParams({
-                grant_type: 'authorization_code',
-                code: authCode,
-                redirect_uri: process.env.SPOTIFY_REDIRECT_URI
-            })
-        });
-        
-        if (!tokenResponse.ok) {
-            throw new Error(`Spotify auth failed: ${tokenResponse.status}`);
-        }
-        
-        return await tokenResponse.json();
-    } catch (error) {
-        console.error('Spotify authentication error:', error);
-        throw new Error('Authentication failed');
-    }
-}
-
-// API request with error handling
-async function makeSpotifyRequest(endpoint, accessToken, options = {}) {
-    const url = `https://api.spotify.com/v1${endpoint}`;
-    const response = await fetch(url, {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            ...options.headers
-        },
-        ...options
-    });
-    
-    if (response.status === 429) {
-        // Handle rate limiting
-        const retryAfter = response.headers.get('Retry-After');
-        throw new Error(`Rate limited. Retry after ${retryAfter} seconds`);
-    }
-    
-    if (!response.ok) {
-        throw new Error(`Spotify API error: ${response.status} ${response.statusText}`);
-    }
-    
-    return await response.json();
-}
-```
-
-### 2. Machine Learning Recommendation Pattern
-
-When suggesting ML code, use this pattern:
-
-```python
-import pandas as pd
-import numpy as np
-from typing import List, Dict, Any
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.decomposition import NMF
-
-class RecommendationEngine:
-    def __init__(self):
-        self.user_item_matrix = None
-        self.item_features = None
-        self.model = None
-    
-    def load_data(self, csv_path: str) -> pd.DataFrame:
-        """Load and preprocess listening history data"""
-        try:
-            df = pd.read_csv(csv_path)
-            # Ensure required columns exist
-            required_cols = ['user_id', 'track_id', 'play_count']
-            if not all(col in df.columns for col in required_cols):
-                raise ValueError(f"CSV must contain columns: {required_cols}")
-            return df
-        except Exception as e:
-            print(f"Error loading data: {e}")
-            return pd.DataFrame()
-    
-    def train_collaborative_filter(self, interaction_data: pd.DataFrame):
-        """Train collaborative filtering model"""
-        try:
-            # Create user-item matrix
-            self.user_item_matrix = interaction_data.pivot_table(
-                index='user_id', 
-                columns='track_id', 
-                values='play_count', 
-                fill_value=0
-            )
-            
-            # Apply matrix factorization
-            self.model = NMF(n_components=50, random_state=42)
-            self.model.fit(self.user_item_matrix)
-            
-            return True
-        except Exception as e:
-            print(f"Training error: {e}")
-            return False
-    
-    def get_recommendations(self, user_id: str, n_recommendations: int = 10) -> List[Dict[str, Any]]:
-        """Generate personalized recommendations"""
-        try:
-            if self.model is None:
-                return []  # Handle cold start
-            
-            # Get user vector
-            if user_id not in self.user_item_matrix.index:
-                return []  # Handle cold start
-            
-            user_vector = self.user_item_matrix.loc[user_id].values.reshape(1, -1)
-            user_features = self.model.transform(user_vector)
-            
-            # Calculate recommendations
-            item_features = self.model.components_
-            scores = cosine_similarity(user_features, item_features.T)[0]
-            
-            # Get top recommendations
-            top_indices = np.argsort(scores)[::-1][:n_recommendations]
-            track_ids = self.user_item_matrix.columns[top_indices]
-            
-            recommendations = []
-            for i, track_id in enumerate(track_ids):
-                recommendations.append({
-                    'track_id': track_id,
-                    'score': float(scores[top_indices[i]]),
-                    'rank': i + 1
-                })
-            
-            return recommendations
-        except Exception as e:
-            print(f"Recommendation error: {e}")
-            return []
-```
-
-### 3. Conversational AI Pattern
-
-When suggesting chat interface code, use this pattern:
-
-```javascript
-class ChatInterface {
-    constructor() {
-        this.providers = {
-            openai: new OpenAIProvider(),
-            gemini: new GeminiProvider(),
-            mock: new MockProvider()
-        };
-        this.currentProvider = process.env.LLM_PROVIDER || 'mock';
-    }
-    
-    async sendMessage(message, context = {}) {
-        try {
-            // Parse musical intent first
-            const intent = this.parseMusicalIntent(message);
-            
-            // Generate contextual prompt
-            const prompt = this.buildMusicPrompt(message, intent, context);
-            
-            // Get response from LLM provider
-            const provider = this.providers[this.currentProvider];
-            const response = await provider.generateResponse(prompt);
-            
-            // Process response for music recommendations
-            const processedResponse = await this.processMusicalResponse(response, intent);
-            
-            return {
-                message: processedResponse.text,
-                recommendations: processedResponse.tracks,
-                intent: intent,
-                provider: this.currentProvider
-            };
-        } catch (error) {
-            console.error('Chat error:', error);
-            // Fallback to mock provider
-            if (this.currentProvider !== 'mock') {
-                this.currentProvider = 'mock';
-                return await this.sendMessage(message, context);
-            }
-            throw new Error('Chat service unavailable');
-        }
-    }
-    
-    parseMusicalIntent(message) {
-        const intents = {
-            genre: /(?:play|find|suggest|recommend).*?(rock|pop|jazz|classical|hip.?hop|electronic|country|folk|metal|blues)/i,
-            mood: /(?:feeling|mood|want something).*?(happy|sad|energetic|calm|angry|romantic|chill|upbeat)/i,
-            activity: /(?:while|during|for).*?(workout|study|sleep|drive|work|party|relax)/i,
-            artist: /(?:by|from|artist).*?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/,
-            discovery: /(?:discover|explore|new|different|surprise)/i
-        };
-        
-        const extracted = {};
-        for (const [key, pattern] of Object.entries(intents)) {
-            const match = message.match(pattern);
-            if (match) {
-                extracted[key] = match[1] || true;
-            }
-        }
-        
-        return extracted;
-    }
-    
-    buildMusicPrompt(message, intent, context) {
-        const systemPrompt = `You are EchoTune AI, a music recommendation expert. 
-        Analyze the user's request and provide personalized music suggestions.
-        
-        User Context:
-        - Recent listening: ${context.recentTracks || 'Unknown'}
-        - Favorite genres: ${context.topGenres || 'Unknown'}
-        - Time of day: ${new Date().getHours()}
-        
-        Detected Intent: ${JSON.stringify(intent)}
-        
-        Provide a conversational response with specific track/artist recommendations.`;
-        
-        return {
-            system: systemPrompt,
-            user: message
-        };
-    }
-}
-```
-
-### 4. Database Operations Pattern
-
-When suggesting database code, use this pattern:
-
-```javascript
-const { MongoClient } = require('mongodb');
-
-class DatabaseManager {
-    constructor() {
-        this.client = null;
-        this.db = null;
-    }
-    
-    async connect() {
-        try {
-            this.client = new MongoClient(process.env.MONGODB_URI, {
-                useUnifiedTopology: true,
-                maxPoolSize: 10,
-                serverSelectionTimeoutMS: 5000,
-            });
-            
-            await this.client.connect();
-            this.db = this.client.db('echotune');
-            console.log('Connected to MongoDB');
-            return true;
-        } catch (error) {
-            console.error('MongoDB connection error:', error);
-            return false;
-        }
-    }
-    
-    async saveUserListeningHistory(userId, tracks) {
-        try {
-            const collection = this.db.collection('listening_history');
-            const documents = tracks.map(track => ({
-                userId,
-                trackId: track.id,
-                trackName: track.name,
-                artist: track.artists[0]?.name,
-                playedAt: new Date(track.played_at),
-                features: track.audio_features,
-                createdAt: new Date()
-            }));
-            
-            const result = await collection.insertMany(documents, { ordered: false });
-            return result.insertedCount;
-        } catch (error) {
-            console.error('Error saving listening history:', error);
-            throw new Error('Failed to save listening history');
-        }
-    }
-    
-    async getUserRecommendations(userId, limit = 20) {
-        try {
-            const collection = this.db.collection('recommendations');
-            return await collection
-                .find({ userId })
-                .sort({ score: -1, createdAt: -1 })
-                .limit(limit)
-                .toArray();
-        } catch (error) {
-            console.error('Error fetching recommendations:', error);
-            return [];
-        }
-    }
-}
-```
-
-## 🛠️ Development Context Guidelines
-
-### When Suggesting New Features
-1. **Check existing files** - Look for similar implementations in `src/`, `scripts/`, or `mcp-server/`
-2. **Follow established patterns** - Maintain consistency with existing code style
-3. **Include error handling** - Always wrap async operations in try/catch
-4. **Add logging** - Include console.log for debugging and console.error for errors
-5. **Environment variables** - Use `.env` file with `.env.example` template
-
-### File Organization Suggestions
-- **Frontend modules**: Place in `src/` directory
-- **Python scripts**: Place in `scripts/` directory  
-- **MCP automation**: Place in `mcp-server/` directory
-- **Static assets**: Place in `static/` directory
-- **Configuration**: Use `.env` file with `.env.example` template
-
-### Testing Patterns
-```javascript
-// Jest test pattern for Node.js
-describe('SpotifyAPI', () => {
-    beforeEach(() => {
-        // Setup mocks
-        jest.clearAllMocks();
-    });
-    
-    it('should authenticate user successfully', async () => {
-        // Arrange
-        const mockResponse = { access_token: 'test_token' };
-        global.fetch = jest.fn().mockResolvedValue({
-            ok: true,
-            json: () => Promise.resolve(mockResponse)
-        });
-        
-        // Act
-        const result = await authenticateUser('test_code');
-        
-        // Assert
-        expect(result.access_token).toBe('test_token');
-        expect(fetch).toHaveBeenCalledWith(
-            'https://accounts.spotify.com/api/token',
-            expect.objectContaining({
-                method: 'POST',
-                headers: expect.objectContaining({
-                    'Authorization': expect.stringContaining('Basic')
-                })
-            })
-        );
-    });
-});
-```
-
-```python
-# pytest pattern for Python
-import pytest
-from unittest.mock import Mock, patch
-from scripts.recommendation_engine import RecommendationEngine
-
-@pytest.fixture
-def sample_data():
-    return pd.DataFrame({
-        'user_id': ['user1', 'user2', 'user1'],
-        'track_id': ['track1', 'track2', 'track3'],
-        'play_count': [5, 3, 8]
-    })
-
-def test_load_data_success(sample_data):
-    # Arrange
-    engine = RecommendationEngine()
-    
-    # Act
-    with patch('pandas.read_csv', return_value=sample_data):
-        result = engine.load_data('test.csv')
-    
-    # Assert
-    assert not result.empty
-    assert 'user_id' in result.columns
-```
-
-## 🚀 Production Deployment Context
-
-### Environment Variables to Reference
-```env
-# Core application
-NODE_ENV=production
-PORT=3000
-
-# Spotify API
-SPOTIFY_CLIENT_ID=your_client_id
-SPOTIFY_CLIENT_SECRET=your_client_secret
-SPOTIFY_REDIRECT_URI=https://yourdomain.com/callback
-
-# Database
-MONGODB_URI=mongodb+srv://...
-SUPABASE_URL=https://...
-SUPABASE_ANON_KEY=...
-
-# LLM Providers
-OPENAI_API_KEY=sk-...
-GEMINI_API_KEY=...
-LLM_PROVIDER=openai
-
-# MCP Server
-MCP_SERVER_PORT=3001
-```
-
-### Performance Optimization Patterns
-```javascript
-// Caching pattern
-const NodeCache = require('node-cache');
-const cache = new NodeCache({ stdTTL: 600 }); // 10 minutes
-
-async function getCachedSpotifyData(key, fetchFunction) {
-    const cached = cache.get(key);
-    if (cached) {
-        return cached;
-    }
-    
-    const data = await fetchFunction();
-    cache.set(key, data);
-    return data;
-}
-
-// Rate limiting pattern
-const rateLimit = require('express-rate-limit');
-
-const spotifyApiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
-    message: 'Too many Spotify API requests, try again later'
-});
-
-app.use('/api/spotify', spotifyApiLimiter);
-```
-
-## 🎯 Priority Development Areas
-
-When suggesting code improvements, prioritize:
-
-### High Priority
-1. **Spotify API Service Layer** - Robust, scalable API integration with proper error handling
-2. **Recommendation Engine** - Core ML algorithms for music suggestions
-3. **Chat Interface** - Natural language music discovery with fallback systems
-4. **Database Optimization** - Efficient data storage and retrieval with indexing
-
-### Medium Priority
-1. **MCP Server Enhancement** - Advanced browser automation capabilities
-2. **Analytics Dashboard** - User listening insights and visualizations
-3. **Mobile Optimization** - Responsive design improvements
-4. **Advanced ML Models** - Deep learning and neural network implementations
-
-## 🔍 Common Patterns and Anti-Patterns
-
-### ✅ Recommended Patterns
-- Use async/await instead of promises chains
-- Implement comprehensive error handling
-- Use environment variables for configuration
-- Include input validation for all user data
-- Add logging for debugging and monitoring
-- Use TypeScript-style JSDoc comments
-
-### ❌ Anti-Patterns to Avoid
-- Hardcoded API keys or secrets
-- Synchronous file operations in Node.js
-- Missing error handling in async functions
-- Direct database queries without connection pooling
-- Unvalidated user inputs
-- Missing rate limiting for external APIs
-
-## 📚 Context Resources
-
-- **Main README**: Contains comprehensive setup and usage instructions
-- **CODING_AGENT_GUIDE.md**: Detailed development workflows
-- **Database Architecture**: MongoDB collections and Supabase tables
-- **API Documentation**: Spotify Web API integration patterns
-- **MCP Server**: Browser automation capabilities
-
-## 🤝 Code Review Guidelines
-
-When suggesting code reviews:
-1. **Security**: Check for exposed credentials or vulnerabilities
-2. **Performance**: Identify potential bottlenecks or inefficiencies
-3. **Error Handling**: Ensure proper try/catch and fallback mechanisms
-4. **Testing**: Suggest unit tests for new functionality
-5. **Documentation**: Recommend JSDoc comments for complex functions
-
-## 🚀 MCP Server Usage Guidelines
-
-This repository has MCP servers configured for enhanced coding capabilities. See `docs/MCP_SETUP_GUIDE.md` for complete setup instructions.
-
-### Always Use Sequential Thinking
-
-For complex tasks, use the sequential-thinking MCP server to break down problems step-by-step before implementing:
-- Multi-file refactorings
-- New feature implementations
-- Complex algorithm design
-- Architecture decisions
-
-### Persist Important Decisions
-
-Use the memory MCP server to store:
-- Architecture decisions and rationale
-- Debugging patterns that worked
-- Project conventions and learnings
-- Important code patterns discovered
-
-### Consult Gemini for Critical Code
-
-For security-sensitive code, authentication, or complex algorithms:
-- Use the Gemini MCP server for a second opinion
-- Ask for security review of OAuth/auth code
-- Get performance optimization suggestions
-- Request code quality analysis
-
-### Leverage Browser Automation
-
-Use Playwright and Puppeteer MCP servers for:
-- E2E testing automation
-- Spotify Web Player integration testing
-- Screenshot capture for UI verification
-- Cross-browser compatibility testing
-
-### Research with Brave Search
-
-Use the Brave Search MCP server (2000 free queries/month) for:
-- Latest documentation lookup
-- Best practices research
-- Error message solutions
-- Technology comparisons
-
-### Available Custom Agents
-
-Specialized agents that leverage the MCP ecosystem:
-
-- **`@mcp-power-developer`** - Full-featured development with all MCP tools
-  - Use for: Complex coding tasks, multi-step implementations, code with Gemini review
-  
-- **`@gemini-consultant`** - Specialized AI code analysis
-  - Use for: Security reviews, code quality analysis, architecture decisions
-  
-- **`@research-assistant`** - Documentation and best practices research
-  - Use for: Documentation research, best practices lookup, technology comparisons
-
-### MCP Workflow Example
-
-```javascript
-// 1. Plan with sequential-thinking
-// "Break down the task of implementing OAuth refresh token logic"
-
-// 2. Check memory for similar patterns
-// "Recall previous OAuth implementation decisions"
-
-// 3. Research best practices
-// "Search for OAuth 2.0 refresh token best practices"
-
-// 4. Consult Gemini for security review
-// "Review this OAuth implementation for security vulnerabilities"
-
-// 5. Implement with filesystem
-// Write the code changes
-
-// 6. Test with Playwright
-// Automated E2E test for OAuth flow
-
-// 7. Store learnings in memory
-// "Store: Always use httpOnly cookies for refresh tokens"
-```
+### Common Issues
+1. **Spotify token expired**: Token refresh happens automatically via middleware
+2. **MongoDB connection**: Verify `MONGODB_URI` in `.env`
+3. **Rate limits**: Spotify API rate limits apply; retry with exponential backoff
+4. **MCP server issues**: Run `npm list -g` to verify MCP packages are installed
+
+## Documentation
+
+- **README.md**: Main project documentation
+- **docs/ARCHITECTURE.md**: System architecture
+- **docs/DEVELOPMENT.md**: Development setup guide
+- **.github/agents/README.md**: Agent quick reference
+- **.github/copilot/mcp.json**: MCP server configuration
+
+## Important Notes
+
+1. **Never commit secrets** - Use `.env` with environment variables
+2. **Spotify credentials** - Store in `.env`, never hardcode
+3. **Rate limiting** - Respect Spotify API limits (handle 429 errors)
+4. **MongoDB indexes** - Always add indexes for queried fields
+5. **Redis caching** - Cache expensive Spotify API calls (TTL: 1h-24h)
+6. **Use appropriate agents** for specialized tasks
+7. **Test with mock Spotify data** in unit tests
+8. **Follow async/await patterns** throughout the codebase
+
+## Pull Request Guidelines
+
+When creating or reviewing PRs:
+
+1. **Before Submitting:**
+   ```bash
+   npm test           # Run JavaScript tests
+   pytest tests/      # Run Python tests
+   npm run lint       # Lint check
+   npm audit          # Security audit
+   ```
+
+2. **PR Description Should Include:**
+   - Summary of changes
+   - Related issue numbers
+   - Testing performed
+   - Breaking changes (if any)
+   - Screenshots for UI changes
+
+3. **Code Review Checklist:**
+   - [ ] Code follows style guidelines
+   - [ ] Tests pass locally
+   - [ ] New tests added for new features
+   - [ ] Documentation updated
+   - [ ] No secrets in code
+   - [ ] Error handling is appropriate
+   - [ ] Spotify API rate limits handled
+   - [ ] MongoDB queries are efficient (indexes)
+
+## Getting Help
+
+- **Agent Docs**: `.github/agents/README.md`
+- **MCP Config**: `.github/copilot/mcp.json`
+- **Workflow Guides**: `.github/agents/CODING_WORKFLOW.md`
+- **Architecture**: `docs/ARCHITECTURE.md`
 
 ---
 
-**Remember**: EchoTune AI emphasizes production readiness, security, and user experience. Always suggest code that is scalable, maintainable, and follows industry best practices.
+**When in doubt**: Use the specialized agents! They have deep knowledge of their domains and can guide you effectively.
+
+**For Spotify-specific tasks**: The `api-developer` knows REST API patterns, `debug-detective` can trace OAuth issues, and `full-stack-developer` can implement end-to-end music features.
